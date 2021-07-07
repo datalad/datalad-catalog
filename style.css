@@ -1,15 +1,53 @@
 body {
-    font-family: Menlo, Consolas, monospace;
-    color: #444;
-  }
-  .item {
-    cursor: pointer;
-  }
-  .bold {
-    font-weight: bold;
-  }
-  ul {
-    list-style-type: none; /* Remove bullets */
-    padding-left: 1em;
-    line-height: 1.5em;
-  }
+  font-family: Menlo, Consolas, monospace;
+  color: #444;
+}
+
+.item {
+  cursor: pointer;
+  font-family: Menlo, Consolas, monospace;
+}
+.bold {
+  font-weight: bold;
+}
+
+.nav-item a {
+  color:#fba304;
+}
+.nav-item a:hover {
+  color:#af7714;
+}
+
+.subdataset {
+  color:#fba304;
+  text-decoration: underline;
+
+}
+.subdataset:hover {
+  color:#af7714;
+}
+
+
+
+body a {
+  color:#fba304;
+}
+body a:hover {
+  color:#af7714;
+}
+
+.modal i:hover {
+  cursor: pointer;
+}
+
+ul {
+  list-style-type: none; /* Remove bullets */
+  padding-left: 1em;
+  line-height: 1.5em;
+}
+li[class="item"]:nth-child(even) {
+  background-color:#eee;
+}
+li[class="item"]:nth-child(odd) {
+  background-color:#fff;
+}

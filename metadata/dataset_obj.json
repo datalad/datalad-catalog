@@ -1,0 +1,204 @@
+{
+    "id": "asdfghjkl",
+    "type": "dataset",
+    "short_name": "Ultrahigh_res_3D",
+    "name": "Ultrahigh resolution 3D cytoarchitectonic map of the human Corpus geniculatum mediale (CGM, MGB, MGBv, MGBd, MGBm, metathalamus)",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque condimentum tortor ac mi sollicitudin, vitae malesuada odio tincidunt. Vestibulum nec viverra metus. Maecenas efficitur orci dolor, quis auctor leo eleifend eget. Mauris congue, enim ut scelerisque condimentum, dui lorem varius ex, ut posuere libero magna eget lorem. Cras eu libero hendrerit, finibus ex ac, ultrices est. Morbi tempor ultricies congue. Vestibulum sit amet lacinia turpis. In feugiat eget purus nec laoreet.",
+    "version": "1.0.3",
+    "last_edited": "2021-04-27",
+    "doi": "https://doi.org/10.17863/cam.4898",
+    "url": "https://github.com/jsheunis/some_repo.git",
+    "license": {
+      "name": "CC-BY-4.0",
+      "url": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "authors": [
+      "Christian Schiffer",
+      "Kai Kiwitz",
+      "Andrea Brandstetter",
+      "Hartmut Mohlberg",
+      "Katrin Amunts",
+      "Timo Dickscheid"
+    ],
+    "keywords": [
+      "human",
+      "fMRI",
+      "task",
+      "signal-to-noise",
+      "picture viewing"
+    ],
+    "funding": [
+      {
+        "type": "MonetaryGrant",
+        "identifier": "BMBF 01GQ1411",
+        "funder": {
+          "id": "https://schema.datalad.org/organization#BMBF",
+          "name": "BMBF"
+        },
+        "fundedItem": {
+          "id": "https://schema.datalad.org/dataset-id#3a8648b3-7df8-413f-8efb-4d39040ac174"
+        },
+        "description": "This research was supported by a grant from the German Research Foundation (DFG) awarded to S. Pollmann and O. Speck (DFG PO 548/15-1). This research was, in part, also supported by the German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this research was supported by US-German CRCNS project, co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1411; NSF 1429999)."
+      },
+      {
+        "type": "MonetaryGrant",
+        "identifier": "NSF 1429999",
+        "funder": {
+          "id": "https://schema.datalad.org/organization#NSF",
+          "name": "NSF"
+        },
+        "fundedItem": {
+          "@id": "https://schema.datalad.org/dataset-id#3a8648b3-7df8-413f-8efb-4d39040ac174"
+        },
+        "description": "This research was supported by a grant from the German Research Foundation (DFG) awarded to S. Pollmann and O. Speck (DFG PO 548/15-1). This research was, in part, also supported by the German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this research was supported by US-German CRCNS project, co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1411; NSF 1429999)."
+      }
+    ],
+    "publications": [
+    ],
+    "children": [
+      {
+        "id": "asdfghjkl",
+        "type": "dataset",
+        "short_name": "Old_Mac",
+        "name": "Old MacDonald had a farm",
+        "description": "BLABLA Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque condimentum tortor ac mi sollicitudin, vitae malesuada odio tincidunt. Vestibulum nec viverra metus. Maecenas efficitur orci dolor, quis auctor leo eleifend eget. Mauris congue, enim ut scelerisque condimentum, dui lorem varius ex, ut posuere libero magna eget lorem. Cras eu libero hendrerit, finibus ex ac, ultrices est. Morbi tempor ultricies congue. Vestibulum sit amet lacinia turpis. In feugiat eget purus nec laoreet.",
+        "version": "1.0.0",
+        "last_edited": "2021-01-30",
+        "doi": "https://doi.org/10.17863/cam.4898",
+        "url": "https://github.com/jsheunis/some_repo2.git",
+        "license": {
+          "name": "CC-BY-4.0",
+          "url": "https://creativecommons.org/licenses/by/4.0/"
+        },
+        "authors": [
+          "Stephan Heunis",
+          "Kaas Koek"
+        ],
+        "keywords": [
+          "human"
+        ],
+        "funding": [
+          {
+            "type": "MonetaryGrant",
+            "identifier": "BMBF 01GQ1411",
+            "funder": {
+              "id": "https://schema.datalad.org/organization#BMBF",
+              "name": "BMBF"
+            },
+            "fundedItem": {
+              "id": "https://schema.datalad.org/dataset-id#3a8648b3-7df8-413f-8efb-4d39040ac174"
+            },
+            "description": "This research was supported by a grant from the German Research Foundation (DFG) awarded to S. Pollmann and O. Speck (DFG PO 548/15-1). This research was, in part, also supported by the German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this research was supported by US-German CRCNS project, co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1411; NSF 1429999)."
+          }
+        ],
+        "publications": [
+        ],
+        "children": [
+          {
+            "type": "directory",
+            "name": "sub-test",
+            "children": [
+              {
+                "type": "directory",
+                "name": "func",
+                "children": [
+                  {
+                    "type": "file",
+                    "name": "sub-test_task-rest_run-1_bold.nii.gz"
+                  },
+                  {
+                    "type": "file",
+                    "name": "sub-test_task-rest_run-2_bold.nii.gz"
+                  }
+                ]
+              },
+              {
+                "type": "file",
+                "name": "README666"
+              }
+            ]
+          },
+          {
+            "type": "file",
+            "name": "participants.tsv"
+          },
+          {
+            "type": "file",
+            "name": "anotherfile.json"
+          }
+  
+          
+        ]
+      },
+      {
+        "type": "directory",
+        "name": "sub-01",
+        "children": [
+          {
+            "type": "directory",
+            "name": "anat",
+            "children": [
+              {
+                "type": "file",
+                "name": "sub-01_T1w.nii.gz"
+              },
+              {
+                "type": "file",
+                "name": "sub-01_T1w.json"
+              }
+            ]
+          },
+          {
+            "type": "file",
+            "name": "README"
+          }
+        ]
+      },
+      {
+        "type": "directory",
+        "name": "sub-02",
+        "children": [
+          {
+            "type": "directory",
+            "name": "anat",
+            "children": [
+              {
+                "type": "file",
+                "name": "sub-02_T1w.nii.gz"
+              },
+              {
+                "type": "file",
+                "name": "sub-02_T1w.json"
+              }
+            ]
+          },
+          {
+            "type": "directory",
+            "name": "func",
+            "children": [
+              {
+                "type": "file",
+                "name": "sub-02_task-rest_run-1_bold.nii.gz"
+              },
+              {
+                "type": "file",
+                "name": "sub-02_task-rest_run-2_bold.nii.gz"
+              }
+            ]
+          },
+          {
+            "type": "file",
+            "name": "README2"
+          }
+        ]
+      },
+      {
+        "type": "file",
+        "name": "participants.tsv"
+      },
+      {
+        "type": "file",
+        "name": "task-rest_bold.json"
+      }
+    ]
+  }
