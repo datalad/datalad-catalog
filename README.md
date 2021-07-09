@@ -55,13 +55,3 @@ The frontend interface currently allows:
 ## Feedback / comments
 
 Please [create a new issue](https://github.com/jsheunis/data-browser-from-metadata/issues/new) if you have any feedback, comments, or requests.
-
-
-
-
-
-
-
-
-
-
