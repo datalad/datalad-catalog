@@ -25,9 +25,9 @@
     <script type="text/x-template" id="item-template">
       <li>
         <div :class="{bold: isFolder}" @click="toggle">
-          <span v-if="isFolder && isOpen"> <i class="far fa-folder-open"></i> {{ displayText }}</span>  <!-- <i class="fas fa-chevron-down"></i> -->
-          <span v-else-if="isFolder && !isOpen"> <i class="far fa-folder"></i> {{ displayText }}</span>  <!-- <i class="fas fa-chevron-right"></i> -->
-          <span v-else-if="isDataset"> <i class="fas fa-folder-plus"></i> <a class="subdataset" @click="selectDataset(item, item.id)">{{ displayText }}</a></span>   <!-- <i class="fas fa-chevron-right"></i>  -->
+          <span v-if="isFolder && isOpen"> <i class="far fa-folder-open"></i> {{ displayText }}</span>
+          <span v-else-if="isFolder && !isOpen"> <i class="far fa-folder"></i> {{ displayText }}</span>
+          <span v-else-if="isDataset"> <i class="fas fa-folder-plus"></i> <a class="subdataset" @click="selectDataset(item, item.id)">{{ displayText }}</a></span>
           <span v-else> <i class="far fa-file-alt"></i> {{ displayText }}</span>
         </div>
         <ul v-show="isOpen" v-if="isFolder">
@@ -40,7 +40,6 @@
   <body>
     <!-- Our application root element -->
     <b-container id="demo" >
-
       <b-container style="margin-top:20px;">
         <b-row>
           <b-col cols="9">
@@ -67,7 +66,6 @@
               <strong>Last edited:</strong> {{selectedDataset.last_edited}}&nbsp;
               <strong>DOI:</strong> <a :href="selectedDataset.doi" target="_blank">{{selectedDataset.doi.replace('https://doi.org/', '')}}</a>&nbsp; <!-- <img src="https://img.shields.io/badge/DOI-10.17863%2Fcam.4898-blue" alt="doi"> -->
               <strong>License:</strong> <a :href="selectedDataset.license.url" target="_blank">{{selectedDataset.license.name}}</a>&nbsp;
-
             </b-card-text>
             <hr>
             
