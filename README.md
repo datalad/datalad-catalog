@@ -6,6 +6,12 @@
 
 This is a single-page VueJS application that reads structured data from a local file (located at `metadata/dataset_obj.json`) and renders a somewhat standardized (meta)data browser interface from the structured data.
 
+## Online demo
+
+Navigate to [https://jsheunis.github.io/data-browser-from-metadata/frontend.html](https://jsheunis.github.io/data-browser-from-metadata/frontend.html) to view a live demo of the current WIP state of the frontend.
+
+This page builds from the `stephan-dev` branch.
+
 ## To run this locally
 
 ### Step 1 - Clone the repo and checkout the `stephan-dev` branch
