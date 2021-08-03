@@ -1,0 +1,69 @@
+{
+    "type": "dataset",
+    "root_dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609",
+    "root_dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758",
+    "dataset_path": "original/7T_multiresolution_fmri",
+    "dataset_id": "3a8648b3-7df8-413f-8efb-4d39040ac174",
+    "dataset_version": "10e23aafa8271f742e9022a3522d9a88d7fe30cf",
+    "extraction_time": 1626953061.5770829,
+    "name": "",
+    "short_name": "",
+    "description": "",
+    "last_edited": "",
+    "doi": "",
+    "url": "",
+    "license": {
+      "name": "",
+      "url": ""
+    },
+    "authors": [
+      {
+        "@id": "",
+        "@type": "",
+        "email": "",
+        "name": "",
+        "givenName": "",
+        "familyName": ""
+      }
+    ],
+    "keywords": [],
+    "funding": [
+      {
+        "type": "",
+        "identifier": "",
+        "funder": {
+          "id": "",
+          "name": ""
+        },
+        "fundedItem": {
+          "id": ""
+        },
+        "description": ""
+      }
+    ],
+    "publications": [
+      {
+        "type": "",
+        "headline": "",
+        "datePublished": 0,
+        "doi": "",
+        "author": [
+          {
+            "@id": ""
+          }
+        ],
+        "publication": {
+          "type": "",
+          "name": ""
+        }
+      }
+    ],
+    "subdatasets": [
+      {
+        "dataset_id": "",
+        "dataset_version": "",
+        "dataset_path": ""
+      }
+    ],
+    "children": []
+}

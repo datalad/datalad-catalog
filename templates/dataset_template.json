@@ -1,0 +1,69 @@
+{
+    "type": "dataset",
+    "root_dataset_id": "", 
+    "root_dataset_version": "",
+    "dataset_path": "",
+    "dataset_id": "",
+    "dataset_version": "",
+    "extraction_time": 0,
+    "name": "",
+    "short_name": "",
+    "description": "",
+    "last_edited": "",
+    "doi": "",
+    "url": "",
+    "license": {
+      "name": "",
+      "url": ""
+    },
+    "authors": [
+      {
+        "@id": "",
+        "@type": "",
+        "email": "",
+        "name": "",
+        "givenName": "",
+        "familyName": ""
+      }
+    ],
+    "keywords": [],
+    "funding": [
+      {
+        "type": "",
+        "identifier": "",
+        "funder": {
+          "id": "",
+          "name": ""
+        },
+        "fundedItem": {
+          "id": ""
+        },
+        "description": ""
+      }
+    ],
+    "publications": [
+      {
+        "type": "",
+        "headline": "",
+        "datePublished": 0,
+        "doi": "",
+        "author": [
+          {
+            "@id": ""
+          }
+        ],
+        "publication": {
+          "type": "",
+          "name": ""
+        }
+      }
+    ],
+    "subdatasets": [
+      {
+        "dataset_id": "",
+        "dataset_version": "",
+        "dataset_path": ""
+      }
+    ],
+    "children": []
+}

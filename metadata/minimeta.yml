@@ -1,0 +1,86 @@
+# Complete study metadata example conforming to ../schema/archive_metadata.yml
+study:
+  name: Intelligence in Rodents
+  purpose:
+    Identify what determines intelligence
+    in rodents and whether it is related
+    to food.
+  start_date: 31.10.1990
+  end_date: 2010-12-22
+  keyword:
+    - Rodent
+    - Intelligence boost
+    - Food
+  principal_investigator: a@fz-juelich.de
+  contributor:
+    - b@fz-juelich.de
+    - c@fz-juelich.de
+  funding: NIH study funds
+
+dataset:
+  name: Rodent-Intelligence Brainscans
+  location: https://bulk1/data/project/riskystudy
+  description:
+    Lorem ipsum dolor sit amet,
+    incidunt ut labore et dolore
+    nostrud exercitation ullamco
+  standard:
+    - dicom
+    - nifti
+    - bids
+  keyword:
+    - fMRI
+    - Rodents
+  author:
+    - a@fz-juelich.de
+    - b@fz-juelich.de
+  funding:
+    - DFG dataset funds
+    - NIH dataset funds
+
+publication:
+  - title: Food-based intelligence
+    author:
+      - a@fz-juelich.de
+      - c@fz-juelich.de
+    year: 1995
+    corresponding_author: a@fz-juelich.de
+    doi: doi:10.1002/0470841559.ch1
+    publication: Proceedings in rodents
+    volume: 23
+    issue: 4
+    pages: 11-15
+    publisher: Spraddison
+
+  - title: Rodent studies survey
+    author: a@fz-juelich.de
+    year: 2005
+
+person:
+  a@fz-juelich.de:
+    given_name: Hans
+    last_name: Glück
+    orcid-id: 1000-0002-4092-0609
+    title: Prof. Dr.
+    affiliation: FZ-Jülich
+    contact_information:
+      Used to work with X, but then went
+      to Australia to work with Koalas,
+      try calling +1 234 567 890
+
+  b@fz-juelich.de:
+     given_name: Irmgard
+     last_name: Glöckner
+     orcid-id: 2000-0002-4092-0247
+
+  c@fz-juelich.de:
+     given_name: Willy
+     last_name: Mann
+
+additional_information:
+  "Provide additional information that the requester wants to provide.
+
+   For example, additional info to publications.
+
+   Use as many lines as necessary
+  "

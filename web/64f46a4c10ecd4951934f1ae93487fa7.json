@@ -1,0 +1,356 @@
+{
+    "type": "dataset",
+    "dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609",
+    "dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758",
+    "extraction_time": 1627303285.9509099,
+    "short_name": "StudyForrest",
+    "name": "StudyForrest Datasets",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque condimentum tortor ac mi sollicitudin, vitae malesuada odio tincidunt. Vestibulum nec viverra metus. Maecenas efficitur orci dolor, quis auctor leo eleifend eget. Mauris congue, enim ut scelerisque condimentum, dui lorem varius ex, ut posuere libero magna eget lorem. Cras eu libero hendrerit, finibus ex ac, ultrices est. Morbi tempor ultricies congue. Vestibulum sit amet lacinia turpis. In feugiat eget purus nec laoreet.",
+    "last_edited": "",
+    "doi": "",
+    "url": "https://github.com/psychoinformatics-de/studyforrest-data",
+    "license": {
+      "name": "PDDL",
+      "url": "https://opendatacommons.org/licenses/pddl/1-0/"
+    },
+    "authors": [
+        {
+          "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk",
+          "@type": "Person",
+          "email": "ayan.sengupta@nottingham.ac.uk",
+          "name": " Ayan Sengupta",
+          "givenName": "Ayan",
+          "familyName": "Sengupta"
+        },
+        {
+          "@id": "https://schema.datalad.org/person#oliver.speck@ovgu.de",
+          "@type": "Person",
+          "email": "oliver.speck@ovgu.de",
+          "name": " Oliver Speck",
+          "givenName": "Oliver",
+          "familyName": "Speck"
+        },
+        {
+          "@id": "https://schema.datalad.org/person#renat.yakupov@ovgu.de",
+          "@type": "Person",
+          "email": "renat.yakupov@ovgu.de",
+          "name": " Renat Yakupov",
+          "givenName": "Renat",
+          "familyName": "Yakupov"
+        },
+        {
+          "@id": "https://schema.datalad.org/person#martin.kanowski@ovgu.de",
+          "@type": "Person",
+          "email": "martin.kanowski@ovgu.de",
+          "name": " Martin Kanowski",
+          "givenName": "Martin",
+          "familyName": "Kanowski"
+        },
+        {
+          "@id": "https://schema.datalad.org/person#claus.tempelmann@ovgu.de",
+          "@type": "Person",
+          "email": "claus.tempelmann@ovgu.de",
+          "name": " Claus Tempelmann",
+          "givenName": "Claus",
+          "familyName": "Tempelmann"
+        },
+        {
+          "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de",
+          "@type": "Person",
+          "email": "stefan.pollmann@ovgu.de",
+          "name": " Stefan Pollmann",
+          "givenName": "Stefan",
+          "familyName": "Pollmann"
+        },
+        {
+          "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de",
+          "@type": "Person",
+          "email": "m.hanke@fz-juelich.de",
+          "name": "Prof. Dr.  Michael Hanke",
+          "givenName": "Michael",
+          "familyName": "Hanke",
+          "honorificSuffix": "Prof. Dr."
+        },
+        {
+          "@id": "https://schema.datalad.org/person#Joerg.Stadler@ifn-magdeburg.de",
+          "@type": "Person",
+          "email": "Joerg.Stadler@ifn-magdeburg.de",
+          "name": " Jörg Stadler",
+          "givenName": "Jörg",
+          "familyName": "Stadler"
+        },
+        {
+          "@id": "https://schema.datalad.org/person#michael@hoffmann@med.ovgu.de",
+          "@type": "Person",
+          "email": "michael@hoffmann@med.ovgu.de",
+          "name": " Michael Hoffmann",
+          "givenName": "Michael",
+          "familyName": "Hoffmann"
+        },
+        {
+          "@id": "https://schema.datalad.org/person#florian.baumgartner@ovgu.de",
+          "@type": "Person",
+          "email": "florian.baumgartner@ovgu.de",
+          "name": " Florian J. Baumgartner",
+          "givenName": "Florian J.",
+          "familyName": "Baumgartner"
+        },
+        {
+          "@id": "https://schema.datalad.org/person#falko.kaule@med.ovgu.de",
+          "@type": "Person",
+          "email": "falko.kaule@med.ovgu.de",
+          "name": " Falko R. Kaule",
+          "givenName": "Falko R.",
+          "familyName": "Kaule"
+        },
+        {
+          "@id": "https://schema.datalad.org/person#vittorio.iacovella@gmail.com",
+          "@type": "Person",
+          "email": "vittorio.iacovella@gmail.com",
+          "name": " Vittorio Iacovella",
+          "givenName": "Vittorio",
+          "familyName": "Iacovella"
+        },
+        {
+          "@id": "https://schema.datalad.org/person#swaroopgj@gmail.com",
+          "@type": "Person",
+          "email": "swaroopgj@gmail.com",
+          "name": " J. Swaroop Guntupalli",
+          "givenName": "J. Swaroop",
+          "familyName": "Guntupalli"
+        },
+        {
+          "@id": "https://schema.datalad.org/person#daniel.kottke@ovgu.de",
+          "@type": "Person",
+          "email": "daniel.kottke@ovgu.de",
+          "name": " Daniel Kottke",
+          "givenName": "Daniel",
+          "familyName": "Kottke"
+        },
+        {
+          "@id": "https://schema.datalad.org/person#c.haeusler@fz-juelich.de",
+          "@type": "Person",
+          "email": "c.haeusler@fz-juelich.de",
+          "name": "M.Sc.  Christian Häusler",
+          "givenName": "Christian",
+          "familyName": "Häusler",
+          "honorificSuffix": "M.Sc."
+        }
+    ],
+    "keywords": [
+        "human",
+        "fMRI",
+        "task",
+        "7T",
+        "3T",
+        "audio",
+        "visual",
+        "music",
+        "retinotopy",
+        "angiography",
+        "T1,T2"
+    ],
+    "funding": [
+        {
+            "type": "MonetaryGrant",
+            "identifier": "BMBF 01GQ1411",
+            "funder": {
+                "id": "https://schema.datalad.org/organization#BMBF",
+                "name": "BMBF"
+            },
+            "fundedItem": {
+                "id": "https://schema.datalad.org/dataset-id#3a8648b3-7df8-413f-8efb-4d39040ac174"
+            },
+            "description": "This research was supported by a grant from the German Research Foundation (DFG) awarded to S. Pollmann and O. Speck (DFG PO 548/15-1). This research was, in part, also supported by the German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this research was supported by US-German CRCNS project, co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1411; NSF 1429999)."
+        },
+        {
+            "type": "MonetaryGrant",
+            "identifier": "NSF 1429999",
+            "funder": {
+                "id": "https://schema.datalad.org/organization#NSF",
+                "name": "NSF"
+            },
+            "fundedItem": {
+                "@id": "https://schema.datalad.org/dataset-id#3a8648b3-7df8-413f-8efb-4d39040ac174"
+            },
+            "description": "This research was supported by a grant from the German Research Foundation (DFG) awarded to S. Pollmann and O. Speck (DFG PO 548/15-1). This research was, in part, also supported by the German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this research was supported by US-German CRCNS project, co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1411; NSF 1429999)."
+        }
+    ],
+    "publications": [
+        {
+          "type": "ScholarlyArticle",
+          "headline": "The effect of acquisition resolution on orientation decoding from V1: comparison of 3T and 7T",
+          "datePublished": 2018,
+          "doi": "10.1101/305417",
+          "author": [
+            {
+              "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#oliver.speck@ovgu.de"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#renat.yakupov@ovgu.de"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#martin.kanowski@ovgu.de"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#claus.tempelmann@ovgu.de"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de"
+            }
+          ],
+          "publication": {
+            "type": "PublicationEvent",
+            "name": "bioRxiv"
+          }
+        },
+        {
+          "@type": "ScholarlyArticle",
+          "headline": "Spatial band-pass filtering aids decoding musical genres from auditory cortex 7T fMRI",
+          "datePublished": 2018,
+          "doi": "10.12688/f1000research.13689.2",
+          "author": [
+            {
+              "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de"
+            }
+          ],
+          "publication": {
+            "type": "PublicationEvent",
+            "name": "F1000Research",
+            "volumeNumber": 7
+          }
+        },
+        {
+          "type": "ScholarlyArticle",
+          "headline": "The effect of acquisition resolution on orientation decoding from V1 BOLD fMRI at 7 Tesla",
+          "datePublished": 2017,
+          "pagination": "64-76",
+          "doi": "10.1016/j.neuroimage.2016.12.040",
+          "author": [
+            {
+              "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#renat.yakupov@ovgu.de"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#oliver.speck@ovgu.de"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de"
+            }
+          ],
+          "publication": {
+            "type": "PublicationEvent",
+            "name": "NeuroImage",
+            "volumeNumber": 148
+          }
+        },
+        {
+          "@type": "ScholarlyArticle",
+          "headline": "Ultra high-field multi-resolution fMRI data for orientation decoding in visual cortex",
+          "datePublished": 2017,
+          "pagination": "219-222",
+          "doi": "10.1016/j.dib.2017.05.014",
+          "author": [
+            {
+              "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#renat.yakupov@ovgu.de"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#oliver.speck@ovgu.de"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de"
+            },
+            {
+              "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de"
+            }
+          ],
+          "publication": {
+            "type": "PublicationEvent",
+            "name": "Data in Brief",
+            "volumeNumber": 13
+          }
+        }
+    ],
+    "subdatasets": [
+        {
+            "dataset_id": "0f66b1ba-e9a9-46fd-b9d9-2e64fe94d307",
+            "dataset_version": "c74b66cf37c0d4ed8914296c6d7792b2d25696aa",
+            "dataset_path": "code/conversion_qa"
+        },
+        {
+            "dataset_id": "7fcd8812-d0fe-11e7-8db2-a0369f7c647e",
+            "dataset_version": "2ccaa115543c21e6658950d1cb8cc3038f14272f",
+            "dataset_path": "derivative/aggregate_fmri_timeseries"
+        },
+        {
+            "dataset_id": "c8ec2919-493b-4af5-9271-cbe9ebd08c43",
+            "dataset_version": "74cd7ec0538448b05fb4d5f91119b279c5e9ab04",
+            "dataset_path": "derivative/aligned_mri"
+        },
+        {
+            "dataset_id": "3304e775-5f5f-435a-b68e-d98c9f5fb72a",
+            "dataset_version": "aaac44e047d375cd8f791b1b6fe2b739f02c83b2",
+            "dataset_path": "derivative/cortical_surfaces_freesurfer"
+        },
+        {
+            "dataset_id": "ceb007ac-ef05-4392-98d2-35c02a774a21",
+            "dataset_version": "688d8d8558fe847f4c1b19aed579745bcd6c7744",
+            "dataset_path": "derivative/image_space_transformations"
+        },
+        {
+            "dataset_id": "2d05f277-94b0-470b-8e11-4e56691d5b89",
+            "dataset_version": "78e04a00fedbe3e055f86c2f9127aa48e1133d55",
+            "dataset_path": "derivative/retinotopic_maps"
+        },
+        {
+            "dataset_id": "92e65958-4a5a-4c34-a4f4-ee070f7a123b",
+            "dataset_version": "203aa983534fc2b823ff4777a85f4f80d7a68656",
+            "dataset_path": "derivative/visual_areas"
+        },
+        {
+            "dataset_id": "5b1081d6-84d7-11e8-b00a-a0369fb55db0",
+            "dataset_version": "b623351b43eb2715331ac59ad4cf41682e84ff7d",
+            "dataset_path": "original/3T_multiresolution_fmri"
+        },
+        {
+            "dataset_id": "1882e2e6-fbbf-4ade-a65f-3a1615235f51",
+            "dataset_version": "e5d2f8368fc5f6717d8ef131041c6d943298d0c7",
+            "dataset_path": "original/3T_structural_mri"
+        },
+        {
+            "dataset_id": "3a8648b3-7df8-413f-8efb-4d39040ac174",
+            "dataset_version": "10e23aafa8271f742e9022a3522d9a88d7fe30cf",
+            "dataset_path": "original/7T_multiresolution_fmri"
+        },
+        {
+            "dataset_id": "5eaff716-54eb-11e8-803d-a0369f7c647e",
+            "dataset_version": "72f835ada046bd0479009ea0ff933b30a95b0076",
+            "dataset_path": "original/phase2"
+        },
+        {
+            "dataset_id": "45b9ab26-07fc-11e8-8c71-f0d5bf7b5561",
+            "dataset_version": "29dcce2b9477537b433996ebc342c531139e1d87",
+            "dataset_path": "stimulus/curated_annotations"
+        }
+    ]
+}

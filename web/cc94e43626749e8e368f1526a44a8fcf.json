@@ -1,0 +1,69 @@
+{
+    "type": "dataset",
+    "root_dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609",
+    "root_dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758",
+    "dataset_path": "original/3T_structural_mri",
+    "dataset_id": "1882e2e6-fbbf-4ade-a65f-3a1615235f51",
+    "dataset_version": "e5d2f8368fc5f6717d8ef131041c6d943298d0c7",
+    "extraction_time": 1626953820.7589839,
+    "name": "",
+    "short_name": "",
+    "description": "",
+    "last_edited": "",
+    "doi": "",
+    "url": "",
+    "license": {
+      "name": "",
+      "url": ""
+    },
+    "authors": [
+      {
+        "@id": "",
+        "@type": "",
+        "email": "",
+        "name": "",
+        "givenName": "",
+        "familyName": ""
+      }
+    ],
+    "keywords": [],
+    "funding": [
+      {
+        "type": "",
+        "identifier": "",
+        "funder": {
+          "id": "",
+          "name": ""
+        },
+        "fundedItem": {
+          "id": ""
+        },
+        "description": ""
+      }
+    ],
+    "publications": [
+      {
+        "type": "",
+        "headline": "",
+        "datePublished": 0,
+        "doi": "",
+        "author": [
+          {
+            "@id": ""
+          }
+        ],
+        "publication": {
+          "type": "",
+          "name": ""
+        }
+      }
+    ],
+    "subdatasets": [
+      {
+        "dataset_id": "",
+        "dataset_version": "",
+        "dataset_path": ""
+      }
+    ],
+    "children": []
+}
