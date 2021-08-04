@@ -38,18 +38,50 @@
       </li>
     </script>
 
+    <!-- Template for main page -->
+    <script type="text/x-template" id="main-template">
+      <div>
+        <br>
+        <h2 class="text-center">Browse datasets</h2>
+        <b-card border-variant="dark" v-for="sds in superdatasets" class="mb-2 p-0">
+          <b-card-body>
+            <b-row no-gutters align-v="center">
+              <b-col md="9">
+                <b-card-title><a @click="selectDataset(sds, sds.dataset_id)" class="stretched-link">{{sds.name}}</a></b-card-title>
+                <b-card-sub-title class="mb-2">
+                  <span v-for="author in sds.authors">{{author.givenName}} {{author.familyName}}, </span>
+                </b-card-sub-title>
+                <b-card-text>
+                  <strong>Version:</strong> {{sds.dataset_version.substring(0,7)}}&nbsp;
+                  <strong>Metadata extracted:</strong> {{sds.last_edited}}&nbsp;
+                  <strong>DOI:</strong> <a :href="sds.doi" target="_blank">{{sds.doi.replace("https://doi.org/", "")}}</a>&nbsp;
+                  <strong>License:</strong> <a :href="sds.license.url" target="_blank">{{sds.license.name}}</a>&nbsp;
+                </b-card-text>
+              </b-col>
+              <b-col md="3">
+                <b-card-text>
+                  <b-button pill disabled size="sm" variant="outline-dark" v-for="keyword in sds.keywords">{{keyword}}</b-button>
+                </b-card-text>
+              </b-col>
+            </b-row>
+          </b-card-body>
+        </b-card>
+      </div>
+    </script>
+
+
     <!-- Template for dataset page -->
     <script type="text/x-template" id="dataset-template">
       <div>
         <b-card border-variant="dark">
           <b-card-body>
-            <b-card-title>{{selectedDataset.name}}</b-card-title>
+            <b-card-title><a @click="gotoHome" class="newlink"><i class="fas fa-home"></i></a> / &mldr; / Superdataset / {{selectedDataset.name}}</b-card-title>
             <b-card-sub-title class="mb-2">
               <span v-for="author in selectedDataset.authors">{{author.givenName}} {{author.familyName}}, </span>
             </b-card-sub-title>
             <b-card-text>
               <strong>Version:</strong> {{selectedDataset.dataset_version.substring(0,7)}}&nbsp;
-              <strong>Last saved:</strong> {{selectedDataset.last_edited}}&nbsp;
+              <strong>Metadata extracted:</strong> {{selectedDataset.last_edited}}&nbsp;
               <strong>DOI:</strong> <a :href="selectedDataset.doi" target="_blank">{{selectedDataset.doi.replace("https://doi.org/", "")}}</a>&nbsp;
               <strong>License:</strong> <a :href="selectedDataset.license.url" target="_blank">{{selectedDataset.license.name}}</a>&nbsp;
             </b-card-text>
@@ -74,12 +106,13 @@
                 <b-button variant="outline-dark" size="sm" v-b-modal.modal-1><i class="fas fa-cloud-download-alt"></i> Download with DataLad</b-button>&nbsp;
                 <b-button variant="outline-dark" size="sm" href="#"><i class="fab fa-github"></i> View on GitHub</b-button>&nbsp;
                 <b-button variant="outline-dark" size="sm"><i class="fas fa-quote-right"></i> Cite</b-button>&nbsp;
-                <b-button variant="outline-dark" size="sm"><i class="fas fa-share"></i> Export metadata</b-button>&nbsp;
+                <b-button variant="outline-dark" size="sm" href="web/64f46a4c10ecd4951934f1ae93487fa7.json" download="ds_64f46a4c10ecd4951934f1ae93487fa7.json"><i class="fas fa-share"></i> Export metadata</b-button>&nbsp;
                 <b-modal id="modal-1" size="lg" 
                 header-bg-variant="light"
                 footer-bg-variant="light"
                 body-bg-variant="light"
-                body-text-variant="dark">
+                body-text-variant="dark"
+                ok-only>
                   <template #modal-header="{ close }">
                     <div class="d-block text-center">
                       <h3>Download with <img src="artwork/datalad_logo_wide.svg" width="100em"></h3>
@@ -130,8 +163,24 @@
                 </template>
                 <b-card v-for="ds in selectedDataset.subdatasets" border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
                   <template v-slot:header>
-                    <h5><a @click="selectDataset(ds, ds.id)" class="stretched-link">{{ds.dataset_path}}</a></h5>
-                    <small>{{ds.dataset_id}}</small>
+                    <b-row no-gutters>
+                      <b-col align-h="center" align-v="center" md="1">
+                        <span class="xxlfont"><i class="fas fa-database"></i></span>
+                      </b-col>
+                      <b-col class="text-muted" md="9">
+                        <h5><a @click="selectDataset(ds, ds.dataset_id)" class="stretched-link">{{ds.dataset_path}}</a></h5>
+                        <small>{{ds.dataset_id}}</small>
+                      </b-col>
+                      <b-col md="2">
+                        <small>
+                          <strong>Version:</strong> {{ds.dataset_version.substring(0,7)}} <br>
+                          <strong>Size:</strong> xxx <br>
+                          <strong>Files:</strong> yyy <br>
+                        </small>
+                      </b-col>
+                    </b-row>
+                    
+                    
                   </template>
                 </b-card>
               </b-tab>
@@ -152,11 +201,25 @@
                 <template v-slot:title>
                   <i class="fas fa-book"></i> Publications
                 </template>
-                <b-card no-body class="mb-1">
-                  <b-card-body>
-                    <b-card-text>
-                    </b-card-text>
-                  </b-card-body>
+                <b-card v-for="pub in selectedDataset.publications" border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
+                  <template v-slot:header>
+                    <b-row no-gutters>
+                      <b-col align-h="center" align-v="center" md="1">
+                        <span class="xxlfont"><i class="fas fa-book "></i></span>
+                      </b-col>
+                      <b-col class="text-muted" md="8">
+                        <h5>{{pub.headline}}</h5>
+                        <small><span v-for="author in pub.author">{{author.givenName}} {{author.familyName}}, </span></small><br>
+                      </b-col>
+                      <b-col md="3">
+                        <small>
+                          Published: {{pub.datePublished}} <br>
+                          DOI: <a :href="pub.doi" target="_blank">{{pub.doi.replace("https://doi.org/", "")}}</a> <br>
+                          Journal: {{pub.publication.name}}
+                        </small>
+                      </b-col>
+                    </b-row>
+                  </template>
                 </b-card>
               </b-tab>
               <b-tab>
@@ -191,17 +254,51 @@
 
   <!-- ### -->
   <!-- ### -->
+  <!-- ### -->
+  <!-- ### -->
+  <!-- ### -->
+  <!-- ### -->
+  <!-- ### -->
   <body>
     <!-- Our application root element -->
     <b-container id="demo" >
       <b-container style="margin-top:20px;">
-        <b-row>
+        <b-row align-v="end">
           <b-col cols="9">
-            <img src="artwork/View1.svg" class="d-inline-block align-middle" alt="datalad" style="width:100%;">
+            <a @click="gotoHome"><img src="artwork/View1.svg" class="d-inline-block" alt="datalad" style="width:100%;"></a>
           </b-col>
-          <b-col cols="3" style="text-align: right; vertical-align: text-bottom;">
-            <i class="fab fa-twitter"></i>
-            &nbsp;&nbsp;<i class="fab fa-github"></i>
+          <b-col cols="1"></b-col>
+          <b-col cols="2" align-h="end"> <!-- style="text-align: right; vertical-align: bottom;" -->
+            <!-- <b-avatar-group overlap="0.05" size="3rem">
+              <b-avatar href="#" src="artwork/readthedocs_logo.png"></b-avatar>
+              <b-avatar href="http://handbook.datalad.org/en/latest/" src="artwork/handbook_logo.svg"></b-avatar>
+              <b-avatar href="https://github.com/jsheunis/data-browser-from-metadata"><i class="fab fa-github"></i></b-avatar>
+              <b-avatar href="https://twitter.com/datalad"><i class="fab fa-twitter"></i></b-avatar>
+            </b-avatar-group> -->
+            <b-navbar toggleable="lg" type="light" variant="outline-dark">
+          
+              <b-navbar-toggle target="navbar-toggle-collapse">
+                <!-- <template #default="{ expanded }">
+                  <b-icon v-if="expanded" icon="chevron-bar-up"></b-icon>
+                  <b-icon v-else icon="chevron-bar-down"></b-icon>
+                </template> -->
+              </b-navbar-toggle>
+          
+              <b-collapse id="navbar-toggle-collapse" is-nav>
+                <b-navbar-nav class="ml-auto mb-0 xlfont">
+                  <b-nav-item v-b-tooltip.hover title="Read documentation" href="#"><i class="fas fa-file-alt"></i></b-nav-item>
+                  <b-nav-item v-b-tooltip.hover title="View code base" href="#"><i class="fab fa-github"></i></b-nav-item>
+                  <b-nav-item v-b-tooltip.hover title="Follow DataLad!" href="#"><i class="fab fa-twitter"></i></b-nav-item>
+                </b-navbar-nav>
+              </b-collapse>
+            </b-navbar>
+            <!-- <b-avatar-group overlap="0.05" size="3rem">
+              <b-avatar href="#" src="artwork/readthedocs_logo.png"></b-avatar>
+              <b-avatar href="http://handbook.datalad.org/en/latest/" src="artwork/handbook_logo.svg"></b-avatar>
+              <b-avatar href="https://github.com/jsheunis/data-browser-from-metadata"><i class="fab fa-github"></i></b-avatar>
+              <b-avatar href="https://twitter.com/datalad"><i class="fab fa-twitter"></i></b-avatar>
+            </b-avatar-group> -->
+            <!-- <h3><i class="fab fa-twitter"></i>&nbsp;&nbsp;<i class="fab fa-github"></i></h3> -->
           </b-col>
         </b-row>
       </b-container>

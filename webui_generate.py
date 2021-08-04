@@ -142,6 +142,5 @@ for i, ds in enumerate(datasets):
 # TODO: figure out automated updates to serving content somewhere
 # TODO: figure out CI
 # TODO: check for duplicate dataset objects (these exist due to multiple datalad extractors generating multiple metadata objects)
-# TODO: JS: check that new data isn't loaded twice ==> currently when doing a router.push() operation when clicking on subdataset, console logs twice:
-# beforerouteupdateGLOBAL vue_app.js:214:11
-# on reroute: dataset page
+# TODO: populate file structure ("children" field) in dataset blob...
+#       need to figure out how to work with directories

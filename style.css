@@ -27,6 +27,27 @@ body {
   color:#af7714;
 }
 
+.newlink {
+  color:#fba304;
+  text-decoration: underline;
+
+}
+.newlink:hover {
+  color:#af7714;
+}
+
+.xxlfont {
+  font-size: xx-large;
+}
+
+.xlfont {
+  font-size: x-large;
+}
+
+.lfont {
+  font-size: large;
+}
+
 
 
 body a {

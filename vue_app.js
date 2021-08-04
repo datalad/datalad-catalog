@@ -1,21 +1,21 @@
 /*
 
-BeforeMount: url refresh ==> check the path, push correct route
+TODO: use emit!!
+TODO: remove redundant methods from components / vue app instance
+TODO: add object and logic to track existence and content of dataset fields and resulting action (visibility, text to display, etc). E.g.:
+-- if there are no publications, hide empty publication card and show sentence "There are currently no publications associated with this dataset."
+-- show/hide components based on whether fields exist or are empty in json blob
+-- populate filler/adapted text (e.g. time of extraction ==> utc seconds converted to display date)
 
-router.beforeEach: only when route changes ==> 
-
-TODO: check if template can work per route. find correct way to pass data as props
 
 
 */
 
-
-
 // Data
 const metadata_dir = './metadata';
 const web_dir = './web';
-// const json_file = metadata_dir + '/dataset_obj.json';
-const json_file = web_dir + '/ed946e96a98769a46c7cb92b89d071a9.json';
+const superdatasets_file = metadata_dir + '/datasets.json';
+const json_file = metadata_dir + '/datasets.json';
 
 
 
@@ -46,24 +46,9 @@ Vue.component("tree-item", {
       if (this.isFolder) {
         this.isOpen = !this.isOpen;
       }
-    }, 
-    selectDataset(obj, objId) {
-      this.$root.selectedDataset = obj;
-      this.$root.dataPath.push(obj.short_name);
-      
     },
   }
 });
-
-
-// Vue.component("page-not-found", {
-//   template: "",
-//   created: function() {
-//       // Redirect outside the app using plain old javascript
-//       window.location.href = "404.html";
-//   }
-// });
-
 
 const datasetView = {
   template: "#dataset-template",
@@ -98,30 +83,60 @@ const datasetView = {
       hash = md5(id_and_version);
       router.push({ name: 'dataset', params: { blobId: hash } })
     },
+    gotoHome() {
+      router.push({ name: 'home'})
+    },
   }
 };
 
-// const datasetPage = {
-//   template: "",
-// };
-
 const mainPage = {
-  template: '<div><p>Main page</p></div>',
-  props:['selectedDataset'],
+  template: "#main-template",
+  data: function() {
+    return {
+      superdatasets: []
+    };
+  },
+  created: function () {
+    comp = this;
+    var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
+      rawFile.onreadystatechange = function () {
+          if(rawFile.readyState === 4) {
+              if(rawFile.status === 200 || rawFile.status == 0) {
+                  var allText = rawFile.responseText;
+                  comp.superdatasets = JSON.parse(allText);
+                  console.log("created and fetched")
+                  console.log(JSON.parse(allText))
+                  // console.log(this.superdatasets[0].dataset_version)
+              } else if (rawFile.status === 404) {
+                router.push({ name: '404'})
+              } else {
+                // TODO: figure out what to do here
+              }
+          }
+      }
+      rawFile.open("GET", superdatasets_file, false);
+      rawFile.send();
+  },
+  methods: {
+    selectDataset(obj, objId) {
+      id_and_version = obj.dataset_id + '-' + obj.dataset_version;
+      hash = md5(id_and_version);
+      router.push({ name: 'dataset', params: { blobId: hash } })
+    },
+    getSuperDatasets() {
+      
+    }
+  }
 };
 
 const notFound = {
   template: '<img src="artwork/404.svg" class="d-inline-block align-middle" alt="404-not-found" style="width:70%;">',
-  // created: function() {
-  //     // Redirect outside the app using plain old javascript
-  //     window.location.href = "404.html";
-  // }
 }
 
 const routes = [
   { path: '/', component: mainPage, name: 'home' },
   { path: '/dataset/:blobId', component: datasetView, name: 'dataset' },
-  { path: '*', component: notFound }
+  { path: '*', component: notFound, name: '404' }
 ];
 
 const router = new VueRouter({
@@ -183,17 +198,18 @@ var demo = new Vue({
                   app.easyDataFromFile = JSON.parse(allText);
                   app.selectedDataset = app.easyDataFromFile;
               } else if (rawFile.status === 404) {
-                console.log('FILE NOT FOUNDxxxx')
-                alert('Dataset not foundxxxx')
+                router.push({ name: '404'})
               } else {
-
+                // TODO: figure out what to do here
               }
           }
       }
       rawFile.open("GET", file, false);
       rawFile.send();
-    
-    }
+    },
+    gotoHome() {
+      router.push({ name: 'home'})
+    },
   },
   beforeMount(){
     console.log('beforeMount')
@@ -205,7 +221,6 @@ var demo = new Vue({
       file = json_file;
     }
     this.getJSONblob(file)
-
   },
   router
 });
@@ -215,7 +230,6 @@ router.beforeEach((to, from, next) => {
   if (to.name == 'dataset') {
     console.log('on reroute: dataset page')
     file = web_dir + '/' + to.params.blobId + '.json'
-    // this.getJSONblob(file)
     var app = demo;
     var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
     rawFile.onreadystatechange = function () {
@@ -225,10 +239,9 @@ router.beforeEach((to, from, next) => {
               app.easyDataFromFile = JSON.parse(allText);
               app.selectedDataset = app.easyDataFromFile;
           } else if (rawFile.status === 404) {
-            console.log('FILE NOT FOUNDglobal')
-            alert('Dataset not foundglobal')
+            router.push({ name: '404'})
           } else {
-
+            // TODO: figure out what to do here
           }
       }
     }
