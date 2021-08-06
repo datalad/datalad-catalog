@@ -1,0 +1,14 @@
+{
+    "name": ["dataset", "name"],
+    "description": ["dataset", "description"],
+    "doi": "",
+    "url": ["dataset", "url"],
+    "license": {
+      "name": "",
+      "url": ""
+    },
+    "authors": [],
+    "keywords": ["dataset", "keywords"],
+    "funding": ["dataset", "funder"],
+    "publications": []
+}

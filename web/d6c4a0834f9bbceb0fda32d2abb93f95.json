@@ -42,28 +42,8 @@
       }
     ],
     "publications": [
-      {
-        "type": "",
-        "headline": "",
-        "datePublished": 0,
-        "doi": "",
-        "author": [
-          {
-            "@id": ""
-          }
-        ],
-        "publication": {
-          "type": "",
-          "name": ""
-        }
-      }
     ],
     "subdatasets": [
-      {
-        "dataset_id": "",
-        "dataset_version": "",
-        "dataset_path": ""
-      }
     ],
     "children": []
 }

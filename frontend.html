@@ -49,7 +49,7 @@
               <b-col md="9">
                 <b-card-title><a @click="selectDataset(sds, sds.dataset_id)" class="stretched-link">{{sds.name}}</a></b-card-title>
                 <b-card-sub-title class="mb-2">
-                  <span v-for="author in sds.authors">{{author.givenName}} {{author.familyName}}, </span>
+                  <span v-for="(author, index) in sds.authors">{{author.givenName}} {{author.familyName}}<span v-if="index != sds.authors.length - 1">, </span></span>
                 </b-card-sub-title>
                 <b-card-text>
                   <strong>Version:</strong> {{sds.dataset_version.substring(0,7)}}&nbsp;
@@ -75,15 +75,15 @@
       <div>
         <b-card border-variant="dark">
           <b-card-body>
-            <b-card-title><a @click="gotoHome" class="newlink"><i class="fas fa-home"></i></a> / &mldr; / Superdataset / {{selectedDataset.name}}</b-card-title>
+            <b-card-title><a @click="gotoHome" class="newlink"><i class="fas fa-home"></i></a> / {{selectedDataset.name}}</b-card-title> <!-- &mldr; -->
             <b-card-sub-title class="mb-2">
-              <span v-for="author in selectedDataset.authors">{{author.givenName}} {{author.familyName}}, </span>
+              <span v-for="(author, index) in selectedDataset.authors">{{author.givenName}} {{author.familyName}}<span v-if="index != selectedDataset.authors.length - 1">, </span></span>
             </b-card-sub-title>
             <b-card-text>
               <strong>Version:</strong> {{selectedDataset.dataset_version.substring(0,7)}}&nbsp;
-              <strong>Metadata extracted:</strong> {{selectedDataset.last_edited}}&nbsp;
-              <strong>DOI:</strong> <a :href="selectedDataset.doi" target="_blank">{{selectedDataset.doi.replace("https://doi.org/", "")}}</a>&nbsp;
-              <strong>License:</strong> <a :href="selectedDataset.license.url" target="_blank">{{selectedDataset.license.name}}</a>&nbsp;
+              <strong>Metadata extracted:</strong> {{displayData.metadata_extracted}}&nbsp;
+              <strong>DOI:</strong> <a v-show="selectedDataset.doi" :href="selectedDataset.doi" target="_blank">{{selectedDataset.doi.replace("https://doi.org/", "")}}</a><span v-show="displayData.doi"><em>{{displayData.doi}}</em></span>&nbsp;
+              <strong>License:</strong> <a v-show="selectedDataset.license.name" :href="selectedDataset.license.url" target="_blank">{{selectedDataset.license.name}}</a><span v-show="displayData.license"><em>{{displayData.license}}</em></span>&nbsp;
             </b-card-text>
             <hr>
             <b-row no-gutters>
@@ -161,28 +161,29 @@
                 <template v-slot:title>
                   <i class="fas fa-list-ol"></i> Subdatasets
                 </template>
-                <b-card v-for="ds in selectedDataset.subdatasets" border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
-                  <template v-slot:header>
-                    <b-row no-gutters>
-                      <b-col align-h="center" align-v="center" md="1">
-                        <span class="xxlfont"><i class="fas fa-database"></i></span>
-                      </b-col>
-                      <b-col class="text-muted" md="9">
-                        <h5><a @click="selectDataset(ds, ds.dataset_id)" class="stretched-link">{{ds.dataset_path}}</a></h5>
-                        <small>{{ds.dataset_id}}</small>
-                      </b-col>
-                      <b-col md="2">
-                        <small>
-                          <strong>Version:</strong> {{ds.dataset_version.substring(0,7)}} <br>
-                          <strong>Size:</strong> xxx <br>
-                          <strong>Files:</strong> yyy <br>
-                        </small>
-                      </b-col>
-                    </b-row>
-                    
-                    
-                  </template>
-                </b-card>
+                <span v-if="!selectedDataset.subdatasets || !selectedDataset.subdatasets.length"><em>There are no subdatasets listed for the current dataset</em></span>
+                <span v-else v-for="ds in selectedDataset.subdatasets">
+                  <b-card border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
+                    <template v-slot:header>
+                      <b-row no-gutters>
+                        <b-col align-h="center" align-v="center" md="1">
+                          <span class="xxlfont"><i class="fas fa-database"></i></span>
+                        </b-col>
+                        <b-col class="text-muted" md="9">
+                          <h5><a @click="selectDataset(ds, ds.dataset_id)" class="stretched-link">{{ds.dataset_path}}</a></h5>
+                          <small>{{ds.dataset_id}}</small>
+                        </b-col>
+                        <b-col md="2">
+                          <small>
+                            <strong>Version:</strong> {{ds.dataset_version.substring(0,7)}} <br>
+                            <strong>Size:</strong> xxx <br>
+                            <strong>Files:</strong> yyy <br>
+                          </small>
+                        </b-col>
+                      </b-row>
+                    </template>
+                  </b-card>
+                </span>
               </b-tab>
               <b-tab>
                 <template v-slot:title>
@@ -201,26 +202,29 @@
                 <template v-slot:title>
                   <i class="fas fa-book"></i> Publications
                 </template>
-                <b-card v-for="pub in selectedDataset.publications" border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
-                  <template v-slot:header>
-                    <b-row no-gutters>
-                      <b-col align-h="center" align-v="center" md="1">
-                        <span class="xxlfont"><i class="fas fa-book "></i></span>
-                      </b-col>
-                      <b-col class="text-muted" md="8">
-                        <h5>{{pub.headline}}</h5>
-                        <small><span v-for="author in pub.author">{{author.givenName}} {{author.familyName}}, </span></small><br>
-                      </b-col>
-                      <b-col md="3">
-                        <small>
-                          Published: {{pub.datePublished}} <br>
-                          DOI: <a :href="pub.doi" target="_blank">{{pub.doi.replace("https://doi.org/", "")}}</a> <br>
-                          Journal: {{pub.publication.name}}
-                        </small>
-                      </b-col>
-                    </b-row>
-                  </template>
-                </b-card>
+                <span v-if="!selectedDataset.publications || !selectedDataset.publications.length"><em>There are no publications listed for the current dataset</em></span>
+                <span v-else v-for="pub in selectedDataset.publications">
+                  <b-card border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
+                    <template v-slot:header>
+                      <b-row no-gutters>
+                        <b-col align-h="center" align-v="center" md="1">
+                          <span class="xxlfont"><i class="fas fa-book "></i></span>
+                        </b-col>
+                        <b-col class="text-muted" md="8">
+                          <h5>{{pub.headline}}</h5>
+                          <small><span v-for="(author, index) in pub.author">{{author.givenName}} {{author.familyName}}<span v-if="index != pub.author.length - 1">, </span></span></small><br>
+                        </b-col>
+                        <b-col md="3">
+                          <small>
+                            Published: {{pub.datePublished}} <br>
+                            DOI: <a :href="pub.doi" target="_blank">{{pub.doi.replace("https://doi.org/", "")}}</a> <br>
+                            Journal: {{pub.publication.name}}
+                          </small>
+                        </b-col>
+                      </b-row>
+                    </template>
+                  </b-card>
+                </span>
               </b-tab>
               <b-tab>
                 <template v-slot:title>

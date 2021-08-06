@@ -7,8 +7,6 @@ TODO: add object and logic to track existence and content of dataset fields and 
 -- show/hide components based on whether fields exist or are empty in json blob
 -- populate filler/adapted text (e.g. time of extraction ==> utc seconds converted to display date)
 
-
-
 */
 
 // Data
@@ -16,8 +14,6 @@ const metadata_dir = './metadata';
 const web_dir = './web';
 const superdatasets_file = metadata_dir + '/datasets.json';
 const json_file = metadata_dir + '/datasets.json';
-
-
 
 // Component definition: recursive item in data tree
 Vue.component("tree-item", {
@@ -50,6 +46,7 @@ Vue.component("tree-item", {
   }
 });
 
+// Component definition: dataset view
 const datasetView = {
   template: "#dataset-template",
   props: {
@@ -60,6 +57,35 @@ const datasetView = {
       dataPath: [],
       showCopyTooltip: false,
     };
+  },
+  computed: {
+    displayData: function () {
+      // TODO: some of these methods/steps should be moved to the generatpr tool. e.g. shortname
+      dataset = this.selectedDataset;
+      disp_dataset = {};
+      // Populate short_name
+      if (!dataset.hasOwnProperty("short_name") || !dataset["short_name"]) {
+        disp_dataset["short_name"] = (dataset["name"].length > 30 ? dataset["name"].substring(0,30)+'...' : dataset["name"])
+      } else {
+        disp_dataset["short_name"] = dataset["short_name"]
+      }
+      // // Display breadcrums and dataset name
+      // if (!dataset.hasOwnProperty("root_dataset_id")) {
+      //   this.dataPath.push(dataset.short_name);
+      // } else {
+      // }
+      // DOI
+      if (!dataset.hasOwnProperty("doi") || !dataset["doi"]) {
+        disp_dataset["doi"] = "not available"
+      }
+      // License
+      if (!dataset.hasOwnProperty("license") || !dataset["license"].hasOwnProperty("name") || !dataset["license"]["name"]) {
+        disp_dataset["license"] = "not available"
+      }
+
+      disp_dataset.metadata_extracted = this.getDateFromUTCseconds(dataset.extraction_time);
+      return disp_dataset
+    }
   },
   methods: {
     copyCloneCommand(index) {
@@ -86,9 +112,19 @@ const datasetView = {
     gotoHome() {
       router.push({ name: 'home'})
     },
+    getDateFromUTCseconds(utcSeconds) {
+      // TODO: consider moving this functionality to generator tool
+      var d = new Date(0); // epoch date
+      d.setUTCSeconds(utcSeconds);
+      day = d.getDate();
+      month = d.getMonth();
+      year = d.getFullYear();
+      return year + '-' + (month > 9 ? month : '0' + month) + '-' + (day > 9 ? day : '0' + day)
+    }
   }
 };
 
+// Component definition: main view
 const mainPage = {
   template: "#main-template",
   data: function() {
@@ -129,16 +165,17 @@ const mainPage = {
   }
 };
 
+// Component definition: 404 view
 const notFound = {
   template: '<img src="artwork/404.svg" class="d-inline-block align-middle" alt="404-not-found" style="width:70%;">',
 }
 
+// Router definition
 const routes = [
   { path: '/', component: mainPage, name: 'home' },
   { path: '/dataset/:blobId', component: datasetView, name: 'dataset' },
   { path: '*', component: notFound, name: '404' }
 ];
-
 const router = new VueRouter({
   routes: routes,
   scrollBehavior (to, from, savedPosition) {
@@ -225,6 +262,7 @@ var demo = new Vue({
   router
 });
 
+// Router function to run before each navigation
 router.beforeEach((to, from, next) => {
   console.log('beforerouteupdateGLOBAL')
   if (to.name == 'dataset') {
@@ -253,6 +291,4 @@ router.beforeEach((to, from, next) => {
     console.log('on reroute: other page')
     next();
   }
-  // if (to.name !== 'Login' && !isAuthenticated) next({ name: 'Login' })
-  // else next()
-})
+});

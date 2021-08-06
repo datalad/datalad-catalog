@@ -59,11 +59,6 @@
       }
     ],
     "subdatasets": [
-      {
-        "dataset_id": "",
-        "dataset_version": "",
-        "dataset_path": ""
-      }
     ],
     "children": []
 }

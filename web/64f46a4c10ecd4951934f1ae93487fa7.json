@@ -4,7 +4,7 @@
     "dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758",
     "extraction_time": 1627303285.9509099,
     "short_name": "StudyForrest",
-    "name": "StudyForrest Datasets",
+    "name": "StudyForrest Dataset",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque condimentum tortor ac mi sollicitudin, vitae malesuada odio tincidunt. Vestibulum nec viverra metus. Maecenas efficitur orci dolor, quis auctor leo eleifend eget. Mauris congue, enim ut scelerisque condimentum, dui lorem varius ex, ut posuere libero magna eget lorem. Cras eu libero hendrerit, finibus ex ac, ultrices est. Morbi tempor ultricies congue. Vestibulum sit amet lacinia turpis. In feugiat eget purus nec laoreet.",
     "last_edited": "",
     "doi": "",
@@ -184,25 +184,61 @@
           "doi": "10.1101/305417",
           "author": [
             {
-              "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk"
+              "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk",
+              "@type": "Person",
+                "email": "ayan.sengupta@nottingham.ac.uk",
+                "name": " Ayan Sengupta",
+                "givenName": "Ayan",
+                "familyName": "Sengupta"
             },
             {
-              "@id": "https://schema.datalad.org/person#oliver.speck@ovgu.de"
+              "@id": "https://schema.datalad.org/person#oliver.speck@ovgu.de",
+              "@type": "Person",
+                "email": "oliver.speck@ovgu.de",
+                "name": " Oliver Speck",
+                "givenName": "Oliver",
+                "familyName": "Speck"
             },
             {
-              "@id": "https://schema.datalad.org/person#renat.yakupov@ovgu.de"
+              "@id": "https://schema.datalad.org/person#renat.yakupov@ovgu.de",
+              "@type": "Person",
+                "email": "renat.yakupov@ovgu.de",
+                "name": " Renat Yakupov",
+                "givenName": "Renat",
+                "familyName": "Yakupov"
             },
             {
-              "@id": "https://schema.datalad.org/person#martin.kanowski@ovgu.de"
+              "@id": "https://schema.datalad.org/person#martin.kanowski@ovgu.de",
+              "@type": "Person",
+                "email": "martin.kanowski@ovgu.de",
+                "name": " Martin Kanowski",
+                "givenName": "Martin",
+                "familyName": "Kanowski"
             },
             {
-              "@id": "https://schema.datalad.org/person#claus.tempelmann@ovgu.de"
+              "@id": "https://schema.datalad.org/person#claus.tempelmann@ovgu.de",
+              "@type": "Person",
+                "email": "claus.tempelmann@ovgu.de",
+                "name": " Claus Tempelmann",
+                "givenName": "Claus",
+                "familyName": "Tempelmann"
             },
             {
-              "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de"
+              "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de",
+              "@type": "Person",
+                "email": "stefan.pollmann@ovgu.de",
+                "name": " Stefan Pollmann",
+                "givenName": "Stefan",
+                "familyName": "Pollmann"
             },
             {
-              "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de"
+              "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de",
+              "@type": "Person",
+                "email": "m.hanke@fz-juelich.de",
+                "name": "Prof. Dr.  Michael Hanke",
+                "givenName": "Michael",
+                "familyName": "Hanke",
+                "honorificSuffix": "Prof. Dr."
             }
           ],
           "publication": {
@@ -217,13 +253,29 @@
           "doi": "10.12688/f1000research.13689.2",
           "author": [
             {
-              "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk"
+              "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk",
+              "@type": "Person",
+                "email": "ayan.sengupta@nottingham.ac.uk",
+                "name": " Ayan Sengupta",
+                "givenName": "Ayan",
+                "familyName": "Sengupta"
             },
             {
-              "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de"
+              "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de",
+              "@type": "Person",
+                "email": "stefan.pollmann@ovgu.de",
+                "name": " Stefan Pollmann",
+                "givenName": "Stefan",
+                "familyName": "Pollmann"
             },
             {
-              "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de"
+              "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de",
+              "@type": "Person",
+                "email": "m.hanke@fz-juelich.de",
+                "name": "Prof. Dr.  Michael Hanke",
+                "givenName": "Michael",
+                "familyName": "Hanke",
+                "honorificSuffix": "Prof. Dr."
             }
           ],
           "publication": {
@@ -240,19 +292,45 @@
           "doi": "10.1016/j.neuroimage.2016.12.040",
           "author": [
             {
-              "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk"
+              "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk",
+              "@type": "Person",
+                "email": "ayan.sengupta@nottingham.ac.uk",
+                "name": " Ayan Sengupta",
+                "givenName": "Ayan",
+                "familyName": "Sengupta"
             },
             {
-              "@id": "https://schema.datalad.org/person#renat.yakupov@ovgu.de"
+              "@id": "https://schema.datalad.org/person#renat.yakupov@ovgu.de",
+              "@type": "Person",
+                "email": "renat.yakupov@ovgu.de",
+                "name": " Renat Yakupov",
+                "givenName": "Renat",
+                "familyName": "Yakupov"
             },
             {
-              "@id": "https://schema.datalad.org/person#oliver.speck@ovgu.de"
+              "@id": "https://schema.datalad.org/person#oliver.speck@ovgu.de",
+              "@type": "Person",
+                "email": "oliver.speck@ovgu.de",
+                "name": " Oliver Speck",
+                "givenName": "Oliver",
+                "familyName": "Speck"
             },
             {
-              "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de"
+              "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de",
+              "@type": "Person",
+                "email": "stefan.pollmann@ovgu.de",
+                "name": " Stefan Pollmann",
+                "givenName": "Stefan",
+                "familyName": "Pollmann"
             },
             {
-              "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de"
+              "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de",
+              "@type": "Person",
+                "email": "m.hanke@fz-juelich.de",
+                "name": "Prof. Dr.  Michael Hanke",
+                "givenName": "Michael",
+                "familyName": "Hanke",
+                "honorificSuffix": "Prof. Dr."
             }
           ],
           "publication": {
@@ -269,19 +347,45 @@
           "doi": "10.1016/j.dib.2017.05.014",
           "author": [
             {
-              "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk"
+              "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk",
+              "@type": "Person",
+                "email": "ayan.sengupta@nottingham.ac.uk",
+                "name": " Ayan Sengupta",
+                "givenName": "Ayan",
+                "familyName": "Sengupta"
             },
             {
-              "@id": "https://schema.datalad.org/person#renat.yakupov@ovgu.de"
+              "@id": "https://schema.datalad.org/person#renat.yakupov@ovgu.de",
+              "@type": "Person",
+                "email": "renat.yakupov@ovgu.de",
+                "name": " Renat Yakupov",
+                "givenName": "Renat",
+                "familyName": "Yakupov"
             },
             {
-              "@id": "https://schema.datalad.org/person#oliver.speck@ovgu.de"
+              "@id": "https://schema.datalad.org/person#oliver.speck@ovgu.de",
+              "@type": "Person",
+                "email": "oliver.speck@ovgu.de",
+                "name": " Oliver Speck",
+                "givenName": "Oliver",
+                "familyName": "Speck"
             },
             {
-              "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de"
+              "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de",
+              "@type": "Person",
+                "email": "stefan.pollmann@ovgu.de",
+                "name": " Stefan Pollmann",
+                "givenName": "Stefan",
+                "familyName": "Pollmann"
             },
             {
-              "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de"
+              "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de",
+              "@type": "Person",
+                "email": "m.hanke@fz-juelich.de",
+                "name": "Prof. Dr.  Michael Hanke",
+                "givenName": "Michael",
+                "familyName": "Hanke",
+                "honorificSuffix": "Prof. Dr."
             }
           ],
           "publication": {

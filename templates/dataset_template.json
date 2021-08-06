@@ -9,7 +9,6 @@
     "name": "",
     "short_name": "",
     "description": "",
-    "last_edited": "",
     "doi": "",
     "url": "",
     "license": {
@@ -26,7 +25,7 @@
         "familyName": ""
       }
     ],
-    "keywords": [],
+    "keywords": [""],
     "funding": [
       {
         "type": "",
@@ -49,7 +48,12 @@
         "doi": "",
         "author": [
           {
-            "@id": ""
+            "@id": "",
+            "@type": "",
+            "email": "",
+            "name": "",
+            "givenName": "",
+            "familyName": ""
           }
         ],
         "publication": {
