@@ -223,7 +223,7 @@ EXTRACTORS = {
 #   - Find all subdatasets for current dataset. For each subdataset:
 #       = 
 datasets = [item for item in metadata if item["type"] == "dataset"]
-for i, dataset in enumerate(datasets):
+for dataset in datasets:
     # First check if file for object has already been created. If yes, load object from file. If not, create empty object.
     blob_hash = md5blob(dataset["dataset_id"], dataset["dataset_version"])
     blob_file = os.path.join(out_dir, blob_hash + ".json")
@@ -259,61 +259,91 @@ for i, dataset in enumerate(datasets):
         new_sub_obj["dataset_version"] = subds["dataset_version"]
         new_sub_obj["dataset_path"] = subds["dataset_path"]
         new_sub_obj["dirs_from_path"] = subds["dataset_path"].split("/")
-        new_obj["subdatasets"].append(new_sub_obj)       
-        new_sub_obj["dirs_from_path"]
+        new_obj["subdatasets"].append(new_sub_obj)
 
-
-
-        dir_obj = {
-            "type": "directory"
-            "name": ""
-            "children": []
-        }
-        file_obj = {
-            "type": "file"
-            "name": ""
-        }
-        ds_obj = {
-            "type": "dataset"
-            "name": ""
-            "dataset_id": ""
-            "dataset_version": ""
-        }
-        new_obj["children"].append
-        
+        # Add subdataset locations as children to parent dataset
         nr_nodes = len(new_sub_obj["dirs_from_path"])
-        nodes_list = []
+        iter_object = new_obj["children"]
+        idx = -1
         for n, node in enumerate(new_sub_obj["dirs_from_path"]):
-            nodes_list.append(node)
+            if n>0:
+                iter_object = iter_object[idx]["children"]
+            
             if n != nr_nodes-1:
                 # this is a directory
-                nr_nodes
-
+                idx_found = next((i for i, item in enumerate(iter_object) if item["type"] == "directory" and item["name"] == node), -1)
             else:
                 # last element, this is a subdataset
-
-            setInDict(dataDict, ["b", "v", "w"], 4)
-
-            # node_exists = next((item for item in metadata["personList"] if item["@id"] == author["@id"]), False)
-
-
+                idx_found = next((i for i, item in enumerate(iter_object) if item["type"] == "dataset" and item["name"] == node), -1)
             
-
-
+            if idx_found < 0:
+                if n != nr_nodes-1:
+                    # this is a directory
+                    new_node = {
+                        "type": "directory",
+                        "name": node,
+                        "children": []
+                    }
+                else:
+                    # last element, this is a subdataset
+                    new_node = {
+                        "type": "dataset"
+                        "name": node
+                        "dataset_id": ""
+                        "dataset_version": ""
+                    }
+                iter_object.append(new_node)
+            else:
+                idx = idx_found
     
     # Files /  Children
+
     # TODO: figure out if we should create a single json file per dataset file, or if all files are to be listed as children in a nested directory structure as a field in the main dataset object
     # OR a mixture of these. Also figure out how to limit the nested-ness within a single object, only render children up to a max amount in the UI, at which point a pointer should identify which
     # file is to be loaded via HTTP request if the rest of the information is to be rendered.
     # Take into account that a file does not have an id and version, so naming of separate blobs per file would likely be something like md5sum(parent_dataset_id-parent_dataset_version-file_path_relative_to_parent)
+
+    # For now,add files as children part of the dataset object:
+    # find all files belonging to current dataset
     files = [item for item in metadata if item["type"] == "file" and item["dataset_id"] == dataset["dataset_id"] and item["dataset_version"] == dataset["dataset_version"]]
+    for file in files:
+        # Add subdataset locations as children to parent dataset
+        nodes = file["path"].split("/")
+        nr_nodes = len(nodes)
+        iter_object = dataset["children"]
+        idx = -1
+        for n, node in enumerate(nodes):
+            if n>0:
+                iter_object = iter_object[idx]["children"]
+            
+            if n != nr_nodes-1:
+                # this is a directory
+                idx_found = next((i for i, item in enumerate(iter_object) if item["type"] == "directory" and item["name"] == node), -1)
+            else:
+                # last element, this is a file
+                idx_found = next((i for i, item in enumerate(iter_object) if item["type"] == "file" and item["name"] == node), -1)
+            
+            if idx_found < 0:
+                if n != nr_nodes-1:
+                    # this is a directory
+                    new_node = {
+                        "type": "directory",
+                        "name": node,
+                        "children": []
+                    }
+                else:
+                    # last element, this is a file
+                    new_node = {
+                        "type": "dataset"
+                        "name": node
+                        "contentbytesize": file["extracted_metadata"]["contentbytesize"] if "contentbytesize" in file["extracted_metadata"],
+                        "url": file["extracted_metadata"]["distribution"]["url"] if "distribution" in file["extracted_metadata"] and "url" in file["extracted_metadata"]["distribution"],
+                    }
+                iter_object.append(new_node)
+            else:
+                idx = idx_found
 
-
-
-    # Superdatasets
-    # 
-
-
+    # Parent datasets
 
     # Write object to file
     with open(blob_file, 'w') as fp:
