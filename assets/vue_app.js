@@ -43,6 +43,13 @@ Vue.component("tree-item", {
         this.isOpen = !this.isOpen;
       }
     },
+    selectDataset(obj, objId) {
+      // this.$root.selectedDataset = obj;
+      // this.$root.dataPath.push(obj.short_name);
+      id_and_version = obj.dataset_id + '-' + obj.dataset_version;
+      hash = md5(id_and_version);
+      router.push({ name: 'dataset', params: { blobId: hash } })
+    },
   }
 });
 
@@ -252,7 +259,7 @@ var demo = new Vue({
     console.log('beforeMount')
     if(this.$route.params.hasOwnProperty('blobId')) {
       console.log('on refresh: dataset page')
-      file = web_dir + '/' + this.$route.params.blobId + '.json'
+      file = metadata_dir + '/' + this.$route.params.blobId + '.json'
     } else {
       console.log('on refresh: other page')
       file = json_file;
@@ -267,7 +274,7 @@ router.beforeEach((to, from, next) => {
   console.log('beforerouteupdateGLOBAL')
   if (to.name == 'dataset') {
     console.log('on reroute: dataset page')
-    file = web_dir + '/' + to.params.blobId + '.json'
+    file = metadata_dir + '/' + to.params.blobId + '.json'
     var app = demo;
     var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
     rawFile.onreadystatechange = function () {

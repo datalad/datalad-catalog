@@ -9,7 +9,7 @@
     <title>DataLad Catalog</title>
 
     <!-- Required Stylesheets -->
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="assets/style.css" />
     <script src="https://kit.fontawesome.com/17e62561a1.js" crossorigin="anonymous"></script>
     <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
     <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
@@ -21,7 +21,7 @@
     <script src="https://unpkg.com/vue@latest/dist/vue.js"></script>
     <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
     <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
-    <script src="md5-2.3.0.js"></script>
+    <script src="assets/md5-2.3.0.js"></script>
 
     <!-- Template for recursive tree item -->
     <script type="text/x-template" id="item-template">
@@ -190,9 +190,9 @@
                   <i class="far fa-folder"></i> Files
                 </template>
                 <b-card no-body class="p-2">
-                  <p><a href=""><i class="fas fa-home"></i></a> /
+                  <!-- <p><a href=""><i class="fas fa-home"></i></a> /
                     <span v-for="path in dataPath"><a href="">{{path}}</a> /</span>
-                  </p>
+                  </p> -->
                   <ul>
                     <tree-item class="item" v-for="item in selectedDataset.children" :item="item"></tree-item>
                   </ul>
@@ -230,22 +230,24 @@
                 <template v-slot:title>
                   <i class="fas fa-dollar-sign"></i> Funding
                 </template>
-                <div class="accordion" role="tablist">
-                  <b-card no-body class="mb-1" v-for="fund in selectedDataset.funding" v-bind:key="fund.identifier">
-                    <b-card-header header-tag="header" class="p-1" role="tab">
-                      <b-button block  v-b-toggle="fund.funder.name" variant="light" class="stretched-link">{{fund.funder.name}}</b-button>
-                    </b-card-header>
-                    <b-collapse :id="fund.funder.name" accordion="my-accordion" role="tabpanel">
-                      <b-card-body>
-                        <b-card-text>
-                          <strong>Type</strong>: {{fund.type}}<br>
-                          <strong>Identifier</strong>: {{fund.identifier}}<br>
-                          <strong>Description</strong>: {{fund.description}}<br>
-                        </b-card-text>
-                      </b-card-body>
-                    </b-collapse>
-                  </b-card>
-                </div>
+                <span v-if="!selectedDataset.funding || !selectedDataset.funding.length"><em>There are no funding sources listed for the current dataset</em></span>
+                <span v-else>
+                  <div class="accordion" role="tablist">
+                    <b-card no-body class="mb-1" v-for="fund in selectedDataset.funding" v-bind:key="fund.name">
+                      <b-card-header header-tag="header" class="p-1" role="tab">
+                        <b-button block  v-b-toggle="fund.name" variant="light" class="stretched-link">{{fund.name.split(',')[0]}}</b-button>
+                      </b-card-header>
+                      <b-collapse :id="fund.name" accordion="my-accordion" role="tabpanel">
+                        <b-card-body>
+                          <b-card-text>
+                            <strong>Type</strong>: {{fund["@type"]}}<br>
+                            <strong>Identifier</strong>: {{fund.name.split(',')[1]}}<br>
+                          </b-card-text>
+                        </b-card-body>
+                      </b-collapse>
+                    </b-card>
+                  </div>
+                </span>
               </b-tab>
             </b-tabs>
           </b-card-body>
@@ -322,7 +324,7 @@
     </b-container>
 
     <!-- Start running your app -->
-    <script src="vue_app.js"></script>
+    <script src="assets/vue_app.js"></script>
     
   </body>
 </html>

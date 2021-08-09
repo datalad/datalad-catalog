@@ -1,0 +1,155 @@
+[
+    {
+        "type": "dataset",
+        "dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609",
+        "dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758",
+        "extraction_time": 1627303285.9509099,
+        "short_name": "StudyForrest",
+        "name": "StudyForrest Dataset",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque condimentum tortor ac mi sollicitudin, vitae malesuada odio tincidunt. Vestibulum nec viverra metus. Maecenas efficitur orci dolor, quis auctor leo eleifend eget. Mauris congue, enim ut scelerisque condimentum, dui lorem varius ex, ut posuere libero magna eget lorem. Cras eu libero hendrerit, finibus ex ac, ultrices est. Morbi tempor ultricies congue. Vestibulum sit amet lacinia turpis. In feugiat eget purus nec laoreet.",
+        "last_edited": "",
+        "doi": "",
+        "url": "https://github.com/psychoinformatics-de/studyforrest-data",
+        "license": {
+            "name": "PDDL",
+            "url": "https://opendatacommons.org/licenses/pddl/1-0/"
+        },
+        "authors": [
+            {
+                "@id": "https://schema.datalad.org/person#ayan.sengupta@nottingham.ac.uk",
+                "@type": "Person",
+                "email": "ayan.sengupta@nottingham.ac.uk",
+                "name": " Ayan Sengupta",
+                "givenName": "Ayan",
+                "familyName": "Sengupta"
+            },
+            {
+                "@id": "https://schema.datalad.org/person#oliver.speck@ovgu.de",
+                "@type": "Person",
+                "email": "oliver.speck@ovgu.de",
+                "name": " Oliver Speck",
+                "givenName": "Oliver",
+                "familyName": "Speck"
+            },
+            {
+                "@id": "https://schema.datalad.org/person#renat.yakupov@ovgu.de",
+                "@type": "Person",
+                "email": "renat.yakupov@ovgu.de",
+                "name": " Renat Yakupov",
+                "givenName": "Renat",
+                "familyName": "Yakupov"
+            },
+            {
+                "@id": "https://schema.datalad.org/person#martin.kanowski@ovgu.de",
+                "@type": "Person",
+                "email": "martin.kanowski@ovgu.de",
+                "name": " Martin Kanowski",
+                "givenName": "Martin",
+                "familyName": "Kanowski"
+            },
+            {
+                "@id": "https://schema.datalad.org/person#claus.tempelmann@ovgu.de",
+                "@type": "Person",
+                "email": "claus.tempelmann@ovgu.de",
+                "name": " Claus Tempelmann",
+                "givenName": "Claus",
+                "familyName": "Tempelmann"
+            },
+            {
+                "@id": "https://schema.datalad.org/person#stefan.pollmann@ovgu.de",
+                "@type": "Person",
+                "email": "stefan.pollmann@ovgu.de",
+                "name": " Stefan Pollmann",
+                "givenName": "Stefan",
+                "familyName": "Pollmann"
+            },
+            {
+                "@id": "https://schema.datalad.org/person#m.hanke@fz-juelich.de",
+                "@type": "Person",
+                "email": "m.hanke@fz-juelich.de",
+                "name": "Prof. Dr.  Michael Hanke",
+                "givenName": "Michael",
+                "familyName": "Hanke",
+                "honorificSuffix": "Prof. Dr."
+            },
+            {
+                "@id": "https://schema.datalad.org/person#Joerg.Stadler@ifn-magdeburg.de",
+                "@type": "Person",
+                "email": "Joerg.Stadler@ifn-magdeburg.de",
+                "name": " Jörg Stadler",
+                "givenName": "Jörg",
+                "familyName": "Stadler"
+            },
+            {
+                "@id": "https://schema.datalad.org/person#michael@hoffmann@med.ovgu.de",
+                "@type": "Person",
+                "email": "michael@hoffmann@med.ovgu.de",
+                "name": " Michael Hoffmann",
+                "givenName": "Michael",
+                "familyName": "Hoffmann"
+            },
+            {
+                "@id": "https://schema.datalad.org/person#florian.baumgartner@ovgu.de",
+                "@type": "Person",
+                "email": "florian.baumgartner@ovgu.de",
+                "name": " Florian J. Baumgartner",
+                "givenName": "Florian J.",
+                "familyName": "Baumgartner"
+            },
+            {
+                "@id": "https://schema.datalad.org/person#falko.kaule@med.ovgu.de",
+                "@type": "Person",
+                "email": "falko.kaule@med.ovgu.de",
+                "name": " Falko R. Kaule",
+                "givenName": "Falko R.",
+                "familyName": "Kaule"
+            },
+            {
+                "@id": "https://schema.datalad.org/person#vittorio.iacovella@gmail.com",
+                "@type": "Person",
+                "email": "vittorio.iacovella@gmail.com",
+                "name": " Vittorio Iacovella",
+                "givenName": "Vittorio",
+                "familyName": "Iacovella"
+            },
+            {
+                "@id": "https://schema.datalad.org/person#swaroopgj@gmail.com",
+                "@type": "Person",
+                "email": "swaroopgj@gmail.com",
+                "name": " J. Swaroop Guntupalli",
+                "givenName": "J. Swaroop",
+                "familyName": "Guntupalli"
+            },
+            {
+                "@id": "https://schema.datalad.org/person#daniel.kottke@ovgu.de",
+                "@type": "Person",
+                "email": "daniel.kottke@ovgu.de",
+                "name": " Daniel Kottke",
+                "givenName": "Daniel",
+                "familyName": "Kottke"
+            },
+            {
+                "@id": "https://schema.datalad.org/person#c.haeusler@fz-juelich.de",
+                "@type": "Person",
+                "email": "c.haeusler@fz-juelich.de",
+                "name": "M.Sc.  Christian Häusler",
+                "givenName": "Christian",
+                "familyName": "Häusler",
+                "honorificSuffix": "M.Sc."
+            }
+        ],
+        "keywords": [
+            "human",
+            "fMRI",
+            "task",
+            "7T",
+            "3T",
+            "audio",
+            "visual",
+            "music",
+            "retinotopy",
+            "angiography",
+            "T1,T2"
+        ]
+    }
+]

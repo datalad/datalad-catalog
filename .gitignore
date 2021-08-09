@@ -1,1 +1,5 @@
 .DS_Store
+_build
+_build/
+dev
+dev/
