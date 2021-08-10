@@ -278,7 +278,10 @@ for dataset in datasets:
         new_sub_obj["dataset_version"] = subds["dataset_version"]
         new_sub_obj["dataset_path"] = subds["dataset_path"]
         new_sub_obj["dirs_from_path"] = subds["dataset_path"].split(os.path.sep)
-        new_obj["subdatasets"].append(new_sub_obj)
+        if not any(x["dataset_id"] == subds["dataset_id"] for x in new_obj["subdatasets"]):
+            new_obj["subdatasets"].append(new_sub_obj)
+        else:
+            continue
 
         # Add subdataset locations as children to parent dataset
         nr_nodes = len(new_sub_obj["dirs_from_path"])
@@ -373,7 +376,10 @@ for dataset in datasets:
             else:
                 idx = idx_found
 
-    # Parent datasets
+    # TODO: write parent dataset ids and versions to all subdatasets
+    # TODO: create single file with all superdatasets (datasets.json) for main page browsing
+    # TODO: calculate directory size by accumulating children file sizes
+
 
     # Write object to file
     with open(blob_file, 'w') as fp:
