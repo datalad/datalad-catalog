@@ -7,6 +7,7 @@ body {
   cursor: pointer;
   font-family: Menlo, Consolas, monospace;
 }
+
 .bold {
   font-weight: bold;
 }
@@ -71,4 +72,16 @@ li[class="item"]:nth-child(even) {
 }
 li[class="item"]:nth-child(odd) {
   background-color:#fff;
+}
+/* li[class="item"] {
+  
+} */
+
+
+
+.filesize {
+  text-align: right;
+  font-size: small;
+  position: absolute;
+  right: 1em;
 }
