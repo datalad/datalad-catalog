@@ -102,6 +102,8 @@ const datasetView = {
       }
 
       disp_dataset.metadata_extracted = this.getDateFromUTCseconds(dataset.extraction_time);
+      id_and_version = dataset.dataset_id + '-' + dataset.dataset_version;
+      disp_dataset.hash = md5(id_and_version);
       return disp_dataset
     }
   },

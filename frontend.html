@@ -106,7 +106,7 @@
                 <b-button variant="outline-dark" size="sm" v-b-modal.modal-1><i class="fas fa-cloud-download-alt"></i> Download with DataLad</b-button>&nbsp;
                 <b-button variant="outline-dark" size="sm" href="#"><i class="fab fa-github"></i> View on GitHub</b-button>&nbsp;
                 <b-button variant="outline-dark" size="sm"><i class="fas fa-quote-right"></i> Cite</b-button>&nbsp;
-                <b-button variant="outline-dark" size="sm" href="web/64f46a4c10ecd4951934f1ae93487fa7.json" download="ds_64f46a4c10ecd4951934f1ae93487fa7.json"><i class="fas fa-share"></i> Export metadata</b-button>&nbsp;
+                <b-button variant="outline-dark" size="sm" :href="'metadata/'+ displayData.hash +'.json'" :download="'dataset_'+ displayData.hash +'.json'"><i class="fas fa-share"></i> Export metadata</b-button>&nbsp;
                 <b-modal id="modal-1" size="lg" 
                 header-bg-variant="light"
                 footer-bg-variant="light"
