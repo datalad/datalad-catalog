@@ -233,11 +233,11 @@
                 <span v-if="!selectedDataset.funding || !selectedDataset.funding.length"><em>There are no funding sources listed for the current dataset</em></span>
                 <span v-else>
                   <div class="accordion" role="tablist">
-                    <b-card no-body class="mb-1" v-for="fund in selectedDataset.funding" v-bind:key="fund.name">
+                    <b-card no-body class="mb-1" v-for="fund in selectedDataset.funding" v-bind:key="fund.name.split(',')[0]">
                       <b-card-header header-tag="header" class="p-1" role="tab">
-                        <b-button block  v-b-toggle="fund.name" variant="light" class="stretched-link">{{fund.name.split(',')[0]}}</b-button>
+                        <b-button block v-b-toggle="fund.name.split(',')[0]" variant="light" class="stretched-link">{{fund.name.split(',')[0]}}</b-button>
                       </b-card-header>
-                      <b-collapse :id="fund.name" accordion="my-accordion" role="tabpanel">
+                      <b-collapse :id="fund.name.split(',')[0]" accordion="my-accordion" role="tabpanel">
                         <b-card-body>
                           <b-card-text>
                             <strong>Type</strong>: {{fund["@type"]}}<br>
