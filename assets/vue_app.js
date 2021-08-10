@@ -36,6 +36,9 @@ Vue.component("tree-item", {
     displayText: function() {
       return this.item["name"]
     },
+    byteText: function(){
+      return this.formatBytes(this.item["contentbytesize"])
+    }
   },
   methods: {
     toggle: function() {
@@ -49,6 +52,14 @@ Vue.component("tree-item", {
       id_and_version = obj.dataset_id + '-' + obj.dataset_version;
       hash = md5(id_and_version);
       router.push({ name: 'dataset', params: { blobId: hash } })
+    },
+    formatBytes(bytes, decimals = 2) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const dm = decimals < 0 ? 0 : decimals;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     },
   }
 });
