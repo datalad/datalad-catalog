@@ -31,6 +31,7 @@ import os
 import hashlib
 from functools import reduce
 import operator
+import shutil
 
 #----------------
 # Parse arguments
@@ -67,7 +68,7 @@ def md5blob(identifier='', version=''):
 
 def load_json_file(filename):
     """
-    Load contents of a JSON file into a dict
+    Load contents of a JSON file into a dict or list of dicts
     """
     try:
         with open(filename) as f:
@@ -77,6 +78,8 @@ def load_json_file(filename):
 
 def core_parse(src_object, dest_object):
     """
+    Parse metadata output by DataLad's `metalad_core` extractor and
+    translate into JSON structure from which UI is generated.
     """
 
 def core_dataset_parse(src_object, dest_object):
@@ -93,7 +96,6 @@ def core_dataset_parse(src_object, dest_object):
     for key in schema:
         if schema[key] in src_object:
             dest_object[key] = src_object[schema[key]]
-    
     return dest_object
 
 def studyminimeta_parse(src_object, dest_object):
@@ -157,23 +159,37 @@ def studyminimeta_parse(src_object, dest_object):
     
     return dest_object
 
+def copy_key_vals(src_object, dest_object, keys):
+    """
+    For each key in a list, copy each corresponding key-value pair from
+    a source dictionary to a destination dictionary, provided that the
+    key-value pair exists in the source dictionary
+    """
+    for key in keys:
+        if key in src_object:
+            dest_object[key] = src_object[key]
+    return dest_object
+
 #-------------------
 # Prep and load data
 #-------------------
 # Create output directories if they do not exist
+script_path = os.path.realpath(__file__)
+sep = os.path.sep
+repo_path = sep.join(script_path.split(sep)[0:-1])
+assets_path = os.path.join(repo_path, 'assets')
+artwork_path = os.path.join(repo_path, 'artwork')
 if arguments.outputdir is True:
     out_dir = arguments.outputdir
 else:
-    script_path = os.path.realpath(__file__)
-    sep = os.path.sep
-    repo_path = sep.join(script_path.split(sep)[0:-1])
     out_dir = os.path.join(repo_path, '_build')
 metadata_out_dir = os.path.join(out_dir, 'metadata')
-datasets_out_dir = os.path.join(out_dir, 'datasets')
 assets_out_dir = os.path.join(out_dir, 'assets')
+artwork_out_dir = os.path.join(out_dir, 'artwork')
 Path(out_dir).mkdir(parents=True, exist_ok=True)
 Path(metadata_out_dir).mkdir(parents=True, exist_ok=True)
-Path(datasets_out_dir).mkdir(parents=True, exist_ok=True)
+Path(assets_out_dir).mkdir(parents=True, exist_ok=True)
+Path(artwork_out_dir).mkdir(parents=True, exist_ok=True)
 # Load data from input file
 # (assume for now that the data were exported by using `datalad meta-dump`,
 # and that all exported objects were added to an array in a json file)
@@ -237,21 +253,33 @@ for dataset in datasets:
             new_obj[key] = schema[key]
     if "children" not in new_obj:
         new_obj["children"] = []
+    
     # Subdatasets per dataset
-    # TODO: check if the subdatasets already exist and decide whether to overwrite or skip. Currently overwritten
     subdatasets = [item for item in datasets if "root_dataset_id" in item and item["root_dataset_id"] == dataset["dataset_id"] and item["root_dataset_version"] == dataset["dataset_version"]]
+    # First save superdataset details to tracking list, for writing it to file later
+    # TODO: handle extra times this section is called because of multiple metadata
+    # objects resulting from different metalad extractors
+    # TODO: copy all keys from required super_dataset_keys list
+    idx_super = -1
+    if len(subdatasets)>0:
+        idx_found_super = next((i for i, item in enumerate(super_datasets) if item["dataset_id"] == dataset["dataset_id"]), -1)
+        if idx_found_super > -1:
+            super_obj = super_datasets[idx_found]
+            copy_key_vals(new_obj, super_obj, super_dataset_keys)
+            idx_super = idx_found_super
+        else:
+            super_obj = {}
+            super_obj = copy_key_vals(new_obj, super_obj, super_dataset_keys)
+            super_datasets.append(super_obj)
+            idx_super = len(super_datasets)-1
+
+        if "subdataset_blobs" not in super_datasets[idx_super]:
+            super_datasets[idx_super]["subdataset_blobs"] = []
+
+    # Then populate subdataset details and append to current dataset 'subdatasets' field, unless previously done
     new_obj["subdatasets"] = []
     for subds in subdatasets:
-        # Save superdataset details to tracking list, for writing it to file later
-        # TODO: handle extra times this section is called because of multiple metadata
-        # objects resulting from different metalad extractors
-        # TODO: copy all keys from required super_dataset_keys list
-        super_datasets.append({
-            "dataset_id": dataset["dataset_id"],
-            "dataset_version": dataset["dataset_version"]
-            "subdatasets": []
-        })
-        # Populate subdataset details and append to current dataset 'subdatasets' field, unless previously done
+        # TODO: check if the subdatasets already exist and decide whether to overwrite or skip. Currently overwritten
         new_sub_obj = {}
         new_sub_obj["dataset_id"] = subds["dataset_id"]
         new_sub_obj["dataset_version"] = subds["dataset_version"]
@@ -261,6 +289,11 @@ for dataset in datasets:
             new_obj["subdatasets"].append(new_sub_obj)
         else:
             continue
+        # Write subdataset blob to relevant superdataset in list
+        blob_hash = md5blob(subds["dataset_id"], subds["dataset_version"])
+        if blob_hash not in super_datasets[idx_super]["subdataset_blobs"]:
+            super_datasets[idx_super]["subdataset_blobs"].append(blob_hash)
+
         # Add subdataset locations as children to parent dataset
         nr_nodes = len(new_sub_obj["dirs_from_path"])
         iter_object = new_obj["children"]
@@ -296,10 +329,15 @@ for dataset in datasets:
                 idx = idx_found
     
     # Files /  Children
-    # TODO: figure out if we should create a single json file per dataset file, or if all files are to be listed as children in a nested directory structure as a field in the main dataset object
-    # OR a mixture of these. Also figure out how to limit the nested-ness within a single object, only render children up to a max amount in the UI, at which point a pointer should identify which
-    # file is to be loaded via HTTP request if the rest of the information is to be rendered.
-    # Take into account that a file does not have an id and version, so naming of separate blobs per file would likely be something like md5sum(parent_dataset_id-parent_dataset_version-file_path_relative_to_parent)
+    # TODO: figure out if we should create a single json file per dataset
+    # file, or if all files are to be listed as children in a nested directory
+    # structure as a field in the main dataset object OR a mixture of these.
+    # Also figure out how to limit the nested-ness within a single object, only
+    # render children up to a max amount in the UI, at which point a pointer
+    # should identify which file is to be loaded via HTTP request if the rest
+    # of the information is to be rendered. Take into account that a file does
+    # not have an id and version, so naming of separate blobs per file would
+    # likely be something like md5sum(parent_dataset_id-parent_dataset_version-file_path_relative_to_parent)
     # For now, add files as children part of the dataset object:
     # find all files belonging to current dataset
     files = [item for item in metadata if item["type"] == "file" and item["dataset_id"] == dataset["dataset_id"] and item["dataset_version"] == dataset["dataset_version"]]
@@ -349,24 +387,40 @@ for dataset in datasets:
     with open(blob_file, 'w') as fp:
         json.dump(new_obj, fp)
 
-# TODO: write parent dataset ids and versions to all subdataset blobs
+# Create single file with all superdatasets (datasets.json) for main page browsing
+super_dataset_file = os.path.join(metadata_out_dir, 'datasets.json')
+with open(super_dataset_file, 'w') as f:
+    json.dump(super_datasets, f)
 
-# TODO: create single file with all superdatasets (datasets.json) for main page browsing
-# super_datasets = [item for item in metadata if item["type"] == "dataset" and "root_dataset_id" not in item]
+# Write superdataset name and shortname to all subdataset blobs
+for superds in super_datasets:
+    for blob_hash in superds["subdataset_blobs"]:
+        blob_file = os.path.join(metadata_out_dir, blob_hash + ".json")
+        ds = load_json_file(blob_file)
+        ds["root_dataset_name"] = superds["name"]
+        ds["root_dataset_short_name"] = superds["short_name"]
+        with open(blob_file, 'w') as f:
+            json.dump(ds, f)
 
-# TODO: copy all remaining components from templates to output directory
+# Copy all remaining components from templates to output directory 
+# Assets
+assets = ["md5-2.3.0.js", "style.css", "vue_app.js"]
+for asset_fn in assets:
+    shutil.copy2(os.path.join(assets_path, asset_fn), assets_out_dir)
+# Artwork
+artworks = ["datalad_logo_wide.svg", "View1.svg"]
+for artwork_fn in artworks:
+    shutil.copy2(os.path.join(artwork_path, artwork_fn), artwork_out_dir)
+# Main UI (html)
+shutil.copy2(os.path.join(repo_path, 'index.html'), out_dir)
 
-
-
-
-### ----------------
-
+#------------
 # MOAR TODOS!
+#------------
 # TODO: figure out logging
+# TODO: figure out testing
 # TODO: figure out installation / building process
 # TODO: figure out automated updates to serving content somewhere
 # TODO: figure out CI
 # TODO: figure out what to do when a dataset belongs to multiple super-datasets
 # TODO: if not provided, calculate directory/dataset size by accumulating children file sizes
-
-

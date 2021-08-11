@@ -73,9 +73,6 @@ li[class="item"]:nth-child(even) {
 li[class="item"]:nth-child(odd) {
   background-color:#fff;
 }
-/* li[class="item"] {
-  
-} */
 
 
 
