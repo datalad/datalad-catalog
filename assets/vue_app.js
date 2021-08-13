@@ -145,6 +145,7 @@ const datasetView = {
   },
   beforeRouteUpdate(to, from, next) {
     this.tabIndex = 0;
+    next();
   }
 };
 
