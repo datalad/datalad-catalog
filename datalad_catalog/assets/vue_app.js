@@ -74,6 +74,7 @@ const datasetView = {
     return {
       dataPath: [],
       showCopyTooltip: false,
+      tabIndex: 0
     };
   },
   computed: {
@@ -141,6 +142,9 @@ const datasetView = {
       year = d.getFullYear();
       return year + '-' + (month > 9 ? month : '0' + month) + '-' + (day > 9 ? day : '0' + day)
     }
+  },
+  beforeRouteUpdate(to, from, next) {
+    this.tabIndex = 0;
   }
 };
 
