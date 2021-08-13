@@ -37,14 +37,15 @@ def run_cmd():
     script_path = os.path.realpath(__file__)
     sep = os.path.sep
     repo_path = sep.join(script_path.split(sep)[0:-2])
+    package_path = sep.join(script_path.split(sep)[0:-1])
     if arguments.outputdir is True:
         out_dir = arguments.outputdir
     else:
         out_dir = os.path.join(repo_path, '_build')
     # Call main function to generate UI
-    datalad_catalog(metadata_file, out_dir, repo_path)
+    datalad_catalog(metadata_file, out_dir, repo_path, package_path)
 
-def datalad_catalog(metadata_file, out_dir, repo_path):
+def datalad_catalog(metadata_file, out_dir, repo_path, package_path):
     """
     Generate web-browser-based user interface for browsing metadata of a
     DataLad dataset.
@@ -69,7 +70,7 @@ def datalad_catalog(metadata_file, out_dir, repo_path):
     # Prep and load data
     #-------------------
     # Create output directories if they do not exist
-    assets_path = os.path.join(repo_path, 'assets')
+    assets_path = os.path.join(package_path, 'assets')
     artwork_path = os.path.join(repo_path, 'artwork')
     metadata_out_dir = os.path.join(out_dir, 'metadata')
     assets_out_dir = os.path.join(out_dir, 'assets')
@@ -82,7 +83,6 @@ def datalad_catalog(metadata_file, out_dir, repo_path):
     # (assume for now that the data were exported by using `datalad meta-dump`,
     # and that all exported objects were added to an array in a json file)
     metadata = load_json_file(metadata_file)
-
     #-----------------------------------------------
     # Parse and translate metadata, generate outputs
     #-----------------------------------------------
@@ -114,9 +114,11 @@ def datalad_catalog(metadata_file, out_dir, repo_path):
         # Populate key-value pairs based on extractor type
         if "extractor_name" in dataset:
             if dataset["extractor_name"] == "metalad_core_dataset":
-                new_obj = core_dataset_parse(dataset, new_obj)
+                schema_file = os.path.join(package_path, "templates", "core_dataset_schema.json")
+                new_obj = core_dataset_parse(dataset, new_obj, schema_file)
             elif dataset["extractor_name"] == "metalad_studyminimeta":
-                new_obj = studyminimeta_parse(dataset, new_obj)
+                schema_file = os.path.join(package_path, "templates", "studyminimeta_schema.json")
+                new_obj = studyminimeta_parse(dataset, new_obj, schema_file)
             elif dataset["extractor_name"] == "metalad_core":
                 # do nothing for now
                 c=1
@@ -135,7 +137,7 @@ def datalad_catalog(metadata_file, out_dir, repo_path):
                 new_obj["short_name"] = new_obj["name"][0,30]+'...'
             else:
                 new_obj["short_name"] = new_obj["name"]
-        schema = load_json_file(os.path.join("templates", "studyminimeta_empty.json"))
+        schema = load_json_file(os.path.join(package_path, "templates", "studyminimeta_empty.json"))
         for key in schema:
             if key not in new_obj:
                 new_obj[key] = schema[key]
@@ -300,7 +302,7 @@ def datalad_catalog(metadata_file, out_dir, repo_path):
     for artwork_fn in artworks:
         shutil.copy2(os.path.join(artwork_path, artwork_fn), artwork_out_dir)
     # Main UI (html)
-    shutil.copy2(os.path.join(repo_path, 'index.html'), out_dir)
+    shutil.copy2(os.path.join(package_path, 'index.html'), out_dir)
 
 #-----------------
 # Helper functions
@@ -324,13 +326,13 @@ def load_json_file(filename):
     except:
         print("Exception occurred: ", sys.exc_info()[0])
 
-def core_parse(src_object, dest_object):
+def core_parse(src_object, dest_object, schema_file):
     """
     Parse metadata output by DataLad's `metalad_core` extractor and
     translate into JSON structure from which UI is generated.
     """
 
-def core_dataset_parse(src_object, dest_object):
+def core_dataset_parse(src_object, dest_object, schema_file):
     """
     Parse metadata output by DataLad's `metalad_core_dataset`
     extractor and translate into JSON structure from which UI is
@@ -339,14 +341,14 @@ def core_dataset_parse(src_object, dest_object):
     # Load schema/template dictionary, where each key represents the exact
     # same key in the destination object, and each associated value
     # represents the key in the source object which value is to be copied.
-    schema = load_json_file(os.path.join("templates", "core_dataset_schema.json"))
+    schema = load_json_file(schema_file)
     # Copy source to destination values, per key
     for key in schema:
         if schema[key] in src_object:
             dest_object[key] = src_object[schema[key]]
     return dest_object
 
-def studyminimeta_parse(src_object, dest_object):
+def studyminimeta_parse(src_object, dest_object, schema_file):
     """
     Parse metadata output by DataLad's `metalad_studyminimeta`
     extractor and translate into JSON structure from which UI is
@@ -357,7 +359,7 @@ def studyminimeta_parse(src_object, dest_object):
     # represents the key in the source object which value is to be copied.
     #TODO: request to add fields to metalad_studyminimeta extractor in metalad:
     # - license, DOI,...
-    schema = load_json_file(os.path.join("templates", "studyminimeta_schema.json"))    
+    schema = load_json_file(schema_file)    
     metadata = {}
     # Extract core objects/lists from src_object
     metadata["dataset"] = next((item for item in src_object["extracted_metadata"]["@graph"] if "@type" in item and item["@type"] == "Dataset"), False)
