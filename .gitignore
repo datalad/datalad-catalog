@@ -1,7 +1,6 @@
 .DS_Store
 _build
-_build/
 _extras
-_extras/
 dev
-dev/
+*.egg-info
+__pycache__
