@@ -1,18 +1,16 @@
 import sys
 from argparse import ArgumentParser, Namespace
-from dataclasses import dataclass
 from pathlib import Path
 import json
-import logging
 import os
 import hashlib
-from functools import reduce
-import operator
 import shutil
 
-#----------------
+# ------------------
 # Main functionality
-#----------------
+# ------------------
+
+
 def run_cmd():
     """
     Calls datalad_catalog() with command line arguments
@@ -45,6 +43,7 @@ def run_cmd():
     # Call main function to generate UI
     datalad_catalog(metadata_file, out_dir, repo_path, package_path)
 
+
 def datalad_catalog(metadata_file, out_dir, repo_path, package_path):
     """
     Generate web-browser-based user interface for browsing metadata of a
@@ -66,9 +65,9 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path):
     EXAMPLE USAGE:
     > datalad-catalog -o <path-to-output-directory> <path-to-input-file>
     """
-    #-------------------
+    # -------------------
     # Prep and load data
-    #-------------------
+    # -------------------
     # Create output directories if they do not exist
     assets_path = os.path.join(package_path, 'assets')
     artwork_path = os.path.join(repo_path, 'artwork')
@@ -83,27 +82,37 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path):
     # (assume for now that the data were exported by using `datalad meta-dump`,
     # and that all exported objects were added to an array in a json file)
     metadata = load_json_file(metadata_file)
-    #-----------------------------------------------
+    # -----------------------------------------------
     # Parse and translate metadata, generate outputs
-    #-----------------------------------------------
+    # -----------------------------------------------
     # LOGIC:
     # 1. Find all objects with type dataset
     # 2. For each dataset:
     #   - Find md5sum of id and version.
-    #   - Check if associated file/object has already been created. If yes, load object from file. If not, create empty object.
-    #   - Populate key-value pairs based on extractor type (metalad_core, metalad_core_dataset, metalad_studyminimeta)
-    #   - Add extra key-value pairs required for UI, but not contained in any extractors or not available in required format
-    #   - Find all subdatasets for current dataset. For each subdataset, create an object and:
+    #   - Check if associated file/object has already been created. If yes,
+    #     load object from file. If not, create empty object.
+    #   - Populate key-value pairs based on extractor type (metalad_core,
+    #     metalad_core_dataset, metalad_studyminimeta)
+    #   - Add extra key-value pairs required for UI, but not contained in any
+    #     extractors or not available in required format
+    #   - Find all subdatasets for current dataset. For each subdataset,
+    #     create an object and:
     #       + add standard dataset fields (id, version, etc)
-    #       + add subdataset and path/directory details to the 'children' array of the parent dataset
+    #       + add subdataset and path/directory details to the 'children'
+    #         array of the parent dataset
     #   - Find all files for current dataset. For each file:
-    #       + add file and path/directory details to the 'children' array of the parent dataset
+    #       + add file and path/directory details to the 'children' array of
+    #         the parent dataset
     #   - ... WIP
     super_datasets = []
-    super_dataset_keys = ["type", "dataset_id", "dataset_version", "extraction_time", "short_name", "name", "description", "doi", "url", "license", "authors", "keywords"]
+    super_dataset_keys = ["type", "dataset_id", "dataset_version",
+                          "extraction_time", "short_name", "name",
+                          "description", "doi", "url", "license",
+                          "authors", "keywords"]
     datasets = [item for item in metadata if item["type"] == "dataset"]
     for dataset in datasets:
-        # First check if file for object has already been created. If yes, load object from file. If not, create empty object.
+        # First check if file for object has already been created. If yes,
+        # load object from file. If not, create empty object.
         blob_hash = md5blob(dataset["dataset_id"], dataset["dataset_version"])
         blob_file = os.path.join(metadata_out_dir, blob_hash + ".json")
         if os.path.isfile(blob_file):
@@ -114,30 +123,35 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path):
         # Populate key-value pairs based on extractor type
         if "extractor_name" in dataset:
             if dataset["extractor_name"] == "metalad_core_dataset":
-                schema_file = os.path.join(package_path, "templates", "core_dataset_schema.json")
+                schema_file = os.path.join(package_path, "templates",
+                                           "core_dataset_schema.json")
                 new_obj = core_dataset_parse(dataset, new_obj, schema_file)
             elif dataset["extractor_name"] == "metalad_studyminimeta":
-                schema_file = os.path.join(package_path, "templates", "studyminimeta_schema.json")
+                schema_file = os.path.join(package_path, "templates",
+                                           "studyminimeta_schema.json")
                 new_obj = studyminimeta_parse(dataset, new_obj, schema_file)
             elif dataset["extractor_name"] == "metalad_core":
                 # do nothing for now
-                c=1
+                c = 1
             else:
                 print("Unrecognized metadata type: DataLad-related")
         else:
-            # TODO: handle scenarios where metadata is not generated by DataLad (or decide not to allow this)
+            # TODO: handle scenarios where metadata is not generated by
+            # DataLad (or decide not to allow this)
             print("Unrecognized metadata type: non-DataLad")
-        # Add fields required for UI, but not contained (or not available in required format) in any extractors
-        # or not yet extracted for specific dataset. 
+        # Add fields required for UI, but not contained (or not available in
+        # required format) in any extractors or not yet extracted for specific
+        # dataset.
         # TODO: this is not done in a smart way currently, needs rework
         if "name" not in new_obj and "dataset_path" in new_obj:
             new_obj["name"] = new_obj["dataset_path"].split(os.path.sep)[-1]
         if "name" in new_obj and "short_name" not in new_obj:
-            if len(new_obj["name"])>30:
-                new_obj["short_name"] = new_obj["name"][0,30]+'...'
+            if len(new_obj["name"]) > 30:
+                new_obj["short_name"] = new_obj["name"][0, 30]+'...'
             else:
                 new_obj["short_name"] = new_obj["name"]
-        schema = load_json_file(os.path.join(package_path, "templates", "studyminimeta_empty.json"))
+        schema = load_json_file(os.path.join(package_path, "templates",
+                                             "studyminimeta_empty.json"))
         for key in schema:
             if key not in new_obj:
                 new_obj[key] = schema[key]
@@ -145,31 +159,40 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path):
             new_obj["children"] = []
         
         # Subdatasets per dataset
-        subdatasets = [item for item in datasets if "root_dataset_id" in item and item["root_dataset_id"] == dataset["dataset_id"] and item["root_dataset_version"] == dataset["dataset_version"]]
-        # First save superdataset details to tracking list, for writing it to file later
-        # TODO: handle extra times this section is called because of multiple metadata
-        # objects resulting from different metalad extractors
+        subdatasets = [item for item in datasets if "root_dataset_id" in item
+                       and item["root_dataset_id"] == dataset["dataset_id"]
+                       and item["root_dataset_version"] ==
+                       dataset["dataset_version"]]
+        # First save superdataset details to tracking list,
+        # for writing it to file later
+        # TODO: handle extra times this section is called because of multiple
+        # metadata objects resulting from different metalad extractors
         # TODO: copy all keys from required super_dataset_keys list
         idx_super = -1
-        if len(subdatasets)>0:
-            idx_found_super = next((i for i, item in enumerate(super_datasets) if item["dataset_id"] == dataset["dataset_id"]), -1)
+        if len(subdatasets) > 0:
+            idx_found_super = next((i for i, item in enumerate(super_datasets)
+                                    if item["dataset_id"] ==
+                                    dataset["dataset_id"]), -1)
             if idx_found_super > -1:
                 super_obj = super_datasets[idx_found]
                 copy_key_vals(new_obj, super_obj, super_dataset_keys)
                 idx_super = idx_found_super
             else:
                 super_obj = {}
-                super_obj = copy_key_vals(new_obj, super_obj, super_dataset_keys)
+                super_obj = copy_key_vals(new_obj, super_obj,
+                                          super_dataset_keys)
                 super_datasets.append(super_obj)
                 idx_super = len(super_datasets)-1
 
             if "subdataset_blobs" not in super_datasets[idx_super]:
                 super_datasets[idx_super]["subdataset_blobs"] = []
 
-        # Then populate subdataset details and append to current dataset 'subdatasets' field, unless previously done
+        # Then populate subdataset details and append to current dataset
+        # 'subdatasets' field, unless previously done
         new_obj["subdatasets"] = []
         for subds in subdatasets:
-            # TODO: check if the subdatasets already exist and decide whether to overwrite or skip. Currently overwritten
+            # TODO: check if the subdatasets already exist and decide whether
+            # to overwrite or skip. Currently overwritten
             new_sub_obj = {}
             new_sub_obj["dataset_id"] = subds["dataset_id"]
             new_sub_obj["dataset_version"] = subds["dataset_version"]
