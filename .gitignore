@@ -1,4 +1,5 @@
 .DS_Store
+.vscode
 _build
 _extras
 dev
