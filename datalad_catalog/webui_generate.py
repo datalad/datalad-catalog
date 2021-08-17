@@ -1,34 +1,40 @@
 import sys
-from argparse import ArgumentParser, Namespace
+from argparse import ArgumentParser, Namespace, RawDescriptionHelpFormatter
 from pathlib import Path
 import json
 import os
 import hashlib
 import shutil
 
-# ------------------
-# Main functionality
-# ------------------
-
 
 def run_cmd():
     """
     Calls datalad_catalog() with command line arguments
     """
-    # Parse arguments
     argument_parser = ArgumentParser(
-        description=__doc__)
+        description=__doc__,
+        formatter_class=RawDescriptionHelpFormatter)
     argument_parser.add_argument(
         "-o", "--outputdir",
         type=str,
-        help="Directory to which outputs are written. Default = '_build'")
+        help="Directory to which outputs are written.\
+        Default is the '_build' directory inside the\
+        'data-browser-from-metadata' rep")
+    argument_parser.add_argument(
+        "-f", "--force",
+        action='store_true',
+        help="If content for the user interface already exists in the specified\
+        or default directory, force this content to be overwritten. Content\
+        overwritten with this flag include the 'artwork' and 'assets'\
+        directories and the 'index.html' file. The 'metadata' directory is\
+        deleted and recreated by default.")
     argument_parser.add_argument(
         "file_path",
         type=str,
         help="The '.json' file containing all metadata (in the form of an\
         array of JSON objects) from which the user interface will be\
         generated.")
-    arguments: Namespace = argument_parser.parse_args(sys.argv[1:])
+    arguments: Namespace = argument_parser.parse_args()
     print(arguments, file=sys.stderr)
     # Set parameters for datalad_catalog()
     metadata_file = arguments.file_path
@@ -41,10 +47,16 @@ def run_cmd():
     else:
         out_dir = os.path.join(repo_path, '_build')
     # Call main function to generate UI
-    datalad_catalog(metadata_file, out_dir, repo_path, package_path)
+    datalad_catalog(
+        metadata_file,
+        out_dir,
+        repo_path,
+        package_path,
+        arguments.force)
 
 
-def datalad_catalog(metadata_file, out_dir, repo_path, package_path):
+def datalad_catalog(metadata_file, out_dir, repo_path, package_path,
+                    overwrite):
     """
     Generate web-browser-based user interface for browsing metadata of a
     DataLad dataset.
@@ -55,7 +67,25 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path):
     Step 2:
     Loop through all metadata objects, map to correct fields, create json
     blob per dataset, containing all data relevant to that dataset,
-    including links to children and parent.
+    including links to children and parent. LOGIC:
+        a. Find all objects with type dataset
+        b. For each dataset:
+        - Find md5sum of id and version.
+        - Check if associated file/object has already been created. If yes,
+            load object from file. If not, create empty object.
+        - Populate key-value pairs based on extractor type (metalad_core,
+            metalad_core_dataset, metalad_studyminimeta)
+        - Add extra key-value pairs required for UI, but not contained in any
+            extractors or not available in required format
+        - Find all subdatasets for current dataset. For each subdataset,
+            create an object and:
+            + add standard dataset fields (id, version, etc)
+            + add subdataset and path/directory details to the 'children'
+                array of the parent dataset
+        - Find all files for current dataset. For each file:
+            + add file and path/directory details to the 'children' array of
+                the parent dataset
+        c. ...
     Step 3:
     From above, create a single json file with an array of superdatasets
     Step 4:
@@ -63,60 +93,24 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path):
     ...
 
     EXAMPLE USAGE:
-    > datalad-catalog -o <path-to-output-directory> <path-to-input-file>
+    > datalad_catalog -o <path-to-output-directory> <path-to-input-file>
     """
-    # -------------------
-    # Prep and load data
-    # -------------------
     # Create output directories if they do not exist
-    assets_path = os.path.join(package_path, 'assets')
+    metadata_out_dir = setup_metadata_dir(out_dir)
     templates_path = os.path.join(package_path, 'templates')
-    artwork_path = os.path.join(repo_path, 'artwork')
-    metadata_out_dir = os.path.join(out_dir, 'metadata')
-    assets_out_dir = os.path.join(out_dir, 'assets')
-    artwork_out_dir = os.path.join(out_dir, 'artwork')
-    Path(out_dir).mkdir(parents=True, exist_ok=True)
-    Path(metadata_out_dir).mkdir(parents=True, exist_ok=True)
-    Path(assets_out_dir).mkdir(parents=True, exist_ok=True)
-    Path(artwork_out_dir).mkdir(parents=True, exist_ok=True)
-
-    # TODO: check if output already exists, delete before continuing (for now)
-
     # Load data from input file
     # (assume for now that the data were exported by using `datalad meta-dump`,
     # and that all exported objects were added to an array in a json file)
     metadata = load_json_file(metadata_file)
-    # -----------------------------------------------
-    # Parse and translate metadata, generate outputs
-    # -----------------------------------------------
-    # LOGIC:
-    # 1. Find all objects with type dataset
-    # 2. For each dataset:
-    #   - Find md5sum of id and version.
-    #   - Check if associated file/object has already been created. If yes,
-    #     load object from file. If not, create empty object.
-    #   - Populate key-value pairs based on extractor type (metalad_core,
-    #     metalad_core_dataset, metalad_studyminimeta)
-    #   - Add extra key-value pairs required for UI, but not contained in any
-    #     extractors or not available in required format
-    #   - Find all subdatasets for current dataset. For each subdataset,
-    #     create an object and:
-    #       + add standard dataset fields (id, version, etc)
-    #       + add subdataset and path/directory details to the 'children'
-    #         array of the parent dataset
-    #   - Find all files for current dataset. For each file:
-    #       + add file and path/directory details to the 'children' array of
-    #         the parent dataset
-    #   - ... WIP
+    # Initialise empty list for appending superdataset details
     super_datasets = []
-
     datasets = filter_metadata_objects(metadata,
                                        options_dict={"type": "dataset"})
     for dataset in datasets:
         # Initialise new/existing object from metadata
-        new_obj = get_dataset_object(dataset["dataset_id"],
-                                     dataset["dataset_version"],
-                                     metadata_out_dir)
+        new_obj, blob_file = get_dataset_object(dataset["dataset_id"],
+                                                dataset["dataset_version"],
+                                                metadata_out_dir)
         # Populate key-value pairs based on extractor type
         if "extractor_name" in dataset:
             parse_metadata_object(dataset, new_obj, templates_path)
@@ -125,7 +119,7 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path):
             # DataLad (or decide not to allow this)
             print("Unrecognized metadata type: non-DataLad")
         # Add missing fields required for UI
-        new_obj = add_missing_fields(new_obj)
+        new_obj = add_missing_fields(new_obj, templates_path)
         # Get all subdatasets of curent dataset
         subdatasets = filter_metadata_objects(
                         datasets,
@@ -133,126 +127,38 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path):
                             "root_dataset_id": dataset["dataset_id"],
                             "root_dataset_version": dataset["dataset_version"]
                         })
-        # 
+        # If subdatasets exist, add them to superdataset list and to
+        # main dataset object
         if len(subdatasets) > 0:
-            # First save superdataset details to list, for writing to file later
-            # TODO: handle extra times this section is called because of multiple
+            # First save superdataset details to list, for writing to file
+            # TODO: handle extra times this section is called because of >1
             # metadata objects resulting from different metalad extractors
-            idx_super, super_datasets = add_update_superdatasets(new_obj, super_datasets)
-
-        # Then populate subdataset details and append to current dataset
-        # 'subdatasets' field, unless previously done
-        for subds in subdatasets:
-            # TODO: check if the subdatasets already exist and decide whether
-            # to overwrite or skip. Currently overwritten
-            new_sub_obj = {}
-            new_sub_obj["dataset_id"] = subds["dataset_id"]
-            new_sub_obj["dataset_version"] = subds["dataset_version"]
-            new_sub_obj["dataset_path"] = subds["dataset_path"]
-            new_sub_obj["dirs_from_path"] = subds["dataset_path"].split(os.path.sep)
-            if not any(x["dataset_id"] == subds["dataset_id"] for x in new_obj["subdatasets"]):
-                new_obj["subdatasets"].append(new_sub_obj)
-            else:
-                continue
-            # Write subdataset blob to relevant superdataset in list
-            blob_hash = md5blob(subds["dataset_id"], subds["dataset_version"])
-            if blob_hash not in super_datasets[idx_super]["subdataset_blobs"]:
-                super_datasets[idx_super]["subdataset_blobs"].append(blob_hash)
-
-            # Add subdataset locations as children to parent dataset
-            nr_nodes = len(new_sub_obj["dirs_from_path"])
-            iter_object = new_obj["children"]
-            idx = -1
-            for n, node in enumerate(new_sub_obj["dirs_from_path"]):
-                if n>0:
-                    iter_object = iter_object[idx]["children"]
-                if n != nr_nodes-1:
-                    # this is a directory
-                    idx_found = next((i for i, item in enumerate(iter_object) if item["type"] == "directory" and item["name"] == node), -1)
-                else:
-                    # last element, this is a subdataset
-                    idx_found = next((i for i, item in enumerate(iter_object) if item["type"] == "dataset" and item["name"] == node), -1)
-                if idx_found < 0:
-                    if n != nr_nodes-1:
-                        # this is a directory
-                        new_node = {
-                            "type": "directory",
-                            "name": node,
-                            "children": []
-                        }
-                    else:
-                        # last element, this is a subdataset
-                        new_node = {
-                            "type": "dataset",
-                            "name": node,
-                            "dataset_id": subds["dataset_id"],
-                            "dataset_version": subds["dataset_version"]
-                        }
-                    iter_object.append(new_node)
-                    idx = len(iter_object) - 1
-                else:
-                    idx = idx_found
-        
-        # Files /  Children
-        # TODO: figure out if we should create a single json file per dataset
-        # file, or if all files are to be listed as children in a nested directory
-        # structure as a field in the main dataset object OR a mixture of these.
-        # Also figure out how to limit the nested-ness within a single object, only
-        # render children up to a max amount in the UI, at which point a pointer
-        # should identify which file is to be loaded via HTTP request if the rest
-        # of the information is to be rendered. Take into account that a file does
-        # not have an id and version, so naming of separate blobs per file would
-        # likely be something like md5sum(parent_dataset_id-parent_dataset_version-file_path_relative_to_parent)
-        # For now, add files as children part of the dataset object:
-        # find all files belonging to current dataset
-        files = [item for item in metadata if item["type"] == "file" and item["dataset_id"] == dataset["dataset_id"] and item["dataset_version"] == dataset["dataset_version"]]
-        for file in files:
-            # Add subdataset locations as children to parent dataset
-            nodes = file["path"].split("/")
-            nr_nodes = len(nodes)
-            iter_object = new_obj["children"]
-            idx = -1
-            for n, node in enumerate(nodes):
-                if n>0:
-                    iter_object = iter_object[idx]["children"]
-                if n != nr_nodes-1:
-                    # this is a directory
-                    idx_found = next((i for i, item in enumerate(iter_object) if item["type"] == "directory" and item["name"] == node), -1)
-                else:
-                    # last element, this is a file
-                    idx_found = next((i for i, item in enumerate(iter_object) if item["type"] == "file" and item["name"] == node), -1)
-                if idx_found < 0:
-                    if n != nr_nodes-1:
-                        # this is a directory
-                        new_node = {
-                            "type": "directory",
-                            "name": node,
-                            "children": []
-                        }
-                    else:
-                        # last element, this is a file
-                        bytesize = -1
-                        if "contentbytesize" in file["extracted_metadata"]:
-                            bytesize = file["extracted_metadata"]["contentbytesize"]
-                        url = ""
-                        if "distribution" in file["extracted_metadata"] and "url" in file["extracted_metadata"]["distribution"]:
-                            url = file["extracted_metadata"]["distribution"]["url"]
-                        new_node = {
-                            "type": "file",
-                            "name": node,
-                            "contentbytesize": bytesize,
-                            "url": url
-                        }
-                    iter_object.append(new_node)
-                    idx = len(iter_object) - 1
-                else:
-                    idx = idx_found
-
-        # Write object to file
+            idx_super, super_datasets = add_update_superdatasets(
+                dataset_object=new_obj,
+                super_datasets=super_datasets)
+            # Then populate subdataset details and append to current dataset
+            # 'subdatasets' field, unless previously done
+            new_obj, super_datasets = add_update_subdatasets(
+                dataset_object=new_obj,
+                subdatasets=subdatasets,
+                super_datasets=super_datasets,
+                idx_super=idx_super)
+        # Find all files with the main object as parent dataset, and add
+        # them as children
+        files = filter_metadata_objects(
+                    metadata,
+                    options_dict={
+                        "type": "file",
+                        "dataset_id": dataset["dataset_id"],
+                        "dataset_version": dataset["dataset_version"]
+                    })
+        new_obj = add_update_files(dataset_object=new_obj, files=files)
+        # Write main data object to file
         with open(blob_file, 'w') as fp:
             json.dump(new_obj, fp)
 
-    # Create single file with all superdatasets (datasets.json) for main page browsing
+    # Create single file with all superdatasets (datasets.json)
+    # for main page browsing
     super_dataset_file = os.path.join(metadata_out_dir, 'datasets.json')
     with open(super_dataset_file, 'w') as f:
         json.dump(super_datasets, f)
@@ -268,7 +174,7 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path):
                 json.dump(ds, f)
 
     # Copy all remaining components from templates to output directory
-    copy_assets()
+    copy_ui_content(repo_path, out_dir, package_path, overwrite)
 
 
 # --------------------
@@ -291,8 +197,11 @@ def load_json_file(filename):
     try:
         with open(filename) as f:
             return json.load(f)
+    except OSError as err:
+        print("OS error: {0}".format(err))
     except:
-        print("Exception occurred: ", sys.exc_info()[0])
+        print("Unexpected error:", sys.exc_info()[0])
+        raise
 
 
 def copy_key_vals(src_object, dest_object, keys=[], overwrite=True):
@@ -301,7 +210,7 @@ def copy_key_vals(src_object, dest_object, keys=[], overwrite=True):
     a source dictionary to a destination dictionary, provided that the
     key-value pair exists in the source dictionary and that it doesn't
     exist in the destination dictionary. If it does, only copy if the
-    overwrite boolean is specified as True.
+    overwrite boolean is specified as True (default).
     """
     # If an empty list is provided, use all keys from src_object
     if not keys:
@@ -313,20 +222,54 @@ def copy_key_vals(src_object, dest_object, keys=[], overwrite=True):
     return dest_object
 
 
-def copy_assets():
+def setup_metadata_dir(out_dir):
     """
+    Setup the 'metadata' directory for saving output files
+    """
+    # If the metadata directory already exists, remove it with its contents
+    metadata_path = Path(out_dir) / 'metadata'
+    if metadata_path.exists() and metadata_path.is_dir():
+        shutil.rmtree(metadata_path)
+    Path(metadata_path).mkdir(parents=True)
+    return metadata_path
 
+
+def copy_ui_content(repo_path, out_dir, package_path, overwrite):
     """
-    # Assets
-    assets = ["md5-2.3.0.js", "style.css", "vue_app.js"]
-    for asset_fn in assets:
-        shutil.copy2(os.path.join(assets_path, asset_fn), assets_out_dir)
-    # Artwork
-    artworks = ["datalad_logo_wide.svg", "View1.svg"]
-    for artwork_fn in artworks:
-        shutil.copy2(os.path.join(artwork_path, artwork_fn), artwork_out_dir)
-    # Main UI (html)
-    shutil.copy2(os.path.join(package_path, 'index.html'), out_dir)
+    Copy all content required for the user interface to render
+
+    This includes assets (JS, CSS), artwork and the main html.
+    """
+    content_paths = {
+        "assets": Path(package_path) / 'assets',
+        "artwork": Path(repo_path) / 'artwork',
+        "html": Path(package_path) / 'index.html',
+    }
+    out_dir_paths = {
+        "assets": Path(out_dir) / 'assets',
+        "artwork": Path(out_dir) / 'artwork',
+        "html": Path(out_dir) / 'index.html',
+    }
+    for key in content_paths:
+        copy_overwrite_path(src=content_paths[key],
+                            dest=out_dir_paths[key],
+                            overwrite=overwrite)
+
+
+def copy_overwrite_path(src, dest, overwrite):
+    """
+    Copy or overwrite a directory or file
+    """
+    isFile = src.is_file()
+    if dest.exists() and not overwrite:
+        pass
+    else:
+        if isFile:
+            shutil.copy2(src, dest)
+        else:
+            if dest.exists():
+                shutil.rmtree(dest)
+            shutil.copytree(src, dest)
 
 
 def get_dataset_object(dataset_id, dataset_version, data_dir):
@@ -337,9 +280,9 @@ def get_dataset_object(dataset_id, dataset_version, data_dir):
     blob_hash = md5blob(dataset_id, dataset_version)
     blob_file = os.path.join(data_dir, blob_hash + ".json")
     if os.path.isfile(blob_file):
-        return load_json_file(blob_file)
+        return load_json_file(blob_file), blob_file
     else:
-        return {}
+        return {}, blob_file
 
 
 def parse_metadata_object(src_object, dest_object, schema_path):
@@ -351,7 +294,7 @@ def parse_metadata_object(src_object, dest_object, schema_path):
         schema_file = os.path.join(schema_path, "core_dataset_schema.json")
         dest_object = core_dataset_parse(src_object, dest_object, schema_file)
     elif src_object["extractor_name"] == "metalad_studyminimeta":
-        schema_file = os.path.join("templates", "studyminimeta_schema.json")
+        schema_file = os.path.join(schema_path, "studyminimeta_schema.json")
         dest_object = studyminimeta_parse(src_object, dest_object, schema_file)
     elif src_object["extractor_name"] == "metalad_core":
         # do nothing for now, until decided if/how files should be parsed
@@ -434,6 +377,134 @@ def add_update_superdatasets(dataset_object, super_datasets):
     return idx_super, super_datasets
 
 
+def object_in_list(attribute_key, attribute_val, search_list):
+    """
+    Returns True if an object with an attribute equal to a specific value
+    exists in a list, else returns False.
+    """
+    return any(x[attribute_key] == attribute_val for x in search_list)
+
+
+def add_update_subdatasets(dataset_object, subdatasets, super_datasets,
+                           idx_super):
+    """
+    For each subdataset in a list, add subdataset locations as children to
+    parent dataset
+    """
+    for subds in subdatasets:
+        # TODO: check if the subdatasets already exist and decide whether
+        # to overwrite or skip. Currently overwritten
+        new_sub_obj = copy_key_vals(src_object=subds,
+                                    dest_object={},
+                                    keys=["dataset_id",
+                                          "dataset_version",
+                                          "dataset_path"])
+        sep = os.path.sep
+        new_sub_obj["dirs_from_path"] = subds["dataset_path"].split(sep)
+        if not object_in_list(attribute_key="dataset_id",
+                              attribute_val=subds["dataset_id"],
+                              search_list=dataset_object["subdatasets"]):
+            dataset_object["subdatasets"].append(new_sub_obj)
+        else:
+            continue
+        # Write subdataset blob to relevant superdataset in list
+        blob_hash = md5blob(subds["dataset_id"], subds["dataset_version"])
+        if blob_hash not in super_datasets[idx_super]["subdataset_blobs"]:
+            super_datasets[idx_super]["subdataset_blobs"].append(blob_hash)
+
+        # Add subdataset locations as children to parent dataset
+        nr_nodes = len(new_sub_obj["dirs_from_path"])
+        iter_object = dataset_object["children"]
+        idx = -1
+        for n, node in enumerate(new_sub_obj["dirs_from_path"]):
+            if n > 0:
+                iter_object = iter_object[idx]["children"]
+            if n != nr_nodes-1:
+                # this is a directory
+                idx_found = next((i for i, item in enumerate(iter_object)
+                                  if item["type"] == "directory"
+                                  and item["name"] == node), -1)
+            else:
+                # last element, this is a subdataset
+                idx_found = next((i for i, item in enumerate(iter_object)
+                                  if item["type"] == "dataset"
+                                  and item["name"] == node), -1)
+            if idx_found < 0:
+                if n != nr_nodes-1:
+                    # this is a directory
+                    new_node = {
+                        "type": "directory",
+                        "name": node,
+                        "children": []
+                    }
+                else:
+                    # last element, this is a subdataset
+                    new_node = {
+                        "type": "dataset",
+                        "name": node,
+                        "dataset_id": subds["dataset_id"],
+                        "dataset_version": subds["dataset_version"]
+                    }
+                iter_object.append(new_node)
+                idx = len(iter_object) - 1
+            else:
+                idx = idx_found
+    return dataset_object, super_datasets
+
+
+def add_update_files(dataset_object, files):
+    """
+    For each file in a list, add file locations as children to parent dataset
+    """
+    for file in files:
+        nodes = file["path"].split("/")
+        nr_nodes = len(nodes)
+        iter_object = dataset_object["children"]
+        idx = -1
+        for n, node in enumerate(nodes):
+            if n > 0:
+                iter_object = iter_object[idx]["children"]
+            if n != nr_nodes-1:
+                # this is a directory
+                idx_found = next((i for i, item in enumerate(iter_object)
+                                  if item["type"] == "directory"
+                                  and item["name"] == node), -1)
+            else:
+                # last element, this is a file
+                idx_found = next((i for i, item in enumerate(iter_object)
+                                  if item["type"] == "file"
+                                  and item["name"] == node), -1)
+            if idx_found < 0:
+                if n != nr_nodes-1:
+                    # this is a directory
+                    new_node = {
+                        "type": "directory",
+                        "name": node,
+                        "children": []
+                    }
+                else:
+                    # last element, this is a file
+                    bytesize = -1
+                    if "contentbytesize" in file["extracted_metadata"]:
+                        bytesize = \
+                            file["extracted_metadata"]["contentbytesize"]
+                    url = ""
+                    if "distribution" in file["extracted_metadata"] \
+                       and "url" in file["extracted_metadata"]["distribution"]:
+                        url = file["extracted_metadata"]["distribution"]["url"]
+                    new_node = {
+                        "type": "file",
+                        "name": node,
+                        "contentbytesize": bytesize,
+                        "url": url
+                    }
+                iter_object.append(new_node)
+                idx = len(iter_object) - 1
+            else:
+                idx = idx_found
+    return dataset_object
+
+
 def core_parse(src_object, dest_object, schema_file):
     """
     Parse metadata output by DataLad's `metalad_core` extractor and
@@ -467,52 +538,73 @@ def studyminimeta_parse(src_object, dest_object, schema_file):
     # Load schema/template dictionary, where each key represents the exact
     # same key in the destination object, and each associated value
     # represents the key in the source object which value is to be copied.
-    #TODO: request to add fields to metalad_studyminimeta extractor in metalad:
+    # TODO: request add fields to metalad_studyminimeta extractor in metalad:
     # - license, DOI,...
-    schema = load_json_file(schema_file)    
+    schema = load_json_file(schema_file)
     metadata = {}
     # Extract core objects/lists from src_object
-    metadata["dataset"] = next((item for item in src_object["extracted_metadata"]["@graph"] if "@type" in item and item["@type"] == "Dataset"), False)
+    metadata["dataset"] = next((item for item
+                                in src_object["extracted_metadata"]["@graph"]
+                                if "@type" in item
+                                and item["@type"] == "Dataset"), False)
     if not metadata["dataset"]:
-        print("Error: object where '@type' equals 'Dataset' not found in src_object['extracted_metadata']['@graph'] during studyminimeta extraction")
-    metadata["publicationList"] = next((item for item in src_object["extracted_metadata"]["@graph"] if "@id" in item and item["@id"] == "#publicationList"), False)
+        print("Error: object where '@type' equals 'Dataset' not found in \
+               src_object['extracted_metadata']['@graph'] during studyminimeta\
+                    extraction")
+    metadata["publicationList"] = \
+        next((item for item in src_object["extracted_metadata"]["@graph"]
+              if "@id" in item and item["@id"] == "#publicationList"), False)
     if not metadata["publicationList"]:
-        print("Error: object where '@id' equals '#publicationList' not found in src_object['extracted_metadata']['@graph'] during studyminimeta extraction")
+        print("Error: object where '@id' equals '#publicationList' not found\
+               in src_object['extracted_metadata']['@graph'] during\
+               studyminimeta extraction")
     else:
         metadata["publicationList"] = metadata["publicationList"]["@list"]
-    metadata["personList"] = next((item for item in src_object["extracted_metadata"]["@graph"] if "@id" in item and item["@id"] == "#personList"), False)
+    metadata["personList"] = \
+        next((item for item in src_object["extracted_metadata"]["@graph"]
+              if "@id" in item and item["@id"] == "#personList"), False)
     if not metadata["personList"]:
-        print("Error: object where '@id' equals '#personList' not found in src_object['extracted_metadata']['@graph'] during studyminimeta extraction")
+        print("Error: object where '@id' equals '#personList' not found in\
+               src_object['extracted_metadata']['@graph'] during\
+               studyminimeta extraction")
     else:
         metadata["personList"] = metadata["personList"]["@list"]
-    # Standard/straightforward fields: copy source to destination values, per key
+    # Standard/straightforward fields: copy source to dest values per key
     for key in schema:
-        if isinstance(schema[key], list) and len(schema[key])==2:
+        if isinstance(schema[key], list) and len(schema[key]) == 2:
             dest_object[key] = metadata[schema[key][0]][schema[key][1]]
         else:
             dest_object[key] = schema[key]
     # Authors
     for author in metadata["dataset"]["author"]:
-        author_details = next((item for item in metadata["personList"] if item["@id"] == author["@id"]), False)
+        author_details = \
+            next((item for item in metadata["personList"]
+                  if item["@id"] == author["@id"]), False)
         if not author_details:
             idd = author["@id"]
-            print(f"Error: Person details not found in '#personList' for '@id' = {idd}")
+            print(f"Error: Person details not found in '#personList' for\
+                  '@id' = {idd}")
         else:
             dest_object["authors"].append(author_details)
     # Publications
     for pub in metadata["publicationList"]:
-        new_pub = {"type" if k == "@type" else k:v for k,v in pub.items()}
-        new_pub = {"doi" if k == "sameAs" else k:v for k,v in new_pub.items()}
-        new_pub["publication"] = {"type" if k == "@type" else k:v for k,v in new_pub.items()}
+        new_pub = {"type" if k == "@type" else k: v for k, v in pub.items()}
+        new_pub = {"doi" if k == "sameAs"
+                   else k: v for k, v in new_pub.items()}
+        new_pub["publication"] = {"type" if k == "@type"
+                                  else k: v for k, v in new_pub.items()}
         if "@id" in new_pub:
             new_pub.pop("@id")
         if "@id" in new_pub["publication"]:
             new_pub["publication"].pop("@id")
         for i, author in enumerate(new_pub["author"]):
-            author_details = next((item for item in metadata["personList"] if item["@id"] == author["@id"]), False)
+            author_details = \
+                next((item for item in metadata["personList"]
+                      if item["@id"] == author["@id"]), False)
             if not author_details:
                 idd = author["@id"]
-                print(f"Error: Person details not found in '#personList' for @id = {idd}")
+                print(f"Error: Person details not found in '#personList' for\
+                      @id = {idd}")
             else:
                 new_pub["author"][i] = author_details
         dest_object["publications"].append(new_pub)
@@ -531,3 +623,14 @@ def studyminimeta_parse(src_object, dest_object, schema_file):
 # TODO: figure out what to do when a dataset belongs to multiple super-datasets
 # TODO: if not provided, calculate directory/dataset size by accumulating
 # children file sizes
+# TODO: figure out if we should create a single json file per dataset
+    # file, or if all files are to be listed as children in a nested directory
+    # structure as a field in the main dataset object OR a mixture of these.
+    # Also figure out how to limit the nested-ness within a single object, only
+    # render children up to a max amount in the UI, at which point a pointer
+    # should identify which file is to be loaded via HTTP request if the rest
+    # of the information is to be rendered. Take into account that a file does
+    # not have an id and version, so naming of separate blobs per file would
+    # likely be something like:
+    # md5sum(parent_dataset_id-parent_dataset_version-file_path_relative_to_parent)
+    # For now, add files as children part of the dataset object
