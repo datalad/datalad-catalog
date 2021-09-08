@@ -279,6 +279,17 @@ var demo = new Vue({
     gotoHome() {
       router.push({ name: 'home'})
     },
+    gotoAbout() {
+      router.push({ name: 'about'})
+    },
+    gotoExternal(dest) {
+      const destinations = {
+        "github": "https://github.com/jsheunis/data-browser-from-metadata/tree/packaging",
+        "docs": "https://github.com/jsheunis/data-browser-from-metadata/tree/packaging",
+        "twitter": "https://twitter.com/datalad",
+      }
+      window.open(destinations[dest]);
+    }
   },
   beforeMount(){
     console.log('beforeMount')
