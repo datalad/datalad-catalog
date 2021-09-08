@@ -14,6 +14,10 @@ const metadata_dir = './metadata';
 const web_dir = './web';
 const superdatasets_file = metadata_dir + '/datasets.json';
 const json_file = metadata_dir + '/datasets.json';
+const super_dataset_id = 'deabeb9b-7a37-4062-a1e0-8fcef7909609';
+const super_dataset_version = '0321dbde969d2f5d6b533e35b5c5c51ac0b15758';
+const super_id_and_version = super_dataset_id + '-' + super_dataset_version;
+const super_hash = md5(super_id_and_version);
 
 // Component definition: recursive item in data tree
 Vue.component("tree-item", {
@@ -196,7 +200,10 @@ const notFound = {
 
 // Router definition
 const routes = [
-  { path: '/', component: mainPage, name: 'home' },
+  { path: '/', component: mainPage, name: 'home', redirect: to => ({
+                                                    name: "dataset",
+                                                    params: { blobId: super_hash },
+                                                  })},
   { path: '/dataset/:blobId', component: datasetView, name: 'dataset' },
   { path: '*', component: notFound, name: '404' }
 ];
@@ -290,7 +297,7 @@ var demo = new Vue({
 router.beforeEach((to, from, next) => {
   console.log('beforerouteupdateGLOBAL')
   if (to.name == 'dataset') {
-    console.log('on reroute: dataset page')
+    console.log('on reroute: dataset pageLKJHJKFGKUGLIYGIL')
     file = metadata_dir + '/' + to.params.blobId + '.json'
     var app = demo;
     var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
