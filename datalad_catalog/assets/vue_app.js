@@ -205,6 +205,7 @@ const routes = [
                                                     params: { blobId: super_hash },
                                                   })},
   { path: '/dataset/:blobId', component: datasetView, name: 'dataset' },
+  { path: '/about', component: mainPage, name: 'about' },
   { path: '*', component: notFound, name: '404' }
 ];
 const router = new VueRouter({
@@ -297,7 +298,7 @@ var demo = new Vue({
 router.beforeEach((to, from, next) => {
   console.log('beforerouteupdateGLOBAL')
   if (to.name == 'dataset') {
-    console.log('on reroute: dataset pageLKJHJKFGKUGLIYGIL')
+    console.log('on reroute: dataset page')
     file = metadata_dir + '/' + to.params.blobId + '.json'
     var app = demo;
     var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
