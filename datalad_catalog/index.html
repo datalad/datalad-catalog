@@ -292,10 +292,10 @@
           
               <b-collapse id="navbar-toggle-collapse" is-nav>
                 <b-navbar-nav class="ml-auto mb-0 xlfont">
-                  <b-nav-item v-b-tooltip.hover title="About" href="#"><i class="fas fa-info-circle"></i></b-nav-item>
-                  <b-nav-item v-b-tooltip.hover title="Read documentation" href="#"><i class="fas fa-file-alt"></i></b-nav-item>
-                  <b-nav-item v-b-tooltip.hover title="View code base" href="#"><i class="fab fa-github"></i></b-nav-item>
-                  <b-nav-item v-b-tooltip.hover title="Follow DataLad!" href="#"><i class="fab fa-twitter"></i></b-nav-item>
+                  <b-nav-item v-b-tooltip.hover title="About" @click="gotoAbout"><i class="fas fa-info-circle"></i></b-nav-item>
+                  <b-nav-item v-b-tooltip.hover title="Read documentation" @click="gotoExternal('docs')"><i class="fas fa-file-alt"></i></b-nav-item>
+                  <b-nav-item v-b-tooltip.hover title="View code base" @click="gotoExternal('github')"><i class="fab fa-github"></i></b-nav-item>
+                  <b-nav-item v-b-tooltip.hover title="Follow DataLad!" @click="gotoExternal('twitter')"><i class="fab fa-twitter"></i></b-nav-item>
                 </b-navbar-nav>
               </b-collapse>
             </b-navbar>
