@@ -159,7 +159,7 @@ const datasetView = {
       const content_repo_name = 'datalad-notebooks';
       const notebook_name = 'download_data_with_datalad_python.ipynb';
       binder_url = environment_url + '?urlpath=git-pull%3Frepo%3D' + content_url + '%26urlpath%3Dnotebooks%252F' 
-      + content_repo_name + '%252F' + notebook_name + '%3Frepourl%3D%22' + dataset_url + '%22%26autorun%3Dtrue';
+      + content_repo_name + '%252F' + notebook_name + '%3Frepourl%3D%22' + dataset_url + '%22';
       window.open(binder_url);
     }
   },
