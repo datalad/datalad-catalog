@@ -145,6 +145,22 @@ const datasetView = {
       month = d.getMonth();
       year = d.getFullYear();
       return year + '-' + (month > 9 ? month : '0' + month) + '-' + (day > 9 ? day : '0' + day)
+    },
+    gotoURL(url) {
+      window.open(url);
+    },
+    openWithBinder(dataset_url) {
+      const environment_url = 'https://mybinder.org/v2/gh/datalad/datalad-binder/parameter-test';
+      const content_url = 'https://github.com/jsheunis/datalad-notebooks';
+      const content_repo_name = 'datalad-notebooks';
+      const notebook_name = 'download_data_with_datalad_python.ipynb';
+      const environment_url = 'https://mybinder.org/v2/gh/datalad/datalad-binder/parameter-test';
+      const content_url = 'https://github.com/jsheunis/datalad-notebooks';
+      const content_repo_name = 'datalad-notebooks';
+      const notebook_name = 'download_data_with_datalad_python.ipynb';
+      binder_url = environment_url + '?urlpath=git-pull%3Frepo%3D' + content_url + '%26urlpath%3Dnotebooks%252F' 
+      + content_repo_name + '%252F' + notebook_name + '%3Frepourl%3D%22' + dataset_url + '%22%26autorun%3Dtrue';
+      window.open(binder_url);
     }
   },
   beforeRouteUpdate(to, from, next) {
@@ -288,7 +304,12 @@ var demo = new Vue({
         "docs": "https://github.com/jsheunis/data-browser-from-metadata/tree/packaging",
         "twitter": "https://twitter.com/datalad",
       }
-      window.open(destinations[dest]);
+      if (dest in destinations) {
+        window.open(destinations[dest]);
+      }
+      else {
+        window.open(dest);
+      }
     }
   },
   beforeMount(){
