@@ -615,6 +615,10 @@ def studyminimeta_parse(src_object, dest_object, schema_file):
 # ------------
 # MOAR TODOS!
 # ------------
+# TODO: IMPORTANT FOR CURRENT UPDATE:
+    # add fields to objects in subdatasets array, which in turn is a field of
+    #   the main superdataset object:
+    #   -extraction_time, name, short_name, doi, url, license, authors,keywords
 # TODO: figure out logging
 # TODO: figure out testing
 # TODO: figure out installation / building process
