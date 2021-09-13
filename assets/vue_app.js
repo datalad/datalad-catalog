@@ -6,7 +6,10 @@ TODO: add object and logic to track existence and content of dataset fields and 
 -- if there are no publications, hide empty publication card and show sentence "There are currently no publications associated with this dataset."
 -- show/hide components based on whether fields exist or are empty in json blob
 -- populate filler/adapted text (e.g. time of extraction ==> utc seconds converted to display date)
-
+TODO: FOR CURRENT UPDATE:
+  - go through html and js and see where there are redundant calls/sets to selectedDataset
+  - find alternatives for ".at(-1)" and ".some()" since they do not work in all browsers
+  - sort out main page, "home", breadcrums, navigation and display
 */
 
 // Data
@@ -14,6 +17,10 @@ const metadata_dir = './metadata';
 const web_dir = './web';
 const superdatasets_file = metadata_dir + '/datasets.json';
 const json_file = metadata_dir + '/datasets.json';
+const super_dataset_id = 'deabeb9b-7a37-4062-a1e0-8fcef7909609';
+const super_dataset_version = '0321dbde969d2f5d6b533e35b5c5c51ac0b15758';
+const super_id_and_version = super_dataset_id + '-' + super_dataset_version;
+const super_hash = md5(super_id_and_version);
 
 // Component definition: recursive item in data tree
 Vue.component("tree-item", {
@@ -74,7 +81,31 @@ const datasetView = {
     return {
       dataPath: [],
       showCopyTooltip: false,
-      tabIndex: 0
+      tabIndex: 0,
+      sort_name: true,
+      sort_modified: true,
+      sort_name_or_modified: true,
+      search_text: '',
+      search_tags: [],
+      tag_text: '',
+      tag_dropdown_open: false,
+      tag_options: [
+        "human",
+        "fMRI",
+        "task",
+        "7T",
+        "3T",
+        "audio",
+        "visual",
+        "music",
+        "retinotopy",
+        "angiography",
+        "T1,T2",
+        "stephan"
+      ],
+      tag_options_filtered: [],
+      tag_options_available: [],
+      popoverShow: false
     };
   },
   computed: {
@@ -88,11 +119,15 @@ const datasetView = {
       } else {
         disp_dataset["short_name"] = dataset["short_name"]
       }
-      // // Display breadcrums and dataset name
-      // if (!dataset.hasOwnProperty("root_dataset_id")) {
-      //   this.dataPath.push(dataset.short_name);
-      // } else {
-      // }
+      // Display breadcrums and dataset name
+      if (dataset.hasOwnProperty("root_dataset_id")) {
+        disp_dataset["display_name"] = ' / ' + dataset["dataset_path"].replace('/', ' / ');
+        disp_dataset["root_dataset"] = false;
+        // this.dataPath.push(dataset.short_name);
+      } else {
+        disp_dataset["display_name"] = ' - ' + dataset["short_name"]
+        disp_dataset["root_dataset"] = true;
+      }
       // DOI
       if (!dataset.hasOwnProperty("doi") || !dataset["doi"]) {
         disp_dataset["doi"] = "not available"
@@ -106,7 +141,41 @@ const datasetView = {
       id_and_version = dataset.dataset_id + '-' + dataset.dataset_version;
       disp_dataset.hash = md5(id_and_version);
       return disp_dataset
-    }
+    },
+    filteredSubdatasets() {
+      subdatasets = this.selectedDataset.subdatasets;
+      return subdatasets.filter(c => {
+        if(this.search_text == '') return true;
+        return ( (c.dirs_from_path.at(-1).toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)
+                  || (c.authors.some(e => e.givenName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)) 
+                  || (c.authors.some(f => f.familyName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)) );
+      })
+    },
+    tagFilteredSubdatasets() {
+      // target.every(v => arr.includes(v));
+      subdatasets = this.filteredSubdatasets;
+      return subdatasets.filter(c => {
+        if(this.search_tags.length == 0) return true;
+        return ( this.search_tags.every(v => c.keywords.includes(v)) );
+      })
+    },
+    sortedSubdatasets() {
+      subdatasets = this.tagFilteredSubdatasets;
+      if (this.sort_name_or_modified) {
+        if (this.sort_name) {
+          sorted = subdatasets.sort((a,b) => (a.dirs_from_path.at(-1) > b.dirs_from_path.at(-1) ? 1 : -1))
+        } else {
+          sorted = subdatasets.sort((a,b) => (a.dirs_from_path.at(-1) < b.dirs_from_path.at(-1) ? 1 : -1))
+        }
+      } else {
+        if (this.sort_modified) {
+          sorted = subdatasets.sort((a,b) => (a.extraction_time > b.extraction_time ? 1 : -1))
+        } else {
+          sorted = subdatasets.sort((a,b) => (a.extraction_time < b.extraction_time ? 1 : -1))
+        }
+      }
+      return sorted
+    },
   },
   methods: {
     copyCloneCommand(index) {
@@ -141,11 +210,100 @@ const datasetView = {
       month = d.getMonth();
       year = d.getFullYear();
       return year + '-' + (month > 9 ? month : '0' + month) + '-' + (day > 9 ? day : '0' + day)
+    },
+    gotoURL(url) {
+      window.open(url);
+    },
+    openWithBinder(dataset_url) {
+      const environment_url = 'https://mybinder.org/v2/gh/datalad/datalad-binder/parameter-test';
+      const content_url = 'https://github.com/jsheunis/datalad-notebooks';
+      const content_repo_name = 'datalad-notebooks';
+      const notebook_name = 'download_data_with_datalad_python.ipynb';
+      binder_url = environment_url + '?urlpath=git-pull%3Frepo%3D' + content_url + '%26urlpath%3Dnotebooks%252F' 
+      + content_repo_name + '%252F' + notebook_name + '%3Frepourl%3D%22' + dataset_url + '%22';
+      window.open(binder_url);
+    },
+    sortByName() {
+      this.sort_name = !this.sort_name;
+      this.sort_name_or_modified = true;
+    },
+    sortByModified() {
+      this.sort_modified = !this.sort_modified;
+      this.sort_name_or_modified = false;
+    },
+    toggleTagDropdown() {
+      dd = this.$refs.tag_dropdown
+      if (!dd.shown) {
+        dd.show()
+      }
+    },
+    addSearchTag(option) {
+      this.search_tags.push(option);
+      this.clearSearchTagText();
+      this.filterTags();
+    },
+    removeSearchTag(tag) {
+      idx = this.search_tags.indexOf(tag);
+      if (idx > -1) {
+        this.search_tags.splice(idx, 1);
+      }
+      this.filterTags();
+    },
+    clearSearchTagText() {
+      this.tag_text = '';
+      this.filterTags();
+      this.popoverShow = false
+
+    },
+    filterTags() {
+      this.tag_options_available = this.tag_options.filter(x => this.search_tags.indexOf(x)===-1);
+      this.tag_options_filtered  = this.tag_options_available.filter(str => str.indexOf(this.tag_text) >= 0);
+    },
+    inputTagText() {
+      this.popoverShow = true;
+      this.filterTags();
+    },
+    onClose() {
+      this.popoverShow = false
+    },
+    onShow() {
+      // This is called just before the popover is shown
+      // Reset our popover form variables
+      // this.focusRef(this.$refs.tag_search_input)
+    },
+    onShown() {
+      // Called just after the popover has been shown
+      // Transfer focus to the first input
+      
+    },
+    onHidden() {
+      // Called just after the popover has finished hiding
+      // this.tag_text = '';
+      // Bring focus back to the button
+      // this.focusRef(this.$refs.button)
+    },
+    focusRef(ref) {
+      // Some references may be a component, functional component, or plain element
+      // This handles that check before focusing, assuming a `focus()` method exists
+      // We do this in a double `$nextTick()` to ensure components have
+      // updated & popover positioned first
+      this.$nextTick(() => {
+        this.$nextTick(() => {
+          ;(ref.$el || ref).focus()
+        })
+      })
+    },
+    validator(tag) {
+      return this.tag_options_available.indexOf(tag) >= 0
     }
   },
   beforeRouteUpdate(to, from, next) {
     this.tabIndex = 0;
     next();
+  },
+  mounted() {
+    this.tag_options_filtered = this.tag_options;
+    this.tag_options_available = this.tag_options;
   }
 };
 
@@ -197,8 +355,14 @@ const notFound = {
 
 // Router definition
 const routes = [
-  { path: '/', component: mainPage, name: 'home' },
+  { path: '/', component: mainPage, name: 'home', redirect: to => ({
+                                                    name: "dataset",
+                                                    params: { blobId: super_hash },
+                                                  })
+  },
+  // { path: '/', component: mainPage, name: 'home'},
   { path: '/dataset/:blobId', component: datasetView, name: 'dataset' },
+  { path: '/about', component: mainPage, name: 'about' },
   { path: '*', component: notFound, name: '404' }
 ];
 const router = new VueRouter({
@@ -272,6 +436,22 @@ var demo = new Vue({
     gotoHome() {
       router.push({ name: 'home'})
     },
+    gotoAbout() {
+      router.push({ name: 'about'})
+    },
+    gotoExternal(dest) {
+      const destinations = {
+        "github": "https://github.com/jsheunis/data-browser-from-metadata/tree/packaging",
+        "docs": "https://github.com/jsheunis/data-browser-from-metadata/tree/packaging",
+        "twitter": "https://twitter.com/datalad",
+      }
+      if (dest in destinations) {
+        window.open(destinations[dest]);
+      }
+      else {
+        window.open(dest);
+      }
+    }
   },
   beforeMount(){
     console.log('beforeMount')
