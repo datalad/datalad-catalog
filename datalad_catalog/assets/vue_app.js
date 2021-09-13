@@ -119,11 +119,15 @@ const datasetView = {
       } else {
         disp_dataset["short_name"] = dataset["short_name"]
       }
-      // // Display breadcrums and dataset name
-      // if (!dataset.hasOwnProperty("root_dataset_id")) {
-      //   this.dataPath.push(dataset.short_name);
-      // } else {
-      // }
+      // Display breadcrums and dataset name
+      if (dataset.hasOwnProperty("root_dataset_id")) {
+        disp_dataset["display_name"] = ' / ' + dataset["dataset_path"].replace('/', ' / ');
+        disp_dataset["root_dataset"] = false;
+        // this.dataPath.push(dataset.short_name);
+      } else {
+        disp_dataset["display_name"] = ' - ' + dataset["short_name"]
+        disp_dataset["root_dataset"] = true;
+      }
       // DOI
       if (!dataset.hasOwnProperty("doi") || !dataset["doi"]) {
         disp_dataset["doi"] = "not available"
@@ -239,12 +243,17 @@ const datasetView = {
       this.filterTags();
     },
     removeSearchTag(tag) {
-      this.search_tags.pop(tag);
+      idx = this.search_tags.indexOf(tag);
+      if (idx > -1) {
+        this.search_tags.splice(idx, 1);
+      }
       this.filterTags();
     },
     clearSearchTagText() {
       this.tag_text = '';
+      this.filterTags();
       this.popoverShow = false
+
     },
     filterTags() {
       this.tag_options_available = this.tag_options.filter(x => this.search_tags.indexOf(x)===-1);
@@ -260,7 +269,7 @@ const datasetView = {
     onShow() {
       // This is called just before the popover is shown
       // Reset our popover form variables
-      this.focusRef(this.$refs.tag_search_input)
+      // this.focusRef(this.$refs.tag_search_input)
     },
     onShown() {
       // Called just after the popover has been shown
@@ -269,6 +278,7 @@ const datasetView = {
     },
     onHidden() {
       // Called just after the popover has finished hiding
+      // this.tag_text = '';
       // Bring focus back to the button
       // this.focusRef(this.$refs.button)
     },
@@ -289,6 +299,7 @@ const datasetView = {
   },
   beforeRouteUpdate(to, from, next) {
     this.tabIndex = 0;
+    next();
   },
   mounted() {
     this.tag_options_filtered = this.tag_options;

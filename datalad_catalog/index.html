@@ -75,7 +75,10 @@
       <div>
         <b-card border-variant="dark">
           <b-card-body>
-            <b-card-title><a @click="gotoHome" class="newlink"><i class="fas fa-home"></i></a> / {{selectedDataset.name}}</b-card-title> <!-- &mldr; -->
+            <b-card-title>
+              <span v-if="displayData.root_dataset"><a @click="gotoHome" class="newlink"><i class="fas fa-home"></i>{{displayData.display_name}}</a></span>
+              <span v-else><a @click="gotoHome" class="newlink"><i class="fas fa-home"></i></a>{{displayData.display_name}}</span>
+            </b-card-title> <!-- &mldr; -->
             <b-card-sub-title class="mb-2">
               <span v-for="(author, index) in selectedDataset.authors">{{author.givenName}} {{author.familyName}}<span v-if="index != selectedDataset.authors.length - 1">, </span></span>
             </b-card-sub-title>
