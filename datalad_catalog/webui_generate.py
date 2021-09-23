@@ -103,24 +103,10 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path,
     # (assume for now that the data were exported by using `datalad meta-dump`,
     # and that all exported objects were added to an array in a json file)
     metadata = load_json_file(metadata_file)
-    # Initialise empty list for appending superdataset details
-    # super_datasets = []
-    # TODO: should we rather isolate and populate superdatasets here?
-    # # ---REWRITE---
-    # # Initialise empty list for appending superdataset details
-    # super_datasets = [item for item in metadata if "type" in item
-    #                   and item["type"] == "dataset"
-    #                   and "root_dataset_id" not in item]
-
-    # N_super_datasets = len(super_datasets)
-    # if N_super_datasets == 0:
-    #     # No superdatasets found: error
-    #     print("Error: no superdataset found in input. datalad_catalog\
-    #           requires all input metadata to be generated from a single\
-    #           superdataset.")
-    # else:
-    #     # Superdataset(s) found
-    #     for superds in super_datasets:
+    # Isolate the superdataset, write to file
+    super_ds = search_superdataset(metadata)
+    write_superdataset(super_ds, metadata_out_dir)
+    # Grab all datasets from metadata
     datasets = filter_metadata_objects(metadata,
                                        options_dict={"type": "dataset"})
     # Initialise empty list for appending indices of processed datasets
@@ -135,11 +121,6 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path,
         processed_datasets, new_obj = \
             process_dataset(dataset, datasets, processed_datasets,
                             metadata, metadata_out_dir, templates_path)
-    # # Create single file with all superdatasets (datasets.json)
-    # # for main page browsing
-    # super_dataset_file = os.path.join(metadata_out_dir, 'datasets.json')
-    # with open(super_dataset_file, 'w') as f:
-    #     json.dump(super_datasets, f)
 
     # Write parent dataset name and shortname to all subdataset blobs
     for parent_hash in processed_datasets:
@@ -160,6 +141,48 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path,
 # --------------------
 # Function definitions
 # --------------------
+def search_superdataset(metadata):
+    """
+    Find the main superdataset from the list of input metadata.
+    Throw errors if zero or multiple superdatasets are found.
+    Create file to save details of single superdataset
+    """
+    super_datasets = [item for item in metadata if "type" in item
+                      and item["type"] == "dataset"
+                      and "root_dataset_id" not in item]
+    if len(super_datasets) == 0:
+        # No superdatasets found: error
+        print("Error: no superdataset found in input. datalad_catalog\
+              requires all input metadata to be generated from a single\
+              superdataset.")
+        sys.exit("No superdatasets found")
+
+    unique_supers = set([])
+    for ds in super_datasets:
+        blob_hash = md5blob(ds["dataset_id"], ds["dataset_version"])
+        unique_supers.add(blob_hash)
+
+    if len(unique_supers) > 1:
+        # Multiple superdatasets found: error
+        print("Error: multiple superdatasets found in input. datalad_catalog\
+              requires all input metadata to be generated from a single\
+              superdataset.")
+        sys.exit("Multiple superdatasets found")
+    else:
+        # Single superdataset found
+        return super_datasets[0]
+
+
+def write_superdataset(superds, metadata_out_dir):
+    """
+    """
+    suberds_obj = {"dataset_id": superds["dataset_id"],
+                   "dataset_version": superds["dataset_version"]}
+    superds_file = os.path.join(metadata_out_dir, "super.json")
+    with open(superds_file, 'w') as f:
+        json.dump(suberds_obj, f)
+
+
 def process_dataset(dataset, all_datasets, processed_datasets,
                     metadata, metadata_out_dir, templates_path):
     """
