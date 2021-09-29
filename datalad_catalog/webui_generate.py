@@ -393,9 +393,8 @@ def parse_metadata_object(src_object, dest_object, schema_path):
         schema_file = os.path.join(schema_path, "studyminimeta_schema.json")
         dest_object = studyminimeta_parse(src_object, dest_object, schema_file)
     elif src_object["extractor_name"] == "metalad_core":
-        # do nothing for now, until decided if/how files should be parsed
-        # instead of (or in addition to) to current `children` setup
-        pass
+        schema_file = os.path.join(schema_path, "core_schema.json")
+        dest_object = core_parse(src_object, dest_object, schema_file)
     else:
         print("Unrecognized metadata type: DataLad-related")
     return dest_object
@@ -629,6 +628,23 @@ def core_parse(src_object, dest_object, schema_file):
     Parse metadata output by DataLad's `metalad_core` extractor and
     translate into JSON structure from which UI is generated.
     """
+    # Load schema/template dictionary, where each key represents the exact
+    # same key in the destination object, and each associated value
+    # represents the key in the source object which value is to be copied.
+    schema = load_json_file(schema_file)
+    # Copy source to destination values, per key
+    for key in schema:
+        if schema[key] in src_object:
+            dest_object[key] = src_object[schema[key]]
+    # Populate URL field
+    ds_info = next((item for item in src_object["extracted_metadata"]["@graph"]
+                    if "@type" in item and item["@type"] == "Dataset"), False)
+    if ds_info and "distribution" in ds_info:
+        origin = next((item for item in ds_info["distribution"]
+                       if "name" in item and item["@name"] == "origin"), False)
+        if origin:
+            dest_object["url"] = origin["url"]
+    return dest_object
 
 
 def core_dataset_parse(src_object, dest_object, schema_file):
@@ -662,6 +678,14 @@ def studyminimeta_parse(src_object, dest_object, schema_file):
     schema = load_json_file(schema_file)
     metadata = {}
     # Extract core objects/lists from src_object
+    metadata["study"] = next((item for item
+                              in src_object["extracted_metadata"]["@graph"]
+                              if "@type" in item
+                              and item["@type"] == "CreativeWork"), False)
+    if not metadata["study"]:
+        print("Error: object where '@type' equals 'CreativeWork' not found in \
+               src_object['extracted_metadata']['@graph'] during studyminimeta\
+                    extraction")
     metadata["dataset"] = next((item for item
                                 in src_object["extracted_metadata"]["@graph"]
                                 if "@type" in item
