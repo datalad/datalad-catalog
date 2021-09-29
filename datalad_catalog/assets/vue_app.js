@@ -89,20 +89,21 @@ const datasetView = {
       search_tags: [],
       tag_text: '',
       tag_dropdown_open: false,
-      tag_options: [
-        "human",
-        "fMRI",
-        "task",
-        "7T",
-        "3T",
-        "audio",
-        "visual",
-        "music",
-        "retinotopy",
-        "angiography",
-        "T1,T2",
-        "stephan"
-      ],
+      tag_options: [],
+      // tag_options: [
+      //   "human",
+      //   "fMRI",
+      //   "task",
+      //   "7T",
+      //   "3T",
+      //   "audio",
+      //   "visual",
+      //   "music",
+      //   "retinotopy",
+      //   "angiography",
+      //   "T1,T2",
+      //   "stephan"
+      // ],
       tag_options_filtered: [],
       tag_options_available: [],
       popoverShow: false
@@ -302,6 +303,7 @@ const datasetView = {
     next();
   },
   mounted() {
+    this.tag_options = this.selectedDataset["subdataset_keywords"]
     this.tag_options_filtered = this.tag_options;
     this.tag_options_available = this.tag_options;
   }
@@ -358,7 +360,7 @@ const routes = [
   { path: '/', component: mainPage, name: 'home', redirect: to => ({
                                                     name: "dataset",
                                                     params: { blobId: getSuper() },
-                                                  })
+                                                  }),
   },
   // { path: '/', component: mainPage, name: 'home'},
   { path: '/dataset/:blobId', component: datasetView, name: 'dataset' },

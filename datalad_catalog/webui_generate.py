@@ -230,10 +230,11 @@ def process_dataset(dataset, all_datasets, processed_datasets,
     # main dataset object
     sub_blob_hashes = []
     subdataset_objects = []
+    subdataset_keywords = set([])
     for subds in subdatasets:
         sub_blob_hash = md5blob(subds["dataset_id"], subds["dataset_version"])
         if sub_blob_hash not in sub_blob_hashes:
-            sub_blob_hashes.append(sub_blob_hash)   
+            sub_blob_hashes.append(sub_blob_hash)
         if sub_blob_hash in processed_datasets:
             continue
         # Process this subds, other related datasets, subdatasets, and files
@@ -241,9 +242,11 @@ def process_dataset(dataset, all_datasets, processed_datasets,
             process_dataset(subds, all_datasets, processed_datasets,
                             metadata, metadata_out_dir, templates_path)
         subdataset_objects.append(subds_obj)
+        subdataset_keywords.update(subds_obj["keywords"])
     # Then populate subdataset details and append to current dataset
     # 'subdatasets' field
     new_obj["subdataset_blobs"] = sub_blob_hashes
+    new_obj["subdataset_keywords"] = list(subdataset_keywords)
     new_obj = add_update_subdatasets(dataset_object=new_obj,
                                      subdatasets=subdataset_objects)
     # Find all files with the main object as parent dataset, and add
