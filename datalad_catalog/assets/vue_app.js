@@ -8,7 +8,7 @@ TODO: add object and logic to track existence and content of dataset fields and 
 -- populate filler/adapted text (e.g. time of extraction ==> utc seconds converted to display date)
 TODO: FOR CURRENT UPDATE:
   - go through html and js and see where there are redundant calls/sets to selectedDataset
-  - find alternatives for ".at(-1)" and ".some()" since they do not work in all browsers
+  - find alternatives for ".some()" since it might not work in all browsers
   - sort out main page, "home", breadcrums, navigation and display
 */
 
@@ -147,7 +147,7 @@ const datasetView = {
       subdatasets = this.selectedDataset.subdatasets;
       return subdatasets.filter(c => {
         if(this.search_text == '') return true;
-        return ( (c.dirs_from_path.at(-1).toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)
+        return ( (c.dirs_from_path[c.dirs_from_path.length - 1].toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)
                   || (c.authors.some(e => e.givenName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)) 
                   || (c.authors.some(f => f.familyName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)) );
       })
@@ -164,9 +164,9 @@ const datasetView = {
       subdatasets = this.tagFilteredSubdatasets;
       if (this.sort_name_or_modified) {
         if (this.sort_name) {
-          sorted = subdatasets.sort((a,b) => (a.dirs_from_path.at(-1) > b.dirs_from_path.at(-1) ? 1 : -1))
+          sorted = subdatasets.sort((a,b) => (a.dirs_from_path[a.dirs_from_path.length - 1] > b.dirs_from_path[b.dirs_from_path.length - 1] ? 1 : -1))
         } else {
-          sorted = subdatasets.sort((a,b) => (a.dirs_from_path.at(-1) < b.dirs_from_path.at(-1) ? 1 : -1))
+          sorted = subdatasets.sort((a,b) => (a.dirs_from_path[a.dirs_from_path.length - 1] < b.dirs_from_path[b.dirs_from_path.length - 1] ? 1 : -1))
         }
       } else {
         if (this.sort_modified) {
