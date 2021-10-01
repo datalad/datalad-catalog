@@ -36,7 +36,6 @@ def run_cmd():
         generated.")
     arguments: Namespace = argument_parser.parse_args()
     print(arguments, file=sys.stderr)
-    print("this is the end!")
     # Set parameters for datalad_catalog()
     metadata_file = arguments.file_path
     script_path = os.path.realpath(__file__)
@@ -130,7 +129,8 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path,
             child_file = os.path.join(metadata_out_dir, child_hash + ".json")
             ds = load_json_file(child_file)
             ds["root_dataset_name"] = parent_ds["name"]
-            ds["root_dataset_short_name"] = parent_ds["short_name"]
+            if "short_name" in parent_ds:
+                ds["root_dataset_short_name"] = parent_ds["short_name"]
             with open(child_file, 'w') as f:
                 json.dump(ds, f)
 
@@ -434,7 +434,7 @@ def add_missing_fields(dataset_object, schema_path):
                                  split(os.path.sep)[-1]
     if "name" in dataset_object and "short_name" not in dataset_object:
         if len(dataset_object["name"]) > 30:
-            dataset_object["short_name"] = dataset_object["name"][0, 30]+'...'
+            dataset_object["short_name"] = dataset_object["name"][0:30]+'...'
         else:
             dataset_object["short_name"] = dataset_object["name"]
 
@@ -522,13 +522,7 @@ def add_update_subdatasets(dataset_object, subdatasets):
                               attribute_val=subds["dataset_id"],
                               search_list=dataset_object["subdatasets"]):
             dataset_object["subdatasets"].append(new_sub_obj)
-            print(f"New subds added: obj={new_sub_obj}\n")
         else:
-            # subidx = next((i for i, item in
-            #                enumerate(dataset_object["subdatasets"])
-            #                if item["dataset_id"] == subds["dataset_id"]), -1)
-            # dataset_object["subdatasets"][subidx] = new_sub_obj
-            print(f"subds replaced: not really, obj={new_sub_obj}\n")
             continue
         # Add subdataset locations as children to parent dataset
         nr_nodes = len(new_sub_obj["dirs_from_path"])
@@ -641,7 +635,7 @@ def core_parse(src_object, dest_object, schema_file):
                     if "@type" in item and item["@type"] == "Dataset"), False)
     if ds_info and "distribution" in ds_info:
         origin = next((item for item in ds_info["distribution"]
-                       if "name" in item and item["@name"] == "origin"), False)
+                       if "name" in item and item["name"] == "origin"), False)
         if origin:
             dest_object["url"] = origin["url"]
     return dest_object
@@ -715,7 +709,9 @@ def studyminimeta_parse(src_object, dest_object, schema_file):
     # Standard/straightforward fields: copy source to dest values per key
     for key in schema:
         if isinstance(schema[key], list) and len(schema[key]) == 2:
-            dest_object[key] = metadata[schema[key][0]][schema[key][1]]
+            if schema[key][0] in metadata \
+               and schema[key][1] in metadata[schema[key][0]]:
+                dest_object[key] = metadata[schema[key][0]][schema[key][1]]
         else:
             dest_object[key] = schema[key]
     # Authors
@@ -725,32 +721,32 @@ def studyminimeta_parse(src_object, dest_object, schema_file):
                   if item["@id"] == author["@id"]), False)
         if not author_details:
             idd = author["@id"]
-            print(f"Error: Person details not found in '#personList' for\
-                  '@id' = {idd}")
+            print(f"Error: Person details not found in '#personList' for '@id'={idd}")
         else:
             dest_object["authors"].append(author_details)
     # Publications
-    for pub in metadata["publicationList"]:
-        new_pub = {"type" if k == "@type" else k: v for k, v in pub.items()}
-        new_pub = {"doi" if k == "sameAs"
-                   else k: v for k, v in new_pub.items()}
-        new_pub["publication"] = {"type" if k == "@type"
-                                  else k: v for k, v in new_pub.items()}
-        if "@id" in new_pub:
-            new_pub.pop("@id")
-        if "@id" in new_pub["publication"]:
-            new_pub["publication"].pop("@id")
-        for i, author in enumerate(new_pub["author"]):
-            author_details = \
-                next((item for item in metadata["personList"]
-                      if item["@id"] == author["@id"]), False)
-            if not author_details:
-                idd = author["@id"]
-                print(f"Error: Person details not found in '#personList' for\
-                      @id = {idd}")
-            else:
-                new_pub["author"][i] = author_details
-        dest_object["publications"].append(new_pub)
+    if metadata["publicationList"]:
+        for pub in metadata["publicationList"]:
+            new_pub = {"type" if k == "@type" else k: v for k, v in pub.items()}
+            new_pub = {"doi" if k == "sameAs"
+                    else k: v for k, v in new_pub.items()}
+            new_pub["publication"] = {"type" if k == "@type"
+                                    else k: v for k, v in new_pub.items()}
+            if "@id" in new_pub:
+                new_pub.pop("@id")
+            if "@id" in new_pub["publication"]:
+                new_pub["publication"].pop("@id")
+            for i, author in enumerate(new_pub["author"]):
+                author_details = \
+                    next((item for item in metadata["personList"]
+                        if item["@id"] == author["@id"]), False)
+                if not author_details:
+                    idd = author["@id"]
+                    print(f"Error: Person details not found in '#personList' for\
+                        @id = {idd}")
+                else:
+                    new_pub["author"][i] = author_details
+            dest_object["publications"].append(new_pub)
 
     return dest_object
 
