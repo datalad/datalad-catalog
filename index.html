@@ -40,33 +40,20 @@
 
     <!-- Template for main page -->
     <script type="text/x-template" id="main-template">
+      <b-card border-variant="dark">
       <div>
         <br>
-        <h2 class="text-center">Browse datasets</h2>
-        <b-card border-variant="dark" v-for="sds in superdatasets" class="mb-2 p-0">
-          <b-card-body>
-            <b-row no-gutters align-v="center">
-              <b-col md="9">
-                <b-card-title><a @click="selectDataset(sds, sds.dataset_id)" class="stretched-link">{{sds.name}}</a></b-card-title>
-                <b-card-sub-title class="mb-2">
-                  <span v-for="(author, index) in sds.authors">{{author.givenName}} {{author.familyName}}<span v-if="index != sds.authors.length - 1">, </span></span>
-                </b-card-sub-title>
-                <b-card-text>
-                  <strong>Version:</strong> {{sds.dataset_version.substring(0,7)}}&nbsp;
-                  <strong>Modified:</strong> {{sds.last_edited}}&nbsp;
-                  <strong>DOI:</strong> <a :href="sds.doi" target="_blank">{{sds.doi.replace("https://doi.org/", "")}}</a>&nbsp;
-                  <strong>License:</strong> <a :href="sds.license.url" target="_blank">{{sds.license.name}}</a>&nbsp;
-                </b-card-text>
-              </b-col>
-              <b-col md="3">
-                <b-card-text>
-                  <b-button pill disabled size="sm" variant="outline-dark" v-for="keyword in sds.keywords">{{keyword}}</b-button>
-                </b-card-text>
-              </b-col>
-            </b-row>
-          </b-card-body>
-        </b-card>
+        <h2 class="text-center">About</h2>
+        <p>This data browser was created with <strong><em>DataLad Catalog</em></strong> which allows
+          generating a standalone browser-based user interface for Datalad datasets as illustrated below.
+          <strong><em>DataLad Catalog</em></strong> parses Datalad-derived metadata, translates the metadata
+          into structured data understandable and renderable by the frontend, and then generates a
+          VueJS-based frontend with which to interactively browse the dataset's metadata.
+        </p>
+        <br>
+        <img src="artwork/datalad_catalog_overview2.png" width="100%">
       </div>
+    </b-card>
     </script>
 
 
