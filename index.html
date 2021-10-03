@@ -171,7 +171,7 @@
                   <template #modal-header="{ close }">
                     <div class="d-block text-center">
                       <h3>Cite Dataset</h3>
-                      <h5>Step 1: blabla</h5>
+                      <h5><em>to be completed</em></h5>
                     </div>
                   </template>
                 </b-modal>
@@ -249,7 +249,7 @@
                           <span class="xxlfont"><i class="fas fa-database"></i></span>
                         </b-col>
                         <b-col class="text-muted" md="7">
-                          <h5><a @click="selectDataset(ds, ds.dataset_id)" class="stretched-link">{{ds.dirs_from_path[ds.dirs_from_path.length - 1]}}</a></h5>
+                          <h5><a @click="selectDataset(ds, ds.dataset_id)" class="stretched-link">{{ds.dirs_from_path.at(-1)}}</a></h5>
                           <span v-for="(author, index) in ds.authors"><small>{{author.givenName}} {{author.familyName}}<span v-if="index != ds.authors.length - 1">, </span></small></span>
                           <b-card-text>
                             <small>
@@ -316,22 +316,23 @@
                   <i class="fas fa-dollar-sign"></i> Funding
                 </template>
                 <span v-if="!selectedDataset.funding || !selectedDataset.funding.length"><em>There are no funding sources listed for the current dataset</em></span>
-                <span v-else>
-                  <div class="accordion" role="tablist">
-                    <b-card no-body class="mb-1" v-for="fund in selectedDataset.funding" v-bind:key="fund.name.split(',')[0]">
-                      <b-card-header header-tag="header" class="p-1" role="tab">
-                        <b-button block v-b-toggle="fund.name.split(',')[0]" variant="light" class="stretched-link">{{fund.name.split(',')[0]}}</b-button>
-                      </b-card-header>
-                      <b-collapse :id="fund.name.split(',')[0]" accordion="my-accordion" role="tabpanel">
-                        <b-card-body>
-                          <b-card-text>
-                            <strong>Type</strong>: {{fund["@type"]}}<br>
-                            <strong>Identifier</strong>: {{fund.name.split(',')[1]}}<br>
-                          </b-card-text>
-                        </b-card-body>
-                      </b-collapse>
-                    </b-card>
-                  </div>
+                <!-- <span v-else> -->
+
+                <span v-else v-for="fund in selectedDataset.funding">
+                  <b-card border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
+                    <template v-slot:header>
+                      <b-row no-gutters>
+                        <b-col align-h="center" align-v="center" md="1">
+                          <span class="xxlfont"><i class="fas fa-dollar-sign "></i></span>
+                        </b-col>
+                        <b-col class="text-muted" md="11">
+                          <h5>{{fund.name.split(',')[0]}}</h5>
+                          <small>Type: {{fund["@type"]}}; Identifier {{fund.name.split(',')[1]}}</small><br>
+                        </b-col>
+                        </b-col>
+                      </b-row>
+                    </template>
+                  </b-card>
                 </span>
               </b-tab>
             </b-tabs>
@@ -350,7 +351,13 @@
   <!-- ### -->
   <!-- ### -->
   <!-- ### -->
-  <body>
+  <body >
+    <style>
+      :root {
+        --link-color: #fba304;
+        --link-hover-color: #af7714;
+      }
+    </style>
     <!-- Our application root element -->
     <b-container id="demo" >
       <b-container style="margin-top:20px;">
@@ -411,6 +418,5 @@
 
     <!-- Start running your app -->
     <script src="assets/vue_app.js"></script>
-    
   </body>
 </html>

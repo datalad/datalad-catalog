@@ -15,12 +15,15 @@ TODO: FOR CURRENT UPDATE:
 // Data
 const metadata_dir = './metadata';
 const web_dir = './web';
-const superdatasets_file = metadata_dir + '/datasets.json';
+const superdatasets_file = metadata_dir + '/super.json';
 const json_file = metadata_dir + '/datasets.json';
-const super_dataset_id = 'deabeb9b-7a37-4062-a1e0-8fcef7909609';
-const super_dataset_version = '0321dbde969d2f5d6b533e35b5c5c51ac0b15758';
-const super_id_and_version = super_dataset_id + '-' + super_dataset_version;
-const super_hash = md5(super_id_and_version);
+// const super_hash = getSuper();
+// console.log("super_hash")
+// console.log(super_hash)
+// const super_dataset_id = 'deabeb9b-7a37-4062-a1e0-8fcef7909609';
+// const super_dataset_version = '0321dbde969d2f5d6b533e35b5c5c51ac0b15758';
+// const super_id_and_version = super_dataset_id + '-' + super_dataset_version;
+// const super_hash = md5(super_id_and_version);
 
 // Component definition: recursive item in data tree
 Vue.component("tree-item", {
@@ -89,20 +92,21 @@ const datasetView = {
       search_tags: [],
       tag_text: '',
       tag_dropdown_open: false,
-      tag_options: [
-        "human",
-        "fMRI",
-        "task",
-        "7T",
-        "3T",
-        "audio",
-        "visual",
-        "music",
-        "retinotopy",
-        "angiography",
-        "T1,T2",
-        "stephan"
-      ],
+      tag_options: [],
+      // tag_options: [
+      //   "human",
+      //   "fMRI",
+      //   "task",
+      //   "7T",
+      //   "3T",
+      //   "audio",
+      //   "visual",
+      //   "music",
+      //   "retinotopy",
+      //   "angiography",
+      //   "T1,T2",
+      //   "stephan"
+      // ],
       tag_options_filtered: [],
       tag_options_available: [],
       popoverShow: false
@@ -302,6 +306,7 @@ const datasetView = {
     next();
   },
   mounted() {
+    this.tag_options = this.selectedDataset["subdataset_keywords"]
     this.tag_options_filtered = this.tag_options;
     this.tag_options_available = this.tag_options;
   }
@@ -315,27 +320,27 @@ const mainPage = {
       superdatasets: []
     };
   },
-  created: function () {
-    comp = this;
-    var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
-      rawFile.onreadystatechange = function () {
-          if(rawFile.readyState === 4) {
-              if(rawFile.status === 200 || rawFile.status == 0) {
-                  var allText = rawFile.responseText;
-                  comp.superdatasets = JSON.parse(allText);
-                  console.log("created and fetched")
-                  console.log(JSON.parse(allText))
-                  // console.log(this.superdatasets[0].dataset_version)
-              } else if (rawFile.status === 404) {
-                router.push({ name: '404'})
-              } else {
-                // TODO: figure out what to do here
-              }
-          }
-      }
-      rawFile.open("GET", superdatasets_file, false);
-      rawFile.send();
-  },
+  // created: function () {
+  //   comp = this;
+  //   var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
+  //     rawFile.onreadystatechange = function () {
+  //         if(rawFile.readyState === 4) {
+  //             if(rawFile.status === 200 || rawFile.status == 0) {
+  //                 var allText = rawFile.responseText;
+  //                 comp.superdatasets = JSON.parse(allText);
+  //                 console.log("created and fetched")
+  //                 console.log(JSON.parse(allText))
+  //                 // console.log(this.superdatasets[0].dataset_version)
+  //             } else if (rawFile.status === 404) {
+  //               router.push({ name: '404'})
+  //             } else {
+  //               // TODO: figure out what to do here
+  //             }
+  //         }
+  //     }
+  //     rawFile.open("GET", superdatasets_file, false);
+  //     rawFile.send();
+  // },
   methods: {
     selectDataset(obj, objId) {
       id_and_version = obj.dataset_id + '-' + obj.dataset_version;
@@ -345,7 +350,32 @@ const mainPage = {
     getSuperDatasets() {
       
     }
-  }
+  },
+  // beforeMount() {
+  //   console.log("Calling getSuper function")
+  //   const superfile = metadata_dir + '/super.json';
+  //   var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
+  //   var app = demo;
+  //   rawFile.onreadystatechange = function () {
+  //     if(rawFile.readyState === 4) {
+  //         if(rawFile.status === 200 || rawFile.status == 0) {
+  //             var allText = rawFile.responseText;
+  //             superds = JSON.parse(allText);
+  //             super_id_and_version = superds["dataset_id"] + '-' + superds["dataset_version"];
+  //             hash = md5(super_id_and_version);
+  //             console.log("Inside getSuper function")
+  //             console.log(hash)
+  //             router.push({ name: 'dataset', params: { blobId: hash } })
+  //         } else if (rawFile.status === 404) {
+  //           router.push({ name: '404'})
+  //         } else {
+  //           // TODO: figure out what to do here
+  //         }
+  //     }
+  //   }
+  //   rawFile.open("GET", superfile, false);
+  //   rawFile.send();
+  // }
 };
 
 // Component definition: 404 view
@@ -355,12 +385,37 @@ const notFound = {
 
 // Router definition
 const routes = [
-  { path: '/', component: mainPage, name: 'home', redirect: to => ({
-                                                    name: "dataset",
-                                                    params: { blobId: super_hash },
-                                                  })
+  // { path: '/', component: mainPage, name: 'home', redirect: to => ({
+  //                                                   name: "dataset",
+  //                                                   params: { blobId: super_hash },
+  //                                                 })
+  // },
+  { path: '/', component: mainPage, name: 'home',
+    beforeEnter: (to, from, next) => {
+      const superfile = metadata_dir + '/super.json';
+      var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
+      rawFile.onreadystatechange = function () {
+        if(rawFile.readyState === 4) {
+            if(rawFile.status === 200 || rawFile.status == 0) {
+                var allText = rawFile.responseText;
+                superds = JSON.parse(allText);
+                super_id_and_version = superds["dataset_id"] + '-' + superds["dataset_version"];
+                hash = md5(super_id_and_version);
+                console.log("Inside main beforeEnter function")
+                console.log(hash)
+                router.push({ name: 'dataset', params: { blobId: hash } })
+                next();
+            } else if (rawFile.status === 404) {
+              router.push({ name: '404'})
+            } else {
+              // TODO: figure out what to do here
+            }
+        }
+      }
+      rawFile.open("GET", superfile, false);
+      rawFile.send();
+    }
   },
-  // { path: '/', component: mainPage, name: 'home'},
   { path: '/dataset/:blobId', component: datasetView, name: 'dataset' },
   { path: '/about', component: mainPage, name: 'about' },
   { path: '*', component: notFound, name: '404' }
@@ -460,7 +515,7 @@ var demo = new Vue({
       file = metadata_dir + '/' + this.$route.params.blobId + '.json'
     } else {
       console.log('on refresh: other page')
-      file = json_file;
+      file = superdatasets_file;
     }
     this.getJSONblob(file)
   },
@@ -497,3 +552,27 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
+
+function getSuper() {
+  const superfile = metadata_dir + '/super.json';
+  var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
+  rawFile.onreadystatechange = function () {
+    if(rawFile.readyState === 4) {
+        if(rawFile.status === 200 || rawFile.status == 0) {
+            var allText = rawFile.responseText;
+            superds = JSON.parse(allText);
+            super_id_and_version = superds["dataset_id"] + '-' + superds["dataset_version"];
+            hash = md5(super_id_and_version);
+            console.log("Inside getSuper function")
+            console.log(hash)
+            router.push({ name: 'dataset', params: { blobId: hash } })
+        } else if (rawFile.status === 404) {
+          router.push({ name: '404'})
+        } else {
+          // TODO: figure out what to do here
+        }
+    }
+  }
+  rawFile.open("GET", superfile, false);
+  rawFile.send();
+}
