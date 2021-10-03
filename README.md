@@ -8,7 +8,7 @@ This code allows you to generate a standalone browser-based user interface for [
 
 ## Online demo
 
-Navigate to [https://jsheunis.github.io/data-browser-from-metadata/](https://jsheunis.github.io/data-browser-from-metadata/) to view a live demo of the current work-in-progress state of the user interface.
+Navigate to [https://datalad.github.io/datalad-catalog](https://datalad.github.io/datalad-catalog) to view a live demo of the current work-in-progress state of the user interface.
 
 This demo site is hosted via GitHub Pages and it builds from the `stephan-dev` branch of this repo.
 
