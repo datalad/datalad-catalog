@@ -496,8 +496,8 @@ var demo = new Vue({
     },
     gotoExternal(dest) {
       const destinations = {
-        "github": "https://github.com/jsheunis/data-browser-from-metadata/tree/packaging",
-        "docs": "https://github.com/jsheunis/data-browser-from-metadata/tree/packaging",
+        "github": "https://github.com/datalad/datalad-catalog/tree/packaging",
+        "docs": "https://github.com/datalad/datalad-catalog/tree/packaging",
         "twitter": "https://twitter.com/datalad",
       }
       if (dest in destinations) {
