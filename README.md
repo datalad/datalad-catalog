@@ -2,13 +2,13 @@
 ---
 
 
-# Data browser from structured DataLad-generated metadata
+# DataLad Catalog - Create a user-friendly data browser from structured metadata
 
 This code allows you to generate a standalone browser-based user interface for [Datalad](https://www.datalad.org/) datasets by: (1) parsing Datalad-derived metadata, (2) translating the metadata into structured data understandable and renderable by the frontend, and (3) generating a VueJS-based frontend with which to interactively browse the dataset's metadata.
 
 ## Online demo
 
-Navigate to [https://jsheunis.github.io/data-browser-from-metadata/](https://jsheunis.github.io/data-browser-from-metadata/) to view a live demo of the current work-in-progress state of the user interface.
+Navigate to [https://datalad.github.io/datalad-catalog/](https://datalad.github.io/datalad-catalog/) to view a live demo of the current work-in-progress state of the user interface.
 
 This demo site is hosted via GitHub Pages and it builds from the `stephan-dev` branch of this repo.
 
