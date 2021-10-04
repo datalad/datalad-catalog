@@ -236,7 +236,7 @@
                           <span class="xxlfont"><i class="fas fa-database"></i></span>
                         </b-col>
                         <b-col class="text-muted" md="7">
-                          <h5><a @click="selectDataset(ds, ds.dataset_id)" class="stretched-link">{{ds.dirs_from_path.at(-1)}}</a></h5>
+                          <h5><a @click="selectDataset(ds, ds.dataset_id)" class="stretched-link">{{ds.dirs_from_path[ds.dirs_from_path.length - 1]}}</a></h5>
                           <span v-for="(author, index) in ds.authors"><small>{{author.givenName}} {{author.familyName}}<span v-if="index != ds.authors.length - 1">, </span></small></span>
                           <b-card-text>
                             <small>
