@@ -24,7 +24,7 @@ Command line reference
 .. toctree::
    :maxdepth: 1
 
-   generated/man/datalad-catalog-cmd
+   generated/man/datalad-catalog
 
 
 Indices and tables
