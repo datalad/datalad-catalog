@@ -6,3 +6,14 @@ dev
 *.egg-info
 __pycache__
 tests/__pycache__
+.pybuild/
+.coverage
+/.tox
+*.py[coe]
+.#*
+.*.swp
+pip-wheel-metadata
+docs/build
+docs/source/generated
+build/
+dist/

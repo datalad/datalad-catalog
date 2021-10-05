@@ -1,28 +1,27 @@
-import pathlib
+#!/usr/bin/env python
+
+import sys
 from setuptools import setup
+import versioneer
 
-# The directory containing this file
-HERE = pathlib.Path(__file__).parent
-
-# The text of the README file
-README = (HERE / "README.md").read_text()
-
-# This call to setup() does all the work
-setup(
-    name="datalad_catalog",
-    version="0.1.0",
-    description="Generate a web-based data browser from a DataLad dataset's metadata",
-    long_description=README,
-    long_description_content_type="text/markdown",
-    url="https://github.com/jsheunis/data-browser-from-metadata",
-    author="DataLad developers",
-    license="MIT",
-    packages=["datalad_catalog"],
-    include_package_data=True,
-    # install_requires=["feedparser", "html2text"],
-    entry_points={
-        "console_scripts": [
-            'datalad_catalog = datalad_catalog.webui_generate:run_cmd',
-            ]
-    },
+from _datalad_buildsupport.setup import (
+    BuildManPage,
 )
+
+cmdclass = versioneer.get_cmdclass()
+cmdclass.update(build_manpage=BuildManPage)
+
+# Give setuptools a hint to complain if it's too old a version
+# 43.0.0 allows us to put most metadata in setup.cfg and causes pyproject.toml
+# to be automatically included in sdists
+# Should match pyproject.toml
+SETUP_REQUIRES = ['setuptools >= 43.0.0']
+# This enables setuptools to install wheel on-the-fly
+SETUP_REQUIRES += ['wheel'] if 'bdist_wheel' in sys.argv else []
+
+if __name__ == '__main__':
+    setup(name='datalad_catalog',
+          version=versioneer.get_version(),
+          cmdclass=cmdclass,
+          setup_requires=SETUP_REQUIRES,
+    )
