@@ -1,3 +1,15 @@
+from os.path import curdir
+from os.path import abspath
+
+from datalad.interface.base import Interface
+from datalad.interface.base import build_doc
+from datalad.support.param import Parameter
+from datalad.distribution.dataset import datasetmethod
+from datalad.interface.utils import eval_results
+from datalad.support.constraints import EnsureChoice
+
+from datalad.interface.results import get_status_dict
+
 import sys
 from argparse import ArgumentParser, Namespace, RawDescriptionHelpFormatter
 from pathlib import Path
@@ -7,52 +19,52 @@ import hashlib
 import shutil
 
 
-def run_cmd():
-    """
-    Calls datalad_catalog() with command line arguments
-    """
-    argument_parser = ArgumentParser(
-        description=__doc__,
-        formatter_class=RawDescriptionHelpFormatter)
-    argument_parser.add_argument(
-        "-o", "--outputdir",
-        type=str,
-        help="Directory to which outputs are written.\
-        Default is the '_build' directory inside the\
-        'data-browser-from-metadata' rep")
-    argument_parser.add_argument(
-        "-f", "--force",
-        action='store_true',
-        help="If content for the user interface already exists in the specified\
-        or default directory, force this content to be overwritten. Content\
-        overwritten with this flag include the 'artwork' and 'assets'\
-        directories and the 'index.html' file. The 'metadata' directory is\
-        deleted and recreated by default.")
-    argument_parser.add_argument(
-        "file_path",
-        type=str,
-        help="The '.json' file containing all metadata (in the form of an\
-        array of JSON objects) from which the user interface will be\
-        generated.")
-    arguments: Namespace = argument_parser.parse_args()
-    print(arguments, file=sys.stderr)
-    # Set parameters for datalad_catalog()
-    metadata_file = arguments.file_path
-    script_path = os.path.realpath(__file__)
-    sep = os.path.sep
-    repo_path = sep.join(script_path.split(sep)[0:-2])
-    package_path = sep.join(script_path.split(sep)[0:-1])
-    if arguments.outputdir:
-        out_dir = arguments.outputdir
-    else:
-        out_dir = os.path.join(repo_path, '_build')
-    # Call main function to generate UI
-    datalad_catalog(
-        metadata_file,
-        out_dir,
-        repo_path,
-        package_path,
-        arguments.force)
+# def run_cmd():
+#     """
+#     Calls datalad_catalog() with command line arguments
+#     """
+#     argument_parser = ArgumentParser(
+#         description=__doc__,
+#         formatter_class=RawDescriptionHelpFormatter)
+#     argument_parser.add_argument(
+#         "-o", "--outputdir",
+#         type=str,
+#         help="Directory to which outputs are written.\
+#         Default is the '_build' directory inside the\
+#         'data-browser-from-metadata' rep")
+#     argument_parser.add_argument(
+#         "-f", "--force",
+#         action='store_true',
+#         help="If content for the user interface already exists in the specified\
+#         or default directory, force this content to be overwritten. Content\
+#         overwritten with this flag include the 'artwork' and 'assets'\
+#         directories and the 'index.html' file. The 'metadata' directory is\
+#         deleted and recreated by default.")
+#     argument_parser.add_argument(
+#         "file_path",
+#         type=str,
+#         help="The '.json' file containing all metadata (in the form of an\
+#         array of JSON objects) from which the user interface will be\
+#         generated.")
+#     arguments: Namespace = argument_parser.parse_args()
+#     print(arguments, file=sys.stderr)
+#     # Set parameters for datalad_catalog()
+#     metadata_file = arguments.file_path
+#     script_path = os.path.realpath(__file__)
+#     sep = os.path.sep
+#     repo_path = sep.join(script_path.split(sep)[0:-2])
+#     package_path = sep.join(script_path.split(sep)[0:-1])
+#     if arguments.outputdir:
+#         out_dir = arguments.outputdir
+#     else:
+#         out_dir = os.path.join(repo_path, '_build')
+#     # Call main function to generate UI
+#     datalad_catalog(
+#         metadata_file,
+#         out_dir,
+#         repo_path,
+#         package_path,
+#         arguments.force)
 
 
 def datalad_catalog(metadata_file, out_dir, repo_path, package_path,
@@ -751,6 +763,124 @@ def studyminimeta_parse(src_object, dest_object, schema_file):
     return dest_object
 
 
+# decoration auto-generates standard help
+@build_doc
+# all commands must be derived from Interface
+class Catalog(Interface):
+    # first docstring line is used a short description in the cmdline help
+    # the rest is put in the verbose help and manpage
+    """Short description of the command
+
+    Long description of arbitrary volume.
+    """
+
+    # parameters of the command, must be exhaustive
+    _params_ = dict(
+        # name of the parameter, must match argument name
+        language=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("-l", "--language"),
+            # documentation
+            doc="""language to say "hello" in""",
+            # type checkers, constraint definition is automatically
+            # added to the docstring
+            constraints=EnsureChoice('en', 'de')),
+        outputdir=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("-o", "--outputdir"),
+            # documentation
+            doc="""Directory to which outputs are written.
+            Default is the '_build' directory inside the
+            'datalad-catalog' repo.
+            Example: ''""",
+            # type checkers, constraint definition is automatically
+            # added to the docstring
+            # constraints=EnsureChoice('en', 'de')
+            ),
+        force=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("-f", "--force"),
+            # documentation
+            doc="""If content for the user interface already exists in the specified
+            or default directory, force this content to be overwritten. Content
+            overwritten with this flag include the 'artwork' and 'assets'
+            directories and the 'index.html' file. The 'metadata' directory is
+            deleted and recreated by default.
+            Example: ''""",
+            action="store_true",
+            # type checkers, constraint definition is automatically
+            # added to the docstring
+            # constraints=EnsureChoice('en', 'de')
+            ),
+        file_path=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("file_path"),
+            # documentation
+            doc="""The '.json' file containing all metadata (in the form of an
+            array of JSON objects) from which the user interface will be
+            generated.
+            Example: ''""",
+            # type checkers, constraint definition is automatically
+            # added to the docstring
+            # constraints=EnsureChoice('en', 'de')
+            ),
+    )
+
+    @staticmethod
+    # decorator binds the command to the Dataset class as a method
+    @datasetmethod(name='catalog')
+    # generic handling of command results (logging, rendering, filtering, ...)
+    @eval_results
+    # signature must match parameter list above
+    # additional generic arguments are added by decorators
+    def __call__(language, outputdir, force, file_path):
+
+        print(language)
+        print(outputdir)
+        print(force)
+        print(file_path)
+        if language == 'en':
+            msg = 'Helloblabla!'
+        elif language == 'de':
+            msg = 'Tachchen!'
+        else:
+            msg = ("unknown language: '%s'", language)
+
+        # Set parameters for datalad_catalog()
+        metadata_file = file_path
+        script_path = os.path.realpath(__file__)
+        sep = os.path.sep
+        repo_path = sep.join(script_path.split(sep)[0:-2])
+        package_path = sep.join(script_path.split(sep)[0:-1])
+        if outputdir:
+            out_dir = outputdir
+        else:
+            out_dir = os.path.join(repo_path, '_build')
+        # Call main function to generate UI
+        datalad_catalog(
+            metadata_file,
+            out_dir,
+            repo_path,
+            package_path,
+            force)
+
+        # commands should be implemented as generators and should
+        # report any results by yielding status dictionaries
+        yield get_status_dict(
+            # an action label must be defined, the command name make a good
+            # default
+            action='catalog',
+            # most results will be about something associated with a dataset
+            # (component), reported paths MUST be absolute
+            path=abspath(curdir),
+            # status labels are used to identify how a result will be reported
+            # and can be used for filtering
+            status='ok' if language in ('en', 'de') else 'error',
+            # arbitrary result message, can be a str or tuple. in the latter
+            # case string expansion with arguments is delayed until the
+            # message actually needs to be rendered (analog to exception messages)
+            message=msg)
+
 # ------------
 # MOAR TODOS!
 # ------------
@@ -777,3 +907,5 @@ def studyminimeta_parse(src_object, dest_object, schema_file):
     # likely be something like:
     # md5sum(parent_dataset_id-parent_dataset_version-file_path_relative_to_parent)
     # For now, add files as children part of the dataset object
+
+# NOTE: replace string properties with global variable / enum, e.g.: obj["property"] ==> obj[global_var.prop], where global_var.prop = "property"
