@@ -1,26 +1,7 @@
-/*
-
-TODO: use emit!!
-TODO: remove redundant methods from components / vue app instance
-TODO: add object and logic to track existence and content of dataset fields and resulting action (visibility, text to display, etc). E.g.:
--- if there are no publications, hide empty publication card and show sentence "There are currently no publications associated with this dataset."
--- show/hide components based on whether fields exist or are empty in json blob
--- populate filler/adapted text (e.g. time of extraction ==> utc seconds converted to display date)
-TODO: FOR CURRENT UPDATE:
-  - go through html and js and see where there are redundant calls/sets to selectedDataset
-  - find alternatives for ".some()" since it might not work in all browsers
-  - sort out main page, "home", breadcrums, navigation and display
-*/
-
 // Data
 const metadata_dir = './metadata';
 const web_dir = './web';
 const superdatasets_file = metadata_dir + '/datasets.json';
-const json_file = metadata_dir + '/datasets.json';
-// const super_dataset_id = 'deabeb9b-7a37-4062-a1e0-8fcef7909609';
-// const super_dataset_version = '0321dbde969d2f5d6b533e35b5c5c51ac0b15758';
-// const super_id_and_version = super_dataset_id + '-' + super_dataset_version;
-// const super_hash = md5(super_id_and_version);
 
 // Component definition: recursive item in data tree
 Vue.component("tree-item", {
@@ -54,8 +35,6 @@ Vue.component("tree-item", {
       }
     },
     selectDataset(obj, objId) {
-      // this.$root.selectedDataset = obj;
-      // this.$root.dataPath.push(obj.short_name);
       id_and_version = obj.dataset_id + '-' + obj.dataset_version;
       hash = md5(id_and_version);
       router.push({ name: 'dataset', params: { blobId: hash } })
@@ -90,20 +69,6 @@ const datasetView = {
       tag_text: '',
       tag_dropdown_open: false,
       tag_options: [],
-      // tag_options: [
-      //   "human",
-      //   "fMRI",
-      //   "task",
-      //   "7T",
-      //   "3T",
-      //   "audio",
-      //   "visual",
-      //   "music",
-      //   "retinotopy",
-      //   "angiography",
-      //   "T1,T2",
-      //   "stephan"
-      // ],
       tag_options_filtered: [],
       tag_options_available: [],
       popoverShow: false
@@ -137,7 +102,6 @@ const datasetView = {
       if (!dataset.hasOwnProperty("license") || !dataset["license"].hasOwnProperty("name") || !dataset["license"]["name"]) {
         disp_dataset["license"] = "not available"
       }
-
       disp_dataset.metadata_extracted = this.getDateFromUTCseconds(dataset.extraction_time);
       id_and_version = dataset.dataset_id + '-' + dataset.dataset_version;
       disp_dataset.hash = md5(id_and_version);
@@ -194,8 +158,6 @@ const datasetView = {
       }, 1000);
     },
     selectDataset(obj, objId) {
-      // this.$root.selectedDataset = obj;
-      // this.$root.dataPath.push(obj.short_name);
       id_and_version = obj.dataset_id + '-' + obj.dataset_version;
       hash = md5(id_and_version);
       router.push({ name: 'dataset', params: { blobId: hash } })
@@ -269,19 +231,12 @@ const datasetView = {
     },
     onShow() {
       // This is called just before the popover is shown
-      // Reset our popover form variables
-      // this.focusRef(this.$refs.tag_search_input)
     },
     onShown() {
       // Called just after the popover has been shown
-      // Transfer focus to the first input
-      
     },
     onHidden() {
       // Called just after the popover has finished hiding
-      // this.tag_text = '';
-      // Bring focus back to the button
-      // this.focusRef(this.$refs.button)
     },
     focusRef(ref) {
       // Some references may be a component, functional component, or plain element
@@ -384,7 +339,7 @@ var demo = new Vue({
       easyDataFromFile: [],
       dataPath: [],
       showCopyTooltip: false,
-      dataFile: json_file,
+    
   },
   methods: {
     copyCloneCommand(index) {
@@ -462,7 +417,7 @@ var demo = new Vue({
       file = metadata_dir + '/' + this.$route.params.blobId + '.json'
     } else {
       console.log('on refresh: other page')
-      file = json_file;
+      file = superdatasets_file;
     }
     this.getJSONblob(file)
   },
@@ -520,3 +475,17 @@ function getSuper() {
   rawFile.open("GET", superfile, false);
   rawFile.send();
 }
+
+/*
+
+TODO: use emit!!
+TODO: remove redundant methods from components / vue app instance
+TODO: add object and logic to track existence and content of dataset fields and resulting action (visibility, text to display, etc). E.g.:
+-- if there are no publications, hide empty publication card and show sentence "There are currently no publications associated with this dataset."
+-- show/hide components based on whether fields exist or are empty in json blob
+-- populate filler/adapted text (e.g. time of extraction ==> utc seconds converted to display date)
+TODO: FOR CURRENT UPDATE:
+  - go through html and js and see where there are redundant calls/sets to selectedDataset
+  - find alternatives for ".some()" since it might not work in all browsers
+  - sort out main page, "home", breadcrums, navigation and display
+*/
