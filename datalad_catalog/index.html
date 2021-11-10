@@ -228,7 +228,7 @@
                           </b-form-tags>
                           <template #append>
                             <b-button variant="outline-dark" id="popover-target-1">Keywords</b-button>
-                            <b-popover target="popover-target-1" triggers="hover" :show.sync="popoverShow" placement="auto" ref="popover" @show="onShow" @shown="onShown" @hidden="onHidden">
+                            <b-popover target="popover-target-1" triggers="hover" :show.sync="popoverShow" placement="auto" ref="popover">
                               <div>
                                 <span v-if="tag_options_filtered.length == 0"><em>No tags found</em></span>
                                 <span v-else v-for="option in tag_options_filtered"><b-button pill size="sm" class="p-1" variant="outline-dark" @click="addSearchTag(option)">{{option}}</b-button>&nbsp;</span>
@@ -255,8 +255,6 @@
                             <small>
                               <strong>Version:</strong> {{ds.dataset_version.substring(0,7)}}&nbsp;
                               <strong>Modified:</strong> {{getDateFromUTCseconds(ds.extraction_time)}}&nbsp;
-                              <!-- <strong>DOI:</strong> <a v-show="ds.doi" :href="ds.doi" target="_blank">{{ds.doi.replace("https://doi.org/", "")}}</a><span v-show="displayData.doi"><em>{{displayData.doi}}</em></span>&nbsp;
-                              <strong>License:</strong> <a v-show="ds.license.name" :href="ds.license.url" target="_blank">{{ds.license.name}}</a><span v-show="displayData.license"><em>{{displayData.license}}</em></span>&nbsp; -->
                             </small>
                           </b-card-text>
                         </b-col>
@@ -275,9 +273,6 @@
                   <i class="far fa-folder"></i> Files
                 </template>
                 <b-card no-body class="p-2">
-                  <!-- <p><a href=""><i class="fas fa-home"></i></a> /
-                    <span v-for="path in dataPath"><a href="">{{path}}</a> /</span>
-                  </p> -->
                   <ul>
                     <tree-item class="item" v-for="item in selectedDataset.children" :item="item"></tree-item>
                   </ul>
@@ -346,10 +341,6 @@
   <!-- ### -->
   <!-- ### -->
   <!-- ### -->
-  <!-- ### -->
-  <!-- ### -->
-  <!-- ### -->
-  <!-- ### -->
   <body>
     <!-- Our application root element -->
     <b-container id="demo" >
@@ -359,22 +350,11 @@
             <a @click="gotoHome"><img src="artwork/View1.svg" class="d-inline-block" alt="datalad" style="width:100%;"></a>
           </b-col>
           <b-col cols="1"></b-col>
-          <b-col cols="2" align-h="end"> <!-- style="text-align: right; vertical-align: bottom;" -->
-            <!-- <b-avatar-group overlap="0.05" size="3rem">
-              <b-avatar href="#" src="artwork/readthedocs_logo.png"></b-avatar>
-              <b-avatar href="http://handbook.datalad.org/en/latest/" src="artwork/handbook_logo.svg"></b-avatar>
-              <b-avatar href="https://github.com/jsheunis/data-browser-from-metadata"><i class="fab fa-github"></i></b-avatar>
-              <b-avatar href="https://twitter.com/datalad"><i class="fab fa-twitter"></i></b-avatar>
-            </b-avatar-group> -->
+          <b-col cols="2" align-h="end">
             <b-navbar toggleable="lg" type="light" variant="outline-dark">
           
               <b-navbar-toggle target="navbar-toggle-collapse">
-                <!-- <template #default="{ expanded }">
-                  <b-icon v-if="expanded" icon="chevron-bar-up"></b-icon>
-                  <b-icon v-else icon="chevron-bar-down"></b-icon>
-                </template> -->
               </b-navbar-toggle>
-          
               <b-collapse id="navbar-toggle-collapse" is-nav>
                 <b-navbar-nav class="ml-auto mb-0 xlfont">
                   <b-nav-item v-b-tooltip.hover title="About" @click="gotoAbout"><i class="fas fa-info-circle"></i></b-nav-item>
@@ -384,13 +364,6 @@
                 </b-navbar-nav>
               </b-collapse>
             </b-navbar>
-            <!-- <b-avatar-group overlap="0.05" size="3rem">
-              <b-avatar href="#" src="artwork/readthedocs_logo.png"></b-avatar>
-              <b-avatar href="http://handbook.datalad.org/en/latest/" src="artwork/handbook_logo.svg"></b-avatar>
-              <b-avatar href="https://github.com/jsheunis/data-browser-from-metadata"><i class="fab fa-github"></i></b-avatar>
-              <b-avatar href="https://twitter.com/datalad"><i class="fab fa-twitter"></i></b-avatar>
-            </b-avatar-group> -->
-            <!-- <h3><i class="fab fa-twitter"></i>&nbsp;&nbsp;<i class="fab fa-github"></i></h3> -->
           </b-col>
         </b-row>
       </b-container>
@@ -411,6 +384,5 @@
 
     <!-- Start running your app -->
     <script src="assets/vue_app.js"></script>
-    
   </body>
 </html>

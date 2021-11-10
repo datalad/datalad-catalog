@@ -1,7 +1,14 @@
-// Data
+/********/
+// Data //
+/********/
 const metadata_dir = './metadata';
-const web_dir = './web';
-const superdatasets_file = metadata_dir + '/datasets.json';
+const superdatasets_file = metadata_dir + '/super.json';
+const json_file = metadata_dir + '/datasets.json';
+
+
+/**************/
+// Components //
+/**************/
 
 // Component definition: recursive item in data tree
 Vue.component("tree-item", {
@@ -71,7 +78,9 @@ const datasetView = {
       tag_options: [],
       tag_options_filtered: [],
       tag_options_available: [],
-      popoverShow: false
+      popoverShow: false,
+      subdatasets_ready: false,
+      dataset_ready: false
     };
   },
   computed: {
@@ -102,6 +111,7 @@ const datasetView = {
       if (!dataset.hasOwnProperty("license") || !dataset["license"].hasOwnProperty("name") || !dataset["license"]["name"]) {
         disp_dataset["license"] = "not available"
       }
+
       disp_dataset.metadata_extracted = this.getDateFromUTCseconds(dataset.extraction_time);
       id_and_version = dataset.dataset_id + '-' + dataset.dataset_version;
       disp_dataset.hash = md5(id_and_version);
@@ -216,7 +226,6 @@ const datasetView = {
       this.tag_text = '';
       this.filterTags();
       this.popoverShow = false
-
     },
     filterTags() {
       this.tag_options_available = this.tag_options.filter(x => this.search_tags.indexOf(x)===-1);
@@ -229,36 +238,65 @@ const datasetView = {
     onClose() {
       this.popoverShow = false
     },
-    onShow() {
-      // This is called just before the popover is shown
-    },
-    onShown() {
-      // Called just after the popover has been shown
-    },
-    onHidden() {
-      // Called just after the popover has finished hiding
-    },
-    focusRef(ref) {
-      // Some references may be a component, functional component, or plain element
-      // This handles that check before focusing, assuming a `focus()` method exists
-      // We do this in a double `$nextTick()` to ensure components have
-      // updated & popover positioned first
-      this.$nextTick(() => {
-        this.$nextTick(() => {
-          ;(ref.$el || ref).focus()
-        })
-      })
-    },
     validator(tag) {
       return this.tag_options_available.indexOf(tag) >= 0
     }
   },
-  beforeRouteUpdate(to, from, next) {
+  async beforeRouteUpdate(to, from, next) {
     this.tabIndex = 0;
+    this.subdatasets_ready = false;
+    file = metadata_dir + '/' + to.params.blobId + '.json'
+    response = await fetch(file);
+    text = await response.text();
+    this.$root.selectedDataset = JSON.parse(text);
+    this.dataset_ready = true;
+    this.tag_options = this.$root.selectedDataset["subdataset_keywords"];
+
+    if (this.$root.selectedDataset.hasOwnProperty("subdatasets")
+        && this.$root.selectedDataset.subdatasets instanceof Array
+        && this.$root.selectedDataset.subdatasets.length > 0) {
+      
+      subds_json = await grabSubDatasets(this.$root);
+      subds_json.forEach(
+        (subds, index) => {
+          this.$root.selectedDataset.subdatasets[index].extraction_time = subds_json[index].extraction_time;
+          this.$root.selectedDataset.subdatasets[index].name = subds_json[index].name;
+          this.$root.selectedDataset.subdatasets[index].short_name = subds_json[index].short_name;
+          this.$root.selectedDataset.subdatasets[index].doi = subds_json[index].doi;
+          this.$root.selectedDataset.subdatasets[index].license = subds_json[index].license;
+          this.$root.selectedDataset.subdatasets[index].authors = subds_json[index].authors;
+          this.$root.selectedDataset.subdatasets[index].keywords = subds_json[index].keywords;
+          this.$root.selectedDataset.subdatasets[index].dirs_from_path = subds_json[index].dirs_from_path;
+        }
+      );
+      this.subdatasets_ready = true;
+    }
     next();
   },
+  async created () {
+    file = metadata_dir + '/' + this.$route.params.blobId + '.json'
+    var app = this.$root;
+    response = await fetch(file);
+    text = await response.text();
+    app.selectedDataset = JSON.parse(text);
+    this.dataset_ready = true;
+    this.tag_options = app.selectedDataset["subdataset_keywords"];
+    subds_json = await grabSubDatasets(app);
+    subds_json.forEach(
+      (subds, index) => {
+        this.$root.selectedDataset.subdatasets[index].extraction_time = subds_json[index].extraction_time;
+        this.$root.selectedDataset.subdatasets[index].name = subds_json[index].name;
+        this.$root.selectedDataset.subdatasets[index].short_name = subds_json[index].short_name;
+        this.$root.selectedDataset.subdatasets[index].doi = subds_json[index].doi;
+        this.$root.selectedDataset.subdatasets[index].license = subds_json[index].license;
+        this.$root.selectedDataset.subdatasets[index].authors = subds_json[index].authors;
+        this.$root.selectedDataset.subdatasets[index].keywords = subds_json[index].keywords;
+        this.$root.selectedDataset.subdatasets[index].dirs_from_path = subds_json[index].dirs_from_path;
+      }
+    );
+    this.subdatasets_ready = true;
+  },
   mounted() {
-    this.tag_options = this.selectedDataset["subdataset_keywords"]
     this.tag_options_filtered = this.tag_options;
     this.tag_options_available = this.tag_options;
   }
@@ -272,27 +310,6 @@ const mainPage = {
       superdatasets: []
     };
   },
-  created: function () {
-    comp = this;
-    var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
-      rawFile.onreadystatechange = function () {
-          if(rawFile.readyState === 4) {
-              if(rawFile.status === 200 || rawFile.status == 0) {
-                  var allText = rawFile.responseText;
-                  comp.superdatasets = JSON.parse(allText);
-                  console.log("created and fetched")
-                  console.log(JSON.parse(allText))
-                  // console.log(this.superdatasets[0].dataset_version)
-              } else if (rawFile.status === 404) {
-                router.push({ name: '404'})
-              } else {
-                // TODO: figure out what to do here
-              }
-          }
-      }
-      rawFile.open("GET", superdatasets_file, false);
-      rawFile.send();
-  },
   methods: {
     selectDataset(obj, objId) {
       id_and_version = obj.dataset_id + '-' + obj.dataset_version;
@@ -302,7 +319,7 @@ const mainPage = {
     getSuperDatasets() {
       
     }
-  }
+  },
 };
 
 // Component definition: 404 view
@@ -310,18 +327,43 @@ const notFound = {
   template: '<img src="artwork/404.svg" class="d-inline-block align-middle" alt="404-not-found" style="width:70%;">',
 }
 
-// Router definition
+
+/**********/
+// Router //
+/**********/
+
+// Router routes definition
 const routes = [
-  { path: '/', component: mainPage, name: 'home', redirect: to => ({
-                                                    name: "dataset",
-                                                    params: { blobId: getSuper() },
-                                                  }),
+  { path: '/', component: mainPage, name: 'home',
+    beforeEnter: (to, from, next) => {
+      const superfile = metadata_dir + '/super.json';
+      var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
+      rawFile.onreadystatechange = function () {
+        if(rawFile.readyState === 4) {
+            if(rawFile.status === 200 || rawFile.status == 0) {
+                var allText = rawFile.responseText;
+                superds = JSON.parse(allText);
+                super_id_and_version = superds["dataset_id"] + '-' + superds["dataset_version"];
+                hash = md5(super_id_and_version);
+                router.push({ name: 'dataset', params: { blobId: hash } })
+                next();
+            } else if (rawFile.status === 404) {
+              router.push({ name: '404'})
+            } else {
+              // TODO: figure out what to do here
+            }
+        }
+      }
+      rawFile.open("GET", superfile, false);
+      rawFile.send();
+    }
   },
-  // { path: '/', component: mainPage, name: 'home'},
-  { path: '/dataset/:blobId', component: datasetView, name: 'dataset' },
-  { path: '/about', component: mainPage, name: 'about' },
-  { path: '*', component: notFound, name: '404' }
+  { path: '/dataset/:blobId', component: datasetView, name: 'dataset'},
+  { path: '/about', component: mainPage, name: 'about'},
+  { path: '*', component: notFound, name: '404'}
 ];
+
+// Create router
 const router = new VueRouter({
   routes: routes,
   scrollBehavior (to, from, savedPosition) {
@@ -329,67 +371,18 @@ const router = new VueRouter({
   }
 });
 
+
+/***********/
+// Vue app //
+/***********/
+
 // Start Vue instance
 var demo = new Vue({
   el: "#demo",
   data: {
-      // studyData: data,
-      datasets: [1,2,3],
-      selectedDataset: [],
-      easyDataFromFile: [],
-      dataPath: [],
-      showCopyTooltip: false,
-    
+      selectedDataset: {},
   },
   methods: {
-    copyCloneCommand(index) {
-      // https://stackoverflow.com/questions/60581285/execcommand-is-now-obsolete-whats-the-alternative
-      // https://www.sitepoint.com/clipboard-api/
-      selectText = document.getElementById("clone_code").textContent;
-      navigator.clipboard.writeText(selectText)
-        .then(() => { })
-        .catch((error) => { alert(`Copy failed! ${error}`) })
-        this.showCopyTooltip = true;
-    },
-    hideTooltipLater() {
-      setTimeout(() => {
-        this.showCopyTooltip = false;
-      }, 1000);
-    },
-    readTextFile(file) {
-      var app = this;
-      var rawFile = new XMLHttpRequest();
-      rawFile.onreadystatechange = function () {
-          if(rawFile.readyState === 4) {
-              if(rawFile.status === 200 || rawFile.status == 0) {
-                  var allText = rawFile.responseText;
-                  app.easyDataFromFile = JSON.parse(allText);
-                  app.selectedDataset = app.easyDataFromFile;
-              }
-          }
-      }
-      rawFile.open("GET", file, false);
-      rawFile.send();
-    },
-    getJSONblob(file) {
-      var app = this;
-      var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
-      rawFile.onreadystatechange = function () {
-          if(rawFile.readyState === 4) {
-              if(rawFile.status === 200 || rawFile.status == 0) {
-                  var allText = rawFile.responseText;
-                  app.easyDataFromFile = JSON.parse(allText);
-                  app.selectedDataset = app.easyDataFromFile;
-              } else if (rawFile.status === 404) {
-                router.push({ name: '404'})
-              } else {
-                // TODO: figure out what to do here
-              }
-          }
-      }
-      rawFile.open("GET", file, false);
-      rawFile.send();
-    },
     gotoHome() {
       router.push({ name: 'home'})
     },
@@ -410,82 +403,33 @@ var demo = new Vue({
       }
     }
   },
-  beforeMount(){
-    console.log('beforeMount')
-    if(this.$route.params.hasOwnProperty('blobId')) {
-      console.log('on refresh: dataset page')
-      file = metadata_dir + '/' + this.$route.params.blobId + '.json'
-    } else {
-      console.log('on refresh: other page')
-      file = superdatasets_file;
-    }
-    this.getJSONblob(file)
-  },
   router
 });
 
-// Router function to run before each navigation
-router.beforeEach((to, from, next) => {
-  console.log('beforerouteupdateGLOBAL')
-  if (to.name == 'dataset') {
-    console.log('on reroute: dataset page')
-    file = metadata_dir + '/' + to.params.blobId + '.json'
-    var app = demo;
-    var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
-    rawFile.onreadystatechange = function () {
-      if(rawFile.readyState === 4) {
-          if(rawFile.status === 200 || rawFile.status == 0) {
-              var allText = rawFile.responseText;
-              app.easyDataFromFile = JSON.parse(allText);
-              app.selectedDataset = app.easyDataFromFile;
-          } else if (rawFile.status === 404) {
-            router.push({ name: '404'})
-          } else {
-            // TODO: figure out what to do here
-          }
-      }
-    }
-    rawFile.open("GET", file, false);
-    rawFile.send();
-    next();
-  }
-  else { 
-    console.log('on reroute: other page')
-    next();
-  }
-});
 
-function getSuper() {
-  const superfile = metadata_dir + '/super.json';
-  var rawFile = new XMLHttpRequest(); // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
-  rawFile.onreadystatechange = function () {
-    if(rawFile.readyState === 4) {
-        if(rawFile.status === 200 || rawFile.status == 0) {
-            var allText = rawFile.responseText;
-            superds = JSON.parse(allText);
-            super_id_and_version = superds["dataset_id"] + '-' + superds["dataset_version"];
-            return md5(super_id_and_version); 
-        } else if (rawFile.status === 404) {
-          // router.push({ name: '404'})
-        } else {
-          // TODO: figure out what to do here
-        }
-    }
-  }
-  rawFile.open("GET", superfile, false);
-  rawFile.send();
+/*************/
+// Functions //
+/*************/
+
+async function grabSubDatasets(app) {
+  subds_json = [];
+  await Promise.all(app.selectedDataset.subdatasets.map(async (subds, index) => {
+    id_and_version = subds.dataset_id + '-' + subds.dataset_version;
+    hash = md5(id_and_version);
+    subds_file = metadata_dir + '/' + hash + '.json';
+    subds_response = await fetch(subds_file);
+    subds_text = await subds_response.text();
+    subds_json[index] = JSON.parse(subds_text);
+  }));
+  return subds_json
 }
+
 
 /*
 
 TODO: use emit!!
-TODO: remove redundant methods from components / vue app instance
 TODO: add object and logic to track existence and content of dataset fields and resulting action (visibility, text to display, etc). E.g.:
 -- if there are no publications, hide empty publication card and show sentence "There are currently no publications associated with this dataset."
 -- show/hide components based on whether fields exist or are empty in json blob
 -- populate filler/adapted text (e.g. time of extraction ==> utc seconds converted to display date)
-TODO: FOR CURRENT UPDATE:
-  - go through html and js and see where there are redundant calls/sets to selectedDataset
-  - find alternatives for ".some()" since it might not work in all browsers
-  - sort out main page, "home", breadcrums, navigation and display
 */
