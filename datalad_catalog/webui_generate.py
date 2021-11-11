@@ -1,6 +1,6 @@
 from os.path import curdir
 from os.path import abspath
-
+import logging
 from datalad.interface.base import Interface
 from datalad.interface.base import build_doc
 from datalad.support.param import Parameter
@@ -17,135 +17,210 @@ import json
 import os
 import hashlib
 import shutil
+from typing import (
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union
+)
+
+# create named logger
+lgr = logging.getLogger("datalad.catalog.webui_generate")
+
+# decoration auto-generates standard help
+@build_doc
+# all commands must be derived from Interface
+class Catalog(Interface):
+    # first docstring line is used a short description in the cmdline help
+    # the rest is put in the verbose help and manpage
+    """Generate web-browser-based user interface for browsing metadata of a 
+    DataLad dataset.
+
+    (Long description of arbitrary volume.)
+    """
+
+    # parameters of the command, must be exhaustive
+    _params_ = dict(
+        # name of the parameter, must match argument name
+        outputdir=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("-o", "--outputdir"),
+            # documentation
+            doc="""Directory to which outputs are written.
+            Default is the current working directory.
+            Example: ''""",
+            # type checkers, constraint definition is automatically
+            # added to the docstring
+            # constraints=EnsureChoice('en', 'de')
+            ),
+        file_path=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("-f", "--file_path"),
+            # documentation
+            doc="""A '.json' file containing all metadata (in the form of an
+            array of JSON objects) of a single dataset
+            Example: ''""",
+            ),
+        data_array=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("-a","--data_array"),
+            # documentation
+            doc="""A JSON array containing all metadata of a single dataset
+            Example: ''""",
+            ),
+        force=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("-force", "--force"),
+            # documentation
+            doc="""If content for the user interface already exists in the specified
+            or default directory, force this content to be overwritten. Content
+            overwritten with this flag include the 'artwork' and 'assets'
+            directories and the 'index.html' file. The 'metadata' directory is
+            deleted and recreated by default.
+            Example: ''""",
+            action="store_true",
+            default=False
+            ),
+        super=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("-s", "--super"),
+            # documentation
+            doc="""Specify the incoming dataset as the superdataset for the catalog.
+            If a superdataset is already specified for this particular catalog, it
+            will be overwritten.
+            Example: ''""",
+            action="store_true",
+            default=False
+            ),
+    )
+
+    @staticmethod
+    # decorator binds the command to the Dataset class as a method
+    @datasetmethod(name='catalog')
+    # generic handling of command results (logging, rendering, filtering, ...)
+    @eval_results
+    # signature must match parameter list above
+    # additional generic arguments are added by decorators
+    def __call__(
+        outputdir = curdir, 
+        file_path = None,
+        data_array = None,
+        force: bool = False):
+        
+        # Set parameters for datalad_catalog()
+        if data_array is None and file_path is None:
+            err_msg = f"No metadata supplied: Datalad catalog has to be supplied with metadata in the form of a path to a JSON file (argument: -f, --file_path) or an array of JSON objects (argument: -f, --meta_data)"
+            yield get_status_dict(
+                action='catalog',
+                path=abspath(curdir),# reported paths MUST be absolute
+                status='error',
+                message=err_msg)
+            sys.exit(err_msg)
+        if data_array is not None:
+            metadata = data_array
+        if file_path is not None:
+            # Load data from input file
+            # (assume for now that the data were exported by using `datalad meta-dump`,
+            # and that all exported objects were added to an array in a json file)
+            # This metadata should be the dataset and file level metadata of a single dataset
+            metadata = load_json_file(file_path)
+
+        script_path = os.path.realpath(__file__)
+        sep = os.path.sep
+        repo_path = sep.join(script_path.split(sep)[0:-2])
+        package_path = sep.join(script_path.split(sep)[0:-1])
+        if outputdir:
+            out_dir = outputdir
+        else:
+            out_dir = curdir
+
+        # Call main function to generate UI
+        datalad_catalog(
+            metadata,
+            out_dir,
+            repo_path,
+            package_path,
+            force)
+        msg=f"Catalog successfully created/updated at: {out_dir}"
+        # commands should be implemented as generators and should
+        # report any results by yielding status dictionaries
+        yield get_status_dict(
+            # an action label must be defined, the command name make a good
+            # default
+            action='catalog',
+            # most results will be about something associated with a dataset
+            # (component), reported paths MUST be absolute
+            path=abspath(curdir),
+            # status labels are used to identify how a result will be reported
+            # and can be used for filtering
+            status='ok',
+            # arbitrary result message, can be a str or tuple. in the latter
+            # case string expansion with arguments is delayed until the
+            # message actually needs to be rendered (analog to exception messages)
+            message=msg)
 
 
-# def run_cmd():
-#     """
-#     Calls datalad_catalog() with command line arguments
-#     """
-#     argument_parser = ArgumentParser(
-#         description=__doc__,
-#         formatter_class=RawDescriptionHelpFormatter)
-#     argument_parser.add_argument(
-#         "-o", "--outputdir",
-#         type=str,
-#         help="Directory to which outputs are written.\
-#         Default is the '_build' directory inside the\
-#         'data-browser-from-metadata' rep")
-#     argument_parser.add_argument(
-#         "-f", "--force",
-#         action='store_true',
-#         help="If content for the user interface already exists in the specified\
-#         or default directory, force this content to be overwritten. Content\
-#         overwritten with this flag include the 'artwork' and 'assets'\
-#         directories and the 'index.html' file. The 'metadata' directory is\
-#         deleted and recreated by default.")
-#     argument_parser.add_argument(
-#         "file_path",
-#         type=str,
-#         help="The '.json' file containing all metadata (in the form of an\
-#         array of JSON objects) from which the user interface will be\
-#         generated.")
-#     arguments: Namespace = argument_parser.parse_args()
-#     print(arguments, file=sys.stderr)
-#     # Set parameters for datalad_catalog()
-#     metadata_file = arguments.file_path
-#     script_path = os.path.realpath(__file__)
-#     sep = os.path.sep
-#     repo_path = sep.join(script_path.split(sep)[0:-2])
-#     package_path = sep.join(script_path.split(sep)[0:-1])
-#     if arguments.outputdir:
-#         out_dir = arguments.outputdir
-#     else:
-#         out_dir = os.path.join(repo_path, '_build')
-#     # Call main function to generate UI
-#     datalad_catalog(
-#         metadata_file,
-#         out_dir,
-#         repo_path,
-#         package_path,
-#         arguments.force)
-
-
-def datalad_catalog(metadata_file, out_dir, repo_path, package_path,
+def datalad_catalog(metadata, out_dir, repo_path, package_path,
                     overwrite):
     """
     Generate web-browser-based user interface for browsing metadata of a
     DataLad dataset.
 
-    WORKFLOW:
-    Step 1:
-    Load JSON data
-    Step 2:
-    Loop through all metadata objects, map to correct fields, create json
-    blob per dataset, containing all data relevant to that dataset,
-    including links to children and parent. LOGIC:
-        a. Find all objects with type dataset
-        b. For each dataset:
-        - Find md5sum of id and version.
-        - Check if associated file/object has already been created. If yes,
-            load object from file. If not, create empty object.
-        - Populate key-value pairs based on extractor type (metalad_core,
-            metalad_core_dataset, metalad_studyminimeta)
-        - Add extra key-value pairs required for UI, but not contained in any
-            extractors or not available in required format
-        - Find all subdatasets for current dataset. For each subdataset,
-            create an object and:
-            + add standard dataset fields (id, version, etc)
-            + add subdataset and path/directory details to the 'children'
-                array of the parent dataset
-        - Find all files for current dataset. For each file:
-            + add file and path/directory details to the 'children' array of
-                the parent dataset
-        c. ...
-    Step 3:
-    From above, create a single json file with an array of superdatasets
-    Step 4:
-    Create/copy html, js, css from templates.
-    ...
-
     EXAMPLE USAGE:
-    > datalad_catalog -o <path-to-output-directory> <path-to-input-file>
+    > datalad_catalog -o <path-to-output-directory> -f <path-to-input-file>
+    > datalad_catalog -o <path-to-output-directory> -f <path-to-input-file>
+    > datalad_catalog -o <path-to-output-directory> -a <data-array>
     """
     # Create output directories if they do not exist
     metadata_out_dir = setup_metadata_dir(out_dir)
     templates_path = os.path.join(package_path, 'templates')
-    # Load data from input file
-    # (assume for now that the data were exported by using `datalad meta-dump`,
-    # and that all exported objects were added to an array in a json file)
-    metadata = load_json_file(metadata_file)
-    # Isolate the superdataset, write to file
-    super_ds = search_superdataset(metadata)
-    write_superdataset(super_ds, metadata_out_dir)
+    
     # Grab all datasets from metadata
     datasets = filter_metadata_objects(metadata,
                                        options_dict={"type": "dataset"})
-    # Initialise empty list for appending indices of processed datasets
-    processed_datasets = []
-    # Loop through datasets
-    for i_ds, dataset in enumerate(datasets):
-        # Skip iteration if object has already been processed
-        blob_hash = md5blob(dataset["dataset_id"], dataset["dataset_version"])
-        if blob_hash in processed_datasets:
-            continue
-        # Process this dataset, other related datasets, subdatasets, and files
-        processed_datasets, new_obj = \
-            process_dataset(dataset, datasets, processed_datasets,
-                            metadata, metadata_out_dir, templates_path)
-
-    # Write parent dataset name and shortname to all subdataset blobs
-    for parent_hash in processed_datasets:
-        parent_file = os.path.join(metadata_out_dir, parent_hash + ".json")
-        parent_ds = load_json_file(parent_file)
-        for child_hash in parent_ds["subdataset_blobs"]:
-            child_file = os.path.join(metadata_out_dir, child_hash + ".json")
-            ds = load_json_file(child_file)
-            ds["root_dataset_name"] = parent_ds["name"]
-            if "short_name" in parent_ds:
-                ds["root_dataset_short_name"] = parent_ds["short_name"]
-            with open(child_file, 'w') as f:
-                json.dump(ds, f)
-
+    # TODO: test for empty list
+    
+    # Isolate the incoming dataset id and version
+    # TODO: decide whether to warn or error out if multiple source datasets included
+    unique_blobs = set([])
+    for ds in datasets:
+        blob_hash = md5blob(ds["dataset_id"], ds["dataset_version"])
+        unique_blobs.add(blob_hash)
+    if len(unique_blobs) > 1:
+        # Multiple dataset-level metadata items found: error/warning?
+        print("Error: dataset-level metadata items found for multiple source \
+              datasets. datalad catalog requires all input metadata to be \
+              generated from a single dataset.")
+        sys.exit("Multiple dataset-level metadata items found")
+    else:
+        # Single dataset source
+        main_dataset_id = datasets[0]["dataset_id"]
+        main_dataset_version = datasets[0]["dataset_version"]
+    
+    # TODO: write main details to file in case -s flag specifies this as catalog super
+    # write_superdataset(super_ds, metadata_out_dir)
+    
+    # Process dataset-level metadata
+    new_obj, blob_file = process_dataset(datasets, metadata, metadata_out_dir, templates_path)
+    # Add subdatasets to "children" field
+    if "subdatasets" in new_obj and isinstance(new_obj["subdatasets"], list) and len(new_obj["subdatasets"]) > 0:
+        new_obj = add_update_subdatasets(new_obj, new_obj["subdatasets"])
+    # Process file-level metadata
+    # Find all files with the main object as parent dataset, and add them as children
+    main_dataset_files = filter_metadata_objects(
+                metadata,
+                options_dict={
+                    "type": "file",
+                    "dataset_id": main_dataset_id,
+                    "dataset_version": main_dataset_version
+                })
+    # TODO: check if extra files are in incoming data, give warning
+    new_obj = add_update_files(dataset_object=new_obj, files=main_dataset_files)
+    # Write main data object to file
+    with open(blob_file, 'w') as fp:
+        json.dump(new_obj, fp)
+    
     # Copy all remaining components from templates to output directory
     copy_ui_content(repo_path, out_dir, package_path, overwrite)
 
@@ -153,76 +228,19 @@ def datalad_catalog(metadata_file, out_dir, repo_path, package_path,
 # --------------------
 # Function definitions
 # --------------------
-def search_superdataset(metadata):
-    """
-    Find the main superdataset from the list of input metadata.
-    Throw errors if zero or multiple superdatasets are found.
-    Create file to save details of single superdataset
-    """
-    super_datasets = [item for item in metadata if "type" in item
-                      and item["type"] == "dataset"
-                      and "root_dataset_id" not in item]
-    if len(super_datasets) == 0:
-        # No superdatasets found: error
-        print("Error: no superdataset found in input. datalad_catalog\
-              requires all input metadata to be generated from a single\
-              superdataset.")
-        sys.exit("No superdatasets found")
 
-    unique_supers = set([])
-    for ds in super_datasets:
-        blob_hash = md5blob(ds["dataset_id"], ds["dataset_version"])
-        unique_supers.add(blob_hash)
-
-    if len(unique_supers) > 1:
-        # Multiple superdatasets found: error
-        print("Error: multiple superdatasets found in input. datalad_catalog\
-              requires all input metadata to be generated from a single\
-              superdataset.")
-        sys.exit("Multiple superdatasets found")
-    else:
-        # Single superdataset found
-        return super_datasets[0]
-
-
-def write_superdataset(superds, metadata_out_dir):
-    """
-    """
-    suberds_obj = {"dataset_id": superds["dataset_id"],
-                   "dataset_version": superds["dataset_version"]}
-    superds_file = os.path.join(metadata_out_dir, "super.json")
-    with open(superds_file, 'w') as f:
-        json.dump(suberds_obj, f)
-
-
-def process_dataset(dataset, all_datasets, processed_datasets,
-                    metadata, metadata_out_dir, templates_path):
+def process_dataset(datasets, metadata, metadata_out_dir, templates_path):
     """
     Process all metadata items extracted for a dataset on the dataset level
     """
 
-    blob_hash = md5blob(dataset["dataset_id"], dataset["dataset_version"])
-    processed_datasets.append(blob_hash)
-    # TODO: make sure that this section is called at all the correct places
-    # idx_list = find_dataset_objects(all_datasets,
-    #                                 dataset["dataset_id"],
-    #                                 dataset["dataset_version"])
-    # processed_datasets.extend(idx_list)
-    # Grab all datasets with the same id and version
-    same_datasets = filter_metadata_objects(
-        all_datasets,
-        options_dict={
-            "dataset_id": dataset["dataset_id"],
-            "dataset_version": dataset["dataset_version"]
-        })
-    # Initialise new object from metadata
-    # TODO: this call might be unnecessarily checking if a file
-    # already exists, follow this up.
-    new_obj, blob_file = get_dataset_object(dataset["dataset_id"],
-                                            dataset["dataset_version"],
+    # blob_hash = md5blob(datasets[0]["dataset_id"], datasets[0]["dataset_version"])
+    
+    new_obj, blob_file = get_dataset_object(datasets[0]["dataset_id"],
+                                            datasets[0]["dataset_version"],
                                             metadata_out_dir)
     # Populate key-value pairs based on extractor type
-    for ds_item in same_datasets:
+    for ds_item in datasets:
         if "extractor_name" in ds_item:
             new_obj = parse_metadata_object(ds_item, new_obj, templates_path)
         else:
@@ -231,51 +249,51 @@ def process_dataset(dataset, all_datasets, processed_datasets,
             print("Unrecognized metadata type: non-DataLad")
     # Add missing fields required for UI
     new_obj = add_missing_fields(new_obj, templates_path)
-    # Get all subdatasets of current dataset
-    subdatasets = filter_metadata_objects(
-                    all_datasets,
-                    options_dict={
-                        "root_dataset_id": dataset["dataset_id"],
-                        "root_dataset_version": dataset["dataset_version"]
-                    })
-    # If subdatasets exist, add them to superdataset list and to
-    # main dataset object
-    sub_blob_hashes = []
-    subdataset_objects = []
-    subdataset_keywords = set([])
-    for subds in subdatasets:
-        sub_blob_hash = md5blob(subds["dataset_id"], subds["dataset_version"])
-        if sub_blob_hash not in sub_blob_hashes:
-            sub_blob_hashes.append(sub_blob_hash)
-        if sub_blob_hash in processed_datasets:
-            continue
-        # Process this subds, other related datasets, subdatasets, and files
-        processed_datasets, subds_obj = \
-            process_dataset(subds, all_datasets, processed_datasets,
-                            metadata, metadata_out_dir, templates_path)
-        subdataset_objects.append(subds_obj)
-        subdataset_keywords.update(subds_obj["keywords"])
-    # Then populate subdataset details and append to current dataset
-    # 'subdatasets' field
-    new_obj["subdataset_blobs"] = sub_blob_hashes
-    new_obj["subdataset_keywords"] = list(subdataset_keywords)
-    new_obj = add_update_subdatasets(dataset_object=new_obj,
-                                     subdatasets=subdataset_objects)
-    # Find all files with the main object as parent dataset, and add
-    # them as children
-    files = filter_metadata_objects(
-                metadata,
-                options_dict={
-                    "type": "file",
-                    "dataset_id": dataset["dataset_id"],
-                    "dataset_version": dataset["dataset_version"]
-                })
-    new_obj = add_update_files(dataset_object=new_obj, files=files)
-    # Write main data object to file
-    with open(blob_file, 'w') as fp:
-        json.dump(new_obj, fp)
+    # # Get all subdatasets of current dataset
+    # subdatasets = filter_metadata_objects(
+    #                 all_datasets,
+    #                 options_dict={
+    #                     "root_dataset_id": dataset["dataset_id"],
+    #                     "root_dataset_version": dataset["dataset_version"]
+    #                 })
+    # # If subdatasets exist, add them to superdataset list and to
+    # # main dataset object
+    # sub_blob_hashes = []
+    # subdataset_objects = []
+    # subdataset_keywords = set([])
+    # for subds in subdatasets:
+    #     sub_blob_hash = md5blob(subds["dataset_id"], subds["dataset_version"])
+    #     if sub_blob_hash not in sub_blob_hashes:
+    #         sub_blob_hashes.append(sub_blob_hash)
+    #     if sub_blob_hash in processed_datasets:
+    #         continue
+    #     # Process this subds, other related datasets, subdatasets, and files
+    #     processed_datasets, subds_obj = \
+    #         process_dataset(subds, all_datasets, processed_datasets,
+    #                         metadata, metadata_out_dir, templates_path)
+    #     subdataset_objects.append(subds_obj)
+    #     subdataset_keywords.update(subds_obj["keywords"])
+    # # Then populate subdataset details and append to current dataset
+    # # 'subdatasets' field
+    # new_obj["subdataset_blobs"] = sub_blob_hashes
+    # new_obj["subdataset_keywords"] = list(subdataset_keywords)
+    # new_obj = add_update_subdatasets(dataset_object=new_obj,
+    #                                  subdatasets=subdataset_objects)
+    # # Find all files with the main object as parent dataset, and add
+    # # them as children
+    # files = filter_metadata_objects(
+    #             metadata,
+    #             options_dict={
+    #                 "type": "file",
+    #                 "dataset_id": dataset["dataset_id"],
+    #                 "dataset_version": dataset["dataset_version"]
+    #             })
+    # new_obj = add_update_files(dataset_object=new_obj, files=files)
+    # # Write main data object to file
+    # with open(blob_file, 'w') as fp:
+    #     json.dump(new_obj, fp)
 
-    return processed_datasets, new_obj
+    return new_obj, blob_file
 
 
 def md5blob(identifier='', version=''):
@@ -395,7 +413,7 @@ def get_dataset_object(dataset_id, dataset_version, data_dir):
 
 def parse_metadata_object(src_object, dest_object, schema_path):
     """
-    Parse a single metadata item )from the list input to `datalad_catalog`),
+    Parse a single metadata item from the list input to `datalad_catalog`,
     using a different parser based on the `extractor_name` field of the item.
     """
     if src_object["extractor_name"] == "metalad_core_dataset":
@@ -404,9 +422,12 @@ def parse_metadata_object(src_object, dest_object, schema_path):
     elif src_object["extractor_name"] == "metalad_studyminimeta":
         schema_file = os.path.join(schema_path, "studyminimeta_schema.json")
         dest_object = studyminimeta_parse(src_object, dest_object, schema_file)
-    elif src_object["extractor_name"] == "metalad_core":
-        schema_file = os.path.join(schema_path, "core_schema.json")
-        dest_object = core_parse(src_object, dest_object, schema_file)
+    elif src_object["extractor_name"] == "metalad_core" and src_object["type"] == "dataset":
+        schema_file = os.path.join(schema_path, "core_schema_for_dataset.json")
+        dest_object = core_parse_dataset(src_object, dest_object, schema_file)
+    elif src_object["extractor_name"] == "metalad_core" and src_object["type"] == "file":
+        schema_file = os.path.join(schema_path, "core_schema_for_file.json")
+        dest_object = core_parse_file(src_object, dest_object, schema_file)
     else:
         print("Unrecognized metadata type: DataLad-related")
     return dest_object
@@ -512,35 +533,11 @@ def add_update_subdatasets(dataset_object, subdatasets):
     parent dataset
     """
     for subds in subdatasets:
-        # TODO: check if the subdatasets already exist and decide whether
-        # to overwrite or skip. Currently overwritten
-        new_sub_obj = copy_key_vals(src_object=subds,
-                                    dest_object={},
-                                    keys=["dataset_id",
-                                          "dataset_version",
-                                          "dataset_path",
-                                          "extraction_time",
-                                          "name",
-                                          "short_name",
-                                          "doi",
-                                          "url",
-                                          "license",
-                                          "authors",
-                                          "keywords",
-                                          ])
-        sep = os.path.sep
-        new_sub_obj["dirs_from_path"] = subds["dataset_path"].split(sep)
-        if not object_in_list(attribute_key="dataset_id",
-                              attribute_val=subds["dataset_id"],
-                              search_list=dataset_object["subdatasets"]):
-            dataset_object["subdatasets"].append(new_sub_obj)
-        else:
-            continue
         # Add subdataset locations as children to parent dataset
-        nr_nodes = len(new_sub_obj["dirs_from_path"])
+        nr_nodes = len(subds["dirs_from_path"])
         iter_object = dataset_object["children"]
         idx = -1
-        for n, node in enumerate(new_sub_obj["dirs_from_path"]):
+        for n, node in enumerate(subds["dirs_from_path"]):
             if n > 0:
                 iter_object = iter_object[idx]["children"]
             if n != nr_nodes-1:
@@ -629,9 +626,44 @@ def add_update_files(dataset_object, files):
     return dataset_object
 
 
-def core_parse(src_object, dest_object, schema_file):
+def core_parse_dataset(src_object, dest_object, schema_file):
     """
-    Parse metadata output by DataLad's `metalad_core` extractor and
+    Parse dataset-level metadata output by DataLad's `metalad_core` extractor from
+    translate into JSON structure from which UI is generated.
+    """
+    # Load schema/template dictionary, where each key represents the exact
+    # same key in the destination object, and each associated value
+    # represents the key in the source object which value is to be copied.
+    schema = load_json_file(schema_file)
+    # Copy source to destination values, per key
+    for key in schema:
+        if schema[key] in src_object:
+            dest_object[key] = src_object[schema[key]]
+    # Populate URL field
+    ds_info = next((item for item in src_object["extracted_metadata"]["@graph"]
+                    if "@type" in item and item["@type"] == "Dataset"), False)
+    if ds_info and "distribution" in ds_info:
+        origin = next((item for item in ds_info["distribution"]
+                       if "name" in item and item["name"] == "origin"), False)
+        if origin:
+            dest_object["url"] = origin["url"]
+    # Populate subdatasets field
+    sep = os.path.sep
+    dest_object["subdatasets"] = []
+    if ds_info and "hasPart" in ds_info:
+        for subds in ds_info["hasPart"]:
+            sub_dict = {
+                "dataset_id": subds["@identifier"].strip("datalad:"),
+                "dataset_version": subds["@id"].strip("datalad:"),
+                "dataset_path": subds["name"],
+                "dirs_from_path": subds["name"].split(sep)
+            }
+            dest_object["subdatasets"].append(sub_dict)
+    return dest_object
+
+def core_parse_file(src_object, dest_object, schema_file):
+    """
+    Parse file-level metadata output by DataLad's `metalad_core` extractor and
     translate into JSON structure from which UI is generated.
     """
     # Load schema/template dictionary, where each key represents the exact
@@ -763,124 +795,46 @@ def studyminimeta_parse(src_object, dest_object, schema_file):
     return dest_object
 
 
-# decoration auto-generates standard help
-@build_doc
-# all commands must be derived from Interface
-class Catalog(Interface):
-    # first docstring line is used a short description in the cmdline help
-    # the rest is put in the verbose help and manpage
-    """Short description of the command
-
-    Long description of arbitrary volume.
+def search_superdataset(metadata):
     """
+    Find the main superdataset from the list of input metadata.
+    Throw errors if zero or multiple superdatasets are found.
+    Create file to save details of single superdataset
+    """
+    super_datasets = [item for item in metadata if "type" in item
+                      and item["type"] == "dataset"
+                      and "root_dataset_id" not in item]
+    if len(super_datasets) == 0:
+        # No superdatasets found: error
+        print("Error: no superdataset found in input. datalad_catalog\
+              requires all input metadata to be generated from a single\
+              superdataset.")
+        sys.exit("No superdatasets found")
 
-    # parameters of the command, must be exhaustive
-    _params_ = dict(
-        # name of the parameter, must match argument name
-        language=Parameter(
-            # cmdline argument definitions, incl aliases
-            args=("-l", "--language"),
-            # documentation
-            doc="""language to say "hello" in""",
-            # type checkers, constraint definition is automatically
-            # added to the docstring
-            constraints=EnsureChoice('en', 'de')),
-        outputdir=Parameter(
-            # cmdline argument definitions, incl aliases
-            args=("-o", "--outputdir"),
-            # documentation
-            doc="""Directory to which outputs are written.
-            Default is the '_build' directory inside the
-            'datalad-catalog' repo.
-            Example: ''""",
-            # type checkers, constraint definition is automatically
-            # added to the docstring
-            # constraints=EnsureChoice('en', 'de')
-            ),
-        force=Parameter(
-            # cmdline argument definitions, incl aliases
-            args=("-f", "--force"),
-            # documentation
-            doc="""If content for the user interface already exists in the specified
-            or default directory, force this content to be overwritten. Content
-            overwritten with this flag include the 'artwork' and 'assets'
-            directories and the 'index.html' file. The 'metadata' directory is
-            deleted and recreated by default.
-            Example: ''""",
-            action="store_true",
-            # type checkers, constraint definition is automatically
-            # added to the docstring
-            # constraints=EnsureChoice('en', 'de')
-            ),
-        file_path=Parameter(
-            # cmdline argument definitions, incl aliases
-            args=("file_path"),
-            # documentation
-            doc="""The '.json' file containing all metadata (in the form of an
-            array of JSON objects) from which the user interface will be
-            generated.
-            Example: ''""",
-            # type checkers, constraint definition is automatically
-            # added to the docstring
-            # constraints=EnsureChoice('en', 'de')
-            ),
-    )
+    unique_supers = set([])
+    for ds in super_datasets:
+        blob_hash = md5blob(ds["dataset_id"], ds["dataset_version"])
+        unique_supers.add(blob_hash)
 
-    @staticmethod
-    # decorator binds the command to the Dataset class as a method
-    @datasetmethod(name='catalog')
-    # generic handling of command results (logging, rendering, filtering, ...)
-    @eval_results
-    # signature must match parameter list above
-    # additional generic arguments are added by decorators
-    def __call__(language, outputdir, force, file_path):
+    if len(unique_supers) > 1:
+        # Multiple superdatasets found: error
+        print("Error: multiple superdatasets found in input. datalad_catalog\
+              requires all input metadata to be generated from a single\
+              superdataset.")
+        sys.exit("Multiple superdatasets found")
+    else:
+        # Single superdataset found
+        return super_datasets[0]
 
-        print(language)
-        print(outputdir)
-        print(force)
-        print(file_path)
-        if language == 'en':
-            msg = 'Helloblabla!'
-        elif language == 'de':
-            msg = 'Tachchen!'
-        else:
-            msg = ("unknown language: '%s'", language)
 
-        # Set parameters for datalad_catalog()
-        metadata_file = file_path
-        script_path = os.path.realpath(__file__)
-        sep = os.path.sep
-        repo_path = sep.join(script_path.split(sep)[0:-2])
-        package_path = sep.join(script_path.split(sep)[0:-1])
-        if outputdir:
-            out_dir = outputdir
-        else:
-            out_dir = os.path.join(repo_path, '_build')
-        # Call main function to generate UI
-        datalad_catalog(
-            metadata_file,
-            out_dir,
-            repo_path,
-            package_path,
-            force)
-
-        # commands should be implemented as generators and should
-        # report any results by yielding status dictionaries
-        yield get_status_dict(
-            # an action label must be defined, the command name make a good
-            # default
-            action='catalog',
-            # most results will be about something associated with a dataset
-            # (component), reported paths MUST be absolute
-            path=abspath(curdir),
-            # status labels are used to identify how a result will be reported
-            # and can be used for filtering
-            status='ok' if language in ('en', 'de') else 'error',
-            # arbitrary result message, can be a str or tuple. in the latter
-            # case string expansion with arguments is delayed until the
-            # message actually needs to be rendered (analog to exception messages)
-            message=msg)
-
+def write_superdataset(superds, metadata_out_dir):
+    """
+    """
+    suberds_obj = {"dataset_id": superds["dataset_id"],
+                   "dataset_version": superds["dataset_version"]}
+    superds_file = os.path.join(metadata_out_dir, "super.json")
+    with open(superds_file, 'w') as f:
+        json.dump(suberds_obj, f)
 # ------------
 # MOAR TODOS!
 # ------------
