@@ -24,6 +24,7 @@ grep "subdataset(ok)" subds.txt | wc -l
 # Get superdataset id and version (to add to file metadata for context in hierarchy)
 # TODO: this could probably be replaced by: git config -f ${SUPER}/.datalad/config datalad.dataset.<id/version>
 echo "Get superdataset metadata:"
+
 SUPER_ID=$(datalad -f json meta-extract -d "$SUPER" metalad_core | jq -r '.["metadata_record"]["dataset_id"]')
 SUPER_VERSION=$(datalad -f json meta-extract -d "$SUPER" metalad_core | jq -r '.["metadata_record"]["dataset_version"]')
 echo "id: $SUPER_ID"

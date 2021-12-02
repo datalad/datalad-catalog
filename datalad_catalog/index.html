@@ -242,7 +242,7 @@
                   <br>
 
                   
-                  <b-card v-for="ds in sortedSubdatasets" border-variant="dark" header-bg-variant="transparent" no-body class="mb-2 pt-1">
+                  <b-card v-if="subdatasets_ready" v-for="ds in sortedSubdatasets" border-variant="dark" header-bg-variant="transparent" no-body class="mb-2 pt-1">
                     <template v-slot:header>
                       <b-row no-gutters>
                         <b-col align-h="center" align-v="center" md="1">

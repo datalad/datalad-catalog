@@ -82,9 +82,9 @@ class Catalog(Interface):
             action="store_true",
             default=False
             ),
-        super=Parameter(
+        set_super=Parameter(
             # cmdline argument definitions, incl aliases
-            args=("-s", "--super"),
+            args=("-s", "--set_super"),
             # documentation
             doc="""Specify the incoming dataset as the superdataset for the catalog.
             If a superdataset is already specified for this particular catalog, it
@@ -106,7 +106,8 @@ class Catalog(Interface):
         outputdir = curdir, 
         file_path = None,
         data_array = None,
-        force: bool = False):
+        force: bool = False,
+        set_super: bool = False):
         
         # Set parameters for datalad_catalog()
         if data_array is None and file_path is None:
@@ -118,7 +119,7 @@ class Catalog(Interface):
                 message=err_msg)
             sys.exit(err_msg)
         if data_array is not None:
-            metadata = data_array
+            metadata = [json.loads(line) for line in open(data_array, 'r')]
         if file_path is not None:
             # Load data from input file
             # (assume for now that the data were exported by using `datalad meta-dump`,
@@ -141,7 +142,8 @@ class Catalog(Interface):
             out_dir,
             repo_path,
             package_path,
-            force)
+            force,
+            set_super)
         msg=f"Catalog successfully created/updated at: {out_dir}"
         # commands should be implemented as generators and should
         # report any results by yielding status dictionaries
@@ -162,7 +164,7 @@ class Catalog(Interface):
 
 
 def datalad_catalog(metadata, out_dir, repo_path, package_path,
-                    overwrite):
+                    overwrite, set_super):
     """
     Generate web-browser-based user interface for browsing metadata of a
     DataLad dataset.
@@ -199,7 +201,9 @@ def datalad_catalog(metadata, out_dir, repo_path, package_path,
         main_dataset_version = datasets[0]["dataset_version"]
     
     # TODO: write main details to file in case -s flag specifies this as catalog super
-    # write_superdataset(super_ds, metadata_out_dir)
+    if set_super:
+        print("Super dataset specified, creating entry")
+        write_superdataset(datasets[0], metadata_out_dir)
     
     # Process dataset-level metadata
     new_obj, blob_file = process_dataset(datasets, metadata, metadata_out_dir, templates_path)
@@ -217,9 +221,22 @@ def datalad_catalog(metadata, out_dir, repo_path, package_path,
                 })
     # TODO: check if extra files are in incoming data, give warning
     new_obj = add_update_files(dataset_object=new_obj, files=main_dataset_files)
+
+    # Write children array to separate file
+    children_hash, children_file = get_md5_details(datasets[0]["dataset_id"],
+                                            datasets[0]["dataset_version"],
+                                            metadata_out_dir,
+                                            children=True)
+    children_obj = {}
+    children_obj["children"] = new_obj["children"]
+    with open(children_file, 'w') as fp1:
+        json.dump(children_obj, fp1)
+    
+    new_obj["children"] = children_hash
+
     # Write main data object to file
-    with open(blob_file, 'w') as fp:
-        json.dump(new_obj, fp)
+    with open(blob_file, 'w') as fp2:
+        json.dump(new_obj, fp2)
     
     # Copy all remaining components from templates to output directory
     copy_ui_content(repo_path, out_dir, package_path, overwrite)
@@ -296,12 +313,14 @@ def process_dataset(datasets, metadata, metadata_out_dir, templates_path):
     return new_obj, blob_file
 
 
-def md5blob(identifier='', version=''):
+def md5blob(identifier='', version='', children=False):
     """
     Create md5sum of an identifier and version number (joined by a
     dash), to serve as a filename for a json blob.
     """
     blob_string = identifier + "-" + version
+    if children:
+        blob_string = blob_string + "-children"
     blob_hash = hashlib.md5(blob_string.encode('utf-8')).hexdigest()
     return blob_hash
 
@@ -344,9 +363,9 @@ def setup_metadata_dir(out_dir):
     """
     # If the metadata directory already exists, remove it with its contents
     metadata_path = Path(out_dir) / 'metadata'
-    if metadata_path.exists() and metadata_path.is_dir():
-        shutil.rmtree(metadata_path)
-    Path(metadata_path).mkdir(parents=True)
+    if not (metadata_path.exists() and metadata_path.is_dir()):
+        Path(metadata_path).mkdir(parents=True)
+    
     return metadata_path
 
 
@@ -358,7 +377,7 @@ def copy_ui_content(repo_path, out_dir, package_path, overwrite):
     """
     content_paths = {
         "assets": Path(package_path) / 'assets',
-        "artwork": Path(repo_path) / 'artwork',
+        "artwork": Path(package_path) / 'artwork',
         "html": Path(package_path) / 'index.html',
     }
     out_dir_paths = {
@@ -388,22 +407,22 @@ def copy_overwrite_path(src, dest, overwrite):
             shutil.copytree(src, dest)
 
 
-def get_md5_details(dataset_id, dataset_version, data_dir):
+def get_md5_details(dataset_id, dataset_version, data_dir, children=False):
     """
     Return an md5 hash of a dataset id and version, as well
     as the path for the file representing this dataset object
     """
-    blob_hash = md5blob(dataset_id, dataset_version)
+    blob_hash = md5blob(dataset_id, dataset_version, children)
     blob_file = os.path.join(data_dir, blob_hash + ".json")
     return blob_hash, blob_file
     
 
-def get_dataset_object(dataset_id, dataset_version, data_dir):
+def get_dataset_object(dataset_id, dataset_version, data_dir, children=False):
     """
     Get a JSON object pertaining to a UI dataset from file if the file exists,
     else return an empty object.
     """
-    blob_hash = md5blob(dataset_id, dataset_version)
+    blob_hash = md5blob(dataset_id, dataset_version, children)
     blob_file = os.path.join(data_dir, blob_hash + ".json")
     if os.path.isfile(blob_file):
         return load_json_file(blob_file), blob_file
@@ -532,6 +551,8 @@ def add_update_subdatasets(dataset_object, subdatasets):
     For each subdataset in a list, add subdataset locations as children to
     parent dataset
     """
+    print(subdatasets)
+    print(dataset_object["children"])
     for subds in subdatasets:
         # Add subdataset locations as children to parent dataset
         nr_nodes = len(subds["dirs_from_path"])
@@ -653,7 +674,7 @@ def core_parse_dataset(src_object, dest_object, schema_file):
     if ds_info and "hasPart" in ds_info:
         for subds in ds_info["hasPart"]:
             sub_dict = {
-                "dataset_id": subds["@identifier"].strip("datalad:"),
+                "dataset_id": subds["identifier"].strip("datalad:"),
                 "dataset_version": subds["@id"].strip("datalad:"),
                 "dataset_path": subds["name"],
                 "dirs_from_path": subds["name"].split(sep)
@@ -721,35 +742,35 @@ def studyminimeta_parse(src_object, dest_object, schema_file):
                               if "@type" in item
                               and item["@type"] == "CreativeWork"), False)
     if not metadata["study"]:
-        print("Error: object where '@type' equals 'CreativeWork' not found in \
-               src_object['extracted_metadata']['@graph'] during studyminimeta\
-                    extraction")
+        print("Warning: object where '@type' equals 'CreativeWork' not found in \
+src_object['extracted_metadata']['@graph'] during studyminimeta extraction")
+    
     metadata["dataset"] = next((item for item
                                 in src_object["extracted_metadata"]["@graph"]
                                 if "@type" in item
                                 and item["@type"] == "Dataset"), False)
     if not metadata["dataset"]:
-        print("Error: object where '@type' equals 'Dataset' not found in \
-               src_object['extracted_metadata']['@graph'] during studyminimeta\
-                    extraction")
+        print("Warning: object where '@type' equals 'Dataset' not found in \
+src_object['extracted_metadata']['@graph'] during studyminimeta extraction")
+    
     metadata["publicationList"] = \
         next((item for item in src_object["extracted_metadata"]["@graph"]
               if "@id" in item and item["@id"] == "#publicationList"), False)
     if not metadata["publicationList"]:
-        print("Error: object where '@id' equals '#publicationList' not found\
-               in src_object['extracted_metadata']['@graph'] during\
-               studyminimeta extraction")
+        print("Warning: object where '@id' equals '#publicationList' not found \
+in src_object['extracted_metadata']['@graph'] during studyminimeta extraction")
     else:
         metadata["publicationList"] = metadata["publicationList"]["@list"]
+    
     metadata["personList"] = \
         next((item for item in src_object["extracted_metadata"]["@graph"]
               if "@id" in item and item["@id"] == "#personList"), False)
     if not metadata["personList"]:
-        print("Error: object where '@id' equals '#personList' not found in\
-               src_object['extracted_metadata']['@graph'] during\
-               studyminimeta extraction")
+        print("Warning: object where '@id' equals '#personList' not found in \
+src_object['extracted_metadata']['@graph'] during studyminimeta extraction")
     else:
         metadata["personList"] = metadata["personList"]["@list"]
+    
     # Standard/straightforward fields: copy source to dest values per key
     for key in schema:
         if isinstance(schema[key], list) and len(schema[key]) == 2:
@@ -758,6 +779,9 @@ def studyminimeta_parse(src_object, dest_object, schema_file):
                 dest_object[key] = metadata[schema[key][0]][schema[key][1]]
         else:
             dest_object[key] = schema[key]
+    # Description
+    dest_object["description"] = dest_object["description"].replace('<', '')
+    dest_object["description"] = dest_object["description"].replace('>', '')
     # Authors
     for author in metadata["dataset"]["author"]:
         author_details = \
@@ -791,7 +815,6 @@ def studyminimeta_parse(src_object, dest_object, schema_file):
                 else:
                     new_pub["author"][i] = author_details
             dest_object["publications"].append(new_pub)
-
     return dest_object
 
 

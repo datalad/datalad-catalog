@@ -1,4 +1,4 @@
-"""DataLad demo extension"""
+"""DataLad Catalog extension"""
 
 __docformat__ = 'restructuredtext'
 
