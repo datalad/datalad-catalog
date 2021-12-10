@@ -24,6 +24,7 @@ from typing import (
     Tuple,
     Union
 )
+from .webcatalog import WebCatalog, Node, Dataset, Translator
 
 # create named logger
 lgr = logging.getLogger("datalad.catalog.webui_generate")
@@ -43,52 +44,57 @@ class Catalog(Interface):
     # parameters of the command, must be exhaustive
     _params_ = dict(
         # name of the parameter, must match argument name
-        outputdir=Parameter(
-            # cmdline argument definitions, incl aliases
-            args=("-o", "--outputdir"),
+        catalog_action=Parameter(
+            args=("catalog_action",),
             # documentation
-            doc="""Directory to which outputs are written.
-            Default is the current working directory.
+            doc="""The subcommand to be executed by datalad-catalog.
+            Options include: create, add, remove, serve, create-sibling-*.
             Example: ''""",
             # type checkers, constraint definition is automatically
             # added to the docstring
-            # constraints=EnsureChoice('en', 'de')
-            ),
-        file_path=Parameter(
+            constraints=EnsureChoice('create', 'add', 'remove', 'serve', 'create-sibling')
+        ),
+        catalog_dir=Parameter(
             # cmdline argument definitions, incl aliases
-            args=("-f", "--file_path"),
+            args=("-c", "--catalog_dir"),
             # documentation
-            doc="""A '.json' file containing all metadata (in the form of an
-            array of JSON objects) of a single dataset
+            doc="""Directory where the catalog is located or will be created.
             Example: ''""",
             ),
-        data_array=Parameter(
+        metadata=Parameter(
             # cmdline argument definitions, incl aliases
-            args=("-a","--data_array"),
+            args=("-m", "--metadata"),
             # documentation
-            doc="""A JSON array containing all metadata of a single dataset
+            doc="""Path to input metadata. Multiple input types are possible:
+            - A '.json' file containing an array of JSON objects related to a
+             single datalad dataset.
+            - A stream of JSON objects/lines
             Example: ''""",
             ),
+        dataset_id=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("-i", "--dataset_id"),
+            # documentation
+            doc="""
+            Example: ''""",
+            ),
+        dataset_version=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("-v", "--dataset_version"),
+            # documentation
+            doc="""
+            Example: ''""",
+            ),
+        
         force=Parameter(
             # cmdline argument definitions, incl aliases
-            args=("-force", "--force"),
+            args=("-f", "--force"),
             # documentation
-            doc="""If content for the user interface already exists in the specified
-            or default directory, force this content to be overwritten. Content
+            doc="""If content for the user interface already exists in the catalog
+            directory, force this content to be overwritten. Content
             overwritten with this flag include the 'artwork' and 'assets'
-            directories and the 'index.html' file. The 'metadata' directory is
-            deleted and recreated by default.
-            Example: ''""",
-            action="store_true",
-            default=False
-            ),
-        set_super=Parameter(
-            # cmdline argument definitions, incl aliases
-            args=("-s", "--set_super"),
-            # documentation
-            doc="""Specify the incoming dataset as the superdataset for the catalog.
-            If a superdataset is already specified for this particular catalog, it
-            will be overwritten.
+            directories and the 'index.html' file. Content in the 'metadata' directory 
+            remain untouched.
             Example: ''""",
             action="store_true",
             default=False
@@ -103,64 +109,156 @@ class Catalog(Interface):
     # signature must match parameter list above
     # additional generic arguments are added by decorators
     def __call__(
-        outputdir = curdir, 
-        file_path = None,
-        data_array = None,
-        force: bool = False,
-        set_super: bool = False):
-        
-        # Set parameters for datalad_catalog()
-        if data_array is None and file_path is None:
-            err_msg = f"No metadata supplied: Datalad catalog has to be supplied with metadata in the form of a path to a JSON file (argument: -f, --file_path) or an array of JSON objects (argument: -f, --meta_data)"
+        catalog_action: str,
+        catalog_dir = None, 
+        metadata = None,
+        dataset_id = None,
+        dataset_version = None,
+        force: bool = False):
+
+        # Error out if `catalog_dir` argument was not supplied
+        if catalog_dir is None:
+            err_msg = f"No catalog directory supplied: Datalad catalog can only operate on a path to a directory (argument: -c, --catalog_dir)"
             yield get_status_dict(
-                action='catalog',
+                action=f"catalog {catalog_action}",
                 path=abspath(curdir),# reported paths MUST be absolute
                 status='error',
                 message=err_msg)
             sys.exit(err_msg)
-        if data_array is not None:
-            metadata = [json.loads(line) for line in open(data_array, 'r')]
-        if file_path is not None:
-            # Load data from input file
-            # (assume for now that the data were exported by using `datalad meta-dump`,
-            # and that all exported objects were added to an array in a json file)
-            # This metadata should be the dataset and file level metadata of a single dataset
-            metadata = load_json_file(file_path)
 
-        script_path = os.path.realpath(__file__)
-        sep = os.path.sep
-        repo_path = sep.join(script_path.split(sep)[0:-2])
-        package_path = sep.join(script_path.split(sep)[0:-1])
-        if outputdir:
-            out_dir = outputdir
+        # Test if catalog already exists at path
+        # Instantiate WebCatalog class
+        ctlg = WebCatalog(catalog_dir, dataset_id, dataset_version, force) 
+        # catalog_path = Path(catalog_dir)
+        # catalog_exists = catalog_path.exists() and catalog_path.is_dir()
+        # Catalog should exist for all actions except create (for create action: unless force flag supplied)
+        if not ctlg.is_created():
+            if catalog_action != 'create':
+                err_msg = f"Catalog does not exist: datalad catalog {catalog_action} can only operate on an existing catalog, please supply a path to an existing directory (-c, --catalog_dir)"
+                yield get_status_dict(
+                    action=f"catalog {catalog_action}",
+                    path=abspath(curdir),# reported paths MUST be absolute
+                    status='error',
+                    message=err_msg)
+                sys.exit(err_msg)
         else:
-            out_dir = curdir
+            if catalog_action == 'create':
+                if not force:
+                    err_msg = f"Catalog already exists: overwriting catalog assets (not catalog data!) is only possible when using the force argument (-f, --force)"
+                    yield get_status_dict(
+                        action=f"catalog {catalog_action}",
+                        path=abspath(curdir),# reported paths MUST be absolute
+                        status='warning',
+                        message=err_msg)
+                    sys.exit(err_msg)
 
-        # Call main function to generate UI
-        datalad_catalog(
+        # Call relevant function based on action
+        # Action-specific argument parsing as well as results yielding are done within action-functions
+        call_action = {
+            'create': create_catalog,
+            'serve': serve_catalog,
+            'add': add_to_catalog,
+            'remove': remove_from_catalog,
+            'create-sibling': create_sibling_catalog,
+        }
+        call_action.get(catalog_action, lambda: 'Invalid')(
+            ctlg, 
             metadata,
-            out_dir,
-            repo_path,
-            package_path,
-            force,
-            set_super)
-        msg=f"Catalog successfully created/updated at: {out_dir}"
-        # commands should be implemented as generators and should
-        # report any results by yielding status dictionaries
+            dataset_id,
+            dataset_version,
+            force
+        )
+
+        # script_path = os.path.realpath(__file__)
+        # sep = os.path.sep
+        # repo_path = sep.join(script_path.split(sep)[0:-2])
+        # package_path = sep.join(script_path.split(sep)[0:-1])
+        # if outputdir:
+        #     out_dir = outputdir
+        # else:
+        #     out_dir = curdir
+
+
+def create_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, force):
+    """
+    [summary]
+    """    
+    # If catalog does not exist, create it
+    # If catalog exists and force flag is True, overwrite assets of existing catalog
+    if not catalog.is_created():
+        catalog.create()
+        msg=f"Catalog successfully created at: {catalog.location}"
+    else:
+        if force:
+            catalog.create(force)
+            msg=f"Catalog assets successfully overwritten at: {catalog.location}"
+    # Yield created/overwitten status message
+    yield get_status_dict(
+        action='catalog create',
+        path=abspath(curdir),
+        status='ok',
+        message=msg)
+    # If metadata was also supplied, add this to the catalog
+    if metadata is not None:
+        add_to_catalog(catalog, metadata, dataset_id, dataset_version, force)
+
+
+def add_to_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, force):
+    """
+    [summary]
+    """
+    if metadata is None:
+        err_msg = f"No metadata supplied: Datalad catalog has to be supplied with metadata in the form of a path to a file containing a JSON array, or JSON lines stream (argument: -m, --metadata)"
         yield get_status_dict(
-            # an action label must be defined, the command name make a good
-            # default
-            action='catalog',
-            # most results will be about something associated with a dataset
-            # (component), reported paths MUST be absolute
-            path=abspath(curdir),
-            # status labels are used to identify how a result will be reported
-            # and can be used for filtering
-            status='ok',
-            # arbitrary result message, can be a str or tuple. in the latter
-            # case string expansion with arguments is delayed until the
-            # message actually needs to be rendered (analog to exception messages)
-            message=msg)
+            action='catalog add',
+            path=abspath(curdir),# reported paths MUST be absolute
+            status='error',
+            message=err_msg)
+        sys.exit(err_msg)
+
+    # Need to do the following:
+    # - 1. establish input type (file, file-with-json-array, file-with-json-lines, command line stdout / stream)
+    # - 2. read input based on type
+    # - 3. instantiate translator
+
+    # 1 ==> assume file-with-json-array for now
+    # Load data from input file
+    # (assume for now that the data were exported by using `datalad meta-dump`,
+    # and that all exported objects were added to an array in a json file)
+    # This metadata should be the dataset and file level metadata of a single dataset
+    metadata = load_json_file(metadata)
+    for meta_object in metadata:
+        """"""
+
+        
+        
+
+
+def remove_from_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, force):
+    """
+    [summary]
+    """
+    # remove argument checks
+    if not dataset_id or not dataset_version:
+        err_msg = f"Dataset ID and/or VERSION missing: datalad catalog remove requires both the ID (-i, --dataset_id) and VERSION (-v, --dataset_version) of the dataset to be removed from the catalog"
+        yield get_status_dict(
+            action=f"catalog remove",
+            path=abspath(curdir),# reported paths MUST be absolute
+            status='error',
+            message=err_msg)
+        sys.exit(err_msg)
+
+
+def serve_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, force):
+    """
+    """
+
+def create_sibling_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, force):
+    """
+    [summary]
+    """
+
+
 
 
 def datalad_catalog(metadata, out_dir, repo_path, package_path,
@@ -174,6 +272,12 @@ def datalad_catalog(metadata, out_dir, repo_path, package_path,
     > datalad_catalog -o <path-to-output-directory> -f <path-to-input-file>
     > datalad_catalog -o <path-to-output-directory> -a <data-array>
     """
+
+    # Parse
+    act = 0
+    actions = ['create', 'add', 'remove', 'serve']
+    action = actions[act]
+
     # Create output directories if they do not exist
     metadata_out_dir = setup_metadata_dir(out_dir)
     templates_path = os.path.join(package_path, 'templates')
