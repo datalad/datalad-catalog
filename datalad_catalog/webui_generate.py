@@ -25,6 +25,7 @@ from typing import (
     Union
 )
 from .webcatalog import WebCatalog, Node, Dataset, Translator
+from . import constants as cnst
 
 # create named logger
 lgr = logging.getLogger("datalad.catalog.webui_generate")
@@ -227,8 +228,19 @@ def add_to_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, f
     # and that all exported objects were added to an array in a json file)
     # This metadata should be the dataset and file level metadata of a single dataset
     metadata = load_json_file(metadata)
-    for meta_object in metadata:
-        """"""
+    for meta_count, meta_object in enumerate(metadata):
+        # Get dataset_id, dataset_version, path
+        # get extractor type (dataset or file)
+        # if file create node per path part
+        if meta_object[cnst.TYPE] == cnst.TYPE_DATASET:
+            node_object = Node()
+            translate = Translator(meta_object, node_object)
+        else:
+            
+            
+        
+
+
 
         
         
