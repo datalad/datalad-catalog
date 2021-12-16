@@ -180,7 +180,7 @@ class Catalog(Interface):
         #     out_dir = curdir
 
 
-def create_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, force):
+def _create_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, force):
     """
     [summary]
     """    
@@ -217,6 +217,10 @@ def add_to_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, f
             message=err_msg)
         sys.exit(err_msg)
 
+    # e.g.:
+    # {"type": "dataset", "dataset_id": "8b7ce998-96d9-11ea-847b-a0369f287950", "dataset_version": "9a3f93cd0a913148b20bd2ea688fda71bfd632ba"}
+    # {"type":"file", "dataset_id":"8b7ce998-96d9-11ea-847b-a0369f287950", "dataset_version":"9a3f93cd0a913148b20bd2ea688fda71bfd632ba", "path":"MovingAverage/OutlierByMovingAverage.m"},
+    # 
     # Need to do the following:
     # - 1. establish input type (file, file-with-json-array, file-with-json-lines, command line stdout / stream)
     # - 2. read input based on type
@@ -229,21 +233,62 @@ def add_to_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, f
     # This metadata should be the dataset and file level metadata of a single dataset
     metadata = load_json_file(metadata)
     for meta_count, meta_object in enumerate(metadata):
-        # Get dataset_id, dataset_version, path
-        # get extractor type (dataset or file)
-        # if file create node per path part
+        # Get dataset_id, dataset_version
+        d_id = meta_object[cnst.DATASET_ID]
+        d_version = meta_object[cnst.DATASET_VERSION]
+        # get metadata object type (dataset or file)
         if meta_object[cnst.TYPE] == cnst.TYPE_DATASET:
-            node_object = Node()
+            # If dataset, create special node
+            node_object = Dataset.get(dataset_id=d_id, dataset_version=d_version)
             translate = Translator(meta_object, node_object)
         else:
-            
-            
-        
+            # If file: create standard node per path part
+            f_path = meta_object[cnst.PATH]
+            parts_in_path = list(Path(f_path.lstrip('/')).parts)
+            nr_of_dirs = len(parts_in_path)-1 # this excludes the last part, which is the actual filename
+            incremental_path = Path('')
+            previous_path = None
+            for part_count, part in enumerate(parts_in_path):
+
+                # Get node path
+                incremental_path = incremental_path / part
+
+                # when reaching the last dir (i.e. parent of file)
+                if part_count == nr_of_dirs-1:
+                    pass
+                # when reaching the filename, add it as child to parent node
+                elif part_count == nr_of_dirs:
+                    # Instantiate/get node object with parent path
+                    node_object = Node.get(dataset_id=d_id, dataset_version=d_version, node_path=previous_path)
+                    node_object.children.append(
+
+
+                    )
+                    pass
+                # for all other parts in the path
+                else:
+                    # Instantiate/get node object
+                    node_object = Node.get(dataset_id=d_id, dataset_version=d_version, node_path=incremental_path)
+
+                # If the accompanying metafile does not exist, create it
+                if not node_object.is_created():
+                    node_object_content = {} # TODO: load template dictionary
+                    with open(node_object.get_location(catalog.metadata_path), 'w') as f:
+                        json.dump(node_object_content, f)
+                
+                
+                node_object_content = node_object.load_file()
+                
+                
+                
+
+                
+                previous_path = incremental_path
+
+                
 
 
 
-        
-        
 
 
 def remove_from_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, force):
