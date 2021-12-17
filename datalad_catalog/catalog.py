@@ -181,9 +181,7 @@ class Catalog(Interface):
 
 
 def create_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, force):
-    """
-    [summary]
-    """    
+    """"""    
     # If catalog does not exist, create it
     # If catalog exists and force flag is True, overwrite assets of existing catalog
     if not catalog.is_created():
