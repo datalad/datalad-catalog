@@ -123,9 +123,9 @@ class WebCatalog:
         """For hosting catalog on e.g. GitHub"""
 
 
-class NodeX():
-    """Implemenation of get function that returns single instance"""
-    __call__
+# class NodeX():
+#     """Implemenation of get function that returns single instance"""
+#     __call__
 
 
 class Node():

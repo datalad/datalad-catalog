@@ -12,7 +12,7 @@ command_suite = (
         # specification of a command, any number of commands can be defined
         (
             # importable module that contains the command implementation
-            'datalad_catalog.webui_generate',
+            'datalad_catalog.catalog',
             # name of the command class implementation in above module
             'Catalog',
             # optional name of the command in the cmdline API

@@ -28,7 +28,7 @@ from .webcatalog import WebCatalog, Node, Dataset, Translator
 from . import constants as cnst
 
 # create named logger
-lgr = logging.getLogger("datalad.catalog.webui_generate")
+lgr = logging.getLogger("datalad.catalog.catalog")
 
 # decoration auto-generates standard help
 @build_doc
@@ -180,7 +180,7 @@ class Catalog(Interface):
         #     out_dir = curdir
 
 
-def _create_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, force):
+def create_catalog(catalog: WebCatalog, metadata, dataset_id, dataset_version, force):
     """
     [summary]
     """    
