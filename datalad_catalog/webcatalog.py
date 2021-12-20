@@ -5,6 +5,8 @@ from pathlib import Path
 import shutil
 import hashlib
 from . import constants as cnst
+import logging
+lgr = logging.getLogger('datalad.catalog.webcatalog')
 
 # Reminders:
 # Instance method
@@ -34,7 +36,6 @@ from . import constants as cnst
 #       - handles individual objects via class Translator
 
 
-
 # class Singleton(type):
 #     """
 #     This singleton design pattern is used as a metaclass by classes that 
@@ -45,7 +46,7 @@ from . import constants as cnst
 #             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
 #         return cls._instances[cls]
 
-
+# TODO: should webcatalog be a subclass of datalad dataset???
 class WebCatalog(object):
     """
     The main catalog class. This is also a datalad dataset
@@ -121,11 +122,6 @@ class WebCatalog(object):
 
     def add_sibling():
         """For hosting catalog on e.g. GitHub"""
-
-
-# class NodeX():
-#     """Implemenation of get function that returns single instance"""
-#     __call__
 
 
 class Node(object):
@@ -248,13 +244,64 @@ class Node(object):
         path_right = dir_name[self._split_dir_length:]
         return path_left, path_right
 
-    def add_child(self):
+    def addAttribrutes(self, new_attributes: dict, overwrite=True):
+        """"""
+        for key in new_attributes.keys():
+            if hasattr(self, key) and overwrite:
+                message = f"Node instance already has an attribute '{key}'. Overwriting attribute value. \
+                    To prevent overwriting, set 'overwrite' argument to False"
+                lgr.warning(message)
+            else:
+                self.key = new_attributes[key]
+
+    def add_child(self, meta_dict: dict):
         """
         [summary]
 
         Returns:
             [type]: [description]
         """
+        child_found = next((item for item in self.children
+                        if item[cnst.TYPE] == meta_dict[cnst.TYPE]
+                        and item[cnst.NAME] == meta_dict[cnst.NAME]), False)
+        if child_found:
+            message = f"Node child of type '{meta_dict[cnst.TYPE]}' \
+                and name '{meta_dict[cnst.NAME]}' already exists."
+            lgr.warning(message)
+        else:
+            self.children.append(meta_dict)
+        example_file = {
+            "type": "file",
+            "name": "",
+            "contentbytesize": int,
+            "url": "",
+        }
+        example_directory = {
+            "type": "directory",
+            "name": "",
+        }
+        example_dataset = {
+            "type": "dataset",
+            "name": "dataset_name",
+            "dataset_id": "",
+            "dataset_version": "",
+        }
+
+
+def getNode(node_type, dataset_id, dataset_version, path=None):
+    """"""
+    name = dataset_id + '-' + dataset_version
+    if path:
+        name = name + '-' + path
+    md5_hash = hashlib.md5(name.encode('utf-8')).hexdigest()
+
+    if md5_hash in Node._instances.keys():
+        return Node._instances[md5_hash] 
+    else:
+        if node_type == "dataset":
+            return Node(dataset_id, dataset_version, path)
+        else:
+            return Dataset(dataset_id, dataset_version)
 
 
 class Dataset(Node):
@@ -303,6 +350,3 @@ def load_json_file(filename):
     except:
         print("Unexpected error:", sys.exc_info()[0])
         raise
-
-
-
