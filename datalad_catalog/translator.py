@@ -1,7 +1,7 @@
 # from abc import ABC, abstractmethod
 from pathlib import Path
 from . import constants as cnst
-from .webcatalog import WebCatalog, Node, getNode
+from .webcatalog import Dataset, WebCatalog, Node, getNode
 from .utils import read_json_file
 from datalad.interface.results import get_status_dict
 import logging
@@ -29,50 +29,92 @@ class Translator(object):
 
     def __call__(self, catalog: WebCatalog, meta_item: dict):
         """
-        Get meta_item type: dataset or file
-        For dataset: create dataset node object and call relevant translator
-        For file: 
         """
         # Get dataset id and version
         d_id = meta_item[cnst.DATASET_ID]
         d_version = meta_item[cnst.DATASET_VERSION]
-        # get metadata object type (dataset or file)
+        # For both dataset and file, we need the dataset node (fetch / create):
+        dataset_instance = getNode("dataset", dataset_id=d_id, dataset_version=d_version)
+        # Then call specific translator
+        # TODO: handle unrecognised extractors
+        translated_dict = cnst.EXTRACTOR_TRANSLATOR_SELECTOR.get(meta_item[cnst.EXTRACTOR_NAME])(meta_item)
+        # Then do things based on metadata object type (dataset or file)
         if meta_item[cnst.TYPE] == cnst.TYPE_DATASET:
-            # If dataset, create special node
-            # TODO: this does not take into account that a dataset might have a path with mupltiple directories
-            node_instance = getNode("dataset", dataset_id=d_id, dataset_version=d_version)
-            # TODO: handle unrecognised extractors
-            translated_dict = cnst.EXTRACTOR_TRANSLATOR_SELECTOR.get(meta_item[cnst.EXTRACTOR_NAME])(meta_item, node_instance)
-            # Add translated_dict to node instance; TODO: handle duplications (overwrite for now)
-            node_instance.addAttribrutes(translated_dict, overwrite=True)
-            # Add extractor info
-            node_instance.addAttribrutes(self.get_extractor_info(meta_item), overwrite=True)
+            # Dataset
+            self.process_dataset(dataset_instance, translated_dict, meta_item, catalog)
         else:
-            # If file: create standard node per path part
-            f_path = meta_item[cnst.PATH]
-            parts_in_path = list(Path(f_path.lstrip('/')).parts)
-            nr_of_dirs = len(parts_in_path)-1 # this excludes the last part, which is the actual filename
-            incremental_path = Path('')
-            # Assume for now that we're working purely with class instances during operation, then write to file at end
-            # IMPORTANT: this does not account for files that already exist, and their content ==> TODO
-            for part_count, part in enumerate(parts_in_path):
-                # Get node path
-                incremental_path = incremental_path / part
-                # when reaching the filename, add it as child to parent node
-                if part_count == nr_of_dirs:
-                    # Get node object with parent path (it would have been created already)
-                    node_instance = getNode(dataset_id=d_id, dataset_version=d_version, node_path=parts_in_path[part_count-1])
-                    # TODO: handle unrecognised extractors
-                    # TODO: decide on useful way to return translated info
-                    translated_dict = cnst.EXTRACTOR_TRANSLATOR_SELECTOR.get(meta_item[cnst.EXTRACTOR_NAME])(meta_item)
-                    # TODO: perhaps instance method for adding children?
-                    # TODO: perhaps instance method for copying data from dict to node?
-                    node_instance.children.append(translated_dict)
-                # for all other parts in the path
-                else:
-                    # Instantiate/get node object
-                    node_instance = getNode(dataset_id=d_id, dataset_version=d_version, node_path=incremental_path)
+            # File
+            # TODO: confirm what to do if meta_item for file from dataset arrives before meta_item for dataset
+            # For now: creating node for dataset, even if via file meta_item.
+            self.process_file(dataset_instance, translated_dict, meta_item, catalog)
 
+    def process_dataset(self, dataset_instance, translated_dict, meta_item, catalog):
+        """"""
+        # Add translated_dict to node instance; TODO: handle duplications (overwrite for now)
+        dataset_instance.addAttribrutes(translated_dict, overwrite=True)
+        # Add missing information TODO.
+        self.add_missing_fields(self, dataset_instance)
+        # Add extractor info
+        dataset_instance.addAttribrutes(self.get_extractor_info(meta_item), overwrite=True)
+        # Make sure that dataset instance belongs to catalog
+        dataset_instance.parent_catalog = catalog
+    
+    def process_file(self, dataset_instance, translated_dict, meta_item, catalog):
+        """"""
+        #  Create standard node per path part; TODO: when adding file as child, also add translated_dict
+        f_path = meta_item[cnst.PATH]
+        parts_in_path = list(Path(f_path.lstrip('/')).parts)
+        nr_parts = len(parts_in_path)
+        nr_dirs = nr_parts-1 # this excludes the last part, which is the actual filename
+        incremental_path = Path('')
+        paths = []
+        # Assume for now that we're working purely with class instances during operation, then write to file at end
+        # IMPORTANT: this does not account for files that already exist, and their content ==> TODO
+        for i, part in enumerate(parts_in_path):
+            # Get node path
+            incremental_path = incremental_path / part
+            paths.append(incremental_path)
+            file_dict = {
+                cnst.TYPE: cnst.TYPE_FILE,
+                cnst.NAME: part,
+                cnst.PATH: str(incremental_path),
+            }
+            dir_dict = {
+                cnst.TYPE: cnst.TYPE_DIRECTORY,
+                cnst.NAME: part,
+                cnst.PATH: str(incremental_path),
+            }
+            if i == 0 and nr_parts == 1:
+                # If the file has no parent directories other than the dataset,
+                # add file as child to dataset node
+                translated_dict.update(file_dict)
+                dataset_instance.children.append(translated_dict)
+                break
+            # If the file has one or more parent directories
+            if i == 0:
+                # first dir in path, add as child to dataset node
+                translated_dict.update(dir_dict)
+                dataset_instance.children.append(dir_dict)
+            elif i < nr_parts:
+                # 2nd...(N-1)th dir in path: create node for N-1, add current as child (dir) to node: bv i=1, create node for i=0
+                # path for i: parent_dirs[nr_parts-1-i]
+                translated_dict.update(dir_dict)
+                node_instance = getNode("node",
+                                        dataset_id=dataset_instance.dataset_id,
+                                        dataset_version=dataset_instance.dataset_version,
+                                        path=paths[i-1])
+                node_instance.parent_catalog = catalog
+                node_instance.children.append(translated_dict)
+            else:
+                # Nth (last) part in path = file: create node for N-1, add current as child (file) to node
+                translated_dict.update(file_dict)
+                node_instance = getNode("node",
+                                        dataset_id=dataset_instance.dataset_id,
+                                        dataset_version=dataset_instance.dataset_version,
+                                        path=paths[i-1])
+                node_instance.parent_catalog = catalog
+                node_instance.children.append(translated_dict)
+    
     def load_schema(self, meta_item, dest_dict):
         schema = read_json_file(self.schema_file)
         # Copy source to destination values, per key
@@ -86,6 +128,36 @@ class Translator(object):
             cnst.EXTRACTOR_NAME: meta_item[cnst.EXTRACTOR_NAME],
             cnst.EXTRACTOR_VERSION: meta_item[cnst.EXTRACTOR_VERSION],
             }
+    
+    def add_missing_fields(self, dataset_object):
+        """
+        Add fields to a dataset object that are required for UI but are not yet
+        contained in the object, i.e. not available in any Datalad extractor output
+        or not yet parsed for the specific dataset
+        """
+        pass
+        # if "name" not in dataset_object and "dataset_path" in dataset_object:
+        #     dataset_object["name"] = dataset_object["dataset_path"]. \
+        #                             split(os.path.sep)[-1]
+        # if "name" in dataset_object and "short_name" not in dataset_object:
+        #     if len(dataset_object["name"]) > 30:
+        #         dataset_object["short_name"] = dataset_object["name"][0:30]+'...'
+        #     else:
+        #         dataset_object["short_name"] = dataset_object["name"]
+
+        # schema = load_json_file(os.path.join(schema_path,
+        #                                     "studyminimeta_empty.json"))
+        # for key in schema:
+        #     if key not in dataset_object:
+        #         dataset_object[key] = schema[key]
+
+        # if "children" not in dataset_object:
+        #     dataset_object["children"] = []
+
+        # if "subdatasets" not in dataset_object:
+        #     dataset_object["subdatasets"] = []
+
+        # return dataset_object
 
 
 class CoreTranslator(Translator):
@@ -96,7 +168,7 @@ class CoreTranslator(Translator):
     Returns a dictionary
     """
 
-    def __init__(self, meta_item, node_instance=None) -> dict:
+    def __init__(self, meta_item) -> dict:
         """"""
         # Initialise empty dictionary to hold translated data
         self.meta_dict = {}
@@ -123,14 +195,17 @@ class CoreTranslator(Translator):
 
         # Add dataset-specific fields
         if self.type == cnst.TYPE_DATASET:
-            self.dataset_translator(self, meta_item, node_instance)
+            self.dataset_translator(self, meta_item)
 
         return self.meta_dict
 
-    def dataset_translator(self, meta_item, node_instance):
+    def dataset_translator(self, meta_item):
         """
         Parse dataset-level metadata output by DataLad's `metalad_core` extractor
         """
+        d_id = meta_item[cnst.DATASET_ID]
+        d_version = meta_item[cnst.DATASET_VERSION]
+        dataset_instance = getNode("dataset", dataset_id=d_id, dataset_version=d_version)
         # Access relevant metadata from item
         ds_info = next((item for item in meta_item[cnst.EXTRACTED_METADATA][cnst.ATGRAPH]
                         if cnst.ATTYPE in item and item[cnst.ATTYPE] == cnst.DATASET), False)
@@ -139,8 +214,9 @@ class CoreTranslator(Translator):
         self.meta_dict[cnst.SUBDATASETS] = []
         if ds_info and cnst.HASPART in ds_info:
             for subds in ds_info[cnst.HASPART]:
-                # Append subdataset
-                parts_in_path = list(Path(subds[cnst.NAME].lstrip('/')).parts)
+                # Construct subdataset dictionary: id, version, path, dirsfrompath
+                p = Path(subds[cnst.NAME].lstrip('/'))
+                parts_in_path = list(p.parts)
                 subds_id = subds[cnst.IDENTIFIER].strip(cnst.STRIPDATALAD)
                 subds_version = subds[cnst.ATID].strip(cnst.STRIPDATALAD)
                 sub_dict = {
@@ -149,34 +225,63 @@ class CoreTranslator(Translator):
                     cnst.DATASET_PATH: subds[cnst.NAME],
                     cnst.DIRSFROMPATH: parts_in_path
                 }
+                # append dict to subdatasets list (an attribute of Node instance)
                 self.meta_dict[cnst.SUBDATASETS].append(sub_dict)
                 # Create node per directory in subdataset
                 if len(parts_in_path) > 1:
-                    self.dataset_path_to_nodes(parts_in_path, subds_id, subds_version)
+                    self.subdataset_path_to_nodes(dataset_instance, parts_in_path, subds_id, subds_version)
                 else:
-                    node_instance.children.append(translated_dict)
+                    subds_dict = {
+                        cnst.TYPE: cnst.TYPE_DATASET,
+                        cnst.NAME: subds[cnst.NAME],
+                        cnst.DATASET_ID: subds_id,
+                        cnst.DATASET_VERSION: subds_version,
+                    }
+                    dataset_instance.children.append(subds_dict)
 
-    def dataset_path_to_nodes(self, parts_in_path, d_id, d_version):
-        """"""
-        nr_of_dirs = len(parts_in_path)-1 # this excludes the last part, which is the dataset
+    def subdataset_path_to_nodes(self, dataset_instance: Dataset, parts_in_path, subds_id, subds_version):
+        """
+        Add parts of subdataset paths as nodes and children where relevant
+        Function used when path to subdataset (relative to parent dataset) has multiple parts
+        """
+        nr_parts = len(parts_in_path)
         incremental_path = Path('')
-        # Assume for now that we're working purely with class instances during operation, then write to file at end
+        paths = []
         # IMPORTANT: this does not account for files that already exist, and their content ==> TODO
-        for part_count, part in enumerate(parts_in_path):
-            # Get node path
+        for i, part in enumerate(parts_in_path):
+            # Create dictionary of type directory
             incremental_path = incremental_path / part
-            # when reaching the filename, add it as child to parent node
-            if part_count == nr_of_dirs:
-                # Get node object with parent path (it would have been created already)
-                node_instance = getNode(dataset_id=d_id, dataset_version=d_version, node_path=parts_in_path[part_count-1])
-                # TODO: perhaps instance method for adding children?
-                # TODO: perhaps instance method for copying data from dict to node?
-                node_instance.children.append(translated_dict)
-            # for all other parts in the path
+            paths.append(incremental_path)
+            dir_dict = {
+                cnst.TYPE: cnst.TYPE_DIRECTORY,
+                cnst.NAME: part,
+                cnst.PATH: str(incremental_path),
+            }
+            if i == 0:
+                # first dir in path, add as child to dataset node
+                dataset_instance.children.append(dir_dict)
+            elif i < nr_parts:
+                # 2nd...(N-1)th dir in path: create node for N-1, add current as child (dir) to node: bv i=1, create node for i=0
+                # path for i: parent_dirs[nr_parts-1-i]
+                node_instance = getNode("node",
+                                        dataset_id=dataset_instance.dataset_id,
+                                        dataset_version=dataset_instance.dataset_version,
+                                        path=paths[i-1])
+                node_instance.children.append(dir_dict)
             else:
-                # Instantiate/get node object
-                node_instance = getNode(dataset_id=d_id, dataset_version=d_version, node_path=incremental_path)
-
+                # Nth (last) part in path = sub-dataset: create node for N-1, add current as child (dataset) to node
+                subds_dict = {
+                    cnst.TYPE: cnst.TYPE_DATASET,
+                    cnst.NAME: part,
+                    cnst.PATH: str(incremental_path),
+                    cnst.DATASET_ID: subds_id,
+                    cnst.DATASET_VERSION: subds_version,
+                }
+                node_instance = getNode("node",
+                                        dataset_id=dataset_instance.dataset_id,
+                                        dataset_version=dataset_instance.dataset_version,
+                                        path=paths[i-1])
+                node_instance.children.append(subds_dict)
 
 
 class StudyminimetaTranslator(Translator):

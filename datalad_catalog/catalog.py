@@ -212,6 +212,7 @@ def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
         translate(catalog, meta_dict)
     
     # TODO: should we write all files here?
+    for 
     # # If the accompanying metafile does not exist, create it
     # if not node_object.is_created():
     #     node_object_content = {} # TODO: load template dictionary

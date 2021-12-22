@@ -1,5 +1,7 @@
 from .translator import CoreTranslator, StudyminimetaTranslator, CoreDatasetTranslator
 
+# A module to store all constants (mostly field names of metalad extractors)
+
 ATGRAPH="@graph"
 ATID="@id"
 ATLIST="@list"
@@ -46,5 +48,6 @@ STUDY="study"
 SUBDATASETS="subdatasets"
 TYPE="type"
 TYPE_DATASET="dataset"
+TYPE_DIRECTORY="directory"
 TYPE_FILE="file"
 URL="url"

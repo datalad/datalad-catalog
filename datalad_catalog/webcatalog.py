@@ -146,18 +146,18 @@ class Node(object):
     #     return id, args, kwargs
     # # End Flyweight
 
-    @classmethod
-    def get(cls, *args, **kwargs):
-        id = kwargs.pop('dataset_id')
-        version = kwargs.pop('dataset_version')
-        path = None
-        if 'node_path' in kwargs:
-            path = kwargs.pop('node_path')
-        name = id + '-' + version
-        if path:
-            name = name + '-' + path
-        md5_hash = hashlib.md5(name.encode('utf-8')).hexdigest()
-        return cls._instances[md5_hash] if md5_hash in cls._instances.keys() else cls(dataset_id=id, dataset_version=version, node_path=path)
+    # @classmethod
+    # def get(cls, *args, **kwargs):
+    #     id = kwargs.pop('dataset_id')
+    #     version = kwargs.pop('dataset_version')
+    #     path = None
+    #     if 'node_path' in kwargs:
+    #         path = kwargs.pop('node_path')
+    #     name = id + '-' + version
+    #     if path:
+    #         name = name + '-' + path
+    #     md5_hash = hashlib.md5(name.encode('utf-8')).hexdigest()
+    #     return cls._instances[md5_hash] if md5_hash in cls._instances.keys() else cls(dataset_id=id, dataset_version=version, node_path=path)
 
     def __init__(self, dataset_id=None, dataset_version=None, node_path=None) -> None:
         """
@@ -173,6 +173,7 @@ class Node(object):
         # Children type: file, node(directory), dataset
         self.children = []
         self._instances[self.md5_hash] = self
+        self.parent_catalog = None
         
 
     def is_created(self) -> bool:
@@ -212,7 +213,7 @@ class Node(object):
             long_name = long_name + "-" + self.node_path
         return long_name
 
-    def get_location(self, metadata_dir):
+    def get_location(self, metadata_dir=None):
         """
         Get node file location from  dataset id, dataset version, and node path
         using a file system structure similar to RIA stores
@@ -273,7 +274,7 @@ class Node(object):
         example_file = {
             "type": "file",
             "name": "",
-            "contentbytesize": int,
+            "contentbytesize": "",
             "url": "",
         }
         example_directory = {
@@ -282,7 +283,7 @@ class Node(object):
         }
         example_dataset = {
             "type": "dataset",
-            "name": "dataset_name",
+            "name": "",
             "dataset_id": "",
             "dataset_version": "",
         }

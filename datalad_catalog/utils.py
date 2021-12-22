@@ -1,6 +1,8 @@
 import json
 import sys
 
+# A module with miscellaneous functions that are used across other modules
+
 def read_json_file(file_path):
     """
     Load content from catalog metadata file for current node

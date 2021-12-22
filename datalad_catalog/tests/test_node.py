@@ -1,5 +1,5 @@
 from datalad.tests.utils import assert_result_count
-from datalad_catalog.webcatalog import Node, Dataset
+from datalad_catalog.webcatalog import Node, getNode
 from nose.tools import (
     assert_equal,
     assert_false,
@@ -26,9 +26,9 @@ from nose.tools import (
 def assert_instances_equal():
     """
     Assert that two instances with identical variables, one created via class
-    instantiation and one created via class method 'get', are the same object
+    instantiation and one created via getNode method, are the same object
     """
     node_instance_1 = Node(dataset_id='123', dataset_version='v1')
-    node_instance_2 = Node.get(dataset_id='123', dataset_version='v1')
+    node_instance_2 = getNode(dataset_id='123', dataset_version='v1')
     assert_equal(node_instance_1, node_instance_2)
 
