@@ -1,5 +1,3 @@
-from .translator import CoreTranslator, StudyminimetaTranslator, CoreDatasetTranslator
-
 # A module to store all constants (mostly field names of metalad extractors)
 
 ATGRAPH="@graph"
@@ -8,6 +6,7 @@ ATLIST="@list"
 ATTYPE="@type"
 AUTHOR="author"
 AUTHORS="authors"
+CONTENTBYTESIZE="contentbytesize"
 CREATIVEWORK="CreativeWork"
 DESCRIPTION="description"
 DOI="doi"
@@ -19,22 +18,19 @@ DATASET_VERSION="dataset_version"
 DIRSFROMPATH="dirs_from_path"
 DISTRIBUTION="distribution"
 EXTRACTED_METADATA="extracted_metadata"
+EXTRACTION_PARAMETER="extraction_parameter"
+EXTRACTION_TIME="extraction_time"
 EXTRACTOR_CORE="metalad_core"
 EXTRACTOR_CORE_DATASET="metalad_core_dataset" # older version; core is newer version
 EXTRACTOR_NAME="extractor_name"
 EXTRACTOR_STUDYMINIMETA="metalad_studyminimeta"
 EXTRACTOR_VERSION="extractor_version"
-EXTRACTOR_TRANSLATOR_SELECTOR = {
-    EXTRACTOR_CORE: CoreTranslator(),
-    EXTRACTOR_CORE_DATASET: CoreDatasetTranslator(),
-    EXTRACTOR_STUDYMINIMETA: StudyminimetaTranslator(),
-}
 HASPART="hasPart"
 IDENTIFIER="identifier"
 NAME="name"
 ORIGIN="origin"
 PATH="path"
-PERSONLIST="personList"
+PERSONLIST="#personList"
 PUBLICATION="publication"
 PUBLICATIONS="publications"
 PUBLICATIONLIST="#publicationList"

@@ -36,24 +36,14 @@ lgr = logging.getLogger('datalad.catalog.webcatalog')
 #       - handles individual objects via class Translator
 
 
-# class Singleton(type):
-#     """
-#     This singleton design pattern is used as a metaclass by classes that 
-#     """
-#     _instances = {}
-#     def __call__(cls, *args, **kwargs):
-#         if cls not in cls._instances:
-#             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-#         return cls._instances[cls]
-
-# TODO: should webcatalog be a subclass of datalad dataset???
+# TODO: should webcatalog be a subclass of datalad dataset?
 class WebCatalog(object):
     """
     The main catalog class. This is also a datalad dataset
     """
 
-    def __init__(self, location: Path, main_id: str = None, main_version: str = None) -> None:
-        self.location = location
+    def __init__(self, location: str, main_id: str = None, main_version: str = None, force=False) -> None:
+        self.location = Path(location)
         self.main_id = main_id
         self.main_version = main_version
         self.metadata_path = Path(self.location) / 'metadata'
@@ -112,7 +102,7 @@ class WebCatalog(object):
             cnst.DATASET_ID: self.main_id,
             cnst.DATASET_VERSION: self.main_version
         }
-        main_file = Path(self.location) / 'metadata' / "super.json"
+        main_file = Path(self.metadata_path) / "super.json"
         with open(main_file, 'w') as f:
             json.dump(main_obj, f)
         return main_file
@@ -130,6 +120,7 @@ class Node(object):
     file will be created.
 
     Required arguments:
+    type -- 'directory' | 'dataset'
     dataset_id -- parent dataset id
     dataset_version -- parent dataset version
     path -- path of node relevant to parent dataset
@@ -138,43 +129,21 @@ class Node(object):
     _split_dir_length = 3
     _instances = {}
 
-    # # Begin Flyweight
-    # _unique_instances = WeakValueDictionary()
-    # @classmethod
-    # def _flyweight_id_from_args(cls, *args, **kwargs):
-    #     id = kwargs.pop('id')
-    #     return id, args, kwargs
-    # # End Flyweight
-
-    # @classmethod
-    # def get(cls, *args, **kwargs):
-    #     id = kwargs.pop('dataset_id')
-    #     version = kwargs.pop('dataset_version')
-    #     path = None
-    #     if 'node_path' in kwargs:
-    #         path = kwargs.pop('node_path')
-    #     name = id + '-' + version
-    #     if path:
-    #         name = name + '-' + path
-    #     md5_hash = hashlib.md5(name.encode('utf-8')).hexdigest()
-    #     return cls._instances[md5_hash] if md5_hash in cls._instances.keys() else cls(dataset_id=id, dataset_version=version, node_path=path)
-
-    def __init__(self, dataset_id=None, dataset_version=None, node_path=None) -> None:
+    def __init__(self, type=None, dataset_id=None, dataset_version=None, node_path=None) -> None:
         """
-        node_type = 'directory' | 'dataset'
+        type = 'directory' | 'dataset'
         """
         self.dataset_id= dataset_id
         self.dataset_version = dataset_version
         self.node_path = node_path
         self.long_name = self.get_long_name()
         self.md5_hash = self.md5hash(self.long_name)
-        self.node_type = cnst.DIRECTORY
+        self.type = type
         self.file_name = None
         # Children type: file, node(directory), dataset
         self.children = []
         self._instances[self.md5_hash] = self
         self.parent_catalog = None
-        
 
     def is_created(self) -> bool:
         """
@@ -206,22 +175,30 @@ class Node(object):
     def get_long_name(self):
         """
         Concatenate dataset id, dataset version, and node path
-
         """
         long_name = self.dataset_id + "-" + self.dataset_version
         if self.node_path:
-            long_name = long_name + "-" + self.node_path
+            long_name = long_name + "-" + str(self.node_path)
         return long_name
 
-    def get_location(self, metadata_dir=None):
+    def get_location(self):
         """
         Get node file location from  dataset id, dataset version, and node path
         using a file system structure similar to RIA stores
         """
         # /metadata/dataset_id/dataset_verion/id_version_hash.json
+        if not hasattr(self, 'node_path') and self.type=='dataset':
+            self.node_path=None
+
+        if not hasattr(self, 'md5_hash'):
+            self.long_name = self.get_long_name()
+            self.md5_hash = self.md5hash(self.long_name)
+
+        
         hash_path_left, hash_path_right = self.split_dir_name(self.md5_hash)
-        node_fn = Path(metadata_dir) / self.dataset_id / self.dataset_version / \
-            hash_path_left / hash_path_right + '.json'
+        node_fn = self.parent_catalog.metadata_path / self.dataset_id / \
+            self.dataset_version / hash_path_left / hash_path_right
+        node_fn = node_fn.with_suffix('.json')
         return node_fn
 
     def md5hash(self, txt):
@@ -245,15 +222,17 @@ class Node(object):
         path_right = dir_name[self._split_dir_length:]
         return path_left, path_right
 
-    def addAttribrutes(self, new_attributes: dict, overwrite=True):
+    def add_attribrutes(self, new_attributes: dict, overwrite=True):
         """"""
         for key in new_attributes.keys():
-            if hasattr(self, key) and overwrite:
-                message = f"Node instance already has an attribute '{key}'. Overwriting attribute value. \
-                    To prevent overwriting, set 'overwrite' argument to False"
-                lgr.warning(message)
+            if hasattr(self, key):
+                if overwrite:
+                    message = (f"Node instance already has an attribute '{key}'. Overwriting attribute value."
+                        "To prevent overwriting, set 'overwrite' argument to False")
+                    lgr.warning(message)
+                    setattr(self, key, new_attributes[key])
             else:
-                self.key = new_attributes[key]
+                setattr(self, key, new_attributes[key])
 
     def add_child(self, meta_dict: dict):
         """
@@ -265,63 +244,39 @@ class Node(object):
         child_found = next((item for item in self.children
                         if item[cnst.TYPE] == meta_dict[cnst.TYPE]
                         and item[cnst.NAME] == meta_dict[cnst.NAME]), False)
-        if child_found:
-            message = f"Node child of type '{meta_dict[cnst.TYPE]}' \
-                and name '{meta_dict[cnst.NAME]}' already exists."
-            lgr.warning(message)
-        else:
+        if not child_found:
             self.children.append(meta_dict)
-        example_file = {
-            "type": "file",
-            "name": "",
-            "contentbytesize": "",
-            "url": "",
-        }
-        example_directory = {
-            "type": "directory",
-            "name": "",
-        }
-        example_dataset = {
-            "type": "dataset",
-            "name": "",
-            "dataset_id": "",
-            "dataset_version": "",
-        }
+        else:
+            pass
+            # message = f"Node child of type '{meta_dict[cnst.TYPE]}' \
+            #     and name '{meta_dict[cnst.NAME]}' already exists."
+            # lgr.warning(message)
+
+    def add_extractor(self, extractor_dict: dict):
+        """"""
+        if not hasattr(self, 'extractors_used') or not self.extractors_used:
+            self.extractors_used = []
+
+        extractor_found = next((item for item in self.extractors_used
+                        if item[cnst.EXTRACTOR_NAME] == extractor_dict[cnst.EXTRACTOR_NAME]
+                        and item[cnst.EXTRACTOR_VERSION] == extractor_dict[cnst.EXTRACTOR_VERSION]), False)
+        if not extractor_found:
+            self.extractors_used.append(extractor_dict)
+        else:
+            pass
 
 
-def getNode(node_type, dataset_id, dataset_version, path=None):
+def getNode(type, dataset_id, dataset_version, path=None):
     """"""
     name = dataset_id + '-' + dataset_version
     if path:
-        name = name + '-' + path
+        name = name + '-' + str(path)
     md5_hash = hashlib.md5(name.encode('utf-8')).hexdigest()
 
     if md5_hash in Node._instances.keys():
         return Node._instances[md5_hash] 
     else:
-        if node_type == "dataset":
-            return Node(dataset_id, dataset_version, path)
-        else:
-            return Dataset(dataset_id, dataset_version)
-
-
-class Dataset(Node):
-    """
-    A dataset is a top-level node, and has additional properties that are
-    specific to datasets 
-    """
-
-    def __init__(self, dataset_id: str=None, dataset_version: str=None, node_path: str=None) -> None:
-        self.dataset_id= dataset_id
-        self.dataset_version = dataset_version
-        self.node_path = None
-        self.long_name = self.get_long_name()
-        self.md5_hash = self.md5hash(self.long_name)
-        self.node_type = cnst.TYPE_DATASET
-        self.file_name = None
-        # Children type: file, node(directory), dataset
-        self.children = []
-        self._instances[self.md5_hash] = self
+        return Node(type, dataset_id, dataset_version, path)
 
 
 def copy_overwrite_path(src: Path, dest: Path, overwrite: bool = False):
@@ -338,16 +293,3 @@ def copy_overwrite_path(src: Path, dest: Path, overwrite: bool = False):
             if dest.exists():
                 shutil.rmtree(dest)
             shutil.copytree(src, dest)
-
-def load_json_file(filename):
-    """
-    Load contents of a JSON file into a dict or list of dicts
-    """
-    try:
-        with open(filename) as f:
-            return json.load(f)
-    except OSError as err:
-        print("OS error: {0}".format(err))
-    except:
-        print("Unexpected error:", sys.exc_info()[0])
-        raise
