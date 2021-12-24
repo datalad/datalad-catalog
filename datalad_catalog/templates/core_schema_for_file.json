@@ -1,6 +1,5 @@
 {
     "type": "type",
     "dataset_id": "dataset_id",
-    "dataset_version": "dataset_version",
-    "extraction_time": "extraction_time"
+    "dataset_version": "dataset_version"
 }
