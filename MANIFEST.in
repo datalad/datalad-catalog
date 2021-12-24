@@ -1,0 +1,5 @@
+include CONTRIBUTORS LICENSE versioneer.py
+graft _datalad_buildsupport
+graft docs
+prune docs/build
+global-exclude *.py[cod]
