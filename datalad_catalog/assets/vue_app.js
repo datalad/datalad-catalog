@@ -4,7 +4,7 @@
 const metadata_dir = './metadata';
 const superdatasets_file = metadata_dir + '/super.json';
 const json_file = metadata_dir + '/datasets.json';
-
+const SPLIT_INDEX = 3;
 
 /**************/
 // Components //
@@ -18,12 +18,14 @@ Vue.component("tree-item", {
   },
   data: function() {
     return {
-      isOpen: false
+      isOpen: false,
+      files_ready: false,
+      children: []
     };
   },
   computed: {
     isFolder: function() {
-      return this.item.children && this.item.children.length && this.item.type !== 'dataset';
+      return this.item.type === 'directory';
     },
     isDataset: function() {
       return this.item.type === 'dataset'
@@ -36,15 +38,31 @@ Vue.component("tree-item", {
     }
   },
   methods: {
-    toggle: function() {
+    async toggle() {
       if (this.isFolder) {
+        tempIsOpen = !this.isOpen;
+        if (tempIsOpen && !this.item.hasOwnProperty("children")) {
+        
+          obj = await this.getChildren(this.item)
+          this.item.children = obj["children"]
+          this.files_ready = true;
+
+        }
         this.isOpen = !this.isOpen;
       }
     },
-    selectDataset(obj, objId) {
-      id_and_version = obj.dataset_id + '-' + obj.dataset_version;
-      hash = md5(id_and_version);
-      router.push({ name: 'dataset', params: { blobId: hash } })
+    async selectDataset(obj, objId) {
+      file = getFilePath(obj.dataset_id, obj.dataset_version, obj.path)
+      fileExists = await checkFileExists(file);
+      if (fileExists) {
+        router.push({ name: 'dataset', params: { dataset_id: obj.dataset_id, dataset_version: obj.dataset_version} })
+      }
+      else {
+        console.log(this.$root.subNotAvailable)
+        this.$root.$emit('bv::show::modal', 'modal-3', '#btnShow')
+        // this.$root.subNotAvailable = true;
+        // alert("Subdataset not currently available in catalog")
+      }
     },
     formatBytes(bytes, decimals = 2) {
       if (bytes === 0) return '0 Bytes';
@@ -53,6 +71,20 @@ Vue.component("tree-item", {
       const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    },
+    async getChildren(obj) {
+      this.files_ready = false;
+      // Gran ID and VERSION from currently active dataset.
+      obj.dataset_id = this.$root.selectedDataset.dataset_id;
+      obj.dataset_version = this.$root.selectedDataset.dataset_version;
+      file = getFilePath(obj.dataset_id, obj.dataset_version, obj.path)
+      try {
+        response = await fetch(file);
+        text = await response.text();
+      } catch (error) {
+        console.error(error);
+      }
+      return JSON.parse(text);
     },
   }
 });
@@ -79,47 +111,86 @@ const datasetView = {
       tag_options_filtered: [],
       tag_options_available: [],
       popoverShow: false,
+      subdatasets:[],
       subdatasets_ready: false,
-      dataset_ready: false
+      dataset_ready: false,
+      files_ready: false,
+      tags_ready: false,
     };
+  },
+  watch: {
+    subdatasets_ready: function (newVal, oldVal) {
+      // do something
+      if (newVal) {
+        console.log("subdatasets fetched!")
+        this.subdatasets = this.selectedDataset.subdatasets;
+        console.log("from watcher")
+        console.log(this.subdatasets)
+        tags = this.tag_options;
+        this.subdatasets.forEach(
+          (subds, index) => {
+            console.log(index + '; ' + subds)
+            if (subds.available == "true") {
+              tags = tags.concat(subds.keywords.filter((item) => tags.indexOf(item) < 0))
+            }
+          }
+        );
+        this.tag_options = tags;
+        this.tag_options_filtered = this.tag_options;
+        this.tag_options_available = this.tag_options;
+        this.tags_ready = true;
+      }
+    },
   },
   computed: {
     displayData: function () {
       // TODO: some of these methods/steps should be moved to the generatpr tool. e.g. shortname
-      dataset = this.selectedDataset;
-      disp_dataset = {};
-      // Populate short_name
-      if (!dataset.hasOwnProperty("short_name") || !dataset["short_name"]) {
-        disp_dataset["short_name"] = (dataset["name"].length > 30 ? dataset["name"].substring(0,30)+'...' : dataset["name"])
-      } else {
-        disp_dataset["short_name"] = dataset["short_name"]
-      }
-      // Display breadcrums and dataset name
-      if (dataset.hasOwnProperty("root_dataset_id")) {
-        disp_dataset["display_name"] = ' / ' + dataset["dataset_path"].replace('/', ' / ');
-        disp_dataset["root_dataset"] = false;
-        // this.dataPath.push(dataset.short_name);
-      } else {
-        disp_dataset["display_name"] = ' - ' + dataset["short_name"]
-        disp_dataset["root_dataset"] = true;
-      }
-      // DOI
-      if (!dataset.hasOwnProperty("doi") || !dataset["doi"]) {
-        disp_dataset["doi"] = "not available"
-      }
-      // License
-      if (!dataset.hasOwnProperty("license") || !dataset["license"].hasOwnProperty("name") || !dataset["license"]["name"]) {
-        disp_dataset["license"] = "not available"
-      }
+      if (this.dataset_ready) {
+        dataset = this.selectedDataset;
+        disp_dataset = {};
+        // Populate short_name
+        if (!dataset.hasOwnProperty("short_name") || !dataset["short_name"]) {
+          disp_dataset["short_name"] = (dataset["name"].length > 30 ? dataset["name"].substring(0,30)+'...' : dataset["name"])
+        } else {
+          disp_dataset["short_name"] = dataset["short_name"]
+        }
+        disp_dataset["display_name"] = ' - ' + disp_dataset["short_name"]
+      
+        // Display breadcrums and dataset name
+        // if (dataset.hasOwnProperty("root_dataset_id")) {
+        //   disp_dataset["display_name"] = ' / ' + dataset["dataset_path"].replace('/', ' / ');
+        //   disp_dataset["root_dataset"] = false;
+        //   // this.dataPath.push(dataset.short_name);
+        // } else {
+        //   disp_dataset["display_name"] = ' - ' + dataset["short_name"]
+        //   disp_dataset["root_dataset"] = true;
+        // }
+        // DOI
+        if (!dataset.hasOwnProperty("doi") || !dataset["doi"]) {
+          disp_dataset["doi"] = "not available"
+        }
+        // License
+        if (!dataset.hasOwnProperty("license") || !dataset["license"].hasOwnProperty("name") || !dataset["license"]["name"]) {
+          disp_dataset["license"] = "not available"
+        }
+        // Extracted time
+        disp_dataset.metadata_extracted = this.getDateFromUTCseconds(dataset.extraction_time);
+        // ID and version
+        id_and_version = dataset.dataset_id + '-' + dataset.dataset_version;
+        disp_dataset.hash = md5(id_and_version);
+        // Github / gitlab / url / binder
+        disp_dataset.is_github = false;
+        disp_dataset.is_gitlab = false;
+        if (dataset.url.toLowerCase().indexOf("github") >= 0) {
+          disp_dataset.is_github = true;
+        }
 
-      disp_dataset.metadata_extracted = this.getDateFromUTCseconds(dataset.extraction_time);
-      id_and_version = dataset.dataset_id + '-' + dataset.dataset_version;
-      disp_dataset.hash = md5(id_and_version);
-      return disp_dataset
+        return disp_dataset
+      }
     },
     filteredSubdatasets() {
-      subdatasets = this.selectedDataset.subdatasets;
-      return subdatasets.filter(c => {
+      all_subdatasets = this.subdatasets.filter(obj => obj.available == "true")
+      return all_subdatasets.filter(c => {
         if(this.search_text == '') return true;
         return ( (c.dirs_from_path[c.dirs_from_path.length - 1].toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)
                   || (c.authors.some(e => e.givenName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)) 
@@ -240,17 +311,42 @@ const datasetView = {
     },
     validator(tag) {
       return this.tag_options_available.indexOf(tag) >= 0
+    },
+    getFiles() {
+      this.$root.selectedDataset.tree = this.$root.selectedDataset["children"]
+      this.files_ready = true;
+    },
+    // async getFiles() {
+    //   this.files_ready = false;
+    //   file_hash = this.selectedDataset.children;
+    //   file = metadata_dir + '/' + file_hash + '.json';
+    //   response = await fetch(file);
+    //   text = await response.text();
+    //   obj = JSON.parse(text);
+    //   this.$root.selectedDataset.tree = obj["children"]
+    //   this.files_ready = true;
+    // },
+    async getNodeChildren() {
+      this.files_ready = false;
+      file_hash = this.selectedDataset.children;
+      file = metadata_dir + '/' + file_hash + '.json';
+      response = await fetch(file);
+      text = await response.text();
+      obj = JSON.parse(text);
+      this.$root.selectedDataset.tree = obj["children"]
+      this.files_ready = true;
     }
   },
   async beforeRouteUpdate(to, from, next) {
     this.tabIndex = 0;
     this.subdatasets_ready = false;
-    file = metadata_dir + '/' + to.params.blobId + '.json'
+    file = getFilePath(to.params.dataset_id, to.params.dataset_version, null)
+    // file = metadata_dir + '/' + to.params.blobId + '.json';
     response = await fetch(file);
     text = await response.text();
     this.$root.selectedDataset = JSON.parse(text);
     this.dataset_ready = true;
-    this.tag_options = this.$root.selectedDataset["subdataset_keywords"];
+    // tags = this.tag_options
 
     if (this.$root.selectedDataset.hasOwnProperty("subdatasets")
         && this.$root.selectedDataset.subdatasets instanceof Array
@@ -259,6 +355,45 @@ const datasetView = {
       subds_json = await grabSubDatasets(this.$root);
       subds_json.forEach(
         (subds, index) => {
+          if (subds_json[index] != "unavailable") {
+            this.$root.selectedDataset.subdatasets[index].extraction_time = subds_json[index].extraction_time;
+            this.$root.selectedDataset.subdatasets[index].name = subds_json[index].name;
+            this.$root.selectedDataset.subdatasets[index].short_name = subds_json[index].short_name;
+            this.$root.selectedDataset.subdatasets[index].doi = subds_json[index].doi;
+            this.$root.selectedDataset.subdatasets[index].license = subds_json[index].license;
+            this.$root.selectedDataset.subdatasets[index].authors = subds_json[index].authors;
+            this.$root.selectedDataset.subdatasets[index].keywords = subds_json[index].keywords;
+            this.$root.selectedDataset.subdatasets[index].available = "true";
+            // tags = tags.concat(subds_json[index].keywords.filter((item) => tags.indexOf(item) < 0))
+
+          }
+          else {
+            this.$root.selectedDataset.subdatasets[index].available = "false";
+          }
+        }
+      );
+      // this.tag_options = tags;
+      this.subdatasets_ready = true;
+      // console.log(this.tag_options)
+    }
+    else {
+      this.subdatasets_ready
+    }
+    next();
+  },
+  async created () {
+    // file = metadata_dir + '/' + this.$route.params.blobId + '.json'
+    file = getFilePath(this.$route.params.dataset_id, this.$route.params.dataset_version, null)
+    var app = this.$root;
+    response = await fetch(file);
+    text = await response.text();
+    app.selectedDataset = JSON.parse(text);
+    this.dataset_ready = true;
+    // tags = this.tag_options;
+    subds_json = await grabSubDatasets(app);
+    subds_json.forEach(
+      (subds, index) => {
+        if (subds_json[index] != "unavailable") {
           this.$root.selectedDataset.subdatasets[index].extraction_time = subds_json[index].extraction_time;
           this.$root.selectedDataset.subdatasets[index].name = subds_json[index].name;
           this.$root.selectedDataset.subdatasets[index].short_name = subds_json[index].short_name;
@@ -266,35 +401,17 @@ const datasetView = {
           this.$root.selectedDataset.subdatasets[index].license = subds_json[index].license;
           this.$root.selectedDataset.subdatasets[index].authors = subds_json[index].authors;
           this.$root.selectedDataset.subdatasets[index].keywords = subds_json[index].keywords;
-          this.$root.selectedDataset.subdatasets[index].dirs_from_path = subds_json[index].dirs_from_path;
+          this.$root.selectedDataset.subdatasets[index].available = "true";
+          // tags = tags.concat(subds_json[index].keywords.filter((item) => tags.indexOf(item) < 0))
         }
-      );
-      this.subdatasets_ready = true;
-    }
-    next();
-  },
-  async created () {
-    file = metadata_dir + '/' + this.$route.params.blobId + '.json'
-    var app = this.$root;
-    response = await fetch(file);
-    text = await response.text();
-    app.selectedDataset = JSON.parse(text);
-    this.dataset_ready = true;
-    this.tag_options = app.selectedDataset["subdataset_keywords"];
-    subds_json = await grabSubDatasets(app);
-    subds_json.forEach(
-      (subds, index) => {
-        this.$root.selectedDataset.subdatasets[index].extraction_time = subds_json[index].extraction_time;
-        this.$root.selectedDataset.subdatasets[index].name = subds_json[index].name;
-        this.$root.selectedDataset.subdatasets[index].short_name = subds_json[index].short_name;
-        this.$root.selectedDataset.subdatasets[index].doi = subds_json[index].doi;
-        this.$root.selectedDataset.subdatasets[index].license = subds_json[index].license;
-        this.$root.selectedDataset.subdatasets[index].authors = subds_json[index].authors;
-        this.$root.selectedDataset.subdatasets[index].keywords = subds_json[index].keywords;
-        this.$root.selectedDataset.subdatasets[index].dirs_from_path = subds_json[index].dirs_from_path;
+        else {
+          this.$root.selectedDataset.subdatasets[index].available = "false";
+        }
       }
     );
+    // this.tag_options = tags;
     this.subdatasets_ready = true;
+    // console.log(this.tag_options)
   },
   mounted() {
     this.tag_options_filtered = this.tag_options;
@@ -343,9 +460,9 @@ const routes = [
             if(rawFile.status === 200 || rawFile.status == 0) {
                 var allText = rawFile.responseText;
                 superds = JSON.parse(allText);
-                super_id_and_version = superds["dataset_id"] + '-' + superds["dataset_version"];
-                hash = md5(super_id_and_version);
-                router.push({ name: 'dataset', params: { blobId: hash } })
+                // super_id_and_version = superds["dataset_id"] + '-' + superds["dataset_version"];
+                // hash = md5(super_id_and_version);
+                router.push({ name: 'dataset', params: { dataset_id: superds["dataset_id"], dataset_version: superds["dataset_version"] } })
                 next();
             } else if (rawFile.status === 404) {
               router.push({ name: '404'})
@@ -358,7 +475,7 @@ const routes = [
       rawFile.send();
     }
   },
-  { path: '/dataset/:blobId', component: datasetView, name: 'dataset'},
+  { path: '/dataset/:dataset_id/:dataset_version', component: datasetView, name: 'dataset'},
   { path: '/about', component: mainPage, name: 'about'},
   { path: '*', component: notFound, name: '404'}
 ];
@@ -415,18 +532,90 @@ async function grabSubDatasets(app) {
   subds_json = [];
   await Promise.all(app.selectedDataset.subdatasets.map(async (subds, index) => {
     id_and_version = subds.dataset_id + '-' + subds.dataset_version;
-    hash = md5(id_and_version);
-    subds_file = metadata_dir + '/' + hash + '.json';
-    subds_response = await fetch(subds_file);
-    subds_text = await subds_response.text();
-    subds_json[index] = JSON.parse(subds_text);
+    // hash = md5(id_and_version);
+    // subds_file = metadata_dir + '/' + hash + '.json';
+    subds_file = getFilePath(subds.dataset_id, subds.dataset_version, null)
+    try {
+
+      subds_response = await fetch(subds_file);
+      subds_text = await subds_response.text();
+      // console.log(subds_text)
+
+      // fetch('/users')
+      // // .then(res => res.json()) // comment this out for now
+      // .then(res => res.text())          // convert to plain text
+      // .then(text => console.log(text))
+    }
+    catch (e) {
+      console.error(e);
+    }
+    finally {
+      try {
+        subds_json[index] = JSON.parse(subds_text);
+      }
+      catch (er) {
+        console.error(er);
+        subds_json[index] = "unavailable";
+      }
+      console.log(subds_json[index])
+    }
   }));
   return subds_json
 }
 
 
-/*
+function getFilePath(dataset_id, dataset_version, path) {
+  // Get node file location from  dataset id, dataset version, and node path
+  // using a file system structure similar to RIA stores
 
+  file = metadata_dir + '/' + dataset_id + '/' + dataset_version;
+  blob = dataset_id + '-' + dataset_version;
+  if (path) {
+    blob = blob + '-' + path;
+  }
+  blob = md5(blob);
+  blob_parts = [blob.substring(0, SPLIT_INDEX), blob.substring(SPLIT_INDEX)];
+  file = file + '/' + blob_parts[0] + '/' + blob_parts[1] + '.json';
+  return file
+}
+
+async function checkFileExists(url) {
+  try {
+    const response = await fetch(url, {
+      method: 'HEAD',
+      cache: 'no-cache'
+    });
+    return response.status === 200;
+
+  } catch(error) {
+    // console.log(error);
+    return false;
+  }
+}
+
+
+
+// async function thisThrows() {
+//   throw new Error("Thrown from thisThrows()");
+// }
+
+// async function myFunctionThatCatches() {
+//   try {
+//       return await thisThrows(); // <-- Notice we added here the "await" keyword.
+//   } catch (e) {
+//       console.error(e);
+//   } finally {
+//       console.log('We do cleanup here');
+//   }
+//   return "Nothing found";
+// }
+
+// async function run() {
+//   const myValue = await myFunctionThatCatches();
+//   console.log(myValue);
+// }
+
+/*
 TODO: use emit!!
 TODO: add object and logic to track existence and content of dataset fields and resulting action (visibility, text to display, etc). E.g.:
 -- if there are no publications, hide empty publication card and show sentence "There are currently no publications associated with this dataset."
