@@ -48,7 +48,7 @@ class Catalog(Interface):
             args=("catalog_action",),
             # documentation
             doc="""This is the subcommand to be executed by datalad-catalog.
-            Options include: create, add, remove, serve, create-sibling-*.
+            Options include: create, add, remove, serve, create-sibling-[].
             Example: ''""",
             # type checkers, constraint definition is automatically
             # added to the docstring
