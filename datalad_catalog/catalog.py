@@ -126,6 +126,25 @@ class Catalog(Interface):
         dataset_version = None,
         force: bool = False,
         ):
+        """
+        [summary]
+
+        Args:
+            catalog_action (str): [description]
+            catalog_dir ([type], optional): [description]. Defaults to None.
+            metadata ([type], optional): [description]. Defaults to None.
+            dataset_id ([type], optional): [description]. Defaults to None.
+            dataset_version ([type], optional): [description]. Defaults to None.
+            force (bool, optional): [description]. Defaults to False.
+
+        Raises:
+            InsufficientArgumentsError: [description]
+            InsufficientArgumentsError: [description]
+            InsufficientArgumentsError: [description]
+
+        Yields:
+            [type]: [description]
+        """
 
         # Error out if `catalog_dir` argument was not supplied
         if catalog_dir is None:
