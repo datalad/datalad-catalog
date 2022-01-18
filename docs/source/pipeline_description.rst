@@ -209,7 +209,7 @@ The important subcommands for generating a catalog are:
   as an optional input argument
 - ``add`` adds dataset and/or file level metadata to an existing catalog
 
-To create a catalog from the metadata we generated below, we can run the following:
+To create a catalog from the metadata we generated above, we can run the following:
 
 .. code-block:: bash
 
