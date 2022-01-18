@@ -4,7 +4,9 @@
 ---
 
 # DataLad Catalog - Create a user-friendly data browser from structured metadata
-=======
+
+[![Documentation Status](https://readthedocs.org/projects/datalad-catalog/badge/?version=latest)](http://docs.datalad.org/projects/catalog/en/latest/?badge=latest)
+
 
 This extension to DataLad allows you to generate a standalone browser-based user interface for [Datalad](https://www.datalad.org/) datasets by:
 1. parsing Datalad-derived metadata,

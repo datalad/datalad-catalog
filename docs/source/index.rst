@@ -1,6 +1,10 @@
 DataLad Catalog
 ***************
 
+.. image:: https://readthedocs.org/projects/datalad-catalog/badge/?version=latest
+   :target: http://docs.datalad.org/projects/catalog/en/latest/?badge=latest
+   :alt: Documentation Status
+
 Welcome to the user and technical documentation of DataLad Catalog,
 a DataLad extension that allows you to create a user-friendly data
 browser from structured DataLad-generated metadata.
@@ -22,7 +26,7 @@ Demo
 See our `demo catalog`_, hosted via GitHub Pages. This catalog was generated
 from the `studyforrest dataset`_.
 
-.. image:: /_static/catalog_screenshot.png
+.. image:: /_static/datalad_catalog_demo.svg
    :align: center
 
 |

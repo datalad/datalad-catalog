@@ -8,6 +8,14 @@ DataLad Catalog is a free and open source command line tool with a Python API
 that allows you to turn structured metadata into a user-friendly, browser-based
 data catalog.
 
+
+.. image:: /_static/datalad_catalog_functionality.svg
+   :width: 80%
+   :alt: alternate text
+   :align: center
+
+|
+
 It is an extension to, and dependent on, `Datalad`_ and `Datalad Metalad`_:
 
 - **DataLad** is a distributed data management system that keeps track of
