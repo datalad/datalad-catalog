@@ -69,6 +69,7 @@ extensions = [
     'sphinx.ext.inheritance_diagram',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
+    'sphinx_copybutton',
 ]
 
 # for the module reference
@@ -86,7 +87,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Datalad Extension Template'
+project = u'DataLad Catalog'
 copyright = u'2018-{}, DataLad team'.format(datetime.datetime.now().year)
 author = u'DataLad team'
 

@@ -1,30 +1,50 @@
-DataLad extension template
-**************************
+DataLad Catalog
+***************
 
-This is a template for creating a `DataLad <http://datalad.org>`__ extension
-that equips DataLad with additional functionality.
+Welcome to the user and technical documentation of DataLad Catalog,
+a DataLad extension that allows you to create a user-friendly data
+browser from structured DataLad-generated metadata.
 
+.. image:: /_static/datalad_catalog_logo_1_dark.svg
+   :height: 100px
+   :width: 200 px
+   :alt: alternate text
+   :align: center
 
-API
-===
-
-High-level API commands
------------------------
-
-.. currentmodule:: datalad.api
-.. autosummary::
-   :toctree: generated
-
-   catalog_cmd
+|
 
 
-Command line reference
-----------------------
+
+
+Demo
+====
+
+See our `demo catalog`_, hosted via GitHub Pages. This catalog was generated
+from the `studyforrest dataset`_.
+
+.. image:: /_static/catalog_screenshot.png
+   :align: center
+
+|
+
+Index
+=====
 
 .. toctree::
    :maxdepth: 1
 
-   generated/man/datalad-catalog
+   overview
+   installation
+   usage
+   pipeline_description
+   metadata_formats
+   examples
+   design
+   contributing
+   command_line_reference
+   python_module_reference
+   changelog
+
 
 
 Indices and tables
@@ -35,3 +55,7 @@ Indices and tables
 * :ref:`search`
 
 .. |---| unicode:: U+02014 .. em dash
+
+.. _demo catalog: https://datalad.github.io/datalad-catalog/
+.. _studyforrest dataset: https://www.studyforrest.org/
+
