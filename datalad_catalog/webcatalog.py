@@ -8,15 +8,6 @@ from . import constants as cnst
 import logging
 lgr = logging.getLogger('datalad.catalog.webcatalog')
 
-# Reminders:
-# Instance method
-# @classmethod
-# @staticmethod
-# @property
-
-
-
-
 # PSEUDOCODE/WORKFLOW:
 # 1) Command line call
 # 2) Incoming metadata 
@@ -24,7 +15,7 @@ lgr = logging.getLogger('datalad.catalog.webcatalog')
 #   - parses incoming data and arguments
 #   - handles argument errors/warnings
 #   - creates or accesses existing catalog via class WebCatalog
-#   - calls relevant function based on subcommand: [create / add / remove / serve / create-sibling]
+#   - calls relevant function based on subcommand: [create / add / remove / serve / set-super
 # [create]:
 #   - if catalog does not exist, create it
 #   - if catalog exists and force flag is True, overwrite assets of existing catalog (not metadata)
@@ -35,11 +26,10 @@ lgr = logging.getLogger('datalad.catalog.webcatalog')
 #   - loops through meta_objects in incoming stream/file:
 #       - handles individual objects via class Translator
 
-
 # TODO: should webcatalog be a subclass of datalad dataset?
 class WebCatalog(object):
     """
-    The main catalog class. This is also a datalad dataset
+    The main catalog class.
     """
 
     def __init__(self, location: str, main_id: str = None, main_version: str = None, force=False) -> None:
@@ -48,14 +38,30 @@ class WebCatalog(object):
         self.main_version = main_version
         self.metadata_path = Path(self.location) / 'metadata'
 
-    def is_created(self) -> bool:
+    def path_exists(self) -> bool:
         """
-        Check if catalog directory exists at location
+        Check if directory exists at location (could be a catalog or any other directory)
         """
         catalog_path = Path(self.location)
         if catalog_path.exists() and catalog_path.is_dir():
             return True
         return False
+
+    def is_created(self) -> bool:
+        """
+        Check if directory exists at location, and if main subdirectories also
+        exist. This identifies the location as a datalad catalog.
+        """
+
+        is_created = self.path_exists()
+        out_dir_paths = {
+            "assets": Path(self.location) / 'assets',
+            "artwork": Path(self.location) / 'artwork',
+            "html": Path(self.location) / 'index.html',
+        }
+        for key in out_dir_paths:
+            is_created = is_created and out_dir_paths[key].exists()
+        return is_created
 
     def create(self, force=False, config=None):
         """
@@ -106,12 +112,6 @@ class WebCatalog(object):
         with open(main_file, 'w') as f:
             json.dump(main_obj, f)
         return main_file
-
-    def serve():
-        """Start local webserver, open catalog html"""
-
-    def add_sibling():
-        """For hosting catalog on e.g. GitHub"""
 
 
 class Node(object):
@@ -194,7 +194,6 @@ class Node(object):
             self.long_name = self.get_long_name()
             self.md5_hash = self.md5hash(self.long_name)
 
-        
         hash_path_left, hash_path_right = self.split_dir_name(self.md5_hash)
         node_fn = self.parent_catalog.metadata_path / self.dataset_id / \
             self.dataset_version / hash_path_left / hash_path_right
@@ -248,9 +247,6 @@ class Node(object):
             self.children.append(meta_dict)
         else:
             pass
-            # message = f"Node child of type '{meta_dict[cnst.TYPE]}' \
-            #     and name '{meta_dict[cnst.NAME]}' already exists."
-            # lgr.warning(message)
 
     def add_extractor(self, extractor_dict: dict):
         """"""

@@ -26,12 +26,12 @@ from .webcatalog import WebCatalog, Node
 from .translator import Translator
 from .utils import read_json_file
 
-# create named logger
+# Create named logger
 lgr = logging.getLogger("datalad.catalog.catalog")
 
-# decoration auto-generates standard help
+# Decoration auto-generates standard help
 @build_doc
-# all commands must be derived from Interface
+# All extension commands must be derived from Interface
 class Catalog(Interface):
     # first docstring line is used a short description in the cmdline help
     # the rest is put in the verbose help and manpage
@@ -48,11 +48,11 @@ class Catalog(Interface):
             args=("catalog_action",),
             # documentation
             doc="""This is the subcommand to be executed by datalad-catalog.
-            Options include: create, add, remove, serve, create-sibling-[].
+            Options include: create, add, remove, serve.
             Example: ''""",
             # type checkers, constraint definition is automatically
             # added to the docstring
-            constraints=EnsureChoice('create', 'add', 'remove', 'serve', 'create-sibling', 'set-super')
+            constraints=EnsureChoice('create', 'add', 'remove', 'serve', 'set-super')
         ),
         catalog_dir=Parameter(
             # cmdline argument definitions, incl aliases
@@ -151,11 +151,17 @@ class Catalog(Interface):
             err_msg = f"No catalog directory supplied: Datalad catalog can only operate on a path to a directory. Argument: -c, --catalog_dir."
             raise InsufficientArgumentsError(err_msg)
         
-        # Test if catalog already exists at path
         # Instantiate WebCatalog class
         ctlg = WebCatalog(catalog_dir, dataset_id, dataset_version, force)
         # catalog_path = Path(catalog_dir)
         # catalog_exists = catalog_path.exists() and catalog_path.is_dir()
+        
+        # Hanlde case where a non-catalog directory already exists at path argument
+        # Should prevent overwriting
+        if ctlg.path_exists() and not ctlg.is_created():
+            err_msg = f"A non-catalog directory already exists at {catalog_dir}. Please supply a different path."
+            raise FileExistsError(err_msg)
+
         # Catalog should exist for all actions except create (for create action: unless force flag supplied)
         if not ctlg.is_created():
             if catalog_action != 'create':
@@ -164,7 +170,7 @@ class Catalog(Interface):
         else:
             if catalog_action == 'create':
                 if not force:
-                    err_msg = f"Catalog already exists: overwriting catalog assets (not catalog metadata!) is only possible when using the force argument: -f, --force."
+                    err_msg = f"Catalog already exists: overwriting catalog assets (not catalog metadata) is only possible when using the force argument: -f, --force."
                     raise InsufficientArgumentsError(err_msg)
 
         # Call relevant function based on action
@@ -174,7 +180,6 @@ class Catalog(Interface):
             'serve': _serve_catalog,
             'add': _add_to_catalog,
             'remove': _remove_from_catalog,
-            'create-sibling': _create_sibling_catalog,
             'set-super': _set_super_of_catalog,
         }
         yield from call_action[catalog_action](
@@ -185,7 +190,6 @@ class Catalog(Interface):
             force,
         )
         
-
 
 # Internal functions to execute based on catalog_action parameter
 def _create_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool):
@@ -314,16 +318,11 @@ def _serve_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_versi
     """
     """
 
-def _create_sibling_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool):
-    """
-    [summary]
-    """
-
 def _set_super_of_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool):
     """
     [summary]
     """
-    err_msg = ("Dataset ID and/or VERSION missing: datalad catalog remove requires both the ID"
+    err_msg = ("Dataset ID and/or VERSION missing: datalad catalog set-super requires both the ID"
                 " (-i, --dataset_id) and VERSION (-v, --dataset_version) of the dataset that is to be"
                 " used as the catalog's super dataset")
     if not dataset_id or not dataset_version:

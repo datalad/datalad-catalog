@@ -23,8 +23,8 @@ def getTranslator(extractor_name):
     elif extractor_name == EXTRACTOR_STUDYMINIMETA:
         return StudyminimetaTranslator
     else:
-        print("UNRECOGNIZED METADTA EXTRACTOR PRESENT. TODO: RAISE EXCEPTION")
-        """"""
+        print("UNRECOGNIZED METADATA EXTRACTOR PRESENT. TODO: RAISE EXCEPTION")
+        # TODO: implement generic translator here
 
 
 class Translator(object):
