@@ -7,23 +7,25 @@
 
 [![Documentation Status](https://readthedocs.org/projects/datalad-catalog/badge/?version=latest)](http://docs.datalad.org/projects/catalog/en/latest/?badge=latest)
 
+![](docs/source/_static/datalad_catalog_demo.svg)
 
 This extension to DataLad allows you to generate a standalone browser-based user interface for [Datalad](https://www.datalad.org/) datasets by:
 1. parsing Datalad-derived metadata,
 2. translating the metadata into structured data understandable and renderable by the frontend
 3. generating a VueJS-based frontend with which to interactively browse the dataset's metadata.
 
-## Online demo
+
+## 1. Online demo
 
 Navigate to [https://datalad.github.io/datalad-catalog/](https://datalad.github.io/datalad-catalog/) to view a live demo of the current work-in-progress state of the user interface.
 
 This demo site is hosted via GitHub Pages and it builds from the `gh-pages` branch of this repository.
 
-## How it works
+## 2. How it works
 
 DataLad's metadata capabilities (see [datalad-metalad](https://github.com/datalad/datalad-metalad)) allows extracting metadata from DataLad datasets, subdatasets, and files, and to aggregate this information to the top-level dataset. When exported (using e.g. `datalad meta-dump`, `meta-extract`, or `meta-conduct`), these metadata objects can be ingested and parsed by `datalad catalog`. This package translates the DataLad metadata into structured data required by the VueJS-based user interface, and it also generates the assets for the interface (artwork, CSS, JavaScript and HTML). The resulting content can be hosted as a standalone website (as is the case for the demo above) without requiring any building steps beforehand.
 
-## Install `datalad catalog`
+## 3. Install `datalad catalog`
 
 ### Step 1 - Setup and activate virtual environment
 
@@ -38,16 +40,33 @@ conda activate catalog
 
 ### Step 2 - Clone the repo and install the package
 
+Run the following from your command line:
 ```
 git clone https://github.com/datalad/datalad-catalog.git
 cd datalad-catalog
 pip install -e .
 ```
 
-Congratulations! You have now installed `datalad catalog`. Let's start using it!
+Congratulations! You have now installed `datalad catalog`.
+
+To generate metadata that is compatible with `datalad catalog`, you will need to install
+the latest version of `datalad metalad` from GitHub (the install process above installs
+it as a dependency, but it installs an earlier release from PyPi). Run the following:
+
+```
+git clone https://github.com/datalad/datalad-metalad.git
+cd datalad-metalad
+pip install -e .
+```
+
+Lastly, in order to build a full data management pipeline from raw data to catalog, you
+will need to use `datalad`, for which you need `git-annex`. This might already have been
+installed as part of the process above, depending on your operating system. For complete
+instructions on how to install `datalad` and `git-annex`, please refer to the
+[DataLad Handbook](https://handbook.datalad.org/en/latest/intro/installation.html).
 
 
-## Generate a catalog locally
+## 4. Generate a catalog locally
 
 ### Step 1 - access and clone DataLad dataset(s)
 In order to generate a catalog, you will need to have access to a DataLad dataset (or many of them).Note: this would be the metadata representation of the dataset and all its files, but the actual file content (residing in the annex) will most likely not be necessary.
@@ -96,6 +115,31 @@ The step above opens a server at [http://localhost:8000/](http://localhost:8000/
 For developers, this local server will allow you to view your changes in real-time as you develop. After making changes to `index.html`, `assets/vue_app.js` or `assets/style.css` (for example), you can refresh your browser tab to view changes.
 
 
-## Feedback / comments
+## 5. Contributing
+
+### Feedback / comments
 
 Please [create a new issue](https://github.com/jsheunis/data-browser-from-metadata/issues/new) if you have any feedback, comments, or requests.
+
+### Developer requirements
+
+If you'd like to contribute as a developer, you need to install a number of extra dependencies:
+
+```
+cd datalad-catalog
+pip install -r requirements-devel.txt
+```
+
+This installs `sphinx` and related packages for documentation building, `coverage` for code coverage testing, and `pytest` for testing.
+
+### Contribution process
+
+To make a contribution to the code or documentation, please:
+
+- create an issue describing the bug/feature
+- fork the project repository,
+- create a branch from `main`,
+- check that tests succeed: from the project root directory, run `pytest`
+- commit your changes,
+- push to your fork
+- create a pull request with a clear description of the changes
