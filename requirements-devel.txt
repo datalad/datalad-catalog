@@ -1,5 +1,5 @@
 # requirements for a development environment
-nose
+pytest
 coverage
 sphinx
 sphinx_rtd_theme
