@@ -20,8 +20,20 @@ SETUP_REQUIRES = ['setuptools >= 43.0.0']
 SETUP_REQUIRES += ['wheel'] if 'bdist_wheel' in sys.argv else []
 
 if __name__ == '__main__':
-    setup(name='datalad_catalog',
-          version=versioneer.get_version(),
-          cmdclass=cmdclass,
-          setup_requires=SETUP_REQUIRES,
+    setup(
+        name='datalad_catalog',
+        version=versioneer.get_version(),
+        cmdclass=cmdclass,
+        setup_requires=SETUP_REQUIRES,
+        entry_points={
+            'datalad.extensions': [
+                'catalog=datalad_catalog:command_suite',
+            ],
+            'datalad.tests': [
+                'catalog=datalad_catalog'
+            ],
+            'datalad.metadata.extractors': [
+                'datacite_gin=datalad_catalog.extractors.datacite_gin:DataciteGINDatasetExtractor',
+            ]
+        }
     )
