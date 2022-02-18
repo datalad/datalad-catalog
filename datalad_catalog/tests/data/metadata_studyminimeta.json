@@ -1,0 +1,279 @@
+{
+    "type": "dataset",
+    "dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609",
+    "dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758",
+    "extractor_name": "metalad_studyminimeta",
+    "extractor_version": "0.1",
+    "extraction_parameter": {},
+    "extraction_time": 1628688861.77397,
+    "agent_name": "Stephan Heunis",
+    "agent_email": "s.heunis@fz-juelich.de",
+    "extracted_metadata": {
+        "@context": {
+            "@vocab": "http://schema.org/"
+        },
+        "@graph": [
+            {
+                "@id": "https://schema.datalad.org/datalad_dataset#deabeb9b-7a37-4062-a1e0-8fcef7909609",
+                "@type": "Dataset",
+                "version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758",
+                "name": "StudyForrest",
+                "url": "https://github.com/psychoinformatics-de/studyforrest-data",
+                "description": "The StudyForrest project centers around the use of the movie Forrest Gump, which provides complex sensory input that is both reproducible and is also richly laden with real-life-like content and contexts. Since its initial release, the StudyForrest dataset has grown and been extended substantially, and now encompasses many hours of fMRI scans, structural brain scans, eye-tracking data, and extensive annotations of the movie. It is a one-of-a-kind resource for studying high-level cognition in the human brain under complex, natural stimulation. The versatility of the provided data (some individuals have nearly ten hours of fMRI data) enables studies far beyond this main focus. This covers a vast range from studies of low-level signal properties and brain structure, to sensory integration and attentional processes, to computational modeling of representational spaces and brain area interactions.",
+                "keywords": [
+                    "human",
+                    "fMRI",
+                    "task",
+                    "7T",
+                    "3T",
+                    "audio",
+                    "visual",
+                    "music",
+                    "retinotopy",
+                    "angiography",
+                    "T1,T2"
+                ],
+                "author": [
+                    {
+                        "@id": "https://schema.datalad.org/person#a@fz-juelich.de"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#b@fz-juelich.de"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#c@fz-juelich.de"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#d@fz-juelich.de"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#e@fz-juelich.de"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#f@fz-juelich.de"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#g@fz-juelich.de"
+                    }
+                ],
+                "funder": [
+                    {
+                        "@id": "https://schema.datalad.org/organization#BMBF, 01GQ1411",
+                        "@type": "Organization",
+                        "name": "BMBF, 01GQ1411"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/organization#NSF, 1429999",
+                        "@type": "Organization",
+                        "name": "NSF, 1429999"
+                    }
+                ]
+            },
+            {
+                "@id": "#publicationList",
+                "@list": [
+                    {
+                        "@id": "#publication[0]",
+                        "@type": "ScholarlyArticle",
+                        "headline": "The effect of acquisition resolution on orientation decoding from V1: comparison of 3T and 7T",
+                        "datePublished": 2018,
+                        "sameAs": "https://doi.org/10.1101/305417",
+                        "author": [
+                            {
+                                "@id": "https://schema.datalad.org/person#a@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#b@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#c@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#d@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#e@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#f@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#g@fz-juelich.de"
+                            }
+                        ],
+                        "publication": {
+                            "@id": "https://schema.datalad.org/publication_event#bioRxiv",
+                            "@type": "PublicationEvent",
+                            "name": "bioRxiv"
+                        }
+                    },
+                    {
+                        "@id": "#publication[1]",
+                        "@type": "ScholarlyArticle",
+                        "headline": "Spatial band-pass filtering aids decoding musical genres from auditory cortex 7T fMRI",
+                        "datePublished": 2018,
+                        "sameAs": "https://doi.org/10.12688/f1000research.13689.2",
+                        "author": [
+                            {
+                                "@id": "https://schema.datalad.org/person#a@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#f@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#g@fz-juelich.de"
+                            }
+                        ],
+                        "publication": {
+                            "@id": "https://schema.datalad.org/publication_event#F1000Research",
+                            "@type": "PublicationEvent",
+                            "name": "F1000Research"
+                        }
+                    },
+                    {
+                        "@id": "#publication[2]",
+                        "@type": "ScholarlyArticle",
+                        "headline": "The effect of acquisition resolution on orientation decoding from V1 BOLD fMRI at 7 Tesla",
+                        "datePublished": 2017,
+                        "sameAs": "https://doi.org/10.1016/j.neuroimage.2016.12.040",
+                        "author": [
+                            {
+                                "@id": "https://schema.datalad.org/person#a@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#c@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#b@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#f@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#g@fz-juelich.de"
+                            }
+                        ],
+                        "publication": {
+                            "@id": "https://schema.datalad.org/publication_event#NeuroImage",
+                            "@type": "PublicationEvent",
+                            "name": "NeuroImage"
+                        }
+                    },
+                    {
+                        "@id": "#publication[3]",
+                        "@type": "ScholarlyArticle",
+                        "headline": "Ultra high-field multi-resolution fMRI data for orientation decoding in visual cortex",
+                        "datePublished": 2017,
+                        "sameAs": "https://doi.org/10.1016/j.dib.2017.05.014",
+                        "author": [
+                            {
+                                "@id": "https://schema.datalad.org/person#a@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#b@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#c@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#d@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#e@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#f@fz-juelich.de"
+                            },
+                            {
+                                "@id": "https://schema.datalad.org/person#g@fz-juelich.de"
+                            }
+                        ],
+                        "publication": {
+                            "@id": "https://schema.datalad.org/publication_event#Data in Brief",
+                            "@type": "PublicationEvent",
+                            "name": "Data in Brief"
+                        }
+                    }
+                ]
+            },
+            {
+                "@id": "#personList",
+                "@list": [
+                    {
+                        "@id": "https://schema.datalad.org/person#a@fz-juelich.de",
+                        "@type": "Person",
+                        "email": "a@fz-juelich.de",
+                        "name": " Ayan Sengupta",
+                        "givenName": "Ayan",
+                        "familyName": "Sengupta"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#b@fz-juelich.de",
+                        "@type": "Person",
+                        "email": "b@fz-juelich.de",
+                        "name": " Oliver Speck",
+                        "givenName": "Oliver",
+                        "familyName": "Speck"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#c@fz-juelich.de",
+                        "@type": "Person",
+                        "email": "c@fz-juelich.de",
+                        "name": " Renat Yakupov",
+                        "givenName": "Renat",
+                        "familyName": "Yakupov"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#d@fz-juelich.de",
+                        "@type": "Person",
+                        "email": "d@fz-juelich.de",
+                        "name": " Martin Kanowski",
+                        "givenName": "Martin",
+                        "familyName": "Kanowski"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#e@fz-juelich.de",
+                        "@type": "Person",
+                        "email": "e@fz-juelich.de",
+                        "name": " Claus Tempelmann",
+                        "givenName": "Claus",
+                        "familyName": "Tempelmann"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#f@fz-juelich.de",
+                        "@type": "Person",
+                        "email": "f@fz-juelich.de",
+                        "name": " Stefan Pollmann",
+                        "givenName": "Stefan",
+                        "familyName": "Pollmann"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#g@fz-juelich.de",
+                        "@type": "Person",
+                        "email": "g@fz-juelich.de",
+                        "name": " Michael Hanke",
+                        "givenName": "Michael",
+                        "familyName": "Hanke",
+                        "sameAs": "0000-0001-6398-6370"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#h@fz-juelich.de",
+                        "@type": "Person",
+                        "email": "h@fz-juelich.de",
+                        "name": " Mi He",
+                        "givenName": "Mi",
+                        "familyName": "He"
+                    },
+                    {
+                        "@id": "https://schema.datalad.org/person#i@fz-juelich.de",
+                        "@type": "Person",
+                        "email": "i@fz-juelich.de",
+                        "name": " Ballas",
+                        "givenName": "Kaas",
+                        "familyName": "Koek"
+                    }
+                ]
+            }
+        ]
+    }
+}

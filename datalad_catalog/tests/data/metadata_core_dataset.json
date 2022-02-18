@@ -1,0 +1,20 @@
+{
+    "type": "dataset",
+    "root_dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609",
+    "root_dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758",
+    "dataset_path": "code/conversion_qa",
+    "dataset_id": "0f66b1ba-e9a9-46fd-b9d9-2e64fe94d307",
+    "dataset_version": "c74b66cf37c0d4ed8914296c6d7792b2d25696aa",
+    "extraction_time": 1626954750.6186612,
+    "agent_name": "Stephan Heunis",
+    "agent_email": "s.heunis@fz-juelich.de",
+    "extractor_name": "metalad_core_dataset",
+    "extractor_version": "0.0.1",
+    "extraction_parameter": {},
+    "extracted_metadata": {
+        "id": "0f66b1ba-e9a9-46fd-b9d9-2e64fe94d307",
+        "refcommit": "c74b66cf37c0d4ed8914296c6d7792b2d25696aa",
+        "dataset_path": "",
+        "comment": "test-implementation of core_dataset"
+    }
+}

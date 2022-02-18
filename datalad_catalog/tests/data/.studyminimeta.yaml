@@ -1,0 +1,161 @@
+#<!-- METADATA START --> # DO NOT DELETE THIS LINE
+# All example text is surrounded with <ex> and </ex>. Please replace the example
+# text including the <ex> and </ex> with your data. Delete all non-applicable
+# lines and sections.
+
+# Attention: indentation is important and must be preserved!
+
+# information on the study the to-be-archived dataset was created for
+
+# mandatory information on to-be-archived dataset
+dataset:
+  # short name or label
+  name: StudyForrest
+
+  # current location of the dataset
+  location: https://github.com/psychoinformatics-de/studyforrest-data
+
+  # summary of purpose and content of the dataset
+  description:
+    "The StudyForrest project centers around the use of the movie Forrest Gump, which provides complex sensory input
+    that is both reproducible and is also richly laden with real-life-like content and contexts. Since its initial release,
+    the StudyForrest dataset has grown and been extended substantially, and now encompasses many hours of fMRI scans,
+    structural brain scans, eye-tracking data, and extensive annotations of the movie.
+    It is a one-of-a-kind resource for studying high-level cognition in the human brain under complex,
+    natural stimulation. The versatility of the provided data (some individuals have nearly ten hours of fMRI data)
+    enables studies far beyond this main focus. This covers a vast range from studies of low-level signal properties
+    and brain structure, to sensory integration and attentional processes, to computational modeling of representational
+    spaces and brain area interactions."
+
+  # optional list of employed standard and format
+  # for automatic generation of rich metadata records
+  # (see handbook for full list)
+
+  # optional list of keyword/phrase
+  keyword:
+    - human
+    - fMRI
+    - task
+    - 7T
+    - 3T
+    - audio
+    - visual
+    - music
+    - retinotopy
+    - angiography
+    - T1,T2
+
+  # minimum of one dataset author required
+  author:
+    - a@fz-juelich.de
+    - b@fz-juelich.de
+    - c@fz-juelich.de
+    - d@fz-juelich.de
+    - e@fz-juelich.de
+    - f@fz-juelich.de
+    - g@fz-juelich.de
+
+  # optional list of entities that funded the creation of
+  # the dataset. This might also be a single value, i.e.:
+  #`` funding: NIH´´.
+  funding:
+    - BMBF, 01GQ1411
+    - NSF, 1429999
+
+
+# one or more publications on or using the dataset, optional
+publication:
+  - title: "The effect of acquisition resolution on orientation decoding from V1: comparison of 3T and 7T"
+    author:
+      - a@fz-juelich.de
+      - b@fz-juelich.de
+      - c@fz-juelich.de
+      - d@fz-juelich.de
+      - e@fz-juelich.de
+      - f@fz-juelich.de
+      - g@fz-juelich.de
+    # when published
+    year: 2018
+    # all other properties are optional
+    # highly recommended to provide a DOI
+    doi: https://doi.org/10.1101/305417
+    # journal name or publication venue label
+    publication: bioRxiv
+
+  - title: "Spatial band-pass filtering aids decoding musical genres from auditory cortex 7T fMRI"
+    author:
+      - a@fz-juelich.de
+      - f@fz-juelich.de
+      - g@fz-juelich.de
+    # when published
+    year: 2018
+    # all other properties are optional
+    # highly recommended to provide a DOI
+    doi: https://doi.org/10.12688/f1000research.13689.2
+    # journal name or publication venue label
+    publication: F1000Research
+
+  - title: "The effect of acquisition resolution on orientation decoding from V1 BOLD fMRI at 7 Tesla"
+    author:
+      - a@fz-juelich.de
+      - c@fz-juelich.de
+      - b@fz-juelich.de
+      - f@fz-juelich.de
+      - g@fz-juelich.de
+    # when published
+    year: 2017
+    # all other properties are optional
+    # highly recommended to provide a DOI
+    doi: https://doi.org/10.1016/j.neuroimage.2016.12.040
+    # journal name or publication venue label
+    publication: NeuroImage
+  
+  - title: "Ultra high-field multi-resolution fMRI data for orientation decoding in visual cortex"
+    author:
+      - a@fz-juelich.de
+      - b@fz-juelich.de
+      - c@fz-juelich.de
+      - d@fz-juelich.de
+      - e@fz-juelich.de
+      - f@fz-juelich.de
+      - g@fz-juelich.de
+    # when published
+    year: 2017
+    # all other properties are optional
+    # highly recommended to provide a DOI
+    doi: https://doi.org/10.1016/j.dib.2017.05.014
+    # journal name or publication venue label
+    publication: Data in Brief
+
+# person information, one record for every email-key used above
+person:
+  a@fz-juelich.de:
+     given_name: Ayan
+     last_name: Sengupta
+  
+  b@fz-juelich.de:
+     given_name: Oliver
+     last_name: Speck
+  
+  c@fz-juelich.de:
+     given_name: Renat
+     last_name: Yakupov
+  
+  d@fz-juelich.de:
+     given_name: Martin
+     last_name: Kanowski
+  
+  e@fz-juelich.de:
+     given_name: Claus
+     last_name: Tempelmann
+  
+  f@fz-juelich.de:
+     given_name: Stefan
+     last_name: Pollmann
+  
+  g@fz-juelich.de:
+     given_name: Michael
+     last_name: Hanke
+     orcid-id: 0000-0001-6398-6370
+
+#<!-- METADATA END -->  # DO NOT DELETE THIS LINE
