@@ -121,11 +121,47 @@ class DataciteGINmeta(object):
         """
         Function to load data and run metadata extraction+translation
         """
+        log_progress(
+            lgr.info,
+            'extractorsdatacitegin',
+            'Start datacite_gin metadata extraction from {path}'.format(path=self.dataset.path),
+            total=len(tuple('ok')) + 1,
+            label='datacite_gin metadata extraction',
+            unit=' Files',
+        )
+
         # Get datacite.yml file
         self.datacite_fn = self._get_datacite_yml_file_name()
+        if not self.datacite_fn.exists():
+            msg = "File " + str(self.datacite_fn) + " could not be found"
+            lgr.warning(msg)
+            return
         # Read metadata from file
         with open(self.datacite_fn, "rt") as input_stream:
             metadata_object = yaml.safe_load(input_stream)
+        # try:
+        #     with open(self.datacite_fn, "rt") as input_stream:
+        #         metadata_object = yaml.safe_load(input_stream)
+        #         print(metadata_object)
+        # except FileNotFoundError:
+        #     msg = "file " + self.datacite_fn + " could not be opened"
+            
+        #     yield {
+        #         "status": "error",
+        #         "metadata": {},
+        #         "type": "dataset",
+        #         "message": msg
+        #     }
+        #     return
+        # except yaml.YAMLError as e:
+        #     yield {
+        #         "status": "error",
+        #         "metadata": {},
+        #         "type": "dataset",
+        #         "message": "YAML parsing failed with: " + str(e)
+        #     }
+        #     return
+
         # Write metadata fields into new dict
         metadata = {k: v for k, v in metadata_object.items()}
         return self._get_dsmeta(metadata)
