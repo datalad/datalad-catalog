@@ -72,7 +72,7 @@
 
     <!-- Template for dataset page -->
     <script type="text/x-template" id="dataset-template">
-      <div v-if="dataset_ready">
+      <div v-if="display_ready">
         <b-card border-variant="dark">
           <b-card-body>
             <b-card-title>
@@ -81,7 +81,7 @@
               <span v-else><a @click="gotoHome" class="newlink"><i class="fas fa-home"></i></a>{{displayData.display_name}}</span> -->
             </b-card-title> <!-- &mldr; -->
             <b-card-sub-title class="mb-2">
-              <span v-for="(author, index) in selectedDataset.authors">{{author.givenName}} {{author.familyName}}<span v-if="index != selectedDataset.authors.length - 1">, </span></span>
+              <span v-for="(author, index) in selectedDataset.authors"><span v-if="author.givenName">{{author.givenName}} {{author.familyName}}</span><span v-else>{{author.name}}</span><span v-if="index != selectedDataset.authors.length - 1">, </span></span>
             </b-card-sub-title>
             <b-card-text>
               <strong>Version:</strong> {{selectedDataset.dataset_version.substring(0,7)}}&nbsp;
@@ -251,8 +251,12 @@
                             <span class="xxlfont"><i class="fas fa-database"></i></span>
                           </b-col>
                           <b-col class="text-muted" md="7">
-                            <h5><a @click="selectDataset(ds, ds.dataset_id)" class="stretched-link">{{ds.dirs_from_path.at(-1)}}</a></h5>
-                            <span v-for="(author, index) in ds.authors"><small>{{author.givenName}} {{author.familyName}}<span v-if="index != ds.authors.length - 1">, </span></small></span>
+                            <h5><a @click="console.log('fromhtml'); console.log(ds); selectDataset(ds)" class="stretched-link">{{ds.dirs_from_path.at(-1)}}</a></h5>
+                            <span v-for="(author, index) in ds.authors">
+                              <small>
+                                <span v-if="author.givenName">{{author.givenName}} {{author.familyName}}</span><span v-else>{{author.name}}</span><span v-if="index != ds.authors.length - 1">, </span>
+                              </small>
+                            </span>
                             <b-card-text>
                               <small>
                                 <strong>Version:</strong> {{ds.dataset_version.substring(0,7)}}&nbsp;
@@ -317,7 +321,9 @@
                         </b-col>
                         <b-col class="text-muted" md="8">
                           <h5>{{pub.headline}}</h5>
-                          <small><span v-for="(author, index) in pub.author">{{author.givenName}} {{author.familyName}}<span v-if="index != pub.author.length - 1">, </span></span></small><br>
+                          <small>
+                            <span v-for="(author, index) in pub.author"><span v-if="author.givenName">{{author.givenName}} {{author.familyName}}</span><span v-else>{{author.name}}</span><span v-if="index != pub.author.length - 1">, </span></span>
+                          </small><br>
                         </b-col>
                         <b-col md="3">
                           <small>

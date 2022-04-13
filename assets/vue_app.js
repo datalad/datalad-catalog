@@ -114,6 +114,8 @@ const datasetView = {
       subdatasets:[],
       subdatasets_ready: false,
       dataset_ready: false,
+      display_ready: false,
+      displayData: {},
       files_ready: false,
       tags_ready: false,
     };
@@ -141,12 +143,11 @@ const datasetView = {
         this.tags_ready = true;
       }
     },
-  },
-  computed: {
-    displayData: function () {
+    dataset_ready: function (newVal, oldVal) {
       // TODO: some of these methods/steps should be moved to the generatpr tool. e.g. shortname
-      if (this.dataset_ready) {
+      if (newVal) {
         dataset = this.selectedDataset;
+        console.log(this.selectedDataset)
         disp_dataset = {};
         // Populate short_name
         if (!dataset.hasOwnProperty("short_name") || !dataset["short_name"]) {
@@ -156,15 +157,6 @@ const datasetView = {
         }
         disp_dataset["display_name"] = ' - ' + disp_dataset["short_name"]
       
-        // Display breadcrums and dataset name
-        // if (dataset.hasOwnProperty("root_dataset_id")) {
-        //   disp_dataset["display_name"] = ' / ' + dataset["dataset_path"].replace('/', ' / ');
-        //   disp_dataset["root_dataset"] = false;
-        //   // this.dataPath.push(dataset.short_name);
-        // } else {
-        //   disp_dataset["display_name"] = ' - ' + dataset["short_name"]
-        //   disp_dataset["root_dataset"] = true;
-        // }
         // DOI
         if (!dataset.hasOwnProperty("doi") || !dataset["doi"]) {
           disp_dataset["doi"] = "not available"
@@ -192,9 +184,17 @@ const datasetView = {
           disp_dataset.url = dataset.url[0];
         }
 
-        return disp_dataset
+        this.displayData = disp_dataset;
+        this.display_ready = true;
+
+        console.log(this.displayData)
       }
-    },
+    }
+  },
+  computed: {
+    // displayData: function () {
+      
+    // },
     filteredSubdatasets() {
       all_subdatasets = this.subdatasets.filter(obj => obj.available == "true")
       return all_subdatasets.filter(c => {
@@ -245,10 +245,18 @@ const datasetView = {
         this.showCopyTooltip = false;
       }, 1000);
     },
-    selectDataset(obj, objId) {
-      id_and_version = obj.dataset_id + '-' + obj.dataset_version;
-      hash = md5(id_and_version);
-      router.push({ name: 'dataset', params: { blobId: hash } })
+    async selectDataset(obj) {
+      file = getFilePath(obj.dataset_id, obj.dataset_version, obj.path)
+      fileExists = await checkFileExists(file);
+      if (fileExists) {
+        router.push({ name: 'dataset', params: { dataset_id: obj.dataset_id, dataset_version: obj.dataset_version} })
+      }
+      else {
+        console.log(this.$root.subNotAvailable)
+        this.$root.$emit('bv::show::modal', 'modal-3', '#btnShow')
+        // this.$root.subNotAvailable = true;
+        // alert("Subdataset not currently available in catalog")
+      }
     },
     gotoHome() {
       router.push({ name: 'home'})
@@ -347,6 +355,8 @@ const datasetView = {
   async beforeRouteUpdate(to, from, next) {
     this.tabIndex = 0;
     this.subdatasets_ready = false;
+    this.dataset_ready = false;
+
     file = getFilePath(to.params.dataset_id, to.params.dataset_version, null)
     // file = metadata_dir + '/' + to.params.blobId + '.json';
     response = await fetch(file);
