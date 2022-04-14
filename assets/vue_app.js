@@ -396,7 +396,7 @@ const datasetView = {
       // console.log(this.tag_options)
     }
     else {
-      this.subdatasets_ready
+      this.subdatasets_ready = true;
     }
     next();
   },

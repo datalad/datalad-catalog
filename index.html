@@ -195,7 +195,7 @@
                   <i class="fas fa-list-ol"></i> Subdatasets
                 </template>
                 <span v-if="subdatasets_ready">
-                  <span v-if="!subdatasets || !subdatasets.length"><em>There are no subdatasets listed for the current dataset</em></span>
+                  <span v-if="!sortedSubdatasets || !sortedSubdatasets.length"><em>There are no subdatasets listed for the current dataset</em></span>
                   <span v-else>
                     <b-form>
                       <b-row>
@@ -288,18 +288,21 @@
                 <template v-slot:title>
                   <i class="far fa-folder"></i> Files
                 </template>
-                <b-card no-body class="p-2">
-                  <span v-if="files_ready">
-                    <ul>
-                      <tree-item class="item" v-for="item in selectedDataset.tree" :item="item"></tree-item>
-                    </ul>
-                  </span>
-                  <span v-else>
-                    <div class="d-flex justify-content-center mb-3">
-                      <b-spinner label="Loading..."></b-spinner>
-                    </div>
-                  </span>
-                </b-card>
+                <span v-if="!selectedDataset.tree || !selectedDataset.tree.length"><em>There are no files listed for the current dataset</em></span>
+                <span v-else>
+                  <b-card no-body class="p-2">
+                    <span v-if="files_ready">
+                      <ul>
+                        <tree-item class="item" v-for="item in selectedDataset.tree" :item="item"></tree-item>
+                      </ul>
+                    </span>
+                    <span v-else>
+                      <div class="d-flex justify-content-center mb-3">
+                        <b-spinner label="Loading..."></b-spinner>
+                      </div>
+                    </span>
+                  </b-card>
+                </span>
                 <b-modal id="modal-3" size="md"
                 header-bg-variant="light"
                 footer-bg-variant="light"
