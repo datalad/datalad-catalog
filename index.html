@@ -87,6 +87,7 @@
             <!-- DATASET VERSION ETC -->
             <b-card-text>
               <strong>Version:</strong> {{selectedDataset.dataset_version.substring(0,7)}}&nbsp;
+              <strong>Metadata extracted:</strong> {{displayData.metadata_extracted}}&nbsp;
               <strong>DOI:</strong> <a v-show="selectedDataset.doi" :href="selectedDataset.doi" target="_blank">{{selectedDataset.doi.replace("https://doi.org/", "")}}</a><span v-show="displayData.doi"><em>{{displayData.doi}}</em></span>&nbsp;
               <strong>License:</strong> <a v-show="selectedDataset.license.name" :href="selectedDataset.license.url" target="_blank">{{selectedDataset.license.name}}</a><span v-show="displayData.license"><em>{{displayData.license}}</em></span>&nbsp;
             </b-card-text>

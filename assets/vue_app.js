@@ -165,8 +165,9 @@ const datasetView = {
         if (!dataset.hasOwnProperty("license") || !dataset["license"].hasOwnProperty("name") || !dataset["license"]["name"]) {
           disp_dataset["license"] = "not available"
         }
-        // Extracted time
-        disp_dataset.metadata_extracted = this.getDateFromUTCseconds(dataset.extraction_time);
+        // Latest extracted time
+        sorted_extractors = dataset.extractors_used.sort((a, b) => b.extraction_time - a.extraction_time)
+        disp_dataset.metadata_extracted = this.getDateFromUTCseconds(sorted_extractors[0].extraction_time);
         // ID and version
         id_and_version = dataset.dataset_id + '-' + dataset.dataset_version;
         disp_dataset.hash = md5(id_and_version);
@@ -373,7 +374,8 @@ const datasetView = {
       subds_json.forEach(
         (subds, index) => {
           if (subds_json[index] != "unavailable") {
-            this.$root.selectedDataset.subdatasets[index].extraction_time = subds_json[index].extraction_time;
+            sorted_extractors = subds_json[index].extractors_used.sort((a, b) => b.extraction_time - a.extraction_time)
+            this.$root.selectedDataset.subdatasets[index].extraction_time = sorted_extractors[0].extraction_time;
             this.$root.selectedDataset.subdatasets[index].name = subds_json[index].name;
             this.$root.selectedDataset.subdatasets[index].short_name = subds_json[index].short_name;
             this.$root.selectedDataset.subdatasets[index].doi = subds_json[index].doi;
@@ -411,7 +413,8 @@ const datasetView = {
     subds_json.forEach(
       (subds, index) => {
         if (subds_json[index] != "unavailable") {
-          this.$root.selectedDataset.subdatasets[index].extraction_time = subds_json[index].extraction_time;
+          sorted_extractors = subds_json[index].extractors_used.sort((a, b) => b.extraction_time - a.extraction_time)
+          this.$root.selectedDataset.subdatasets[index].extraction_time = sorted_extractors[0].extraction_time;
           this.$root.selectedDataset.subdatasets[index].name = subds_json[index].name;
           this.$root.selectedDataset.subdatasets[index].short_name = subds_json[index].short_name;
           this.$root.selectedDataset.subdatasets[index].doi = subds_json[index].doi;
