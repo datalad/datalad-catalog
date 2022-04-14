@@ -156,7 +156,6 @@ const datasetView = {
           disp_dataset["short_name"] = dataset["short_name"]
         }
         disp_dataset["display_name"] = ' - ' + disp_dataset["short_name"]
-      
         // DOI
         if (!dataset.hasOwnProperty("doi") || !dataset["doi"]) {
           disp_dataset["doi"] = "not available"
@@ -168,9 +167,10 @@ const datasetView = {
         // Latest extracted time
         sorted_extractors = dataset.extractors_used.sort((a, b) => b.extraction_time - a.extraction_time)
         disp_dataset.metadata_extracted = this.getDateFromUTCseconds(sorted_extractors[0].extraction_time);
-        // ID and version
-        id_and_version = dataset.dataset_id + '-' + dataset.dataset_version;
-        disp_dataset.hash = md5(id_and_version);
+        // ID, version and location
+        disp_dataset.file_path = 'metadata/' + getRelativeFilePath(dataset.dataset_id, dataset.dataset_version, null)
+        disp_dataset.id_and_version = dataset.dataset_id + '_' + dataset.dataset_version;
+        disp_dataset.download_filename = 'dataset_' + disp_dataset.id_and_version + '.json'
         // URL
         disp_dataset.is_github = false; // Github / gitlab / url / binder
         disp_dataset.is_gitlab = false; // Github / gitlab / url / binder
@@ -597,6 +597,22 @@ function getFilePath(dataset_id, dataset_version, path) {
   blob_parts = [blob.substring(0, SPLIT_INDEX), blob.substring(SPLIT_INDEX)];
   file = file + '/' + blob_parts[0] + '/' + blob_parts[1] + '.json';
   return file
+}
+
+function getRelativeFilePath(dataset_id, dataset_version, path) {
+  // Get node file location from  dataset id, dataset version, and node path
+  // (using a file system structure similar to RIA stores), relative to metadata
+  // directory.
+
+  file_path = dataset_id + '/' + dataset_version;
+  blob = dataset_id + '-' + dataset_version;
+  if (path) {
+    blob = blob + '-' + path;
+  }
+  blob = md5(blob);
+  blob_parts = [blob.substring(0, SPLIT_INDEX), blob.substring(SPLIT_INDEX)];
+  file_path = file_path + '/' + blob_parts[0] + '/' + blob_parts[1] + '.json';
+  return file_path
 }
 
 async function checkFileExists(url) {
