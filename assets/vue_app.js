@@ -51,8 +51,8 @@ Vue.component("tree-item", {
         this.isOpen = !this.isOpen;
       }
     },
-    async selectDataset(obj, objId) {
-      file = getFilePath(obj.dataset_id, obj.dataset_version, obj.path)
+    async selectDataset(obj) {
+      file = getFilePath(obj.dataset_id, obj.dataset_version, '')
       fileExists = await checkFileExists(file);
       if (fileExists) {
         router.push({ name: 'dataset', params: { dataset_id: obj.dataset_id, dataset_version: obj.dataset_version} })
