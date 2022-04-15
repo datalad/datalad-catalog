@@ -118,6 +118,8 @@ const datasetView = {
       displayData: {},
       files_ready: false,
       tags_ready: false,
+      description_ready: false,
+      description_display: ''
     };
   },
   watch: {
@@ -184,11 +186,19 @@ const datasetView = {
         if (!disp_dataset.url) {
           disp_dataset.url = dataset.url[0];
         }
-
+        // Description
+        if (dataset.hasOwnProperty("descriptions") && dataset["descriptions"].length>0) {
+          disp_dataset.descriptions = dataset.descriptions;
+          disp_dataset.selected_description = disp_dataset.descriptions.find(obj => {return obj.priority === 1});
+          if (!disp_dataset.selected_description) {
+            disp_dataset.selected_description = disp_dataset.descriptions[0];
+          }
+          this.selectDescription(disp_dataset.selected_description)
+        }
         this.displayData = disp_dataset;
         this.display_ready = true;
 
-        console.log(this.displayData)
+        // console.log(this.displayData)
       }
     }
   },
@@ -257,6 +267,24 @@ const datasetView = {
         this.$root.$emit('bv::show::modal', 'modal-3', '#btnShow')
         // this.$root.subNotAvailable = true;
         // alert("Subdataset not currently available in catalog")
+      }
+    },
+    selectDescription(desc) {
+      if (desc.type == "file") {
+        this.description_ready = false;
+        extension = '.' + desc.path.split(".")[1];
+        desc_file = getFilePath(this.selectedDataset.dataset_id, this.selectedDataset.dataset_version, desc.path, extension)
+        fetch(desc_file)
+          .then(response => response.blob())
+          .then(blob => blob.text())
+          .then(markdown => {
+            this.description_display = marked.parse(markdown);
+            this.description_ready = true;
+          });
+      }
+      else {
+        this.description_display = desc.content;
+        this.description_ready = true;
       }
     },
     gotoHome() {
@@ -584,7 +612,7 @@ async function grabSubDatasets(app) {
 }
 
 
-function getFilePath(dataset_id, dataset_version, path) {
+function getFilePath(dataset_id, dataset_version, path, ext='.json') {
   // Get node file location from  dataset id, dataset version, and node path
   // using a file system structure similar to RIA stores
 
@@ -595,7 +623,7 @@ function getFilePath(dataset_id, dataset_version, path) {
   }
   blob = md5(blob);
   blob_parts = [blob.substring(0, SPLIT_INDEX), blob.substring(SPLIT_INDEX)];
-  file = file + '/' + blob_parts[0] + '/' + blob_parts[1] + '.json';
+  file = file + '/' + blob_parts[0] + '/' + blob_parts[1] + ext;
   return file
 }
 
