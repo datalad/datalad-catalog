@@ -178,11 +178,18 @@ const datasetView = {
         // ID and version
         id_and_version = dataset.dataset_id + '-' + dataset.dataset_version;
         disp_dataset.hash = md5(id_and_version);
-        // Github / gitlab / url / binder
-        disp_dataset.is_github = false;
-        disp_dataset.is_gitlab = false;
-        if (dataset.url.toLowerCase().indexOf("github") >= 0) {
-          disp_dataset.is_github = true;
+        // URL
+        disp_dataset.is_github = false; // Github / gitlab / url / binder
+        disp_dataset.is_gitlab = false; // Github / gitlab / url / binder
+        disp_dataset.url = ''
+        for (var i = 0; i < dataset.url.length; i++) { 
+          if (dataset.url[i].toLowerCase().indexOf("github") >= 0) {
+            disp_dataset.is_github = true;
+            disp_dataset.url = dataset.url[i];
+          }
+        }
+        if (!disp_dataset.url) {
+          disp_dataset.url = dataset.url[0];
         }
 
         return disp_dataset
