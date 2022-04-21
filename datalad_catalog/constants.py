@@ -1,11 +1,12 @@
-# A module to store all constants (mostly field names of metalad extractors)
-
+# A module to store all constants
 ATGRAPH="@graph"
 ATID="@id"
 ATLIST="@list"
 ATTYPE="@type"
 AUTHOR="author"
 AUTHORS="authors"
+CATALOG="catalog"
+CHILDREN="children"
 CONTENTBYTESIZE="contentbytesize"
 CREATIVEWORK="CreativeWork"
 DESCRIPTION="description"
@@ -25,6 +26,7 @@ EXTRACTOR_CORE_DATASET="metalad_core_dataset" # older version; core is newer ver
 EXTRACTOR_NAME="extractor_name"
 EXTRACTOR_STUDYMINIMETA="metalad_studyminimeta"
 EXTRACTOR_VERSION="extractor_version"
+EXTRACTORS="extractors"
 HASPART="hasPart"
 IDENTIFIER="identifier"
 NAME="name"

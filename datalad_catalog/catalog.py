@@ -25,6 +25,10 @@ from typing import (
 from .webcatalog import WebCatalog, Node
 from .translator import Translator
 from .utils import read_json_file
+from .meta_item import MetaItem
+from jsonschema import ValidationError
+
+from datalad_catalog import utils
 
 # Create named logger
 lgr = logging.getLogger("datalad.catalog.catalog")
@@ -146,6 +150,10 @@ class Catalog(Interface):
             [type]: [description]
         """
 
+        # TODO: check if schema is valid
+        # Draft202012Validator.check_schema(schema)
+        
+
         # Error out if `catalog_dir` argument was not supplied
         if catalog_dir is None:
             err_msg = f"No catalog directory supplied: Datalad catalog can only operate on a path to a directory. Argument: -c, --catalog_dir."
@@ -225,6 +233,7 @@ def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
 
     # Then we need to do the following:
     # 1. establish input type (file, file-with-json-array, file-with-json-lines, command line stdout / stream)
+    
     #    - for now: assume file-with-json-array (data exported by `datalad meta-dump` and all exported objects added to an array in file)
     # 2. instantiate translator
     # 3. read input based on type
@@ -236,30 +245,34 @@ def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
 
     # TODO: Establish input type
     # 3. Read input
-    metadata = read_json_file(metadata)
+    # metadata = read_json_file(metadata)
     # This metadata should be the dataset and file level metadata of a single dataset
     # TODO: insert checks to verify this
-    # TODO: decide whether to allow metadata dictionaries from multiple datasets
-    for meta_count, meta_dict in enumerate(metadata):
-        # TODO: raise exception here if meta_dict does not contain a minimal 
-        # set of keys/values that identifies it as a metalad metadata object
-        Translator(catalog, meta_dict)
+    # TODO: decide whether to allow metadata dictionaries from multiple datasets    
+
+    with open(metadata) as file:
+        for line in file:
+            # meta_dict = line.rstrip()
+            meta_dict = json.loads(line.rstrip())
+
+            # Check if item/line is a dict
+            if not isinstance(meta_dict, dict):
+                err_msg = f"Metadata item not of type dict: metadata items should be passed to datalad catalog as JSON objects adhering to the catalog schema."
+                lgr.warning(err_msg)
+                # raise TypeError(err_msg)
+            # Validate dict against catalog schema
+            # try:
+            #     catalog.VALIDATOR.validate(meta_dict)
+            # except ValidationError as e:
+            #     err_msg = f"Schema validation failed: {e}"
+            #     raise ValidationError(err_msg) from e
+            # If validation passed, translate into catalog files
+            MetaItem(catalog, meta_dict)
+            # Translator(catalog, meta_dict)
     
 
     # TODO: should we write all files here?
     # Set parent catalog of orphans
-    # orphans = [Node._instances[inst] for inst in Node._instances
-    #            if not hasattr(Node._instances[inst], 'parent_catalog')
-    #            or not Node._instances[inst].parent_catalog]
-    # orphans = [Node._instances[inst] for inst in Node._instances if not hasattr(Node._instances[inst], 'parent_catalog') or not Node._instances[inst].parent_catalog]
-    # orphans2 = [inst for inst in Node._instances if not hasattr(Node._instances[inst], 'parent_catalog') or not Node._instances[inst].parent_catalog]
-    # print("DO SOME STUFF")
-    # Node._instances['b46d0df301aba80e1561f589b8445844'].parent_catalog = catalog
-    # for orphan in orphans:
-    #     orphan.parent_catalog = catalog
-    # If the accompanying metafile does not exist:
-    # - create it
-
     orphans = [Node._instances[inst] for inst in Node._instances if not hasattr(Node._instances[inst], 'parent_catalog') or not Node._instances[inst].parent_catalog]
     for orphan in orphans:
         orphan.parent_catalog = catalog
