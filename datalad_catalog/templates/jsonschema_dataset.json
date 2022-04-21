@@ -53,7 +53,7 @@
       },
       "required": ["name"]
     },
-    "authors": { "$ref": "file:///Users/jsheunis/Documents/psyinf/datalad-catalog/datalad_catalog/templates/jsonschema_authors.json"},
+    "authors": { "$ref": "https://datalad.org/catalog.authors.schema.json"},
     "keywords": {
       "description": "Tags or keywords describing the dataset",
       "type": "array",
@@ -111,7 +111,7 @@
             "description": "The publication outlet / venue, such as the journal, publisher name, or news outlet",
             "type": "string"
           },
-          "authors": { "$ref": "file:///Users/jsheunis/Documents/psyinf/datalad-catalog/datalad_catalog/templates/jsonschema_authors.json"}
+          "authors": { "$ref": "https://datalad.org/catalog.authors.schema.json"}
         },
         "required": ["title", "doi", "authors"]
       },
@@ -140,8 +140,47 @@
       },
       "uniqueItems": true
     },
-    "children": {"$ref": "file:///Users/jsheunis/Documents/psyinf/datalad-catalog/datalad_catalog/templates/jsonschema_children.json"},
-    "extractors_used": {"$ref": "file:///Users/jsheunis/Documents/psyinf/datalad-catalog/datalad_catalog/templates/jsonschema_extractors.json"}
+    "children": {"$ref": "https://datalad.org/catalog.children.schema.json"},
+    "extractors_used": {"$ref": "https://datalad.org/catalog.extractors.schema.json"},
+    "additional_display": {
+      "description": "Additonal items to display in tabs on dataset page",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the section that will appear as the tab name",
+            "type": "string"
+          },
+          "content": {
+            "description": "The content that will appear in the tab when opened, specified as key-value pairs",
+            "type": "object"
+          }
+        },
+        "required": ["name", "content"]
+      },
+      "uniqueItems": true
+    },
+    "top_display": {
+      "description": "Additonal items to display at the top of the dataset page (along with keywords, description, etc)",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the item that will appear as part of the top display",
+            "type": "string"
+          },
+          "value": {
+            "description": "Value of the item that will appear as part of the top display",
+            "type": ["number", "string"]
+          }
+        },
+        "required": ["name", "value"]
+      },
+      "uniqueItems": true,
+      "maxItems": 5
+    }
   },
   "required": [ "type", "dataset_id", "dataset_version", "name"]
 }

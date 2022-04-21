@@ -9,7 +9,7 @@
     "properties": {
       "type": {
         "description": "The type of child",
-        "type": {"enum": ["file", "directory", "dataset"]}
+        "type": "string"
       },
       "dataset_id": {
         "description": "The parent dataset ID, if type is file or directory. Otherwise dataset ID.",
@@ -35,7 +35,7 @@
         "description": "If type is file: size of file in bytes",
         "type": "integer"
       },
-      "extractors_used": {"$ref": "file:///Users/jsheunis/Documents/psyinf/datalad-catalog/datalad_catalog/templates/jsonschema_extractors.json"}
+      "extractors_used": {"$ref": "https://datalad.org/catalog.extractors.schema.json"}
     },
     "required": ["type", "dataset_id", "dataset_version", "name", "path"]
   },
