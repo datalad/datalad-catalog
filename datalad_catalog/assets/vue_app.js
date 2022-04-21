@@ -99,6 +99,7 @@ const datasetView = {
     return {
       dataPath: [],
       showCopyTooltip: false,
+      showCopyCiteTooltip: false,
       tabIndex: 0,
       sort_name: true,
       sort_modified: true,
@@ -119,7 +120,10 @@ const datasetView = {
       files_ready: false,
       tags_ready: false,
       description_ready: false,
-      description_display: ''
+      description_display: '',
+      citation_busy: false,
+      citation_text: '',
+      invalid_doi: false
     };
   },
   watch: {
@@ -256,6 +260,20 @@ const datasetView = {
         this.showCopyTooltip = false;
       }, 1000);
     },
+    copyCitationText(index) {
+      // https://stackoverflow.com/questions/60581285/execcommand-is-now-obsolete-whats-the-alternative
+      // https://www.sitepoint.com/clipboard-api/
+      selectText = document.getElementById("citation").textContent;
+      navigator.clipboard.writeText(selectText)
+        .then(() => { })
+        .catch((error) => { alert(`Copy failed! ${error}`) })
+        this.showCopyCiteTooltip = true;
+    },
+    hideCiteTooltipLater() {
+      setTimeout(() => {
+        this.showCopyCiteTooltip = false;
+      }, 1000);
+    },
     async selectDataset(obj) {
       file = getFilePath(obj.dataset_id, obj.dataset_version, obj.path)
       fileExists = await checkFileExists(file);
@@ -379,6 +397,27 @@ const datasetView = {
       obj = JSON.parse(text);
       this.$root.selectedDataset.tree = obj["children"]
       this.files_ready = true;
+    },
+    getCitationText(doi = '') {
+      if (!this.selectedDataset.citation_text) {
+        if (doi && doi.includes('https://doi.org/')) {
+          this.invalid_doi = false;
+          this.citation_busy = true;
+          const headers = {
+            'Accept': 'text/x-bibliography; style=apa'
+          };
+          fetch(doi, { headers })
+              .then(response => response.text())
+              .then(data => {
+                this.selectedDataset.citation_text = data;
+                console.log(data)
+                this.citation_busy = false;
+              });
+        }
+        else {
+          this.invalid_doi = true;
+        }
+      }
     }
   },
   async beforeRouteUpdate(to, from, next) {
@@ -659,25 +698,8 @@ async function checkFileExists(url) {
 
 
 
-// async function thisThrows() {
-//   throw new Error("Thrown from thisThrows()");
-// }
 
-// async function myFunctionThatCatches() {
-//   try {
-//       return await thisThrows(); // <-- Notice we added here the "await" keyword.
-//   } catch (e) {
-//       console.error(e);
-//   } finally {
-//       console.log('We do cleanup here');
-//   }
-//   return "Nothing found";
-// }
 
-// async function run() {
-//   const myValue = await myFunctionThatCatches();
-//   console.log(myValue);
-// }
 
 /*
 TODO: use emit!!
