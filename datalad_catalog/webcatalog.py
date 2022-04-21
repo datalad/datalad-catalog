@@ -1,11 +1,12 @@
 import sys
 import json
-from abc import ABC, abstractmethod
 from pathlib import Path
 import shutil
 import hashlib
 from . import constants as cnst
 import logging
+from .utils import read_json_file
+from jsonschema import Draft202012Validator, RefResolver
 lgr = logging.getLogger('datalad.catalog.webcatalog')
 
 # PSEUDOCODE/WORKFLOW:
@@ -26,11 +27,32 @@ lgr = logging.getLogger('datalad.catalog.webcatalog')
 #   - loops through meta_objects in incoming stream/file:
 #       - handles individual objects via class Translator
 
-# TODO: should webcatalog be a subclass of datalad dataset?
+CATALOG_SCHEMA_IDS = {
+    cnst.CATALOG: "https://datalad.org/catalog.schema.json",
+    cnst.TYPE_DATASET: "https://datalad.org/catalog.dataset.schema.json",
+    cnst.TYPE_FILE: "https://datalad.org/catalog.file.schema.json",
+    cnst.AUTHORS: "https://datalad.org/catalog.authors.schema.json",
+    cnst.CHILDREN: "https://datalad.org/catalog.children.schema.json",
+    cnst.EXTRACTORS: "https://datalad.org/catalog.extractors.schema.json"
+}
+
 class WebCatalog(object):
     """
     The main catalog class.
     """
+
+    # Get package-related paths
+    package_path = Path(__file__).resolve().parent
+    templates_path = package_path / 'templates'
+    # Set up schema store and validator
+    SCHEMA_STORE = {}
+    for schema_type, schema_id in CATALOG_SCHEMA_IDS.items():
+        schema_path = templates_path / f"jsonschema_{schema_type}.json"
+        schema = read_json_file(schema_path)
+        SCHEMA_STORE[schema['$id']] = schema
+    CATALOG_SCHEMA = SCHEMA_STORE[CATALOG_SCHEMA_IDS[cnst.CATALOG]]
+    RESOLVER = RefResolver.from_schema(CATALOG_SCHEMA, store=SCHEMA_STORE)
+    VALIDATOR = Draft202012Validator(CATALOG_SCHEMA, resolver=RESOLVER)
 
     def __init__(self, location: str, main_id: str = None, main_version: str = None, force=False) -> None:
         self.location = Path(location)
@@ -225,8 +247,12 @@ class Node(object):
         """"""
         for key in new_attributes.keys():
             if hasattr(self, key):
-                if overwrite:
-                    message = (f"Node instance already has an attribute '{key}'. Overwriting attribute value."
+                # Only overwrite if flag is True AND the new property actually has content
+                # This prevents existing content from being overwritten by empty arrays/dicts
+                # TODO: this should be replaced by the enhancement to allow multiple sources of
+                # content (i.e. from multiple extractors) for the same attribute.
+                if overwrite and bool(new_attributes[key]):
+                    message = (f"Node instance already has an attribute '{key}'. Overwriting attribute value with non-zero/null content."
                         "To prevent overwriting, set 'overwrite' argument to False")
                     lgr.warning(message)
                     setattr(self, key, new_attributes[key])
@@ -260,6 +286,32 @@ class Node(object):
             self.extractors_used.append(extractor_dict)
         else:
             pass
+
+    def write_to_file(self):
+        """"""
+        parent_path = self.get_location().parents[0]
+        fn = self.get_location()
+        created = self.is_created()
+
+        # if hasattr(self, 'node_path') and self.type != 'dataset':
+        #     setattr(self, 'path', str(self.node_path))
+        # if hasattr(self, 'node_path') and self.type == 'directory':
+        #     setattr(self, 'name', self.node_path.name)
+        
+        meta_dict = vars(self)
+        keys_to_pop = ['node_path', 'long_name', 'md5_hash', 'file_name', 'parent_catalog']
+        for key in keys_to_pop:
+            meta_dict.pop(key, None)
+
+        if not created:
+            parent_path.mkdir(parents=True, exist_ok=True)
+            with open(fn, 'w') as f:
+                json.dump(vars(self), f)
+        else:
+            with open(fn, "r+") as f:
+                f.seek(0)
+                json.dump(vars(self), f)
+                f.truncate()
 
 
 def getNode(type, dataset_id, dataset_version, path=None):
