@@ -19,3 +19,4 @@ build/
 dist/
 _old
 _scratch
+.pytest_cache
