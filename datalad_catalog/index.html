@@ -345,59 +345,63 @@
                 </b-modal>
               </b-tab>
               <!-- PUBLICATIONS -->
-              <b-tab>
-                <template v-slot:title>
-                  <i class="fas fa-book"></i> Publications
-                </template>
-                <span v-if="!selectedDataset.publications || !selectedDataset.publications.length"><em>There are no publications listed for the current dataset</em></span>
-                <span v-else v-for="pub in selectedDataset.publications">
-                  <b-card border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
-                    <template v-slot:header>
-                      <b-row no-gutters>
-                        <b-col align-h="center" align-v="center" md="1">
-                          <span class="xxlfont"><i class="fas fa-book "></i></span>
-                        </b-col>
-                        <b-col class="text-muted" md="8">
-                          <h5>{{pub.headline}}</h5>
-                          <small>
-                            <span v-for="(author, index) in pub.author"><span v-if="author.givenName">{{author.givenName}} {{author.familyName}}</span><span v-else>{{author.name}}</span><span v-if="index != pub.author.length - 1">, </span></span>
-                          </small><br>
-                        </b-col>
-                        <b-col md="3">
-                          <small>
-                            Published: {{pub.datePublished}} <br>
-                            DOI: <span v-if="pub.doi"><a :href="pub.doi" target="_blank">{{pub.doi.replace("https://doi.org/", "")}}</a></span> <br>
-                            Journal: {{pub.publication.name}}
-                          </small>
-                        </b-col>
-                      </b-row>
-                    </template>
-                  </b-card>
-                </span>
-              </b-tab>
+              <span v-if="selectedDataset.publications && selectedDataset.publications.length">
+                <b-tab>
+                  <template v-slot:title>
+                    <i class="fas fa-book"></i> Publications
+                  </template>
+                  <span v-if="!selectedDataset.publications || !selectedDataset.publications.length"><em>There are no publications listed for the current dataset</em></span>
+                  <span v-else v-for="pub in selectedDataset.publications">
+                    <b-card border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
+                      <template v-slot:header>
+                        <b-row no-gutters>
+                          <b-col align-h="center" align-v="center" md="1">
+                            <span class="xxlfont"><i class="fas fa-book "></i></span>
+                          </b-col>
+                          <b-col class="text-muted" md="8">
+                            <h5>{{pub.headline}}</h5>
+                            <small>
+                              <span v-for="(author, index) in pub.author"><span v-if="author.givenName">{{author.givenName}} {{author.familyName}}</span><span v-else>{{author.name}}</span><span v-if="index != pub.author.length - 1">, </span></span>
+                            </small><br>
+                          </b-col>
+                          <b-col md="3">
+                            <small>
+                              Published: {{pub.datePublished}} <br>
+                              DOI: <span v-if="pub.doi"><a :href="pub.doi" target="_blank">{{pub.doi.replace("https://doi.org/", "")}}</a></span> <br>
+                              Journal: {{pub.publication.name}}
+                            </small>
+                          </b-col>
+                        </b-row>
+                      </template>
+                    </b-card>
+                  </span>
+                </b-tab>
+              </span>
               <!-- FUNDING -->
-              <b-tab>
-                <template v-slot:title>
-                  <i class="fas fa-dollar-sign"></i> Funding
-                </template>
-                <span v-if="!selectedDataset.funding || !selectedDataset.funding.length"><em>There are no funding sources listed for the current dataset</em></span>
-                <span v-else v-for="fund in selectedDataset.funding">
-                  <b-card border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
-                    <template v-slot:header>
-                      <b-row no-gutters>
-                        <b-col align-h="center" align-v="center" md="1">
-                          <span class="xxlfont"><i class="fas fa-dollar-sign "></i></span>
-                        </b-col>
-                        <b-col class="text-muted" md="11">
-                          <h5><span v-if="fund.name">{{fund.name}}</span><span v-else><em>(fund name missing)</em></span></h5>
-                          <small><strong>Grant identifier:</strong> {{fund["grant"]}}<br><strong>Description:</strong> {{fund["description"]}}</small><br>
-                        </b-col>
-                        </b-col>
-                      </b-row>
-                    </template>
-                  </b-card>
-                </span>
-              </b-tab>
+              <span v-if="selectedDataset.funding && selectedDataset.funding.length">
+                <b-tab>
+                  <template v-slot:title>
+                    <i class="fas fa-dollar-sign"></i> Funding
+                  </template>
+                  <span v-if="!selectedDataset.funding || !selectedDataset.funding.length"><em>There are no funding sources listed for the current dataset</em></span>
+                  <span v-else v-for="fund in selectedDataset.funding">
+                    <b-card border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
+                      <template v-slot:header>
+                        <b-row no-gutters>
+                          <b-col align-h="center" align-v="center" md="1">
+                            <span class="xxlfont"><i class="fas fa-dollar-sign "></i></span>
+                          </b-col>
+                          <b-col class="text-muted" md="11">
+                            <h5><span v-if="fund.name">{{fund.name}}</span><span v-else><em>(fund name missing)</em></span></h5>
+                            <small><strong>Grant identifier:</strong> {{fund["grant"]}}<br><strong>Description:</strong> {{fund["description"]}}</small><br>
+                          </b-col>
+                          </b-col>
+                        </b-row>
+                      </template>
+                    </b-card>
+                  </span>
+                </b-tab>
+              </span>
               <!-- EXTRA TABS -->
               <span v-if="selectedDataset.additional_display && selectedDataset.additional_display.length">
                 <span v-for="new_tab in selectedDataset.additional_display">
