@@ -1,6 +1,6 @@
 {
     "provider": {
-      "module": "datalad_metalad.provider.datasettraverse",
+      "module": "datalad_metalad.pipeline.provider.datasettraverse",
       "class": "DatasetTraverser",
       "name": "traverser",
       "arguments": [],
@@ -8,21 +8,21 @@
     },
     "processors": [
       {
-        "module": "datalad_metalad.processor.extract",
+        "module": "datalad_metalad.pipeline.processor.extract",
         "class": "MetadataExtractor",
         "name": "extractor1",
         "arguments": [],
         "keyword_arguments": {}
       },
       {
-        "module": "datalad_metalad.processor.extract",
+        "module": "datalad_metalad.pipeline.processor.extract",
         "class": "MetadataExtractor",
         "name": "extractor2",
         "arguments": [],
         "keyword_arguments": {}
       },
       {
-        "module": "datalad_metalad.processor.extract",
+        "module": "datalad_metalad.pipeline.processor.extract",
         "class": "MetadataExtractor",
         "name": "extractor3",
         "arguments": [],
