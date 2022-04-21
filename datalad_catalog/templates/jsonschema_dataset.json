@@ -140,7 +140,6 @@
       },
       "uniqueItems": true
     },
-    "children": {"$ref": "https://datalad.org/catalog.children.schema.json"},
     "extractors_used": {"$ref": "https://datalad.org/catalog.extractors.schema.json"},
     "additional_display": {
       "description": "Additonal items to display in tabs on dataset page",
