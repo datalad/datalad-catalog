@@ -1,0 +1,165 @@
+{
+    "dataset_id": "3a8648b3-7df8-413f-8efb-4d39040ac174",
+    "dataset_version": "10e23aafa8271f742e9022a3522d9a88d7fe30cf",
+    "type": "dataset",
+    "children": [],
+    "name": "studyforrest_multires7t",
+    "short_name": "",
+    "description": "\"# An Extension of studyforrest.org Dataset\n\n[![made-with-datalad](https://www.datalad.org/badges/made_with.svg)](https://datalad.org)\n[![PDDL-licensed](https://img.shields.io/badge/license-PDDL-blue.svg)](http://opendatacommons.org/licenses/pddl/summary)\n[![No registration or authentication required](https://img.shields.io/badge/data_access-unrestricted-green.svg)]()\n[![DOI](https://zenodo.org/badge/14167/psychoinformatics-de/studyforrest-data-multires7t.svg)](https://zenodo.org/badge/latestdoi/14167/psychoinformatics-de/studyforrest-data-multires7t)\n\n## Multi-resolution 7T fMRI data on the representation of visual orientation\n\nThis dataset consists of empirical ultra high-field fMRI data recorded at four\nspatial resolutions (0.8 mm, 1.4 mm, 2 mm, and 3 mm isotropic voxel size) for\norientation decoding in visual cortex \u2014 in order to test hypotheses on the\nstrength and spatial scale of orientation discriminating signals. This is an\nextension of the studyforrest project. All seven participants previously\nvolunteered for the audio-only and the audio-visual Forrest Gump study. The\ndataset is compliant with the BIDS data description standard\n(http://bids.neuroimaging.io).  A detailed description can be found in:\n\nSengupta, A., Yakupov, R., Speck, O., Pollmann, S., Hanke, M. *Ultra \nHigh-Field (7 Tesla) multi-resolution fMRI data on the representation\nof visual orientation*. Data in Brief (submitted)\n\nFor more information about the project visit: http://studyforrest.org\n\n## How to obtain the data files\n\nThis repository is a [DataLad](https://www.datalad.org/) dataset. It provides\nfine-grained data access down to the level of individual files, and allows for\ntracking future updates. In order to use this repository for data retrieval,\n[DataLad](https://www.datalad.org/) is required. It is a free and\nopen source command line tool, available for all major operating\nsystems, and builds up on Git and [git-annex](https://git-annex.branchable.com/)\nto allow sharing, synchronizing, and version controlling collections of\nlarge files. You can find information on how to install DataLad at\n[handbook.datalad.org/en/latest/intro/installation.html](http://handbook.datalad.org/en/latest/intro/installation.html).\n\n### Get the dataset\n\nA DataLad dataset can be `cloned` by running\n\n```\ndatalad clone <url>\n```\n\nOnce a dataset is cloned, it is a light-weight directory on your local machine.\nAt this point, it contains only small metadata and information on the\nidentity of the files in the dataset, but not actual *content* of the\n(sometimes large) data files.\n\n### Retrieve dataset content\n\nAfter cloning a dataset, you can retrieve file contents by running\n\n```\ndatalad get <path/to/directory/or/file>\n```\n\nThis command will trigger a download of the files, directories, or\nsubdatasets you have specified.\n\nDataLad datasets can contain other datasets, so called *subdatasets*.\nIf you clone the top-level dataset, subdatasets do not yet contain\nmetadata and information on the identity of files, but appear to be\nempty directories. In order to retrieve file availability metadata in\nsubdatasets, run\n\n```\ndatalad get -n <path/to/subdataset>\n```\n\nAfterwards, you can browse the retrieved metadata to find out about\nsubdataset contents, and retrieve individual files with `datalad get`.\nIf you use `datalad get <path/to/subdataset>`, all contents of the\nsubdataset will be downloaded at once.\n\n### Stay up-to-date\n\nDataLad datasets can be updated. The command `datalad update` will\n*fetch* updates and store them on a different branch (by default\n`remotes/origin/master`). Running\n\n```\ndatalad update --merge\n```\n\nwill *pull* available updates and integrate them in one go.\n\n### More information\n\nMore information on DataLad and how to use it can be found in the DataLad Handbook at\n[handbook.datalad.org](http://handbook.datalad.org/en/latest/index.html). The chapter\nDataLad datasets can help you to familiarize yourself with the concept of a dataset.\"",
+    "doi": "",
+    "url": "",
+    "license": {
+        "name": "PDDL",
+        "url": ""
+    },
+    "authors": [
+        {
+            "name": "Ayan Sengupta",
+            "givenName": "",
+            "familyName": "",
+            "email": "",
+            "honorificSuffix": "",
+            "identifiers": []
+        },
+        {
+            "name": "Renat Yakupov",
+            "givenName": "",
+            "familyName": "",
+            "email": "",
+            "honorificSuffix": "",
+            "identifiers": []
+        },
+        {
+            "name": "Oliver Speck",
+            "givenName": "",
+            "familyName": "",
+            "email": "",
+            "honorificSuffix": "",
+            "identifiers": []
+        },
+        {
+            "name": "Stefan Pollmann",
+            "givenName": "",
+            "familyName": "",
+            "email": "",
+            "honorificSuffix": "",
+            "identifiers": []
+        },
+        {
+            "name": "Michael Hanke",
+            "givenName": "",
+            "familyName": "",
+            "email": "",
+            "honorificSuffix": "",
+            "identifiers": []
+        }
+    ],
+    "keywords": [
+        "orientation",
+        "coverage",
+        "subject",
+        "age",
+        "gender",
+        "handedness",
+        "suffix"
+    ],
+    "funding": [
+        {
+            "name": "",
+            "grant": "",
+            "description": "This research was supported by a grant from the German Research Foundation (DFG) awarded to S. Pollmann and O. Speck (DFG PO 548/15-1). This research was, in part, also supported by the German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this research was supported by US-German CRCNS project, co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1411; NSF 1429999)."
+        }
+    ],
+    "publications": [],
+    "subdatasets": [],
+    "extractors_used": [
+        {
+            "extractor_name": "bids_dataset",
+            "extractor_version": "0.0.1",
+            "extraction_parameter": {},
+            "extraction_time": 1649840102.747505,
+            "agent_name": "Stephan Heunis",
+            "agent_email": "s.heunis@fz-juelich.de"
+        }
+    ],
+    "additional_display": [
+        {
+            "name": "BIDS",
+            "icon": "fas fa-brain",
+            "content": {
+                "subject": [
+                    "21",
+                    "17",
+                    "16",
+                    "06",
+                    "18",
+                    "20",
+                    "04"
+                ],
+                "session": [
+                    "r30",
+                    "r20",
+                    "r08",
+                    "r14"
+                ],
+                "task": [
+                    "orientation",
+                    "coverage"
+                ],
+                "reconstruction": [
+                    "dico"
+                ],
+                "run": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11
+                ],
+                "recording": [
+                    "motion"
+                ],
+                "suffix": [
+                    "physio",
+                    "description",
+                    "participants",
+                    "events",
+                    "bold"
+                ],
+                "datatype": [
+                    "func"
+                ],
+                "extension": [
+                    ".nii.gz",
+                    ".tsv.gz",
+                    ".tsv",
+                    ".json"
+                ]
+            }
+        }
+    ],
+    "top_display": [
+        {
+            "name": "Subjects",
+            "value": 7
+        },
+        {
+            "name": "Sessions",
+            "value": 4
+        },
+        {
+            "name": "Tasks",
+            "value": 2
+        },
+        {
+            "name": "Runs",
+            "value": 11
+        }
+    ]
+}
