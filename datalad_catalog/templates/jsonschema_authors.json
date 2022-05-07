@@ -47,7 +47,7 @@
       }
 
     },
-    "required": ["givenName", "familyName"]
+    "required": []
   },
   "uniqueItems": true
 }

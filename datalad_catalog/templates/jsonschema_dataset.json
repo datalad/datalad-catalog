@@ -36,7 +36,10 @@
     },
     "url": {
       "description": "The location of the datalad dataset's annex",
-      "type": "string"
+      "type": ["array", "string"],
+      "items": {
+        "type": "string"
+      }
     },
     "license": {
       "description": "The license under which the dataset is made available",
@@ -51,7 +54,15 @@
           "type": "string"
         }
       },
-      "required": ["name"]
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "name": {
+          "required": ["name"]
+        },
+        "url": {
+          "required": ["name"]
+        }
+      }
     },
     "authors": { "$ref": "https://datalad.org/catalog.authors.schema.json"},
     "keywords": {

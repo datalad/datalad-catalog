@@ -23,12 +23,13 @@ from typing import (
     Union
 )
 from .webcatalog import WebCatalog, Node
-from .translator import Translator
 from .utils import read_json_file
 from .meta_item import MetaItem
 from jsonschema import ValidationError
 
 from datalad_catalog import utils
+
+from datalad.tests.utils import HTTPPath
 
 # Create named logger
 lgr = logging.getLogger("datalad.catalog.catalog")
@@ -251,7 +252,9 @@ def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
     # TODO: decide whether to allow metadata dictionaries from multiple datasets    
 
     with open(metadata) as file:
+        i=0
         for line in file:
+            i+=1
             # meta_dict = line.rstrip()
             meta_dict = json.loads(line.rstrip())
 
@@ -261,11 +264,11 @@ def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
                 lgr.warning(err_msg)
                 # raise TypeError(err_msg)
             # Validate dict against catalog schema
-            # try:
-            #     catalog.VALIDATOR.validate(meta_dict)
-            # except ValidationError as e:
-            #     err_msg = f"Schema validation failed: {e}"
-            #     raise ValidationError(err_msg) from e
+            try:
+                catalog.VALIDATOR.validate(meta_dict)
+            except ValidationError as e:
+                err_msg = f"Schema validation failed in LINE {i}: \n\n{e}"
+                raise ValidationError(err_msg) from e
             # If validation passed, translate into catalog files
             MetaItem(catalog, meta_dict)
             # Translator(catalog, meta_dict)
@@ -329,7 +332,38 @@ def _remove_from_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset
 
 def _serve_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool):
     """
+    Start a local http server for viewing/testing a local catalog
+
+    Args:
+        catalog (WebCatalog): the catalog to be served
+        metadata (dict): unused
+        dataset_id (str): unused
+        dataset_version (str): unused
+        force (bool): unused
+
+    Yields:
+        (dict): result record
     """
+    os.chdir(catalog.location)
+    import http.server
+    import socketserver
+
+    PORT = 8000
+    HOSTNAME = 'localhost'
+    # HOSTNAME = '127.0.0.1'
+    Handler = http.server.SimpleHTTPRequestHandler
+    with socketserver.TCPServer((HOSTNAME, PORT), Handler) as httpd:
+        print(f"\nServing catalog at: http://{HOSTNAME}:{PORT}/")
+        print("- navigate to this address in your browser to test the catalog locally")
+        print("- press CTRL+C to stop local testing\n")
+        httpd.serve_forever()
+        
+    msg = "Dataset served"
+    yield get_status_dict(
+        action='catalog serve',
+        path=abspath(curdir),
+        status='ok',
+        message=msg)
 
 def _set_super_of_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool):
     """

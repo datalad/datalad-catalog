@@ -28,7 +28,10 @@
     },
     "url": {
       "description": "The location of the annexed file",
-      "type": "string"
+      "type": ["array", "string"],
+      "items": {
+        "type": "string"
+      }
     },
     "extractors_used": {"$ref": "https://datalad.org/catalog.extractors.schema.json"},
     "additional_display": {
