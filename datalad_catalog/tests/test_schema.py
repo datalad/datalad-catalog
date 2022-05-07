@@ -10,7 +10,7 @@ from ..utils import read_json_file
 # Setup schema parameters
 package_path = Path(__file__).resolve().parent.parent
 templates_path = package_path / 'templates'
-schemas = ['dataset', 'authors', 'children', 'extractors']
+schemas = ['dataset', 'file', 'authors', 'extractors']
 schema_store = {}
 for s in schemas:
     schema_path = templates_path / str('jsonschema_' + s + '.json')

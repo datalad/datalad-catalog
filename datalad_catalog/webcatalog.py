@@ -32,7 +32,7 @@ CATALOG_SCHEMA_IDS = {
     cnst.TYPE_DATASET: "https://datalad.org/catalog.dataset.schema.json",
     cnst.TYPE_FILE: "https://datalad.org/catalog.file.schema.json",
     cnst.AUTHORS: "https://datalad.org/catalog.authors.schema.json",
-    cnst.CHILDREN: "https://datalad.org/catalog.children.schema.json",
+    # cnst.CHILDREN: "https://datalad.org/catalog.children.schema.json",
     cnst.EXTRACTORS: "https://datalad.org/catalog.extractors.schema.json"
 }
 
