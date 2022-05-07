@@ -21,7 +21,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements-devel.txt
-        pip install .
+        pip install --upgrade .
     - name: Build docs
       run: |
         make -C docs html
