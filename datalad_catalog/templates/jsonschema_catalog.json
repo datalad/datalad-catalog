@@ -4,9 +4,22 @@
   "title": "catalog",
   "description": "The main catalog schema",
   "type": "object",
-  "anyOf": [
-    {"$ref": "https://datalad.org/catalog.dataset.schema.json"},
-    {"$ref": "https://datalad.org/catalog.file.schema.json"}
+  "allOf": [
+    {
+      "if": {
+        "properties": { "type": { "const": "dataset" } }
+      },
+      "then": {
+        "$ref": "https://datalad.org/catalog.dataset.schema.json"
+      }
+    },
+    {
+      "if": {
+        "properties": { "type": { "const": "file" } }
+      },
+      "then": {
+        "$ref": "https://datalad.org/catalog.file.schema.json"
+      }
+    }
   ]
 }
-
