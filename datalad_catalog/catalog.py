@@ -252,7 +252,9 @@ def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
     # TODO: decide whether to allow metadata dictionaries from multiple datasets    
 
     with open(metadata) as file:
+        i=0
         for line in file:
+            i+=1
             # meta_dict = line.rstrip()
             meta_dict = json.loads(line.rstrip())
 
@@ -262,11 +264,11 @@ def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
                 lgr.warning(err_msg)
                 # raise TypeError(err_msg)
             # Validate dict against catalog schema
-            # try:
-            #     catalog.VALIDATOR.validate(meta_dict)
-            # except ValidationError as e:
-            #     err_msg = f"Schema validation failed: {e}"
-            #     raise ValidationError(err_msg) from e
+            try:
+                catalog.VALIDATOR.validate(meta_dict)
+            except ValidationError as e:
+                err_msg = f"Schema validation failed in LINE {i}: \n\n{e}"
+                raise ValidationError(err_msg) from e
             # If validation passed, translate into catalog files
             MetaItem(catalog, meta_dict)
             # Translator(catalog, meta_dict)
