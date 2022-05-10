@@ -3,18 +3,17 @@ from os.path import abspath
 import logging
 from datalad.interface.base import Interface
 from datalad.interface.base import build_doc
+from datalad.interface.utils import eval_results
+from datalad.interface.results import get_status_dict
+from datalad.log import log_progress
 from datalad.support.param import Parameter
 from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.distribution.dataset import datasetmethod
-from datalad.interface.utils import eval_results
 from datalad.support.constraints import EnsureChoice
-from datalad.interface.results import get_status_dict
 import sys
 from pathlib import Path
 import json
 import os
-import hashlib
-import shutil
 from typing import (
     Dict,
     List,
@@ -25,11 +24,7 @@ from typing import (
 from .webcatalog import WebCatalog, Node
 from .utils import read_json_file
 from .meta_item import MetaItem
-from jsonschema import ValidationError
-
-from datalad_catalog import utils
-
-from datalad.tests.utils import HTTPPath
+from jsonschema import ValidationError, Draft202012Validator, RefResolver
 
 # Create named logger
 lgr = logging.getLogger("datalad.catalog.catalog")
@@ -53,11 +48,11 @@ class Catalog(Interface):
             args=("catalog_action",),
             # documentation
             doc="""This is the subcommand to be executed by datalad-catalog.
-            Options include: create, add, remove, serve.
+            Options include: create, add, remove, serve, set-super, and validate.
             Example: ''""",
             # type checkers, constraint definition is automatically
             # added to the docstring
-            constraints=EnsureChoice('create', 'add', 'remove', 'serve', 'set-super')
+            constraints=EnsureChoice('create', 'add', 'remove', 'serve', 'set-super', 'validate')
         ),
         catalog_dir=Parameter(
             # cmdline argument definitions, incl aliases
@@ -153,8 +148,17 @@ class Catalog(Interface):
 
         # TODO: check if schema is valid
         # Draft202012Validator.check_schema(schema)
-        
 
+        # If action is validate, only metadata required
+        if catalog_action == 'validate':
+            yield from _validate_metadata(
+                None, 
+                metadata,
+                None,
+                None,
+                None,
+            )
+            
         # Error out if `catalog_dir` argument was not supplied
         if catalog_dir is None:
             err_msg = f"No catalog directory supplied: Datalad catalog can only operate on a path to a directory. Argument: -c, --catalog_dir."
@@ -184,14 +188,14 @@ class Catalog(Interface):
 
         # Call relevant function based on action
         # Action-specific argument parsing as well as results yielding are done within action-functions
-        call_action = {
+        CALL_ACTION = {
             'create': _create_catalog,
             'serve': _serve_catalog,
             'add': _add_to_catalog,
             'remove': _remove_from_catalog,
             'set-super': _set_super_of_catalog,
         }
-        yield from call_action[catalog_action](
+        yield from CALL_ACTION[catalog_action](
             ctlg, 
             metadata,
             dataset_id,
@@ -383,3 +387,64 @@ def _set_super_of_catalog(catalog: WebCatalog, metadata, dataset_id: str, datase
         path=abspath(curdir),
         status='ok',
         message=msg)
+
+def _validate_metadata(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool):
+    """"""
+    # First check metadata was supplied via -m flag
+    if metadata is None:
+        err_msg = f"No metadata supplied: datalad catalog has to be supplied with metadata in the form of a path to a file containing a JSON array, or JSON lines stream, using the argument: -m, --metadata."
+        raise InsufficientArgumentsError(err_msg)
+
+    # Setup schema parameters
+    package_path = Path(__file__).resolve().parent
+    templates_path = package_path / 'templates'
+    schemas = ['catalog', 'dataset', 'file', 'authors', 'extractors']
+    schema_store = {}
+    for s in schemas:
+        schema_path = templates_path / str('jsonschema_' + s + '.json')
+        schema = read_json_file(schema_path)
+        schema_store[schema['$id']] = schema
+    
+    # Access the schema against which incoming metadata items will be validated
+    catalog_schema = schema_store["https://datalad.org/catalog.schema.json"]
+    RESOLVER = RefResolver.from_schema(catalog_schema, store=schema_store)
+    num_lines = _get_line_count(metadata)
+
+    # Open metadata file and validate line by line
+    with open(metadata) as file:
+        i=0
+        for line in file:
+            i+=1
+            log_progress(
+                lgr.info,
+                'catalogvalidate',
+                f'Start validation of metadata in {metadata}',
+                total=num_lines,
+                update=i,
+                label='metadata validation against catalog schema',
+                unit=' Lines',
+            )
+            meta_dict = json.loads(line.rstrip())
+            # Check if item/line is a dict
+            if not isinstance(meta_dict, dict):
+                err_msg = f"Metadata item not of type dict: metadata items should be passed to datalad catalog as JSON objects adhering to the catalog schema."
+                lgr.warning(err_msg)
+            # Validate dict against schema
+            try:
+                Draft202012Validator(catalog_schema, resolver=RESOLVER).validate(meta_dict)
+            except ValidationError as e:
+                err_msg = f"Schema validation failed in LINE {i}/{num_lines}: \n\n{e}"
+                raise ValidationError(err_msg) from e
+
+    msg = "Metadata successfully validated"
+    yield get_status_dict(
+        action='catalog validate',
+        path=abspath(curdir),
+        status='ok',
+        message=msg)
+
+def _get_line_count(file):
+    with open(file) as f:
+        for i, _ in enumerate(f):
+            pass
+    return i + 1
