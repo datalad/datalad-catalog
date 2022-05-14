@@ -6,17 +6,13 @@
 #   copyright and license terms.
 #
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-"""Metadata extractor for BIDS dataset-level information"""
-from lib2to3.pgen2.token import NAME
+"""Metadata extractor for GIN-flavored datacite.yml information"""
 import logging
 from uuid import UUID
-from bids import BIDSLayout
 from pathlib import Path
 import yaml
 from datalad_metalad.extractors.base import DataOutputCategory, ExtractorResult, DatasetMetadataExtractor
-from datalad_metalad.extractors.studyminimeta.ldcreator import SMMJsonLdTags, SMMProperties, SMMSchemaOrgProperties
 from datalad.log import log_progress
-import sys
 from datalad.metadata.definitions import vocabulary_id
 from datalad.utils import assure_unicode
 
