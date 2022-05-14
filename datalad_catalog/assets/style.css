@@ -67,12 +67,22 @@ ul {
   padding-left: 1em;
   line-height: 1.5em;
 }
-li[class="item"]:nth-child(even) {
+li[class="item"] {
+  border-bottom: 1px solid #eee;
+}
+li[class="item"]:last-child {
+  border-bottom: none;
+}
+
+/* .open-item {
+  border-bottom: none;
+} */
+/* li[class="item"]:nth-child(even) {
   background-color:#eee;
 }
 li[class="item"]:nth-child(odd) {
   background-color:#fff;
-}
+} */
 
 
 
@@ -87,6 +97,11 @@ li[class="item"]:nth-child(odd) {
   font-size: small;
   padding: 0px 3px;
   margin-bottom: 0.5em;
+}
+
+.xsm-dl-button {
+  font-size: small;
+  padding: 0px 3px;
 }
 
 #desc_display {

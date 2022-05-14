@@ -35,6 +35,9 @@ Vue.component("tree-item", {
     },
     byteText: function(){
       return this.formatBytes(this.item["contentbytesize"])
+    },
+    downloadURL: function(){
+      return this.getDownloadURL(this.item["url"])
     }
   },
   methods: {
@@ -86,6 +89,14 @@ Vue.component("tree-item", {
       }
       return JSON.parse(text);
     },
+    getDownloadURL(url_array) {
+      if (url_array && url_array[0]) {
+        return url_array[0]
+      } else {
+        return ""
+      }
+    }
+
   }
 });
 
@@ -215,8 +226,8 @@ const datasetView = {
       return all_subdatasets.filter(c => {
         if(this.search_text == '') return true;
         return ( (c.dirs_from_path[c.dirs_from_path.length - 1].toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)
-                  || (c.authors.some(e => e.givenName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)) 
-                  || (c.authors.some(f => f.familyName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)) );
+                  // || (c.authors.some(e => e.givenName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)) 
+                  || (c.authors.some(f => f.name.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0)) );
       })
     },
     tagFilteredSubdatasets() {
