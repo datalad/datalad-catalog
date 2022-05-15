@@ -360,16 +360,16 @@
                             <span class="xxlfont"><i class="fas fa-book "></i></span>
                           </b-col>
                           <b-col class="text-muted" md="8">
-                            <h5>{{pub.headline}}</h5>
+                            <h5>{{pub.title}}</h5>
                             <small>
-                              <span v-for="(author, index) in pub.author"><span v-if="author.givenName">{{author.givenName}} {{author.familyName}}</span><span v-else>{{author.name}}</span><span v-if="index != pub.author.length - 1">, </span></span>
+                              <span v-for="(author, index) in pub.authors"><span v-if="author.givenName">{{author.givenName}} {{author.familyName}}</span><span v-else>{{author.name}}</span><span v-if="index != pub.author.length - 1">, </span></span>
                             </small><br>
                           </b-col>
                           <b-col md="3">
                             <small>
                               Published: {{pub.datePublished}} <br>
                               DOI: <span v-if="pub.doi"><a :href="pub.doi" target="_blank">{{pub.doi.replace("https://doi.org/", "")}}</a></span> <br>
-                              Journal: {{pub.publication.name}}
+                              Journal: {{pub.publicationOutlet}}
                             </small>
                           </b-col>
                         </b-row>
