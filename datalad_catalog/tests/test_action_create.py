@@ -4,12 +4,20 @@ from ..catalog import Catalog
 import pytest
 from datalad.support.exceptions import InsufficientArgumentsError
 
+# catalog_paths = [
+#     'assets/md5-2.3.0.js',
+#     'assets/vue_app.js',
+#     'assets/style.css',
+#     'artwork',
+#     'index.html']
+
 catalog_paths = [
     'assets/md5-2.3.0.js',
     'assets/vue_app.js',
     'assets/style.css',
     'artwork',
-    'index.html']
+    'index.html',
+    'config.yml']
 
 def test_create(tmp_path):
     """
@@ -59,7 +67,7 @@ def test_create_at_existing_catalog_force(tmp_path):
     Test if catalog is created when create action is used on an existing catalog,
     together with force flag
     """
-    catalog_path = tmp_path / "test_catalog"
+    catalog_path = tmp_path / "test_catalog2"
     test_catalog = Catalog()
     test_catalog('create', catalog_dir=catalog_path)
 
