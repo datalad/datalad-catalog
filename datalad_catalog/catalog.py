@@ -98,18 +98,14 @@ class Catalog(Interface):
             action="store_true",
             default=False
             ),
-        # set_super=Parameter(
-        #     # cmdline argument definitions, incl aliases
-        #     args=("-s", "--set_super"),
-        #     # documentation
-        #     doc="""Use this flag together with providing a `dataset_id` and 'dataset_version'
-        #     in order to specify the super dataset of the catalog. A catalog can have only ONE
-        #     super dataset. This dataset will serve as the 'home page' of the catalog when 
-        #     viewed in the browser, i.e. it will display first.
-        #     Example: ''""",
-        #     action="store_true",
-        #     default=False
-        #     )
+        config_file=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("--config-file"),
+            # documentation
+            doc="""Path to config file in YAML format. Default config is read from 
+            datalad_catalog/templates/config.yml
+            Example: ''""",
+            ),
     )
     @staticmethod
     # decorator binds the command to the Dataset class as a method
@@ -125,6 +121,7 @@ class Catalog(Interface):
         dataset_id = None,
         dataset_version = None,
         force: bool = False,
+        config_file = None,
         ):
         """
         [summary]
@@ -146,7 +143,7 @@ class Catalog(Interface):
             [type]: [description]
         """
 
-        # TODO: check if schema is valid
+        # TODO: check if schema is valid (move to tests)
         # Draft202012Validator.check_schema(schema)
 
         # If action is validate, only metadata required
@@ -165,7 +162,7 @@ class Catalog(Interface):
             raise InsufficientArgumentsError(err_msg)
         
         # Instantiate WebCatalog class
-        ctlg = WebCatalog(catalog_dir, dataset_id, dataset_version, force)
+        ctlg = WebCatalog(catalog_dir, dataset_id, dataset_version, config_file)
         # catalog_path = Path(catalog_dir)
         # catalog_exists = catalog_path.exists() and catalog_path.is_dir()
         
@@ -201,11 +198,12 @@ class Catalog(Interface):
             dataset_id,
             dataset_version,
             force,
+            config_file
         )
         
 
 # Internal functions to execute based on catalog_action parameter
-def _create_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool):
+def _create_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool, config_file: str):
     """"""
     # If catalog does not exist, create it
     # If catalog exists and force flag is True, overwrite assets of existing catalog
@@ -228,7 +226,7 @@ def _create_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
         yield from _add_to_catalog(catalog, metadata, dataset_id, dataset_version, force)
 
 
-def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool):
+def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool, config_file: str):
     """
     [summary]
     """
@@ -319,7 +317,7 @@ def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
         message=msg)
 
 
-def _remove_from_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool):
+def _remove_from_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool, config_file: str):
     """
     [summary]
     """
@@ -334,7 +332,7 @@ def _remove_from_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset
         sys.exit(err_msg)
 
 
-def _serve_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool):
+def _serve_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool, config_file: str):
     """
     Start a local http server for viewing/testing a local catalog
 
@@ -369,7 +367,7 @@ def _serve_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_versi
         status='ok',
         message=msg)
 
-def _set_super_of_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool):
+def _set_super_of_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool, config_file: str):
     """
     [summary]
     """
@@ -388,7 +386,7 @@ def _set_super_of_catalog(catalog: WebCatalog, metadata, dataset_id: str, datase
         status='ok',
         message=msg)
 
-def _validate_metadata(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool):
+def _validate_metadata(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool, config_file: str):
     """"""
     # First check metadata was supplied via -m flag
     if metadata is None:

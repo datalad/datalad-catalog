@@ -7,6 +7,7 @@ from . import constants as cnst
 import logging
 from .utils import read_json_file
 from jsonschema import Draft202012Validator, RefResolver
+import yaml
 lgr = logging.getLogger('datalad.catalog.webcatalog')
 
 # PSEUDOCODE/WORKFLOW:
@@ -54,11 +55,13 @@ class WebCatalog(object):
     RESOLVER = RefResolver.from_schema(CATALOG_SCHEMA, store=SCHEMA_STORE)
     VALIDATOR = Draft202012Validator(CATALOG_SCHEMA, resolver=RESOLVER)
 
-    def __init__(self, location: str, main_id: str = None, main_version: str = None, force=False) -> None:
+    def __init__(self, location: str, main_id: str = None, main_version: str = None, config_file: str = None) -> None:
         self.location = Path(location)
         self.main_id = main_id
         self.main_version = main_version
         self.metadata_path = Path(self.location) / 'metadata'
+        self.config_path = self.set_config_source(config_file)
+        self.config = self.get_config()
 
     def path_exists(self) -> bool:
         """
@@ -85,9 +88,9 @@ class WebCatalog(object):
             is_created = is_created and out_dir_paths[key].exists()
         return is_created
 
-    def create(self, force=False, config=None):
+    def create(self, force=False):
         """
-        Create new catalog directory with assets (JS, CSS), artwork and the main html
+        Create new catalog directory with assets (JS, CSS), artwork, config and the main html
         """
 
         # Get package-related paths/content
@@ -100,11 +103,13 @@ class WebCatalog(object):
             "assets": Path(package_path) / 'assets',
             "artwork": Path(package_path) / 'artwork',
             "html": Path(package_path) / 'index.html',
+            "config": self.config_path,
         }
         out_dir_paths = {
             "assets": Path(self.location) / 'assets',
             "artwork": Path(self.location) / 'artwork',
             "html": Path(self.location) / 'index.html',
+            "config": Path(self.location) / 'config.yml',
         }
         for key in content_paths:
             copy_overwrite_path(src=content_paths[key],
@@ -134,6 +139,31 @@ class WebCatalog(object):
         with open(main_file, 'w') as f:
             json.dump(main_obj, f)
         return main_file
+
+    def set_config_source(self, source_str=None):
+        """"""        
+        # If no source_str provided, determine
+        if self.is_created():
+            # If catalog already exists, return config if it exists, otherwise None
+            config_path = Path(self.location / 'config.yml')
+            if config_path.exists():
+                return config_path
+            # TODO: if catalog exists without config file, should one be created from default?
+            return None
+        else:
+            # If catalog does not exist, return config if specified, otherwise default
+            if source_str is not None:
+                return Path(source_str)
+            else:
+                return Path(self.templates_path / 'config.yml')
+
+    def get_config(self):
+        """"""
+        # Read metadata from file
+        with open(self.config_path, "rt") as input_stream:
+            # print(yaml.safe_load(input_stream))
+            return yaml.safe_load(input_stream)
+
 
 
 class Node(object):
@@ -336,7 +366,10 @@ def copy_overwrite_path(src: Path, dest: Path, overwrite: bool = False):
         pass
     else:
         if isFile:
-            shutil.copy2(src, dest)
+            try:
+                shutil.copy2(src, dest)
+            except shutil.SameFileError:
+                pass
         else:
             if dest.exists():
                 shutil.rmtree(dest)
