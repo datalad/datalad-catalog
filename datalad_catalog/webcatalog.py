@@ -115,6 +115,17 @@ class WebCatalog(object):
             copy_overwrite_path(src=content_paths[key],
                                 dest=out_dir_paths[key],
                                 overwrite=force)
+        
+        # Copy content specified by config
+        
+        if cnst.LOGO_PATH in self.config and self.config[cnst.LOGO_PATH]:
+            existing_path = Path(self.config[cnst.LOGO_PATH])
+            existing_suffix = existing_path.suffix
+            new_path = Path(self.location) / 'artwork' / ('catalog_logo' + existing_suffix)
+            copy_overwrite_path(src=existing_path,
+                                dest=new_path,
+                                overwrite=force)
+
 
     def add_dataset():
         """"""
