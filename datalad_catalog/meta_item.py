@@ -76,7 +76,7 @@ class MetaItem(object):
                     # If no nodes, just add as child
                     subds_dict = {
                         cnst.TYPE: cnst.TYPE_DATASET,
-                        cnst.NAME: subds[cnst.NAME],
+                        cnst.NAME: parts_in_path[0],
                         cnst.DATASET_ID: subds[cnst.DATASET_ID],
                         cnst.DATASET_VERSION: subds[cnst.DATASET_VERSION],
                     }

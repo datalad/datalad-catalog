@@ -116,7 +116,7 @@
           },
           "datePublished": {
             "description": "The publication date year",
-            "type": "string"
+            "type": ["number", "string"]
           },
           "publicationOutlet": {
             "description": "The publication outlet / venue, such as the journal, publisher name, or news outlet",

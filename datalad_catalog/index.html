@@ -362,7 +362,7 @@
                           <b-col class="text-muted" md="8">
                             <h5>{{pub.title}}</h5>
                             <small>
-                              <span v-for="(author, index) in pub.authors"><span v-if="author.givenName">{{author.givenName}} {{author.familyName}}</span><span v-else>{{author.name}}</span><span v-if="index != pub.author.length - 1">, </span></span>
+                              <span v-for="(author, index) in pub.authors"><span v-if="author.givenName">{{author.givenName}} {{author.familyName}}</span><span v-else>{{author.name}}</span><span v-if="index != pub.authors.length - 1">, </span></span>
                             </small><br>
                           </b-col>
                           <b-col md="3">
@@ -452,7 +452,7 @@
       <b-container style="margin-top:20px;">
         <b-row align-v="end">
           <b-col cols="9">
-            <a @click="gotoHome"><img src="artwork/catalog_logo" class="d-inline-block" alt="datalad" style="width:100%;"></a>
+            <a @click="gotoHome"><img src="artwork/catalog_logo.svg" class="d-inline-block" alt="datalad" style="width:100%;"></a>
           </b-col>
           <b-col cols="1"></b-col>
           <b-col cols="2" align-h="end">

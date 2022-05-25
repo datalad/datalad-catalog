@@ -100,7 +100,7 @@ class Catalog(Interface):
             ),
         config_file=Parameter(
             # cmdline argument definitions, incl aliases
-            args=("--config-file"),
+            args=("-y", "--config-file"),
             # documentation
             doc="""Path to config file in YAML format. Default config is read from 
             datalad_catalog/templates/config.yml

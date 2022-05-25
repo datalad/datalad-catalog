@@ -61,7 +61,8 @@ class WebCatalog(object):
         self.main_version = main_version
         self.metadata_path = Path(self.location) / 'metadata'
         self.config_path = self.set_config_source(config_file)
-        self.config = self.get_config()
+        if self.config_path is not None:
+            self.config = self.get_config()
 
     def path_exists(self) -> bool:
         """
@@ -117,7 +118,6 @@ class WebCatalog(object):
                                 overwrite=force)
         
         # Copy content specified by config
-        
         if cnst.LOGO_PATH in self.config and self.config[cnst.LOGO_PATH]:
             existing_path = Path(self.config[cnst.LOGO_PATH])
             existing_suffix = existing_path.suffix
