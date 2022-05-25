@@ -190,15 +190,11 @@
                   <strong>Description:</strong>
                   <span v-if="displayData.descriptions && displayData.descriptions.length>0">
                     <b-button-group><span v-for="desc in displayData.descriptions"><b-button id="xsm-button" size="sm" variant="outline-dark" @click="selectDescription(desc)">{{desc.name}}</b-button>&nbsp;</span></b-button-group><br>
-                    <!-- <span ref="description_display">{{description_display}}</span> -->
                     <span v-html="description_display"></span>
                   </span>
-                </b-card-text>
-                <b-card-text>
                   <span v-else>{{selectedDataset.description}}</span>
                 </b-card-text>
               </b-col>
-              <!-- <b-col md="1"></b-col> -->
               <b-col md="3">
                 <b-card-text>
                   <strong>Keywords:</strong> <br>
