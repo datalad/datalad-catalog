@@ -92,8 +92,8 @@ class Catalog(Interface):
             doc="""If content for the user interface already exists in the catalog
             directory, force this content to be overwritten. Content
             overwritten with this flag include the 'artwork' and 'assets'
-            directories and the 'index.html' file. Content in the 'metadata' directory 
-            remain untouched.
+            directories and the 'index.html' and 'config.json' files. Content in
+            the 'metadata' directory remain untouched.
             Example: ''""",
             action="store_true",
             default=False
@@ -102,8 +102,8 @@ class Catalog(Interface):
             # cmdline argument definitions, incl aliases
             args=("-y", "--config-file"),
             # documentation
-            doc="""Path to config file in YAML format. Default config is read from 
-            datalad_catalog/templates/config.yml
+            doc="""Path to config file in YAML or JSON format. Default config is read
+            from datalad_catalog/templates/config.json
             Example: ''""",
             ),
     )

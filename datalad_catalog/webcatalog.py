@@ -60,7 +60,7 @@ class WebCatalog(object):
         self.main_id = main_id
         self.main_version = main_version
         self.metadata_path = Path(self.location) / 'metadata'
-        self.config_path = self.set_config_source(config_file)
+        self.config_path = self.get_config_source(config_file)
         if self.config_path is not None:
             self.config = self.get_config()
 
@@ -95,28 +95,27 @@ class WebCatalog(object):
         """
 
         # Get package-related paths/content
-        package_path = Path(__file__).resolve().parent
 
         if not (self.metadata_path.exists() and self.metadata_path.is_dir()):
             Path(self.metadata_path).mkdir(parents=True)
 
         content_paths = {
-            "assets": Path(package_path) / 'assets',
-            "artwork": Path(package_path) / 'artwork',
-            "html": Path(package_path) / 'index.html',
-            "config": self.config_path,
+            "assets": Path(self.package_path) / 'assets',
+            "artwork": Path(self.package_path) / 'artwork',
+            "html": Path(self.package_path) / 'index.html'
         }
         out_dir_paths = {
             "assets": Path(self.location) / 'assets',
             "artwork": Path(self.location) / 'artwork',
-            "html": Path(self.location) / 'index.html',
-            "config": Path(self.location) / 'config.yml',
+            "html": Path(self.location) / 'index.html'
         }
         for key in content_paths:
             copy_overwrite_path(src=content_paths[key],
                                 dest=out_dir_paths[key],
                                 overwrite=force)
-        
+
+        # Copy / write config file
+        self.write_config(force)
         # Copy content specified by config
         if cnst.LOGO_PATH in self.config and self.config[cnst.LOGO_PATH]:
             existing_path = Path(self.config[cnst.LOGO_PATH])
@@ -151,12 +150,12 @@ class WebCatalog(object):
             json.dump(main_obj, f)
         return main_file
 
-    def set_config_source(self, source_str=None):
+    def get_config_source(self, source_str=None):
         """"""        
         # If no source_str provided, determine
         if self.is_created():
             # If catalog already exists, return config if it exists, otherwise None
-            config_path = Path(self.location / 'config.yml')
+            config_path = Path(self.location / 'config.json')
             if config_path.exists():
                 return config_path
             # TODO: if catalog exists without config file, should one be created from default?
@@ -166,15 +165,32 @@ class WebCatalog(object):
             if source_str is not None:
                 return Path(source_str)
             else:
-                return Path(self.templates_path / 'config.yml')
+                return Path(self.templates_path / 'config.json')
 
     def get_config(self):
         """"""
         # Read metadata from file
-        with open(self.config_path, "rt") as input_stream:
-            # print(yaml.safe_load(input_stream))
-            return yaml.safe_load(input_stream)
+        with open(self.config_path) as f:
+            if self.config_path.suffix == '.json':
+                return json.load(f)
+            if self.config_path.suffix in ['.yml', '.yaml']:
+                return yaml.safe_load(f)
 
+    def write_config(self, force=False):
+        """"""
+        new_path = Path(self.location) / 'config.json'
+        # if JSON, copy directly
+        if self.config_path.suffix == '.json':
+            existing_path = self.config_path
+            copy_overwrite_path(src=existing_path,
+                                dest=new_path,
+                                overwrite=force)
+        # If YAML, first load into dict then dump to new json file
+        if self.config_path.suffix in ['.yml', '.yaml']:
+            with open(self.config_path) as f:
+                config_dict = yaml.safe_load(f)
+                with open(new_path, 'w') as f_config:
+                    json.dump(config_dict, f_config)
 
 
 class Node(object):

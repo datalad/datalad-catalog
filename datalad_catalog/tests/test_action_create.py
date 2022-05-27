@@ -17,7 +17,7 @@ catalog_paths = [
     'assets/style.css',
     'artwork',
     'index.html',
-    'config.yml']
+    'config.json']
 
 def test_create(tmp_path):
     """
