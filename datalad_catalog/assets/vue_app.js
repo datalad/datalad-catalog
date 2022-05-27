@@ -1,10 +1,45 @@
 /********/
 // Data //
 /********/
+const config_file =  './config.json';
 const metadata_dir = './metadata';
 const superdatasets_file = metadata_dir + '/super.json';
 const json_file = metadata_dir + '/datasets.json';
 const SPLIT_INDEX = 3;
+const default_config = {
+  catalog_name: 'DataCat',
+  link_color: '#fba304',
+  link_hover_color: '#af7714'
+}
+
+
+/**********/
+// Config //
+/**********/
+fetch(config_file).then((response) => {
+  if (response.ok) {
+    return response.json();
+  } else {
+    console.log('WARNING: config.json file could not be loaded; using defaults.');
+    return default_config
+  }
+})
+.then((responseJson) => {
+  obj = responseJson;
+  // Set color scheme
+  const style_text =  ":root{--link-color: " + responseJson.link_color + "; --link-hover-color: " + responseJson.link_hover_color + ";}"
+  const style_section = document.createElement("style");
+  const node = document.createTextNode(style_text);
+  style_section.appendChild(node);
+  const body_element = document.getElementById("mainbody");
+  body_element.insertBefore(style_section, body_element.firstChild)
+  // Settings for multiple property sources
+})
+.catch((error) => {
+  console.log(error)
+});
+
+
 
 /**************/
 // Components //
