@@ -223,7 +223,7 @@ def _create_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
         message=msg)
     # If metadata was also supplied, add this to the catalog
     if metadata is not None:
-        yield from _add_to_catalog(catalog, metadata, dataset_id, dataset_version, force)
+        yield from _add_to_catalog(catalog, metadata, dataset_id, dataset_version, force, config_file)
 
 
 def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool, config_file: str):
