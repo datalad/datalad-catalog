@@ -24,6 +24,13 @@ def demo_catalog(tmp_path):
 def test_translate_dataset(demo_metadata_item: dict, demo_catalog: WebCatalog):
     """
     """
+    Node._instances = {}
+    demo_catalog.config = {
+        "property_source": {
+            "dataset": {
+            }
+        }
+    }
     metatest = MetaItem(demo_catalog, demo_metadata_item)
     assert len(Node._instances) == 1
     new_node = [Node._instances[n] for n in Node._instances if
@@ -33,4 +40,9 @@ def test_translate_dataset(demo_metadata_item: dict, demo_catalog: WebCatalog):
     fn = new_node[0].get_location()
     new_node[0].write_to_file()
     translated_metadata = read_json_file(fn)
-    assert demo_metadata_item == translated_metadata
+    for key in translated_metadata:
+        if not bool(translated_metadata[key]):
+            continue
+        assert key in demo_metadata_item
+        assert demo_metadata_item[key] == translated_metadata[key]
+    

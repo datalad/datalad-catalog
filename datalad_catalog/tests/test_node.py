@@ -3,6 +3,7 @@ import hashlib
 import pytest
 from .. import constants as cnst
 
+
 @pytest.fixture
 def demo_node_dataset():
     test_ds_id = '5df8eb3a-95c5-11ea-b4b9-a0369f287950'
@@ -10,6 +11,7 @@ def demo_node_dataset():
     test_type = 'dataset'
     Node._split_dir_length = 3
     return Node(type=test_type, dataset_id=test_ds_id, dataset_version=test_ds_version)
+
 
 @pytest.fixture
 def demo_node_directory():
@@ -20,10 +22,12 @@ def demo_node_directory():
     Node._split_dir_length = 3
     return Node(type=test_type, dataset_id=test_ds_id, dataset_version=test_ds_version, node_path=dir_path)
 
+
 @pytest.fixture
 def demo_catalog(tmp_path):
     catalog_path = tmp_path / "test_catalog"
     return WebCatalog(location=catalog_path)
+
 
 def test_node_instances_equal():
     """
@@ -34,6 +38,7 @@ def test_node_instances_equal():
     node_instance_2 = getNode(type='dataset', dataset_id='123', dataset_version='v1')
     assert node_instance_1 == node_instance_2
 
+
 def test_md5hash():
     """
     Test md5 hash of input string
@@ -42,6 +47,7 @@ def test_md5hash():
     true_output = '661f8009fa8e56a9d0e94a0a644397d7'
     test_hash = hashlib.md5(test_string.encode('utf-8')).hexdigest()
     assert test_hash == true_output
+
 
 def test_node_location_dataset(demo_catalog: WebCatalog, demo_node_dataset: Node):
     """
@@ -58,6 +64,7 @@ def test_node_location_dataset(demo_catalog: WebCatalog, demo_node_dataset: Node
         / '449' / '268b13a1c869555f6c2f6e66d3923.json'
     assert demo_node_dataset.get_location() == location
 
+
 def test_node_location_directory(demo_catalog: WebCatalog, demo_node_directory: Node):
     """
     Test location of directory node as well as interim steps
@@ -73,37 +80,20 @@ def test_node_location_directory(demo_catalog: WebCatalog, demo_node_directory: 
         / '5eb' / '52c113eb545c1c35647be3a613051.json'
     assert demo_node_directory.get_location() == location
 
-def test_add_attributes(demo_node_directory: Node):
+
+def test_add_attributes(demo_catalog: WebCatalog, demo_node_directory: Node):
     """
     Test if attributes are correctly added to Node instance
     """
-    test_key = "key1"
+    test_key = "url"
     test_value = "value1"
     test_attributes = {
         test_key: test_value
     }
-    demo_node_directory.add_attribrutes(test_attributes)
+    demo_node_directory.parent_catalog = demo_catalog
+    demo_node_directory.add_attribrutes(test_attributes, demo_catalog)
     assert hasattr(demo_node_directory, test_key)
-    assert demo_node_directory.key1 == test_value
-
-def test_add_existing_attributes(caplog, demo_node_directory: Node):
-    """
-    Test that warning is emitted if add_attributes is invoked to add
-    attributes that already exist on a Node instance.
-
-    Uses caplog to inspect warning levels and text
-    """
-    test_key = "key1"
-    test_value = "value1"
-    test_attributes = {
-        test_key: test_value
-    }
-    demo_node_directory.key1 = test_value
-    caplog.clear()
-    demo_node_directory.add_attribrutes(test_attributes)
-    for record in caplog.records:
-        assert record.levelname == "WARNING"
-    assert "Node instance already has an attribute" in caplog.text
+    assert demo_node_directory.url == test_value
 
 
 def test_add_child_new(demo_node_directory: Node):

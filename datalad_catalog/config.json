@@ -5,10 +5,11 @@
     "property_sources": {
         "dataset": {
             "authors": "merge",
-            "description": {
+            "descriptions": {
                 "display": "all",
                 "source": []
             },
+            "description": "metalad_studyminimeta",
             "keywords": "merge",
             "additional_display": "merge",
             "top_display": "merge"
