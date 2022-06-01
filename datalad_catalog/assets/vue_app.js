@@ -181,14 +181,16 @@ const datasetView = {
         console.log("from watcher")
         console.log(this.subdatasets)
         tags = this.tag_options;
-        this.subdatasets.forEach(
-          (subds, index) => {
-            console.log(index + '; ' + subds)
-            if (subds.available == "true") {
-              tags = tags.concat(subds.keywords.filter((item) => tags.indexOf(item) < 0))
+        if (this.subdatasets) {
+          this.subdatasets.forEach(
+            (subds, index) => {
+              console.log(index + '; ' + subds)
+              if (subds.available == "true" && subds.keywords) {
+                tags = tags.concat(subds.keywords.filter((item) => tags.indexOf(item) < 0))
+              }
             }
-          }
-        );
+          );
+        }
         this.tag_options = tags;
         this.tag_options_filtered = this.tag_options;
         this.tag_options_available = this.tag_options;
@@ -476,6 +478,12 @@ const datasetView = {
     response = await fetch(file);
     text = await response.text();
     this.$root.selectedDataset = JSON.parse(text);
+    this.$root.selectedDataset.name = this.$root.selectedDataset.name ? this.$root.selectedDataset.name : "";
+    this.$root.selectedDataset.short_name = this.$root.selectedDataset.short_name ? this.$root.selectedDataset.short_name : "";
+    this.$root.selectedDataset.doi = this.$root.selectedDataset.doi ? this.$root.selectedDataset.doi : "";
+    this.$root.selectedDataset.license = this.$root.selectedDataset.license ? this.$root.selectedDataset.license : {};
+    this.$root.selectedDataset.authors = this.$root.selectedDataset.authors ? this.$root.selectedDataset.authors : [];
+    this.$root.selectedDataset.keywords = this.$root.selectedDataset.keywords ? this.$root.selectedDataset.keywords : [];
     this.dataset_ready = true;
     // tags = this.tag_options
 
@@ -489,12 +497,12 @@ const datasetView = {
           if (subds_json[index] != "unavailable") {
             sorted_extractors = subds_json[index].extractors_used.sort((a, b) => b.extraction_time - a.extraction_time)
             this.$root.selectedDataset.subdatasets[index].extraction_time = sorted_extractors[0].extraction_time;
-            this.$root.selectedDataset.subdatasets[index].name = subds_json[index].name;
-            this.$root.selectedDataset.subdatasets[index].short_name = subds_json[index].short_name;
-            this.$root.selectedDataset.subdatasets[index].doi = subds_json[index].doi;
-            this.$root.selectedDataset.subdatasets[index].license = subds_json[index].license;
-            this.$root.selectedDataset.subdatasets[index].authors = subds_json[index].authors;
-            this.$root.selectedDataset.subdatasets[index].keywords = subds_json[index].keywords;
+            this.$root.selectedDataset.subdatasets[index].name = subds_json[index].name ? subds_json[index].name : "";
+            this.$root.selectedDataset.subdatasets[index].short_name = subds_json[index].short_name ? subds_json[index].short_name : "";
+            this.$root.selectedDataset.subdatasets[index].doi = subds_json[index].doi ? subds_json[index].doi : "";
+            this.$root.selectedDataset.subdatasets[index].license = subds_json[index].license ? subds_json[index].license : {};
+            this.$root.selectedDataset.subdatasets[index].authors = subds_json[index].authors ? subds_json[index].authors : [];
+            this.$root.selectedDataset.subdatasets[index].keywords = subds_json[index].keywords ? subds_json[index].keywords : [];
             this.$root.selectedDataset.subdatasets[index].available = "true";
             // tags = tags.concat(subds_json[index].keywords.filter((item) => tags.indexOf(item) < 0))
 
@@ -506,9 +514,10 @@ const datasetView = {
       );
       // this.tag_options = tags;
       this.subdatasets_ready = true;
-      // console.log(this.tag_options)
+      console.log(this.subdatasets_ready)
     }
     else {
+      this.$root.selectedDataset.subdatasets = [];
       this.subdatasets_ready = true;
     }
     next();

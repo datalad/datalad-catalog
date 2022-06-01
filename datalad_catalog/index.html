@@ -60,7 +60,9 @@
                 <b-card-text>
                   <strong>Version:</strong> {{sds.dataset_version.substring(0,7)}}&nbsp;
                   <strong>Modified:</strong> {{sds.last_edited}}&nbsp;
-                  <strong>DOI:</strong> <a :href="sds.doi" target="_blank">{{sds.doi.replace("https://doi.org/", "")}}</a>&nbsp;
+                  <strong>DOI:</strong>
+                    <span v-if="sds.doi"><a :href="sds.doi" target="_blank">{{sds.doi.replace("https://doi.org/", "")}}</a></span>
+                    <span v-else><em>not available</em></span>&nbsp;
                   <strong>License:</strong> <a :href="sds.license.url" target="_blank">{{sds.license.name}}</a>&nbsp;
                 </b-card-text>
               </b-col>
@@ -94,8 +96,10 @@
             <b-card-text>
               <strong>Version:</strong> {{selectedDataset.dataset_version.substring(0,7)}}&nbsp;
               <strong>Metadata extracted:</strong> {{displayData.metadata_extracted}}&nbsp;
-              <strong>DOI:</strong> <a v-show="selectedDataset.doi" :href="selectedDataset.doi" target="_blank">{{selectedDataset.doi.replace("https://doi.org/", "")}}</a><span v-show="displayData.doi"><em>{{displayData.doi}}</em></span>&nbsp;
-              <strong>License:</strong> <a v-show="selectedDataset.license.name" :href="selectedDataset.license.url" target="_blank">{{selectedDataset.license.name}}</a><span v-show="displayData.license"><em>{{displayData.license}}</em></span>&nbsp;
+              <strong>DOI:</strong> <span v-if="selectedDataset.doi"><a :href="selectedDataset.doi" target="_blank"> {{selectedDataset.doi.replace("https://doi.org/", "")}}</a></span>
+              <span v-else><em>not available</em></span>&nbsp;
+              <strong>License:</strong> <span v-if="selectedDataset.license && selectedDataset.license.name"><a :href="selectedDataset.license.url" target="_blank"> {{selectedDataset.license.name}}</a></span>
+              <span v-else><em>not available</em></span>
             </b-card-text>
             <!-- DATASET BUTTONS -->
             <div style="text-align: left;">
