@@ -5,7 +5,7 @@ import shutil
 import hashlib
 from . import constants as cnst
 import logging
-from .utils import read_json_file
+from .utils import read_json_file, find_duplicate_object_in_list
 from jsonschema import Draft202012Validator, RefResolver
 import yaml
 lgr = logging.getLogger('datalad.catalog.webcatalog')
@@ -262,10 +262,11 @@ class Node(object):
 
     def get_location(self):
         """
-        Get node file location from  dataset id, dataset version, and node path
-        using a file system structure similar to RIA stores
+        Get node file location from dataset id, dataset version, and node path
+        using a file system structure similar to RIA stores. Format:
+        "/metadata/dataset_id/dataset_version/id_version_hash.json"
         """
-        # /metadata/dataset_id/dataset_verion/id_version_hash.json
+        # /metadata/dataset_id/dataset_version/id_version_hash.json
         if not hasattr(self, 'node_path') and self.type=='dataset':
             self.node_path=None
 
@@ -300,21 +301,124 @@ class Node(object):
         path_right = dir_name[self._split_dir_length:]
         return path_left, path_right
 
-    def add_attribrutes(self, new_attributes: dict, overwrite=True):
-        """"""
+    def add_attribrutes(self, new_attributes: dict, catalog: WebCatalog, overwrite=False):
+        """Add attributes (key-value pairs) to a Node as instance variables
+
+        """
+        # Get config
+        dataset_config = catalog.config[cnst.PROPERTY_SOURCE][cnst.TYPE_DATASET]
+        # Get extractor / source. TODO: rework the extractors_used property, see https://github.com/datalad/datalad-catalog/issues/68
+        try:
+            data_source = new_attributes[cnst.EXTRACTORS_USED][0][cnst.EXTRACTOR_NAME]
+        except:
+            data_source = None
+        # Loop through provided keys
         for key in new_attributes.keys():
-            if hasattr(self, key):
-                # Only overwrite if flag is True AND the new property actually has content
-                # This prevents existing content from being overwritten by empty arrays/dicts
-                # TODO: this should be replaced by the enhancement to allow multiple sources of
-                # content (i.e. from multiple extractors) for the same attribute.
-                if overwrite and bool(new_attributes[key]):
-                    message = (f"Node instance already has an attribute '{key}'. Overwriting attribute value with non-zero/null content."
-                        "To prevent overwriting, set 'overwrite' argument to False")
-                    lgr.warning(message)
-                    setattr(self, key, new_attributes[key])
+            # Add extractor
+            if key == cnst.EXTRACTORS_USED:
+                self.add_extractor(new_attributes[cnst.EXTRACTORS_USED][0])
+                continue
+            # Skip keys with empty values
+            if not bool(new_attributes[key]):
+                continue
+            # create new or update existing attribute/variable
+            setattr(self, key, self._update_attribute(key, new_attributes, dataset_config, data_source, overwrite))
+
+
+    def _update_attribute(self, key,
+                          new_attributes: dict,
+                          dataset_config: dict,
+                          data_source,
+                          overwrite=False):
+        """Create new or update existing attribute/variable of a Node instance
+
+        This function incorporates prioritizing instructions from the user-
+        specified or default dataset-level config, reads the source of incoming
+        metadata, and decides whether to:
+        - create a new instance variable, if none exists
+        - merge the existing instance variable value with that of the incoming
+          data
+        - overwrite the existing instance variable value (if/when applicable)
+        - 
+        """
+        # TODO: still need to use overwrite flag where it makes sense to do so
+
+        # Extract config, existing, and new attribute values
+
+        config_source = dataset_config.get(key, None)
+        existing_value = None
+        if hasattr(self, key):
+            existing_value = getattr(self, key)
+        new_value = new_attributes[key]
+
+        # Decide what to do based on config. Options include:
+        # 1. list of names of data sources (e.g. ["metalad_studyminimeta", "datacite_gin"])
+        # 2. name of data source (e.g. extractor such as "metalad_core")
+        # 3. "merge"
+        # 4. "" (empty string) or None/null
+
+        # 1. List of names of data sources
+        if isinstance(config_source, list):
+            """"""
+            # Construct dict element for multisource list
+            new_object = {
+                "source": data_source,
+                "content": new_value
+            }
+            new_list = [new_object]
+            # If attribute does not exist yet, create it
+            if existing_value is None:
+                return new_list
             else:
-                setattr(self, key, new_attributes[key])
+                # Otherwise, merge into existing list
+                # If an object with the same "source" value already exists,
+                # replace value of the "content" key of existing object
+                existing_object = find_duplicate_object_in_list(existing_value, new_object, [cnst.SOURCE])
+                if existing_object is not None:
+                    existing_object[cnst.CONTENT] = new_value
+                    return existing_value
+                else:
+                # Otherwise, merge new list into existing list
+                    return existing_value + new_list
+        # If data from a single source should be used
+        elif config_source == data_source:
+            return new_value
+        # If data from multiple sources should be merged
+        elif config_source == "merge":
+            if existing_value is None:
+                return new_value
+            else:
+                # First ensure that both existing and new values are lists
+                if not isinstance(existing_value, list):
+                    existing_value = [existing_value]
+                if not isinstance(new_value, list):
+                    new_value = [new_value]
+                # Then determine type of variable in list and handle accordingly
+                if isinstance(new_value[0], (str, int)):
+                    return list(set(existing_value + new_value))
+                if isinstance(new_value[0], object):
+                    for new_object in new_value:
+                        existing_object = find_duplicate_object_in_list(existing_value, new_object, new_object.keys())
+                        if existing_object is None:
+                            existing_value.append(new_object)
+                        else:
+                            continue
+                    return existing_value
+                
+        # If config has empty string or none/null or does not exist
+        elif not bool(config_source):
+            if existing_value is None:
+                return new_value
+            else:
+                return existing_value
+        else:
+            # If a non priority source is present
+            if (config_source != data_source) and (existing_value is None):
+                return new_value
+            else:
+                # TODO: figure out if this is expected/ideal behaviour or not
+                return existing_value
+
 
     def add_child(self, meta_dict: dict):
         """

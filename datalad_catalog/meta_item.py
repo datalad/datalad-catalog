@@ -83,7 +83,7 @@ class MetaItem(object):
                     dataset_instance.add_child(subds_dict)
         
         # 2. Add fields to node instance; TODO: handle duplications (overwrite for now)
-        dataset_instance.add_attribrutes(meta_item, overwrite=True)
+        dataset_instance.add_attribrutes(meta_item, catalog, overwrite=False)
     
     def process_file(self, dataset_instance: Node, meta_item: dict, catalog: WebCatalog):
         """"""
