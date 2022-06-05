@@ -192,8 +192,8 @@
               <b-col md="9" style="text-align: justify;">
                 <b-card-text>
                   <strong>Description:</strong>
-                  <span v-if="displayData.descriptions && displayData.descriptions.length>0">
-                    <b-button-group><span v-for="desc in displayData.descriptions"><b-button id="xsm-button" size="sm" variant="outline-dark" @click="selectDescription(desc)">{{desc.name}}</b-button>&nbsp;</span></b-button-group><br>
+                  <span v-if="selectedDataset.description && selectedDataset.description.length>0">
+                    <b-button-group><span v-for="desc in selectedDataset.description"><b-button id="xsm-button" size="sm" variant="outline-dark" @click="selectDescription(desc)">{{desc.source}}</b-button>&nbsp;</span></b-button-group><br>
                     <span v-html="description_display"></span>
                   </span>
                   <span v-else>{{selectedDataset.description}}</span>

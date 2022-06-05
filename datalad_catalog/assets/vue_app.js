@@ -239,12 +239,9 @@ const datasetView = {
           disp_dataset.url = dataset.url[0];
         }
         // Description
-        if (dataset.hasOwnProperty("descriptions") && dataset["descriptions"].length>0) {
-          disp_dataset.descriptions = dataset.descriptions;
-          disp_dataset.selected_description = disp_dataset.descriptions.find(obj => {return obj.priority === 1});
-          if (!disp_dataset.selected_description) {
-            disp_dataset.selected_description = disp_dataset.descriptions[0];
-          }
+        if (dataset.hasOwnProperty("description") && dataset["description"].length>0) {
+          disp_dataset.description = dataset.description;
+          disp_dataset.selected_description = disp_dataset.description[0];
           this.selectDescription(disp_dataset.selected_description)
         }
         this.displayData = disp_dataset;
@@ -336,9 +333,10 @@ const datasetView = {
       }
     },
     selectDescription(desc) {
-      if (desc.type == "file") {
+      if (desc.content.startsWith("path:")) {
         this.description_ready = false;
-        extension = '.' + desc.path.split(".")[1];
+        filepath = desc.content.split(":")[1];
+        extension = '.' + filepath.split(".")[1];
         desc_file = getFilePath(this.selectedDataset.dataset_id, this.selectedDataset.dataset_version, desc.path, extension)
         fetch(desc_file)
           .then(response => response.blob())
