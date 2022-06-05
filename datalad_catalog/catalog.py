@@ -154,8 +154,10 @@ class Catalog(Interface):
                 None,
                 None,
                 None,
+                None,
             )
-            
+            return
+                               
         # Error out if `catalog_dir` argument was not supplied
         if catalog_dir is None:
             err_msg = f"No catalog directory supplied: Datalad catalog can only operate on a path to a directory. Argument: -c, --catalog_dir."
