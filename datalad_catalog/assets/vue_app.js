@@ -531,29 +531,36 @@ const datasetView = {
     app.selectedDataset = JSON.parse(text);
     this.dataset_ready = true;
     // tags = this.tag_options;
-    subds_json = await grabSubDatasets(app);
-    subds_json.forEach(
-      (subds, index) => {
-        if (subds_json[index] != "unavailable") {
-          sorted_extractors = subds_json[index].extractors_used.sort((a, b) => b.extraction_time - a.extraction_time)
-          this.$root.selectedDataset.subdatasets[index].extraction_time = sorted_extractors[0].extraction_time;
-          this.$root.selectedDataset.subdatasets[index].name = subds_json[index].name;
-          this.$root.selectedDataset.subdatasets[index].short_name = subds_json[index].short_name;
-          this.$root.selectedDataset.subdatasets[index].doi = subds_json[index].doi;
-          this.$root.selectedDataset.subdatasets[index].license = subds_json[index].license;
-          this.$root.selectedDataset.subdatasets[index].authors = subds_json[index].authors;
-          this.$root.selectedDataset.subdatasets[index].keywords = subds_json[index].keywords;
-          this.$root.selectedDataset.subdatasets[index].available = "true";
-          // tags = tags.concat(subds_json[index].keywords.filter((item) => tags.indexOf(item) < 0))
+    if (this.$root.selectedDataset.hasOwnProperty("subdatasets")
+        && this.$root.selectedDataset.subdatasets instanceof Array
+        && this.$root.selectedDataset.subdatasets.length > 0) {
+      subds_json = await grabSubDatasets(app);
+      subds_json.forEach(
+        (subds, index) => {
+          if (subds_json[index] != "unavailable") {
+            sorted_extractors = subds_json[index].extractors_used.sort((a, b) => b.extraction_time - a.extraction_time)
+            this.$root.selectedDataset.subdatasets[index].extraction_time = sorted_extractors[0].extraction_time;
+            this.$root.selectedDataset.subdatasets[index].name = subds_json[index].name;
+            this.$root.selectedDataset.subdatasets[index].short_name = subds_json[index].short_name;
+            this.$root.selectedDataset.subdatasets[index].doi = subds_json[index].doi;
+            this.$root.selectedDataset.subdatasets[index].license = subds_json[index].license;
+            this.$root.selectedDataset.subdatasets[index].authors = subds_json[index].authors;
+            this.$root.selectedDataset.subdatasets[index].keywords = subds_json[index].keywords;
+            this.$root.selectedDataset.subdatasets[index].available = "true";
+            // tags = tags.concat(subds_json[index].keywords.filter((item) => tags.indexOf(item) < 0))
+          }
+          else {
+            this.$root.selectedDataset.subdatasets[index].available = "false";
+          }
         }
-        else {
-          this.$root.selectedDataset.subdatasets[index].available = "false";
-        }
-      }
-    );
-    // this.tag_options = tags;
-    this.subdatasets_ready = true;
-    // console.log(this.tag_options)
+      );
+      // this.tag_options = tags;
+      this.subdatasets_ready = true;
+      // console.log(this.tag_options)
+    } else {
+      this.$root.selectedDataset.subdatasets = [];
+      this.subdatasets_ready = true;
+    }
   },
   mounted() {
     this.tag_options_filtered = this.tag_options;
