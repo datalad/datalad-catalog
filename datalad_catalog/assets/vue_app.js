@@ -229,25 +229,37 @@ const datasetView = {
         disp_dataset.is_github = false; // Github / gitlab / url / binder
         disp_dataset.is_gitlab = false; // Github / gitlab / url / binder
         disp_dataset.url = ''
-        for (var i = 0; i < dataset.url.length; i++) { 
-          if (dataset.url[i].toLowerCase().indexOf("github") >= 0) {
-            disp_dataset.is_github = true;
-            disp_dataset.url = dataset.url[i];
-          }
+
+        if (dataset.hasOwnProperty("url")
+          && (dataset["url"] instanceof Array || Array.isArray(dataset["url"]))
+          && dataset["url"].length>0) {
+            for (var i = 0; i < dataset.url.length; i++) { 
+              if (dataset.url[i].toLowerCase().indexOf("github") >= 0) {
+                disp_dataset.is_github = true;
+                disp_dataset.url = dataset.url[i];
+              }
+            }
+            if (!disp_dataset.url) {
+              disp_dataset.url = dataset.url[0];
+            }
+        } else {
+          disp_dataset.url = dataset.url;
         }
-        if (!disp_dataset.url) {
-          disp_dataset.url = dataset.url[0];
-        }
+
         // Description
-        if (dataset.hasOwnProperty("description") && dataset["description"].length>0) {
-          disp_dataset.description = dataset.description;
-          disp_dataset.selected_description = disp_dataset.description[0];
-          this.selectDescription(disp_dataset.selected_description)
+        if (dataset.hasOwnProperty("description")
+          && (dataset["description"] instanceof Array || Array.isArray(dataset["description"]))
+          && dataset["description"].length>0) {
+            disp_dataset.description = dataset.description;
+            disp_dataset.selected_description = disp_dataset.description[0];
+            this.selectDescription(disp_dataset.selected_description)
+        }
+        if (dataset.hasOwnProperty("description")
+          && (dataset["description"] instanceof String) || typeof dataset["description"] === 'string') {
+            this.description_ready = true;
         }
         this.displayData = disp_dataset;
         this.display_ready = true;
-
-        // console.log(this.displayData)
       }
     }
   },
