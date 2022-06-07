@@ -2,29 +2,35 @@
 catalog_name: "DataCat"
 
 # Styling
-logo_path: "" # absolute path of logo
+logo_path: "" # path to logo
 link_color: "#fba304" # hex color code
 link_hover_color: "#af7714" # hex color code
 
-# Dealing with multiple sources of metadata
-# Options:
-# - prioritised list, show all and user selects ==> yaml list of extractors, top to bottom = high to low priority
-# - merge all sources ==> "merge"
-# - prioritised list, show one ==> yaml list of extractors, top to bottom = high to low priority
+# Options for multiple sources of metadata:
+# - user selects from a list of sources
+# - merge all sources
 # - single source ==> extractor name
-
-# Note 1: all sources do not have to be included in the ordered list. The ones that are included are taken as priority
-# in order of appearance. Sources that are not included in list below are still considered, see Note 2.
-
-# Note 2: for unspecified properties, default behaviour is to:
+# Note: for unspecified properties, default behaviour is to:
 # - overwrite if null/empty 
-# - if existing (do nothing? turn into array?)
-property_sources: #
+# - do nothing if exists
+property_sources:
   dataset:
-    authors: merge
-    description:
-      display: all
-      source: []
-    keywords: merge
-    additional_display: merge
+    dataset_id: "metalad_core",
+    dataset_version: "metalad_core",
+    type: "metalad_core",
+    children: merge,
+    name: "metalad_studyminimeta",
+    short_name: "",
+    description: ["metalad_studyminimeta", "datacite_gin", "readme.md"],
+    doi: "",
+    url: merge,
+    authors: merge,
+    keywords: merge,
+    license: "",
+    funding: merge,
+    publications: merge,
+    subdatasets: merge,
+    extractors_used: merge,
+    additional_display: merge,
     top_display: merge
+  # file: not yet specified
