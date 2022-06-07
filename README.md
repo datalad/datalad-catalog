@@ -3,39 +3,51 @@
 
 ---
 
-# DataLad Catalog - Create a user-friendly data browser from structured metadata
 
 [![Documentation Status](https://readthedocs.org/projects/datalad-catalog/badge/?version=latest)](http://docs.datalad.org/projects/catalog/en/latest/?badge=latest)
 
-![](docs/source/_static/datalad_catalog_demo.svg)
+![](docs/source/_static/datacat0_hero.svg)
 
-This extension to DataLad allows you to generate a standalone browser-based user interface for [Datalad](https://www.datalad.org/) datasets by:
-1. parsing Datalad-derived metadata,
-2. translating the metadata into structured data understandable and renderable by the frontend
-3. generating a VueJS-based frontend with which to interactively browse the dataset's metadata.
+<br>
 
+DataLad Catalog is a free and open source command line tool, with a Python API, that assists with the automatic generation of user-friendly, browser-based data catalogs from structured metadata. It is an extension to [DataLad](https://datalad.org) and forms part of the broader ecosystem of DataLad's distributed metadata handling and (meta)data publishing tools.
 
 ## 1. Online demo
 
-Navigate to [https://datalad.github.io/datalad-catalog/](https://datalad.github.io/datalad-catalog/) to view a live demo of the current work-in-progress state of the user interface.
+Navigate to [https://datalad.github.io/datalad-catalog/](https://datalad.github.io/datalad-catalog/) to view a live demo of a catalog generated with DataLad Catalog.
 
 This demo site is hosted via GitHub Pages and it builds from the `gh-pages` branch of this repository.
 
+<div style="text-align:center;">
+    <img src="docs/source/_static/datalad_catalog_demo.svg" width="60%"></img>
+</div>
+
 ## 2. How it works
 
-DataLad's metadata capabilities (see [datalad-metalad](https://github.com/datalad/datalad-metalad)) allows extracting metadata from DataLad datasets, subdatasets, and files, and to aggregate this information to the top-level dataset. When exported (using e.g. `datalad meta-dump`, `meta-extract`, or `meta-conduct`), these metadata objects can be ingested and parsed by `datalad catalog`. This package translates the DataLad metadata into structured data required by the VueJS-based user interface, and it also generates the assets for the interface (artwork, CSS, JavaScript and HTML). The resulting content can be hosted as a standalone website (as is the case for the demo above) without requiring any building steps beforehand.
+DataLad Catalog can receive commands to `create` a new catalog, `add` and `remove` metadata entries to/from an existing catalog, `serve` an existing catalog locally, and more. Metadata can be provided to DataLad Catalog from any number of arbitrary metadata sources, as an aggregated set or as individual metadata items. DataLad Catalog has a dedicated schema (using the [JSON Schema](https://json-schema.org/) vocabulary) against which incoming metadata items are validated. This schema allows for standard metadata fields as one would expect for datasets of any kind (such as `name`, `doi`, `url`, `description`, `license`, `authors`, and more), as well as fields that support identification, versioning, dataset context and linkage, and file tree specification.
 
-## 3. Install `datalad catalog`
+The process of generating a catalog, after metadata entry validation, involves:
+1. aggregation of the provided metadata into the catalog filetree, and
+2. generating the assets required to render the user interface in a browser.
+
+The output is a set of structured metadata files, as well as a [Vue.js](https://vuejs.org/)-based browser interface that understands how to render this metadata in the browser. What is left for the user is to host this content on their platform of choice and to serve it for the world to see.
+
+<br>
+<div style="text-align:center;">
+    <img src="docs/source/_static/datacat4_the_catalog.svg" width="60%"></img>
+</div>
+
+
+## 3. Install `datalad-catalog`
 
 ### Step 1 - Setup and activate virtual environment
 
 With your virtual environment manager of choice, create a virtual environment and ensure
-you have a recent version of Python installed. Then activate the environment. E.g. with
-[miniconda](https://docs.conda.io/en/latest/miniconda.html#latest-miniconda-installer-links):
+you have a recent version of Python installed. Then activate the environment. E.g. with `venv`:
 
 ```
-conda create -n catalog python=3.9
-conda activate catalog
+python -m venv my_catalog_env
+source my_catalog_env/bin/activate
 ```
 
 ### Step 2 - Clone the repo and install the package
@@ -47,75 +59,68 @@ cd datalad-catalog
 pip install -e .
 ```
 
-Congratulations! You have now installed `datalad catalog`.
+Congratulations! You have now installed `datalad-catalog`.
 
-To generate metadata that is compatible with `datalad catalog`, you will need to install
-the latest version of `datalad metalad` from GitHub (the install process above installs
-it as a dependency, but it installs an earlier release from PyPi). Run the following:
+#### Note on dependencies:
 
-```
-git clone https://github.com/datalad/datalad-metalad.git
-cd datalad-metalad
-pip install -e .
-```
+Because this is an extension to `datalad` and builds on metadata handling functionality, the installation process also installed [`datalad`](https://github.com/datalad/datalad) and [`datalad-metalad`](https://github.com/datalad/datalad-metalad) as dependencies, although these do not have to be used as the only sources of metadata for a catalog.
 
-Lastly, in order to build a full data management pipeline from raw data to catalog, you
-will need to use `datalad`, for which you need `git-annex`. This might already have been
-installed as part of the process above, depending on your operating system. For complete
-instructions on how to install `datalad` and `git-annex`, please refer to the
-[DataLad Handbook](https://handbook.datalad.org/en/latest/intro/installation.html).
+While the catalog generation process does not expect data to be structured as DataLad datasets, it can still be very useful to do so when building a full (meta)data management pipeline from raw data to catalog publishing. For complete instructions on how to install `datalad` and `git-annex`, please refer to the [DataLad Handbook](https://handbook.datalad.org/en/latest/intro/installation.html).
+
+Similarly, the metadata input to `datalad-catalog` can come from any source as long as it conforms to the catalog schema. While the catalog does not expect metadata originating only from `datalad-metalad`'s extractors, this tool has advanced metadata handling capabilities that will integrate seamlessly with DataLad datasets and the catalog generation process.
 
 
-## 4. Generate a catalog locally
+## 4. Generating a catalog
 
-### Step 1 - access and clone DataLad dataset(s)
-In order to generate a catalog, you will need to have access to a DataLad dataset (or many of them).Note: this would be the metadata representation of the dataset and all its files, but the actual file content (residing in the annex) will most likely not be necessary.
+The overall catalog generation process actually starts several steps before the involvement of `datalad-catalog`. Steps include:
 
-To get access to a DataLad dataset, use `datalad` in the command line as follows:
-```
-datalad clone <dataset-loaction>
-```
+1. curating data into datasets (a group of files in an hierarchical tree)
+2. adding metadata to datasets and files (the process for this and the resulting metadata formats and content vary widely depending on domain, file types, data availability, and more)
+3. extracting the metadata using an automated tool to output metadata items into a standardized and queryable set
+4. in the current context: translating the metadata into the catalog schema
+5. in the current context: using `datalad-catalog` to generate a catalog from the schema-conforming metadata
 
-### Step 2 - metadata extraction/aggregation
-This needs to be followed by a process of metadata extraction with `datalad metalad`, using commands such as `datalad meta-dump`, `datalad meta-extract`, or `datalad meta-conduct`. Extraction and aggregation results in the aggregated dataset- and file-level metadata from which the catalog will be generated. Currently, this metadata should be an array of JSON objects in a text file.
-
-For a detailed example of how to get from raw DataLad datasets to input data for `datalad catalog`, please refer to [this sample pipeline description](datalad_catalog/examples/sample_catalog_pipeline.md).
-
-For an example of such an input file, have a look at [`datalad_catalog/examples/sample_input_metadata.json`](datalad_catalog/examples/sample_input_metadata.json).
-
-### Step 3 - generate the catalog
-
-`datalad catalog` can be used via the command line with specific commands:
+The first four steps in this list can follow any arbitrarily specified procedures and can use any arbitrarily specified tools to get the job done. If these steps are completed, correctly formatted data can be input, together with some configuration details, to `datalad-catalog`. This tool then provides several basic commands for catalog generation and customization. *For example:*
 
 ```bash
-# Create a catalog at loctaion <path/to/catalog/directory>, using input data located at <path/to/input/data>
+
+datalad catalog validate -m <path/to/input/data>
+# Validate input data located at <path/to/input/data> according to the catalog's schema.
+
 datalad catalog create -c <path/to/catalog/directory> -m <path/to/input/data>
-# Add metadata to an existing catalog at loctaion <path/to/catalog/directory>, using input data located at <path/to/input/data>
+# Create a catalog at location <path/to/catalog/directory>, using input data located at <path/to/input/data>.
+
 datalad catalog add -c <path/to/catalog/directory> -m <path/to/input/data>
-# Set the superdataset of an existing catalog at loctaion <path/to/catalog/directory>, where the superdataset id and version are provided as arguments
+# Add metadata to an existing catalog at location <path/to/catalog/directory>, using input data located at <path/to/input/data>.
+
 datalad catalog set-super -c <path/to/catalog/directory> -i <dataset_id> -v <dataset_version>
-```
+# Set the superdataset of an existing catalog at location <path/to/catalog/directory>, where the superdataset id and version are provided as arguments. The superdataset will be the first dataset displayed when navigating to the root URL of a catalog.
 
-### Step 4 - render the catalog
-
-#### a) Start a webserver with Python
-
-The webserver is necessary because the code uses [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) to `GET` data from local file, and you will run into CORS errors (e.g. [here](https://stackoverflow.com/questions/10752055/cross-origin-requests-are-only-supported-for-http-error-when-loading-a-local)) when trying to access content on the local file system without a web server.
-
-Within your virtual environment, navigate to your catalog directory and then start the webserver:
+datalad catalog serve -c <path/to/catalog/directory>
+# Serve the content of the catalog at location <path/to/catalog/directory> via a local HTTP server.
 
 ```
-python3 -m http.server
-```
 
-#### b) Open the locally hosted user interface
-
-The step above opens a server at [http://localhost:8000/](http://localhost:8000/), which you can navigate to in your browser. This will render the `index.html` page in your browser, which is the same (or very similar) content that is served to the demo page.
-
-For developers, this local server will allow you to view your changes in real-time as you develop. After making changes to `index.html`, `assets/vue_app.js` or `assets/style.css` (for example), you can refresh your browser tab to view changes.
+To explore the basic functionality of `datalad-catalog`, please refer to [these tutorials](https://github.com/datalad/tutorials/tree/master/notebooks/catalog_tutorials#readme).
 
 
-## 5. Contributing
+## 5. An example workflow
+
+The DataLad ecosystem provides a complete set of free and open source tools that, together, provide full control over dataset/file access and distribution, version control, provenance tracking, metadata addition/extraction/aggregation, and catalog generation. 
+
+DataLad itself can be used for decentralised management of data as lightweight, portable and extensible representations. DataLad MetaLad can extract structured high- and low-level metadata and associate it with these datasets or with individual files. And at the end of the workflow, DataLad Catalog can turn the structured metadata into a user-friendly data browser.
+
+Importantly, DataLad Catalog can operate independently as well. Since it provides its own schema in a standard vocabulary, any metadata that conforms to this schema can be submitted to the tool in order to generate a catalog. Metadata items do not necessarily have to be derived from DataLad datasets, and the metadata extraction does not have to be conducted via DataLad MetaLad.
+
+Even so, the provided set of tools can be particularly powerful when used together in a distributed (meta)data management pipeline.
+
+<br>
+<div style="text-align:center;">
+    <img src="docs/source/_static/datacat3_the_toolset.svg" width="60%"></img>
+</div>
+
+
+## 6. Contributing
 
 ### Feedback / comments
 
@@ -130,7 +135,7 @@ cd datalad-catalog
 pip install -r requirements-devel.txt
 ```
 
-This installs `sphinx` and related packages for documentation building, `coverage` for code coverage testing, and `pytest` for testing.
+This installs `sphinx` and related packages for documentation building, `coverage` for code coverage, and `pytest` for testing.
 
 ### Contribution process
 
