@@ -450,7 +450,7 @@
       <b-container style="margin-top:20px;">
         <b-row align-v="end">
           <b-col cols="9">
-            <a @click="gotoHome"><img src="artwork/catalog_logo.svg" class="d-inline-block" alt="datalad" style="width:100%;"></a>
+            <span v-show="logo_path"><a @click="gotoHome"><img :src="logo_path" class="d-inline-block" alt="datalad" style="width:100%;"></a></span>
           </b-col>
           <b-col cols="1"></b-col>
           <b-col cols="2" align-h="end">

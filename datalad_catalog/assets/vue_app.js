@@ -9,37 +9,9 @@ const SPLIT_INDEX = 3;
 const default_config = {
   catalog_name: 'DataCat',
   link_color: '#fba304',
-  link_hover_color: '#af7714'
+  link_hover_color: '#af7714',
+  logo_path: 'artwork/catalog_logo.svg'
 }
-
-
-/**********/
-// Config //
-/**********/
-fetch(config_file).then((response) => {
-  if (response.ok) {
-    return response.json();
-  } else {
-    console.log('WARNING: config.json file could not be loaded; using defaults.');
-    return default_config
-  }
-})
-.then((responseJson) => {
-  obj = responseJson;
-  // Set color scheme
-  const style_text =  ":root{--link-color: " + responseJson.link_color + "; --link-hover-color: " + responseJson.link_hover_color + ";}"
-  const style_section = document.createElement("style");
-  const node = document.createTextNode(style_text);
-  style_section.appendChild(node);
-  const body_element = document.getElementById("mainbody");
-  body_element.insertBefore(style_section, body_element.firstChild)
-  // Settings for multiple property sources
-})
-.catch((error) => {
-  console.log(error)
-});
-
-
 
 /**************/
 // Components //
@@ -657,6 +629,7 @@ var demo = new Vue({
   el: "#demo",
   data: {
       selectedDataset: {},
+      logo_path: '',
   },
   methods: {
     gotoHome() {
@@ -678,6 +651,37 @@ var demo = new Vue({
         window.open(dest);
       }
     }
+  },
+  beforeCreate() {
+    fetch(config_file).then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        console.log('WARNING: config.json file could not be loaded; using defaults.');
+        return default_config
+      }
+    })
+    .then((responseJson) => {
+      obj = responseJson;
+      // Set color scheme
+      const style_text =  ":root{--link-color: " + responseJson.link_color + "; --link-hover-color: " + responseJson.link_hover_color + ";}"
+      const style_section = document.createElement("style");
+      const node = document.createTextNode(style_text);
+      style_section.appendChild(node);
+      const body_element = document.getElementById("mainbody");
+      body_element.insertBefore(style_section, body_element.firstChild)
+      // Set logo
+      if (obj.logo_path) {
+        this.logo_path = obj.logo_path
+      } else {
+        this.logo_path = default_config.logo_path;
+      }
+      // Settings for multiple property sources
+    })
+    .catch((error) => {
+      console.log(error)
+      this.logo_path = default_config.logo_path;
+    });
   },
   router
 });
@@ -767,16 +771,3 @@ async function checkFileExists(url) {
     return false;
   }
 }
-
-
-
-
-
-
-/*
-TODO: use emit!!
-TODO: add object and logic to track existence and content of dataset fields and resulting action (visibility, text to display, etc). E.g.:
--- if there are no publications, hide empty publication card and show sentence "There are currently no publications associated with this dataset."
--- show/hide components based on whether fields exist or are empty in json blob
--- populate filler/adapted text (e.g. time of extraction ==> utc seconds converted to display date)
-*/
