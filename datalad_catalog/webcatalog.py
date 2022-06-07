@@ -94,8 +94,14 @@ class WebCatalog(object):
         Create new catalog directory with assets (JS, CSS), artwork, config and the main html
         """
 
-        # Get package-related paths/content
+        # TODO: first validate config file (using jsonschema?)
+        # Check logo path, if added to config
+        if cnst.LOGO_PATH in self.config and self.config[cnst.LOGO_PATH]:
+            if not Path(self.config[cnst.LOGO_PATH]).exists():
+                msg = f"Error in config: the specified logo does not exist at path: {self.config[cnst.LOGO_PATH]}"
+                raise FileNotFoundError(msg)
 
+        # Get package-related paths/content
         if not (self.metadata_path.exists() and self.metadata_path.is_dir()):
             Path(self.metadata_path).mkdir(parents=True)
 
@@ -116,14 +122,6 @@ class WebCatalog(object):
 
         # Copy / write config file
         self.write_config(force)
-        # Copy content specified by config
-        if cnst.LOGO_PATH in self.config and self.config[cnst.LOGO_PATH]:
-            existing_path = Path(self.config[cnst.LOGO_PATH])
-            existing_suffix = existing_path.suffix
-            new_path = Path(self.location) / 'artwork' / ('catalog_logo' + existing_suffix)
-            copy_overwrite_path(src=existing_path,
-                                dest=new_path,
-                                overwrite=force)
 
 
     def add_dataset():
@@ -178,19 +176,21 @@ class WebCatalog(object):
 
     def write_config(self, force=False):
         """"""
-        new_path = Path(self.location) / 'config.json'
-        # if JSON, copy directly
-        if self.config_path.suffix == '.json':
-            existing_path = self.config_path
+
+        # Copy content specified by config
+        if cnst.LOGO_PATH in self.config and self.config[cnst.LOGO_PATH] \
+            and self.config[cnst.LOGO_PATH] != 'artwork/catalog_logo.svg':
+            existing_path = Path(self.config[cnst.LOGO_PATH])
+            existing_name = existing_path.name
+            new_path = Path(self.location) / 'artwork' / existing_name
             copy_overwrite_path(src=existing_path,
                                 dest=new_path,
                                 overwrite=force)
-        # If YAML, first load into dict then dump to new json file
-        if self.config_path.suffix in ['.yml', '.yaml']:
-            with open(self.config_path) as f:
-                config_dict = yaml.safe_load(f)
-                with open(new_path, 'w') as f_config:
-                    json.dump(config_dict, f_config)
+            self.config[cnst.LOGO_PATH] = 'artwork/' + existing_name
+
+        new_config_path = Path(self.location) / 'config.json'
+        with open(new_config_path, 'w') as f_config:
+                json.dump(self.config, f_config)
 
 
 class Node(object):
