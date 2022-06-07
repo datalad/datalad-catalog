@@ -19,7 +19,7 @@ Navigate to [https://datalad.github.io/datalad-catalog/](https://datalad.github.
 This demo site is hosted via GitHub Pages and it builds from the `gh-pages` branch of this repository.
 
 <div style="text-align:center;">
-    <img src="docs/source/_static/datalad_catalog_demo.svg" width="60%"></img>
+    <img src="docs/source/_static/datalad_catalog_demo.svg" width="75%"></img>
 </div>
 
 ## 2. How it works
@@ -34,7 +34,7 @@ The output is a set of structured metadata files, as well as a [Vue.js](https://
 
 <br>
 <div style="text-align:center;">
-    <img src="docs/source/_static/datacat4_the_catalog.svg" width="60%"></img>
+    <img src="docs/source/_static/datacat4_the_catalog.svg" width="75%"></img>
 </div>
 
 
@@ -116,7 +116,7 @@ Even so, the provided set of tools can be particularly powerful when used togeth
 
 <br>
 <div style="text-align:center;">
-    <img src="docs/source/_static/datacat3_the_toolset.svg" width="60%"></img>
+    <img src="docs/source/_static/datacat3_the_toolset.svg" width="75%"></img>
 </div>
 
 
