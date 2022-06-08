@@ -101,10 +101,14 @@ datalad catalog serve -c <path/to/catalog/directory>
 
 ```
 
+<div id="tutorial"><div>
+
+## 5. Tutorial
+
 To explore the basic functionality of `datalad-catalog`, please refer to [these tutorials](https://github.com/datalad/tutorials/tree/master/notebooks/catalog_tutorials#readme).
 
 
-## 5. An example workflow
+## 6. An example workflow
 
 The DataLad ecosystem provides a complete set of free and open source tools that, together, provide full control over dataset/file access and distribution, version control, provenance tracking, metadata addition/extraction/aggregation, and catalog generation. 
 
@@ -120,7 +124,7 @@ Even so, the provided set of tools can be particularly powerful when used togeth
 </div>
 
 
-## 6. Contributing
+## 7. Contributing
 
 ### Feedback / comments
 
