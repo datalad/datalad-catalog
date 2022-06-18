@@ -37,6 +37,28 @@
         "userTesting",
         "bug"
       ]
+    },
+    {
+      "login": "jkosciessa",
+      "name": "Julian Kosciessa",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40263608?v=4",
+      "profile": "http://juliankosciessa.eu",
+      "contributions": [
+        "userTesting",
+        "tutorial",
+        "ideas",
+        "doc",
+        "bug"
+      ]
+    },
+    {
+      "login": "adswa",
+      "name": "Adina Wagner",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29738718?v=4",
+      "profile": "http://www.adina-wagner.com",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
