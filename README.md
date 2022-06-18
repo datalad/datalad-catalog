@@ -1,4 +1,7 @@
 ## --- UNDER DEVELOPMENT ---
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 *This repository is undergoing continuous development and all branches should be considered unstable*
 
 ---
@@ -152,3 +155,22 @@ To make a contribution to the code or documentation, please:
 - commit your changes,
 - push to your fork
 - create a pull request with a clear description of the changes
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://jsheunis.github.io/"><img src="https://avatars.githubusercontent.com/u/10141237?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Stephan Heunis</b></sub></a><br /><a href="https://github.com/datalad/datalad-catalog/issues?q=author%3Ajsheunis" title="Bug reports">🐛</a> <a href="https://github.com/datalad/datalad-catalog/commits?author=jsheunis" title="Code">💻</a> <a href="#content-jsheunis" title="Content">🖋</a> <a href="#data-jsheunis" title="Data">🔣</a> <a href="https://github.com/datalad/datalad-catalog/commits?author=jsheunis" title="Documentation">📖</a> <a href="#design-jsheunis" title="Design">🎨</a> <a href="#ideas-jsheunis" title="Ideas, Planning, & Feedback">🤔</a> <a href="#infra-jsheunis" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#maintenance-jsheunis" title="Maintenance">🚧</a> <a href="https://github.com/datalad/datalad-catalog/commits?author=jsheunis" title="Tests">⚠️</a> <a href="#question-jsheunis" title="Answering Questions">💬</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
