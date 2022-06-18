@@ -36,6 +36,19 @@
         "code",
         "userTesting"
       ]
+    },
+    {
+      "login": "jkosciessa",
+      "name": "Julian Kosciessa",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40263608?v=4",
+      "profile": "http://juliankosciessa.eu",
+      "contributions": [
+        "userTesting",
+        "tutorial",
+        "ideas",
+        "doc",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
