@@ -1,0 +1,34 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "jsheunis",
+      "name": "Stephan Heunis",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10141237?v=4",
+      "profile": "https://jsheunis.github.io/",
+      "contributions": [
+        "bug",
+        "code",
+        "content",
+        "data",
+        "doc",
+        "design",
+        "ideas",
+        "infra",
+        "maintenance",
+        "test",
+        "question"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "datalad-catalog",
+  "projectOwner": "datalad",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
