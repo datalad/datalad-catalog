@@ -59,6 +59,16 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "yarikoptic",
+      "name": "Yaroslav Halchenko",
+      "avatar_url": "https://avatars.githubusercontent.com/u/39889?v=4",
+      "profile": "http://www.onerussian.com",
+      "contributions": [
+        "userTesting",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
