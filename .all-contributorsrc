@@ -78,6 +78,15 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "bpoldrack",
+      "name": "Benjamin Poldrack",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10498301?v=4",
+      "profile": "https://github.com/bpoldrack",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
