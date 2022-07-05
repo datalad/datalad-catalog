@@ -13,11 +13,11 @@ from ..utils import read_json_file
 
 # Setup schema parameters
 package_path = Path(__file__).resolve().parent.parent
-templates_path = package_path / "templates"
+schema_dir = package_path / "schema"
 schemas = ["dataset", "file", "authors", "extractors"]
 schema_store = {}
 for s in schemas:
-    schema_path = templates_path / str("jsonschema_" + s + ".json")
+    schema_path = schema_dir / str("jsonschema_" + s + ".json")
     schema = read_json_file(schema_path)
     schema_store[schema["$id"]] = schema
 dataset_schema = schema_store["https://datalad.org/catalog.dataset.schema.json"]

@@ -125,7 +125,7 @@ class Catalog(Interface):
             args=("-y", "--config-file"),
             # documentation
             doc="""Path to config file in YAML or JSON format. Default config is read
-            from datalad_catalog/templates/config.json
+            from datalad_catalog/config/config.json
             Example: ''""",
         ),
     )
@@ -471,11 +471,12 @@ def _validate_metadata(
 
     # Setup schema parameters
     package_path = Path(__file__).resolve().parent
-    templates_path = package_path / "templates"
+    config_dir = package_path / "config"
+    schema_dir = package_path / "schema"
     schemas = ["catalog", "dataset", "file", "authors", "extractors"]
     schema_store = {}
     for s in schemas:
-        schema_path = templates_path / str("jsonschema_" + s + ".json")
+        schema_path = schema_dir / str("jsonschema_" + s + ".json")
         schema = read_json_file(schema_path)
         schema_store[schema["$id"]] = schema
 
