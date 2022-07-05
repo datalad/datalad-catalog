@@ -1,8 +1,8 @@
-
 from ..catalog import Catalog
 from ..webcatalog import WebCatalog
 import pytest
 from datalad.support.exceptions import InsufficientArgumentsError
+
 
 def test_catalog_no_argument():
     """
@@ -12,13 +12,15 @@ def test_catalog_no_argument():
         ctlg = Catalog()
         ctlg()
 
+
 def test_catalog_wrong_action_argument():
     """
     Test if error is raised when wrong action argument is supplied
     """
     with pytest.raises(ValueError):
         ctlg = Catalog()
-        ctlg('wrong_action')
+        ctlg("wrong_action")
+
 
 def test_catalog_no_path_argument():
     """
@@ -27,7 +29,8 @@ def test_catalog_no_path_argument():
     partial_error_msg = "--catalog_dir"
     with pytest.raises(InsufficientArgumentsError, match=partial_error_msg):
         ctlg = Catalog()
-        ctlg('create')
+        ctlg("create")
+
 
 def test_catalog_nonexisting_noncreate(tmp_path):
     """
@@ -38,4 +41,4 @@ def test_catalog_nonexisting_noncreate(tmp_path):
     partial_error_msg = "can only operate on an existing catalog"
     with pytest.raises(InsufficientArgumentsError, match=partial_error_msg):
         ctlg = Catalog()
-        ctlg('add', catalog_dir=catalog_path)
+        ctlg("add", catalog_dir=catalog_path)

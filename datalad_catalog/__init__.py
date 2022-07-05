@@ -1,6 +1,6 @@
 """DataLad Catalog extension"""
 
-__docformat__ = 'restructuredtext'
+__docformat__ = "restructuredtext"
 
 # Defines a datalad command suite.
 # This variable must be bound as a setuptools entrypoint
@@ -12,15 +12,15 @@ command_suite = (
         # specification of a command, any number of commands can be defined
         (
             # importable module that contains the command implementation
-            'datalad_catalog.catalog',
+            "datalad_catalog.catalog",
             # name of the command class implementation in above module
-            'Catalog',
+            "Catalog",
             # optional name of the command in the cmdline API
-            'catalog',
+            "catalog",
             # optional name of the command in the Python API
-            'catalog_cmd'
+            "catalog_cmd",
         ),
-    ]
+    ],
 )
 
 
@@ -28,5 +28,6 @@ from datalad import setup_package
 from datalad import teardown_package
 
 from ._version import get_versions
-__version__ = get_versions()['version']
+
+__version__ = get_versions()["version"]
 del get_versions
