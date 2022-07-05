@@ -6,5 +6,5 @@ Python Module Reference
 .. autosummary::
    :toctree: generated
 
-   catalog_cmd
+   catalog
 
