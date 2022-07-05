@@ -36,9 +36,11 @@ class Catalog(Interface):
     """
 
     _examples_ = [
-        dict(text="TODO",
-             code_py="TODO",
-             code_cmd="TODO"),
+        dict(
+            text="Create a new catalog from scratch",
+            code_py="catalog_cmd('create', catalog_dir='/tmp/new')",
+            code_cmd="datalad catalog create -c /tmp/new",
+        ),
     ]
     # parameters of the command, must be exhaustive
     _params_ = dict(
