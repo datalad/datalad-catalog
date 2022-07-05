@@ -15,25 +15,23 @@ cmdclass.update(build_manpage=BuildManPage)
 # 43.0.0 allows us to put most metadata in setup.cfg and causes pyproject.toml
 # to be automatically included in sdists
 # Should match pyproject.toml
-SETUP_REQUIRES = ['setuptools >= 43.0.0']
+SETUP_REQUIRES = ["setuptools >= 43.0.0"]
 # This enables setuptools to install wheel on-the-fly
-SETUP_REQUIRES += ['wheel'] if 'bdist_wheel' in sys.argv else []
+SETUP_REQUIRES += ["wheel"] if "bdist_wheel" in sys.argv else []
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     setup(
-        name='datalad_catalog',
+        name="datalad_catalog",
         version=versioneer.get_version(),
         cmdclass=cmdclass,
         setup_requires=SETUP_REQUIRES,
         entry_points={
-            'datalad.extensions': [
-                'catalog=datalad_catalog:command_suite',
+            "datalad.extensions": [
+                "catalog=datalad_catalog:command_suite",
             ],
-            'datalad.tests': [
-                'catalog=datalad_catalog'
+            "datalad.tests": ["catalog=datalad_catalog"],
+            "datalad.metadata.extractors": [
+                "datacite_gin=datalad_catalog.extractors.datacite_gin:DataciteGINDatasetExtractor",
             ],
-            'datalad.metadata.extractors': [
-                'datacite_gin=datalad_catalog.extractors.datacite_gin:DataciteGINDatasetExtractor',
-            ]
-        }
+        },
     )

@@ -14,13 +14,7 @@ import sys
 from pathlib import Path
 import json
 import os
-from typing import (
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union
-)
+from typing import Dict, List, Optional, Tuple, Union
 from .webcatalog import WebCatalog, Node
 from .utils import read_json_file
 from .meta_item import MetaItem
@@ -35,7 +29,7 @@ lgr = logging.getLogger("datalad.catalog.catalog")
 class Catalog(Interface):
     # first docstring line is used a short description in the cmdline help
     # the rest is put in the verbose help and manpage
-    """Generate web-browser-based user interface for browsing metadata of a 
+    """Generate web-browser-based user interface for browsing metadata of a
     DataLad dataset.
 
     (Long description of arbitrary volume.)
@@ -52,7 +46,9 @@ class Catalog(Interface):
             Example: ''""",
             # type checkers, constraint definition is automatically
             # added to the docstring
-            constraints=EnsureChoice('create', 'add', 'remove', 'serve', 'set-super', 'validate')
+            constraints=EnsureChoice(
+                "create", "add", "remove", "serve", "set-super", "validate"
+            ),
         ),
         catalog_dir=Parameter(
             # cmdline argument definitions, incl aliases
@@ -60,7 +56,7 @@ class Catalog(Interface):
             # documentation
             doc="""Directory where the catalog is located or will be created.
             Example: ''""",
-            ),
+        ),
         metadata=Parameter(
             # cmdline argument definitions, incl aliases
             args=("-m", "--metadata"),
@@ -70,21 +66,21 @@ class Catalog(Interface):
              single datalad dataset.
             - A stream of JSON objects/lines
             Example: ''""",
-            ),
+        ),
         dataset_id=Parameter(
             # cmdline argument definitions, incl aliases
             args=("-i", "--dataset_id"),
             # documentation
             doc="""
             Example: ''""",
-            ),
+        ),
         dataset_version=Parameter(
             # cmdline argument definitions, incl aliases
             args=("-v", "--dataset_version"),
             # documentation
             doc="""
             Example: ''""",
-            ),
+        ),
         force=Parameter(
             # cmdline argument definitions, incl aliases
             args=("-f", "--force"),
@@ -96,8 +92,8 @@ class Catalog(Interface):
             the 'metadata' directory remain untouched.
             Example: ''""",
             action="store_true",
-            default=False
-            ),
+            default=False,
+        ),
         config_file=Parameter(
             # cmdline argument definitions, incl aliases
             args=("-y", "--config-file"),
@@ -105,24 +101,25 @@ class Catalog(Interface):
             doc="""Path to config file in YAML or JSON format. Default config is read
             from datalad_catalog/templates/config.json
             Example: ''""",
-            ),
+        ),
     )
+
     @staticmethod
     # decorator binds the command to the Dataset class as a method
-    @datasetmethod(name='catalog')
+    @datasetmethod(name="catalog")
     # generic handling of command results (logging, rendering, filtering, ...)
     @eval_results
     # signature must match parameter list above
     # additional generic arguments are added by decorators
     def __call__(
         catalog_action: str,
-        catalog_dir = None, 
-        metadata = None,
-        dataset_id = None,
-        dataset_version = None,
+        catalog_dir=None,
+        metadata=None,
+        dataset_id=None,
+        dataset_version=None,
         force: bool = False,
-        config_file = None,
-        ):
+        config_file=None,
+    ):
         """
         [summary]
 
@@ -147,9 +144,9 @@ class Catalog(Interface):
         # Draft202012Validator.check_schema(schema)
 
         # If action is validate, only metadata required
-        if catalog_action == 'validate':
+        if catalog_action == "validate":
             yield from _validate_metadata(
-                None, 
+                None,
                 metadata,
                 None,
                 None,
@@ -157,17 +154,17 @@ class Catalog(Interface):
                 None,
             )
             return
-                               
+
         # Error out if `catalog_dir` argument was not supplied
         if catalog_dir is None:
             err_msg = f"No catalog directory supplied: Datalad catalog can only operate on a path to a directory. Argument: -c, --catalog_dir."
             raise InsufficientArgumentsError(err_msg)
-        
+
         # Instantiate WebCatalog class
         ctlg = WebCatalog(catalog_dir, dataset_id, dataset_version, config_file)
         # catalog_path = Path(catalog_dir)
         # catalog_exists = catalog_path.exists() and catalog_path.is_dir()
-        
+
         # Hanlde case where a non-catalog directory already exists at path argument
         # Should prevent overwriting
         if ctlg.path_exists() and not ctlg.is_created():
@@ -176,11 +173,11 @@ class Catalog(Interface):
 
         # Catalog should exist for all actions except create (for create action: unless force flag supplied)
         if not ctlg.is_created():
-            if catalog_action != 'create':
+            if catalog_action != "create":
                 err_msg = f"Catalog does not exist: datalad catalog {catalog_action} can only operate on an existing catalog, please supply a path to an existing directory with the catalog argument: -c, --catalog_dir."
                 raise InsufficientArgumentsError(err_msg)
         else:
-            if catalog_action == 'create':
+            if catalog_action == "create":
                 if not force:
                     err_msg = f"Catalog already exists: overwriting catalog assets (not catalog metadata) is only possible when using the force argument: -f, --force."
                     raise InsufficientArgumentsError(err_msg)
@@ -188,47 +185,56 @@ class Catalog(Interface):
         # Call relevant function based on action
         # Action-specific argument parsing as well as results yielding are done within action-functions
         CALL_ACTION = {
-            'create': _create_catalog,
-            'serve': _serve_catalog,
-            'add': _add_to_catalog,
-            'remove': _remove_from_catalog,
-            'set-super': _set_super_of_catalog,
+            "create": _create_catalog,
+            "serve": _serve_catalog,
+            "add": _add_to_catalog,
+            "remove": _remove_from_catalog,
+            "set-super": _set_super_of_catalog,
         }
         yield from CALL_ACTION[catalog_action](
-            ctlg, 
-            metadata,
-            dataset_id,
-            dataset_version,
-            force,
-            config_file
+            ctlg, metadata, dataset_id, dataset_version, force, config_file
         )
-        
+
 
 # Internal functions to execute based on catalog_action parameter
-def _create_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool, config_file: str):
+def _create_catalog(
+    catalog: WebCatalog,
+    metadata,
+    dataset_id: str,
+    dataset_version: str,
+    force: bool,
+    config_file: str,
+):
     """"""
     # If catalog does not exist, create it
     # If catalog exists and force flag is True, overwrite assets of existing catalog
-    msg=''
+    msg = ""
     if not catalog.is_created():
         catalog.create()
-        msg=f"Catalog successfully created at: {catalog.location}"
+        msg = f"Catalog successfully created at: {catalog.location}"
     else:
         if force:
             catalog.create(force)
-            msg=f"Catalog assets successfully overwritten at: {catalog.location}"
+            msg = f"Catalog assets successfully overwritten at: {catalog.location}"
     # Yield created/overwitten status message
     yield get_status_dict(
-        action='catalog create',
-        path=abspath(curdir),
-        status='ok',
-        message=msg)
+        action="catalog create", path=abspath(curdir), status="ok", message=msg
+    )
     # If metadata was also supplied, add this to the catalog
     if metadata is not None:
-        yield from _add_to_catalog(catalog, metadata, dataset_id, dataset_version, force, config_file)
+        yield from _add_to_catalog(
+            catalog, metadata, dataset_id, dataset_version, force, config_file
+        )
 
 
-def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool, config_file: str):
+def _add_to_catalog(
+    catalog: WebCatalog,
+    metadata,
+    dataset_id: str,
+    dataset_version: str,
+    force: bool,
+    config_file: str,
+):
     """
     [summary]
     """
@@ -238,13 +244,13 @@ def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
 
     # Then we need to do the following:
     # 1. establish input type (file, file-with-json-array, file-with-json-lines, command line stdout / stream)
-    
+
     #    - for now: assume file-with-json-array (data exported by `datalad meta-dump` and all exported objects added to an array in file)
     # 2. instantiate translator
     # 3. read input based on type
     #    - for now: load data from input file
     # 4. For each metadata object in input, call translator
-    
+
     # 2. Instantiate single translator
     # translate = Translator()
 
@@ -253,12 +259,12 @@ def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
     # metadata = read_json_file(metadata)
     # This metadata should be the dataset and file level metadata of a single dataset
     # TODO: insert checks to verify this
-    # TODO: decide whether to allow metadata dictionaries from multiple datasets    
+    # TODO: decide whether to allow metadata dictionaries from multiple datasets
 
     with open(metadata) as file:
-        i=0
+        i = 0
         for line in file:
-            i+=1
+            i += 1
             # meta_dict = line.rstrip()
             meta_dict = json.loads(line.rstrip())
 
@@ -276,11 +282,15 @@ def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
             # If validation passed, translate into catalog files
             MetaItem(catalog, meta_dict)
             # Translator(catalog, meta_dict)
-    
 
     # TODO: should we write all files here?
     # Set parent catalog of orphans
-    orphans = [Node._instances[inst] for inst in Node._instances if not hasattr(Node._instances[inst], 'parent_catalog') or not Node._instances[inst].parent_catalog]
+    orphans = [
+        Node._instances[inst]
+        for inst in Node._instances
+        if not hasattr(Node._instances[inst], "parent_catalog")
+        or not Node._instances[inst].parent_catalog
+    ]
     for orphan in orphans:
         orphan.parent_catalog = catalog
 
@@ -291,19 +301,25 @@ def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
         fn = inst.get_location()
         created = inst.is_created()
 
-        if hasattr(inst, 'node_path') and inst.type != 'dataset':
-            setattr(inst, 'path', str(inst.node_path))
-        if hasattr(inst, 'node_path') and inst.type == 'directory':
-            setattr(inst, 'name', inst.node_path.name)
-        
+        if hasattr(inst, "node_path") and inst.type != "dataset":
+            setattr(inst, "path", str(inst.node_path))
+        if hasattr(inst, "node_path") and inst.type == "directory":
+            setattr(inst, "name", inst.node_path.name)
+
         meta_dict = vars(inst)
-        keys_to_pop = ['node_path', 'long_name', 'md5_hash', 'file_name', 'parent_catalog']
+        keys_to_pop = [
+            "node_path",
+            "long_name",
+            "md5_hash",
+            "file_name",
+            "parent_catalog",
+        ]
         for key in keys_to_pop:
             meta_dict.pop(key, None)
 
         if not created:
             parent_path.mkdir(parents=True, exist_ok=True)
-            with open(fn, 'w') as f:
+            with open(fn, "w") as f:
                 json.dump(vars(inst), f)
         else:
             with open(fn, "r+") as f:
@@ -313,13 +329,18 @@ def _add_to_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_vers
 
     msg = "Metadata items successfully added to catalog"
     yield get_status_dict(
-        action='catalog add',
-        path=abspath(curdir),
-        status='ok',
-        message=msg)
+        action="catalog add", path=abspath(curdir), status="ok", message=msg
+    )
 
 
-def _remove_from_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool, config_file: str):
+def _remove_from_catalog(
+    catalog: WebCatalog,
+    metadata,
+    dataset_id: str,
+    dataset_version: str,
+    force: bool,
+    config_file: str,
+):
     """
     [summary]
     """
@@ -328,13 +349,21 @@ def _remove_from_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset
         err_msg = f"Dataset ID and/or VERSION missing: datalad catalog remove requires both the ID (-i, --dataset_id) and VERSION (-v, --dataset_version) of the dataset to be removed from the catalog"
         yield get_status_dict(
             action=f"catalog remove",
-            path=abspath(curdir),# reported paths MUST be absolute
-            status='error',
-            message=err_msg)
+            path=abspath(curdir),  # reported paths MUST be absolute
+            status="error",
+            message=err_msg,
+        )
         sys.exit(err_msg)
 
 
-def _serve_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool, config_file: str):
+def _serve_catalog(
+    catalog: WebCatalog,
+    metadata,
+    dataset_id: str,
+    dataset_version: str,
+    force: bool,
+    config_file: str,
+):
     """
     Start a local http server for viewing/testing a local catalog
 
@@ -353,29 +382,39 @@ def _serve_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_versi
     import socketserver
 
     PORT = 8000
-    HOSTNAME = 'localhost'
+    HOSTNAME = "localhost"
     # HOSTNAME = '127.0.0.1'
     Handler = http.server.SimpleHTTPRequestHandler
     with socketserver.TCPServer((HOSTNAME, PORT), Handler) as httpd:
         print(f"\nServing catalog at: http://{HOSTNAME}:{PORT}/")
-        print("- navigate to this address in your browser to test the catalog locally")
+        print(
+            "- navigate to this address in your browser to test the catalog locally"
+        )
         print("- press CTRL+C to stop local testing\n")
         httpd.serve_forever()
-        
+
     msg = "Dataset served"
     yield get_status_dict(
-        action='catalog serve',
-        path=abspath(curdir),
-        status='ok',
-        message=msg)
+        action="catalog serve", path=abspath(curdir), status="ok", message=msg
+    )
 
-def _set_super_of_catalog(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool, config_file: str):
+
+def _set_super_of_catalog(
+    catalog: WebCatalog,
+    metadata,
+    dataset_id: str,
+    dataset_version: str,
+    force: bool,
+    config_file: str,
+):
     """
     [summary]
     """
-    err_msg = ("Dataset ID and/or VERSION missing: datalad catalog set-super requires both the ID"
-                " (-i, --dataset_id) and VERSION (-v, --dataset_version) of the dataset that is to be"
-                " used as the catalog's super dataset")
+    err_msg = (
+        "Dataset ID and/or VERSION missing: datalad catalog set-super requires both the ID"
+        " (-i, --dataset_id) and VERSION (-v, --dataset_version) of the dataset that is to be"
+        " used as the catalog's super dataset"
+    )
     if not dataset_id or not dataset_version:
         raise InsufficientArgumentsError(err_msg)
 
@@ -383,12 +422,21 @@ def _set_super_of_catalog(catalog: WebCatalog, metadata, dataset_id: str, datase
 
     msg = "Superdataset successfully set for catalog"
     yield get_status_dict(
-        action='catalog set-super',
+        action="catalog set-super",
         path=abspath(curdir),
-        status='ok',
-        message=msg)
+        status="ok",
+        message=msg,
+    )
 
-def _validate_metadata(catalog: WebCatalog, metadata, dataset_id: str, dataset_version: str, force: bool, config_file: str):
+
+def _validate_metadata(
+    catalog: WebCatalog,
+    metadata,
+    dataset_id: str,
+    dataset_version: str,
+    force: bool,
+    config_file: str,
+):
     """"""
     # First check metadata was supplied via -m flag
     if metadata is None:
@@ -397,14 +445,14 @@ def _validate_metadata(catalog: WebCatalog, metadata, dataset_id: str, dataset_v
 
     # Setup schema parameters
     package_path = Path(__file__).resolve().parent
-    templates_path = package_path / 'templates'
-    schemas = ['catalog', 'dataset', 'file', 'authors', 'extractors']
+    templates_path = package_path / "templates"
+    schemas = ["catalog", "dataset", "file", "authors", "extractors"]
     schema_store = {}
     for s in schemas:
-        schema_path = templates_path / str('jsonschema_' + s + '.json')
+        schema_path = templates_path / str("jsonschema_" + s + ".json")
         schema = read_json_file(schema_path)
-        schema_store[schema['$id']] = schema
-    
+        schema_store[schema["$id"]] = schema
+
     # Access the schema against which incoming metadata items will be validated
     catalog_schema = schema_store["https://datalad.org/catalog.schema.json"]
     RESOLVER = RefResolver.from_schema(catalog_schema, store=schema_store)
@@ -412,17 +460,17 @@ def _validate_metadata(catalog: WebCatalog, metadata, dataset_id: str, dataset_v
 
     # Open metadata file and validate line by line
     with open(metadata) as file:
-        i=0
+        i = 0
         for line in file:
-            i+=1
+            i += 1
             log_progress(
                 lgr.info,
-                'catalogvalidate',
-                f'Start validation of metadata in {metadata}',
+                "catalogvalidate",
+                f"Start validation of metadata in {metadata}",
                 total=num_lines,
                 update=i,
-                label='metadata validation against catalog schema',
-                unit=' Lines',
+                label="metadata validation against catalog schema",
+                unit=" Lines",
             )
             meta_dict = json.loads(line.rstrip())
             # Check if item/line is a dict
@@ -431,17 +479,23 @@ def _validate_metadata(catalog: WebCatalog, metadata, dataset_id: str, dataset_v
                 lgr.warning(err_msg)
             # Validate dict against schema
             try:
-                Draft202012Validator(catalog_schema, resolver=RESOLVER).validate(meta_dict)
+                Draft202012Validator(
+                    catalog_schema, resolver=RESOLVER
+                ).validate(meta_dict)
             except ValidationError as e:
-                err_msg = f"Schema validation failed in LINE {i}/{num_lines}: \n\n{e}"
+                err_msg = (
+                    f"Schema validation failed in LINE {i}/{num_lines}: \n\n{e}"
+                )
                 raise ValidationError(err_msg) from e
 
     msg = "Metadata successfully validated"
     yield get_status_dict(
-        action='catalog validate',
+        action="catalog validate",
         path=abspath(curdir),
-        status='ok',
-        message=msg)
+        status="ok",
+        message=msg,
+    )
+
 
 def _get_line_count(file):
     with open(file) as f:
