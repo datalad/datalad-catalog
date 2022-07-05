@@ -11,7 +11,7 @@ demo_config_path_yml = data_path / "test_config_file.yml"
 demo_config_path_json = data_path / "test_config_file.json"
 
 package_path = Path(__file__).resolve().parent.parent
-default_config_path = package_path / "templates" / "config.json"
+default_config_path = package_path / "config" / "config.json"
 
 
 @pytest.fixture
