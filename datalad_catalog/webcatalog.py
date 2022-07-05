@@ -1,13 +1,21 @@
-import sys
-import json
-from pathlib import Path
-import shutil
 import hashlib
-from . import constants as cnst
+import json
 import logging
-from .utils import read_json_file, find_duplicate_object_in_list
-from jsonschema import Draft202012Validator, RefResolver
+import shutil
+import sys
+from pathlib import Path
+
 import yaml
+from jsonschema import (
+    Draft202012Validator,
+    RefResolver,
+)
+
+import datalad_catalog.constants as cnst
+from datalad_catalog.utils import (
+    find_duplicate_object_in_list,
+    read_json_file,
+)
 
 lgr = logging.getLogger("datalad.catalog.webcatalog")
 
