@@ -169,6 +169,9 @@ class Catalog(Interface):
         # TODO: check if schema is valid (move to tests)
         # Draft202012Validator.check_schema(schema)
 
+        # set common result kwargs:
+        action = "catalog_%s" % catalog_action
+        res_kwargs = dict(action=action)
         # If action is validate, only metadata required
         if catalog_action == "validate":
             yield from _validate_metadata(
@@ -183,30 +186,69 @@ class Catalog(Interface):
 
         # Error out if `catalog_dir` argument was not supplied
         if catalog_dir is None:
-            err_msg = f"No catalog directory supplied: Datalad catalog can only operate on a path to a directory. Argument: -c, --catalog_dir."
-            raise InsufficientArgumentsError(err_msg)
+            yield dict(
+                **res_kwargs,
+                status="impossible",
+                message=(
+                    "Datalad catalog %s requires a path to operate on. "
+                    "Forgot -c, --catalog_dir?",
+                    catalog_action,
+                ),
+                path=None,
+            )
+            return
+        # now that we have a path, update result kwargs with it
+        res_kwargs["path"] = catalog_dir
 
         # Instantiate WebCatalog class
         ctlg = WebCatalog(catalog_dir, dataset_id, dataset_version, config_file)
         # catalog_path = Path(catalog_dir)
         # catalog_exists = catalog_path.exists() and catalog_path.is_dir()
 
-        # Hanlde case where a non-catalog directory already exists at path argument
-        # Should prevent overwriting
+        # Hanlde case where a non-catalog directory already exists at path
+        # argument. Should prevent overwriting
         if ctlg.path_exists() and not ctlg.is_created():
-            err_msg = f"A non-catalog directory already exists at {catalog_dir}. Please supply a different path."
-            raise FileExistsError(err_msg)
+            yield dict(
+                **res_kwargs,
+                status="error",
+                message=(
+                    "A non-catalog directory already exists at %s. "
+                    "Please supply a different path.",
+                    catalog_dir,
+                ),
+            )
+            return
 
-        # Catalog should exist for all actions except create (for create action: unless force flag supplied)
+        # Catalog should exist for all actions except create (for create action:
+        # unless force flag supplied)
         if not ctlg.is_created():
             if catalog_action != "create":
-                err_msg = f"Catalog does not exist: datalad catalog {catalog_action} can only operate on an existing catalog, please supply a path to an existing directory with the catalog argument: -c, --catalog_dir."
-                raise InsufficientArgumentsError(err_msg)
+                yield dict(
+                    **res_kwargs,
+                    status="impossible",
+                    message=(
+                        "Catalog does not exist: datalad catalog '%s' can only "
+                        "operate on an existing catalog, please supply a path "
+                        "to an existing directory with the catalog argument: "
+                        "-c, --catalog_dir.",
+                        catalog_action,
+                    ),
+                )
+                return
         else:
             if catalog_action == "create":
                 if not force:
-                    err_msg = f"Catalog already exists: overwriting catalog assets (not catalog metadata) is only possible when using the force argument: -f, --force."
-                    raise InsufficientArgumentsError(err_msg)
+                    yield dict(
+                        **res_kwargs,
+                        status="error",
+                        message=(
+                            "Found existing catalog at %s. Overwriting catalog "
+                            "assets (not catalog metadata) is only possible "
+                            "when using --force.",
+                            catalog_dir,
+                        ),
+                    )
+                    return
 
         # Call relevant function based on action
         # Action-specific argument parsing as well as results yielding are done within action-functions
