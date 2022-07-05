@@ -29,10 +29,36 @@ lgr = logging.getLogger("datalad.catalog.catalog")
 class Catalog(Interface):
     # first docstring line is used a short description in the cmdline help
     # the rest is put in the verbose help and manpage
-    """Generate web-browser-based user interface for browsing metadata of a
-    DataLad dataset.
+    """Generate web-browser-based user interface for browsing metadata of
+    a DataLad dataset.
 
-    (Long description of arbitrary volume.)
+    The ``datalad catalog`` command can be used to ``create`` a new
+    catalog, ``add`` and ``remove`` metadata entries to/from an
+    existing catalog, or start a a local http server to ``serve`` an
+    existing catalog locally. It can also ``validate`` a metadata
+    entry (validation is also performed implicitly when adding) and
+    set the dataset to be shown by default (``set-super``).
+
+    Metadata can be provided to DataLad Catalog from any number of
+    arbitrary metadata sources, as an aggregated set or as individual
+    metadata items. DataLad Catalog has a dedicated schema (using the
+    JSON Schema vocabulary) against which incoming metadata items are
+    validated. This schema allows for standard metadata fields as one
+    would expect for datasets of any kind (such as name, doi, url,
+    description, license, authors, and more), as well as fields that
+    support identification, versioning, dataset context and linkage,
+    and file tree specification.
+
+    The output is a set of structured metadata files, as well as a
+    Vue.js-based browser interface that understands how to render this
+    metadata in the browser. These can be hosted on a platform of
+    choice as a static webpage.
+
+    Note: in the catalog website, each dataset entry is displayed
+    under ``<main page>/#/dataset/<dataset_id>/<dataset_version>``.
+    By default, the main page of the catalog will display a 404 error,
+    unless the default dataset is configured with ``datalad catalog
+    set-super``.
     """
 
     # parameters of the command, must be exhaustive
