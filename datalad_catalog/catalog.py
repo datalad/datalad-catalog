@@ -35,6 +35,11 @@ class Catalog(Interface):
     (Long description of arbitrary volume.)
     """
 
+    _examples_ = [
+        dict(text="TODO",
+             code_py="TODO",
+             code_cmd="TODO"),
+    ]
     # parameters of the command, must be exhaustive
     _params_ = dict(
         # name of the parameter, must match argument name
