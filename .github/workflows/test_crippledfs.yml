@@ -36,7 +36,7 @@ jobs:
       run: |
         pip install -r requirements-devel.txt
         python -m pip install --upgrade pip
-    - name: Installation
+    - name: Install datalad_catalog
       run: |
         # package install
         python -m pip install --upgrade .
@@ -52,4 +52,4 @@ jobs:
         echo "== mount >>"
         mount
         echo "<< mount =="
-        python -m nose -s -v --with-doctest --with-coverage --cover-package datalad_catalog datalad_catalog
+        coverage run -m pytest -s -v datalad_catalog
