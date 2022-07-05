@@ -1,2 +1,15 @@
 [build-system]
 requires = ["setuptools >= 43.0.0", "wheel"]
+[tool.black]
+line-length = 80
+target-version = ['py37']
+include = '\.pyi?$'
+# 'extend-exclude' excludes files or directories in addition to the defaults
+extend-exclude = '''
+(
+  ^/versioneer.py
+  | docs/source/conf.py
+  | _datalad_buildsupport/*
+  | datalad_catalog/_version.py
+)
+'''
