@@ -52,4 +52,4 @@ jobs:
         echo "== mount >>"
         mount
         echo "<< mount =="
-        coverage run -m pytest -s -v datalad_catalog
+        coverage run -m pytest -s -v ../datalad_catalog
