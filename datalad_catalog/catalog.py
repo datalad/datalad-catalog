@@ -1,24 +1,43 @@
-from os.path import curdir
-from os.path import abspath
-import logging
-from datalad.interface.base import Interface
-from datalad.interface.base import build_doc
-from datalad.interface.utils import eval_results
-from datalad.interface.results import get_status_dict
-from datalad.log import log_progress
-from datalad.support.param import Parameter
-from datalad.support.exceptions import InsufficientArgumentsError
-from datalad.distribution.dataset import datasetmethod
-from datalad.support.constraints import EnsureChoice
-import sys
-from pathlib import Path
 import json
+import logging
 import os
-from typing import Dict, List, Optional, Tuple, Union
-from .webcatalog import WebCatalog, Node
-from .utils import read_json_file
-from .meta_item import MetaItem
-from jsonschema import ValidationError, Draft202012Validator, RefResolver
+import sys
+from os.path import (
+    abspath,
+    curdir,
+)
+from pathlib import Path
+from typing import (
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union,
+)
+
+from datalad.distribution.dataset import datasetmethod
+from datalad.interface.base import (
+    Interface,
+    build_doc,
+)
+from datalad.interface.results import get_status_dict
+from datalad.interface.utils import eval_results
+from datalad.log import log_progress
+from datalad.support.constraints import EnsureChoice
+from datalad.support.exceptions import InsufficientArgumentsError
+from datalad.support.param import Parameter
+from jsonschema import (
+    Draft202012Validator,
+    RefResolver,
+    ValidationError,
+)
+
+from datalad_catalog.meta_item import MetaItem
+from datalad_catalog.utils import read_json_file
+from datalad_catalog.webcatalog import (
+    Node,
+    WebCatalog,
+)
 
 # Create named logger
 lgr = logging.getLogger("datalad.catalog.catalog")
@@ -35,6 +54,13 @@ class Catalog(Interface):
     (Long description of arbitrary volume.)
     """
 
+    _examples_ = [
+        dict(
+            text="Create a new catalog from scratch",
+            code_py="catalog_cmd('create', catalog_dir='/tmp/new')",
+            code_cmd="datalad catalog create -c /tmp/new",
+        ),
+    ]
     # parameters of the command, must be exhaustive
     _params_ = dict(
         # name of the parameter, must match argument name

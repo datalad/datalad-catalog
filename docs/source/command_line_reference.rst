@@ -2,6 +2,7 @@ Command Line Reference
 **********************
 
 
-.. admonition:: TODO
-    
-    - add content
+.. toctree::
+   :maxdepth: 1
+
+   generated/man/datalad-catalog
