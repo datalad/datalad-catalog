@@ -53,3 +53,8 @@ jobs:
         mount
         echo "<< mount =="
         coverage run -m pytest -s -v ../datalad_catalog
+        coverage xml
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        flags: unittests
