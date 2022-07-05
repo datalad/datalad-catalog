@@ -54,6 +54,13 @@ class Catalog(Interface):
     (Long description of arbitrary volume.)
     """
 
+    _examples_ = [
+        dict(
+            text="Create a new catalog from scratch",
+            code_py="catalog_cmd('create', catalog_dir='/tmp/new')",
+            code_cmd="datalad catalog create -c /tmp/new",
+        ),
+    ]
     # parameters of the command, must be exhaustive
     _params_ = dict(
         # name of the parameter, must match argument name
