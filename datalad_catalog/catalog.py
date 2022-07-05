@@ -231,9 +231,26 @@ def _create_catalog(
     force: bool,
     config_file: str,
 ):
-    """"""
-    # If catalog does not exist, create it
-    # If catalog exists and force flag is True, overwrite assets of existing catalog
+    """Create the catalog in its specified location.
+
+    If catalog does not exist, it will be created.  If catalog exists
+    and force flag is True, this will overwrite assets of the existing
+    catalog.
+
+    Parameters
+    ----------
+    catalog : WebCatalog
+        an instance of the catalog to be created
+    metadata : optional
+        metadata to be added to the catalog after creation
+    force : bool, optional
+        if True, will overwrite assets of an existing catalog
+
+    Yields
+    ------
+    status_dict : dict
+        DataLad result record
+    """
     msg = ""
     if not catalog.is_created():
         catalog.create()
