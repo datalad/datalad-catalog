@@ -1,7 +1,8 @@
-from ..webcatalog import WebCatalog
-from ..catalog import Catalog
 import pytest
+from datalad_catalog.webcatalog import WebCatalog
+from datalad_catalog.catalog import Catalog
 from datalad.support.exceptions import InsufficientArgumentsError
+from datalad.tests.utils_pytest import assert_in_results
 
 # catalog_paths = [
 #     'assets/md5-2.3.0.js',
@@ -45,9 +46,22 @@ def test_create_at_existing_noncatalog(tmp_path):
     dir_path = tmp_path / "test_dir"
     dir_path.mkdir()
     test_catalog = Catalog()
-    partial_error_msg = "non-catalog directory already exists"
-    with pytest.raises(FileExistsError, match=partial_error_msg):
-        test_catalog("create", catalog_dir=dir_path)
+    assert_in_results(
+        test_catalog(
+            "create",
+            catalog_dir=dir_path,
+            on_failure="ignore",
+            return_type="list",
+        ),
+        action="catalog_create",
+        status="error",
+        message=(
+            "A non-catalog directory already exists at %s. "
+            "Please supply a different path.",
+            dir_path,
+        ),
+        path=dir_path,
+    )
 
 
 def test_create_at_existing_catalog_noforce(tmp_path):
@@ -61,9 +75,23 @@ def test_create_at_existing_catalog_noforce(tmp_path):
     new_catalog_path = catalog_path
     new_test_catalog = Catalog()
 
-    partial_error_msg = "only possible when using the force argument"
-    with pytest.raises(InsufficientArgumentsError, match=partial_error_msg):
-        new_test_catalog("create", catalog_dir=new_catalog_path)
+    assert_in_results(
+        new_test_catalog(
+            "create",
+            catalog_dir=new_catalog_path,
+            on_failure="ignore",
+            return_type="list",
+        ),
+        action="catalog_create",
+        status="error",
+        message=(
+            "Found existing catalog at %s. Overwriting catalog "
+            "assets (not catalog metadata) is only possible "
+            "when using --force.",
+            new_catalog_path,
+        ),
+        path=new_catalog_path,
+    )
 
 
 def test_create_at_existing_catalog_force(tmp_path):
