@@ -76,7 +76,7 @@ def test_important_source(
             }
         }
     }
-    demo_node_dataset.add_attribrutes(
+    demo_node_dataset.add_attributes(
         demo_metadata[metadata_source], demo_catalog
     )
     for key in demo_metadata[metadata_source].keys():
@@ -89,7 +89,7 @@ def test_important_source(
         )
 
     metadata_source = "metadata_source_random"
-    demo_node_dataset.add_attribrutes(
+    demo_node_dataset.add_attributes(
         demo_metadata[metadata_source], demo_catalog
     )
     for key in demo_metadata[metadata_source].keys():
@@ -125,7 +125,7 @@ def test_merge_sources(
             }
         }
     }
-    demo_node_dataset.add_attribrutes(
+    demo_node_dataset.add_attributes(
         demo_metadata[metadata_source], demo_catalog
     )
     for key in demo_metadata[metadata_source].keys():
@@ -138,7 +138,7 @@ def test_merge_sources(
         )
 
     metadata_source = "metadata_source_random"
-    demo_node_dataset.add_attribrutes(
+    demo_node_dataset.add_attributes(
         demo_metadata[metadata_source], demo_catalog
     )
 
@@ -201,7 +201,7 @@ def test_multiple_sources(
             }
         }
     }
-    demo_node_dataset.add_attribrutes(
+    demo_node_dataset.add_attributes(
         demo_metadata[metadata_source], demo_catalog
     )
     key = "name"
@@ -213,7 +213,7 @@ def test_multiple_sources(
         }
     ]
     metadata_source = "metadata_source_random"
-    demo_node_dataset.add_attribrutes(
+    demo_node_dataset.add_attributes(
         demo_metadata[metadata_source], demo_catalog
     )
     for key in ["name", "keywords", "authors"]:
@@ -241,7 +241,7 @@ def test_no_source_config(
     demo_node_dataset.parent_catalog = demo_catalog
     metadata_source = "metadata_source_important"
     demo_catalog.config = {"property_source": {"dataset": {}}}
-    demo_node_dataset.add_attribrutes(
+    demo_node_dataset.add_attributes(
         demo_metadata[metadata_source], demo_catalog
     )
     for key in demo_metadata[metadata_source].keys():
@@ -254,7 +254,7 @@ def test_no_source_config(
         )
 
     metadata_source = "metadata_source_random"
-    demo_node_dataset.add_attribrutes(
+    demo_node_dataset.add_attributes(
         demo_metadata[metadata_source], demo_catalog
     )
     for key in demo_metadata[metadata_source].keys():
