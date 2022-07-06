@@ -1,6 +1,10 @@
-from ..webcatalog import WebCatalog, Node
 import pytest
-from .. import constants as cnst
+
+from datalad_catalog import constants as cnst
+from datalad_catalog.webcatalog import (
+    Node,
+    WebCatalog,
+)
 
 
 @pytest.fixture

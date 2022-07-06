@@ -1,11 +1,10 @@
-from ..catalog import Catalog
-from ..webcatalog import WebCatalog
 import pytest
 from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.tests.utils import (
     assert_in_results,
     assert_raises,
 )
+from datalad_catalog.catalog import Catalog
 
 
 def test_catalog_no_argument():
