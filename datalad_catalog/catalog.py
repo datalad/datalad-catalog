@@ -29,8 +29,8 @@ lgr = logging.getLogger("datalad.catalog.catalog")
 class Catalog(Interface):
     # first docstring line is used a short description in the cmdline help
     # the rest is put in the verbose help and manpage
-    """Generate web-browser-based user interface for browsing metadata of
-    a DataLad dataset.
+    """Generate a user-friendly web-based data catalog from structured
+    metadata.
 
     The ``datalad catalog`` command can be used to ``create`` a new
     catalog, ``add`` and ``remove`` metadata entries to/from an
