@@ -1,0 +1,140 @@
+:root, :host {
+  --fa-font-regular: normal 400 1em/1 "Font Awesome 6 Free";
+  --fa-font-solid: normal 900 1em/1 "Font Awesome 6 Free";
+}
+
+@font-face {
+  font-family: 'Font Awesome 6 Free';
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("fa-regular-400.woff2") format("woff2");
+}
+@font-face {
+  font-family: 'Font Awesome 6 Free';
+  font-style: normal;
+  font-weight: 900;
+  font-display: block;
+  src: url("fa-solid-900.woff2") format("woff2");
+}
+.far,
+.fa-regular {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 400;
+}
+.fas,
+.fa-solid {
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+}
+
+body {
+  font-family: Menlo, Consolas, monospace;
+  color: #444;
+}
+
+.item {
+  cursor: pointer;
+  font-family: Menlo, Consolas, monospace;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.nav-item a {
+  color: var(--link-color);
+}
+.nav-item a:hover {
+  color: var(--link-hover-color);
+}
+
+.subdataset {
+  color: var(--link-color);
+  text-decoration: underline;
+
+}
+.subdataset:hover {
+  color: var(--link-hover-color);
+}
+
+.newlink {
+  color: var(--link-color);
+  text-decoration: underline;
+
+}
+.newlink:hover {
+  color: var(--link-hover-color);
+}
+
+.xxlfont {
+  font-size: xx-large;
+}
+
+.xlfont {
+  font-size: x-large;
+}
+
+.lfont {
+  font-size: large;
+}
+
+
+
+body a {
+  color: var(--link-color);
+}
+body a:hover {
+  color: var(--link-hover-color);
+}
+
+.modal i:hover {
+  cursor: pointer;
+}
+
+ul {
+  list-style-type: none; /* Remove bullets */
+  padding-left: 1em;
+  line-height: 1.5em;
+}
+li[class="item"] {
+  border-bottom: 1px solid #eee;
+}
+li[class="item"]:last-child {
+  border-bottom: none;
+}
+
+/* .open-item {
+  border-bottom: none;
+} */
+/* li[class="item"]:nth-child(even) {
+  background-color:#eee;
+}
+li[class="item"]:nth-child(odd) {
+  background-color:#fff;
+} */
+
+
+
+.filesize {
+  text-align: right;
+  font-size: small;
+  position: absolute;
+  right: 1em;
+}
+
+#xsm-button {
+  font-size: small;
+  padding: 0px 3px;
+  margin-bottom: 0.5em;
+}
+
+.xsm-dl-button {
+  font-size: small;
+  padding: 0px 3px;
+}
+
+#desc_display {
+  border: 1px solid #444;
+  border-radius: 5px;
+}
