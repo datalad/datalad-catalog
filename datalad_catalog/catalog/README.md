@@ -16,7 +16,7 @@ The content of this root directory includes everything necessary to serve the st
 └── README.md
 ```
 
-The `artwork` and `assets` directories contain images and web assets (such as JavaScript and CSS files) that support the rendering of the HTML components in `index.html`. The `config.json` file contains customizable configuration options supplied to `datalad-catalog` 
+The `artwork` and `assets` directories contain images and web assets (such as JavaScript and CSS files) respectively that support the rendering of the HTML components in `index.html`. The `config.json` file contains customizable configuration options supplied to `datalad-catalog`.
 
 ## Serving the content
 
@@ -29,7 +29,7 @@ cd path/to/catalog/directory
 python3 -m http.server
 ```
 
-The content can also be hosted and served online. A straightforward and free way to achieve this is via GitHub and [GitHub Pages](https://pages.github.com/). After publishing this content as a GitHub repository, you can activate GitHub Pages in the repository's settings. See detailed instructions [here](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site)
+The content can also be hosted and served online. A straightforward and free way to achieve this is via GitHub and [GitHub Pages](https://pages.github.com/). After publishing this content as a GitHub repository, you can activate GitHub Pages in the repository's settings. See detailed instructions [here](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site).
 
 ## Maintaining content
 
