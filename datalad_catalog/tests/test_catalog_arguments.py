@@ -4,6 +4,7 @@ import pytest
 from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.tests.utils import (
     assert_in_results,
+    assert_raises,
 )
 
 
@@ -11,9 +12,8 @@ def test_catalog_no_argument():
     """
     Test if error is raised when no argument is supplied
     """
-    with pytest.raises(TypeError):
-        ctlg = Catalog()
-        ctlg()
+    ctlg = Catalog()
+    assert_raises(TypeError, ctlg)
 
 
 def test_catalog_wrong_action_argument():
@@ -21,19 +21,7 @@ def test_catalog_wrong_action_argument():
     Test if error is raised when wrong action argument is supplied
     """
     ctlg = Catalog()
-    # TODO: This test is wrong, the package lacks proper handling of wrong
-    # TODO: subcommands. Needs redoing after code is fixed!
-    assert_in_results(
-        ctlg("wrong_action", on_failure="ignore"),
-        action="catalog_wrong_action",
-        status="impossible",
-        message=(
-            "Datalad catalog %s requires a path to operate on. "
-            "Forgot -c, --catalog_dir?",
-            "wrong_action",
-        ),
-        path=None,
-    )
+    assert_raises(ValueError, ctlg, "wrong_action")
 
 
 def test_catalog_no_path_argument():
