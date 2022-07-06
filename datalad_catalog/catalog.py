@@ -159,6 +159,22 @@ class Catalog(Interface):
             [type]: [description]
         """
 
+        # Define valid subcommands, catch if invalid action is specified
+        # (relevant for Python API usage).
+        CALL_ACTION = [
+            "create",
+            "validate",
+            "serve",
+            "add",
+            "remove",
+            "set-super",
+        ]
+        if catalog_action not in CALL_ACTION:
+            raise ValueError(
+                "Unknown subcommand %s, choose from %s"
+                % (catalog_action, ", ".join(c for c in CALL_ACTION))
+            )
+
         # TODO: check if schema is valid (move to tests)
         # Draft202012Validator.check_schema(schema)
 
