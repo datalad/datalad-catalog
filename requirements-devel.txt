@@ -1,5 +1,6 @@
 # runtime requirements
-datalad>=0.16
+# datalad>=0.17
+git+https://github.com/datalad/datalad@master
 datalad-metalad>=0.3.10
 jsonschema
 yaml2
