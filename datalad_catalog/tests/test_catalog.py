@@ -161,7 +161,7 @@ def test_catalog_action_routing(temp_dir: str = "", config_file: str = ""):
                             **default_kwargs,
                             "catalog_action": action,
                             "config_file": config_file,
-                            "catalog_dir": str(Path(temp_dir) / "test_catalog"),
+                            "catalog_dir": str(test_catalog_path),
                             "result_renderer": "disabled",
                         }
                     )
