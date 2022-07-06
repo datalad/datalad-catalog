@@ -41,19 +41,88 @@ lgr = logging.getLogger("datalad.catalog.catalog")
 class Catalog(Interface):
     # first docstring line is used a short description in the cmdline help
     # the rest is put in the verbose help and manpage
-    """Generate web-browser-based user interface for browsing metadata of a
-    DataLad dataset.
+    """Generate a user-friendly web-based data catalog from structured
+    metadata.
 
-    (Long description of arbitrary volume.)
+    The ``datalad catalog`` command can be used to ``create`` a new
+    catalog, ``add`` and ``remove`` metadata entries to/from an
+    existing catalog, or start a a local http server to ``serve`` an
+    existing catalog locally. It can also ``validate`` a metadata
+    entry (validation is also performed implicitly when adding) and
+    set the dataset to be shown by default (``set-super``).
+
+    Metadata can be provided to DataLad Catalog from any number of
+    arbitrary metadata sources, as an aggregated set or as individual
+    metadata items. DataLad Catalog has a dedicated schema (using the
+    JSON Schema vocabulary) against which incoming metadata items are
+    validated. This schema allows for standard metadata fields as one
+    would expect for datasets of any kind (such as name, doi, url,
+    description, license, authors, and more), as well as fields that
+    support identification, versioning, dataset context and linkage,
+    and file tree specification.
+
+    The output is a set of structured metadata files, as well as a
+    Vue.js-based browser interface that understands how to render this
+    metadata in the browser. These can be hosted on a platform of
+    choice as a static webpage.
+
+    Note: in the catalog website, each dataset entry is displayed
+    under ``<main page>/#/dataset/<dataset_id>/<dataset_version>``.
+    By default, the main page of the catalog will display a 404 error,
+    unless the default dataset is configured with ``datalad catalog
+    set-super``.
     """
 
+    # usage examples
     _examples_ = [
         dict(
             text="Create a new catalog from scratch",
-            code_py="catalog_cmd('create', catalog_dir='/tmp/new')",
-            code_cmd="datalad catalog create -c /tmp/new",
+            code_py="catalog('create', catalog_dir='/tmp/my-cat')",
+            code_cmd="datalad catalog create -c /tmp/my-cat",
+        ),
+        dict(
+            text="Add metadata to an existing catalog",
+            code_py=(
+                "catalog('add', catalog_dir='/tmp/my-cat', "
+                "metadata='path/to/metadata.jsonl')"
+            ),
+            code_cmd=(
+                "datalad catalog add "
+                "-c /tmp/my-cat -m path/to/metadata.jsonl"
+            ),
+        ),
+        dict(
+            text=(
+                "Set the superdataset of an existing catalog - the first "
+                "dataset displayed when navigating to the root URL of the "
+                "catalog"
+            ),
+            code_py=(
+                "catalog('set-super', catalog_dir='/tmp/my-cat', "
+                "dataset_id='abcd', dataset_version='1234')"
+            ),
+            code_cmd=(
+                "datalad catalog set-super -c /tmp/my-cat -i abcd -v 1234"
+            ),
+        ),
+        dict(
+            text=(
+                "Serve the content of the catalog via a local HTTP server "
+                "at http://localhost:8000"
+            ),
+            code_py="catalog('serve', catalog_dir='/tmp/my-cat/')",
+            code_cmd="datalad catalog serve -c /tmp/my-cat",
+        ),
+        dict(
+            text=(
+                "Check if metadata conforms to catalog schema without adding "
+                "it to the catalog"
+            ),
+            code_py="catalog('validate', metadata='path/to/metadata.jsonl')",
+            code_cmd="datalad catalog validate -m path/to/metadata.jsonl",
         ),
     ]
+
     # parameters of the command, must be exhaustive
     _params_ = dict(
         # name of the parameter, must match argument name
@@ -274,9 +343,26 @@ def _create_catalog(
     force: bool,
     config_file: str,
 ):
-    """"""
-    # If catalog does not exist, create it
-    # If catalog exists and force flag is True, overwrite assets of existing catalog
+    """Create the catalog in its specified location.
+
+    If catalog does not exist, it will be created. If catalog exists
+    and force flag is True, this will overwrite assets of the existing
+    catalog.
+
+    Parameters
+    ----------
+    catalog : WebCatalog
+        an instance of the catalog to be created
+    metadata : path-like object, optional
+        metadata to be added to the catalog after creation
+    force : bool, optional
+        if True, will overwrite assets of an existing catalog
+
+    Yields
+    ------
+    status_dict : dict
+        DataLad result record
+    """
     msg = ""
     if not catalog.is_created():
         catalog.create()
@@ -300,8 +386,24 @@ def _add_to_catalog(
     catalog: WebCatalog,
     metadata,
 ):
-    """
-    [summary]
+    """Add metadata entries to the catalog.
+
+    Reads a specified metadata file and adds the metadata to the
+    catalog. Currently supports files in which each line contains a
+    json object.
+
+    Parameters
+    ----------
+    catalog : WebCatalog
+        an instance of the catalog to be populated
+    metadata : path-like object
+        path to a file containing metadata
+
+    Yields
+    ------
+    status_dict : dict
+        DataLad result record
+
     """
     if metadata is None:
         err_msg = f"No metadata supplied: Datalad catalog has to be supplied with metadata in the form of a path to a file containing a JSON array, or JSON lines stream, using the argument: -m, --metadata."
@@ -403,8 +505,19 @@ def _remove_from_catalog(
     dataset_id: str,
     dataset_version: str,
 ):
-    """
-    [summary]
+    """Remove a dataset from the catalog.
+
+    Parameters
+    ----------
+    dataset_id : str
+        dataset id of the dataset to be removed
+    dataset_version : str
+        dataset version of the dataset to be removed
+
+    Yields
+    ------
+    status_dict : dict
+        DataLad result record
     """
     # remove argument checks
 
@@ -423,18 +536,17 @@ def _remove_from_catalog(
 def _serve_catalog(
     catalog: WebCatalog,
 ):
-    """
-    Start a local http server for viewing/testing a local catalog
+    """Start a local http server for viewing/testing a local catalog.
 
-    Args:
-        catalog (WebCatalog): the catalog to be served
-        metadata (dict): unused
-        dataset_id (str): unused
-        dataset_version (str): unused
-        force (bool): unused
+    Parameters
+    ----------
+    catalog : WebCatalog
+        the catalog to be served
 
-    Yields:
-        (dict): result record
+    Yields
+    ------
+    status_dict : dict
+        DataLad result record
     """
     os.chdir(catalog.location)
     import http.server
@@ -463,8 +575,26 @@ def _set_super_of_catalog(
     dataset_id: str,
     dataset_version: str,
 ):
-    """
-    [summary]
+    """Set the catalog's main dataset (shown on home page).
+
+    This sets which dataset will be shown on the catalog home page.
+    This would normally be a superdataset containing other datasets
+    from the catalog (acting as en entry page), but in practice this
+    could be any of the datasets.
+
+    Parameters
+    ----------
+    catalog : WebCatalog
+        the catalog to be configured
+    dataset_id : str
+        id of the dataset chosen to be the main dataset
+    dataset_version : str
+        version of the dataset chosen to be the main dataset
+
+    Yields
+    ------
+    status_dict : dict
+        DataLad result record
     """
     err_msg = (
         "Dataset ID and/or VERSION missing: datalad catalog set-super requires both the ID"
@@ -486,7 +616,18 @@ def _set_super_of_catalog(
 
 
 def _validate_metadata(metadata: str):
-    """"""
+    """Validate supplied metadata entries against catalog schema.
+
+    Parameters
+    ----------
+    metadata : path-like object
+        metadata to be validated
+
+    Yields
+    ------
+    status_dict : dict
+        DataLad result record
+    """
     # First check metadata was supplied via -m flag
     if metadata is None:
         err_msg = f"No metadata supplied: datalad catalog has to be supplied with metadata in the form of a path to a file containing a JSON array, or JSON lines stream, using the argument: -m, --metadata."
@@ -548,4 +689,5 @@ def _validate_metadata(metadata: str):
 
 
 def _get_line_count(file: str) -> int:
+    """A helper function to get a file line count"""
     return sum(1 for _ in open(file))
