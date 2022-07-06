@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 from unittest.mock import (
     call,
@@ -16,9 +18,32 @@ from datalad.tests.utils import (
 
 
 from ..catalog import (
+    Catalog,
     _get_line_count,
     _validate_metadata,
 )
+
+
+minimal_metadata = '{' \
+    '   "type": "dataset",' \
+    '   "dataset_id": "0000",' \
+    '   "dataset_version": "000",' \
+    '   "name": "abc"' \
+    '}'
+
+default_kwargs = {
+    "catalog_dir": ".",
+    "metadata": minimal_metadata,
+    "dataset_id": "0000-0000-0000",
+    "dataset_version": "abcdef",
+    "force": False,
+    "config_file": "catalog.conf"
+}
+
+result_template = {
+    "status": "ok",
+    "path": "/catalog"
+}
 
 
 def _unwind(
@@ -74,16 +99,62 @@ def test_metadata_type_mismatch_detection(metadata_file: str = ""):
 
 
 # TODO: _validate does not validate semantics of dataset_id
-@with_tempfile(
-    content="{"
-    '   "type": "dataset",'
-    '   "dataset_id": "0000",'
-    '   "dataset_version": "000",'
-    '   "name": "abc"'
-    "}"
-)
+@with_tempfile(content=minimal_metadata)
 def test_proper_validation(metadata_file: str = ""):
     result = tuple(
         _validate_metadata(None, metadata_file, None, None, False, None)
     )[0]
     assert_equal(result["status"], "ok")
+
+
+@with_tempfile(mkdir=True)
+@with_tempfile(content="key: value")
+def test_catalog_action_routing(temp_dir: str = "", config_file: str = ""):
+    # expect that every mocked action handler is called
+    with patch("datalad_catalog.catalog._validate_metadata") as f1, \
+            patch("datalad_catalog.catalog._create_catalog") as f2, \
+            patch("datalad_catalog.catalog._serve_catalog") as f3, \
+            patch("datalad_catalog.catalog._add_to_catalog") as f4, \
+            patch("datalad_catalog.catalog._remove_from_catalog") as f5, \
+            patch("datalad_catalog.catalog._set_super_of_catalog") as f6:
+
+        for mock, name in zip((f1, f2, f3, f4, f5, f6),
+                              (f"f{i}" for i in range(1, 7))):
+            mock.return_value = iter([{
+                **result_template,
+                "action": name
+            }])
+
+        results = []
+        for action, create_dir in (("create", False), ("validate", False),
+                                   ("add", True), ("remove", True),
+                                   ("set-super", True), ("serve", True)):
+
+            test_catalog_path = Path(temp_dir) / "test_catalog"
+
+            if create_dir:
+                try:
+                    test_catalog_path.mkdir()
+                    (test_catalog_path / "assets").mkdir()
+                    (test_catalog_path / "artwork").mkdir()
+                    (test_catalog_path / "index.html").write_text("")
+                except FileExistsError:
+                    pass
+            else:
+                try:
+                    test_catalog_path.unlink()
+                except FileNotFoundError:
+                    pass
+
+            results.append(tuple(
+                Catalog()(**{
+                    **default_kwargs,
+                    "catalog_action": action,
+                    "config_file": config_file,
+                    "catalog_dir": str(Path(temp_dir) / "test_catalog"),
+                    "result_renderer": "disabled"
+                })
+            )[0]["action"])
+
+        for i in range(1, 7):
+            assert_in(f"f{i}", results)
