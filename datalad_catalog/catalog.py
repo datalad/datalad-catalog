@@ -668,16 +668,23 @@ def _validate_metadata(metadata: str):
     # Open metadata file and validate line by line
     with open(metadata) as file:
         i = 0
+        prog_id = "catalogvalidate"
+        log_progress(
+            lgr.info,
+            prog_id,
+            "Validating metadata",
+            unit=" Lines",
+            label="Validating",
+            total=num_lines,
+        )
         for line in file:
             i += 1
             log_progress(
                 lgr.info,
-                "catalogvalidate",
-                f"Start validation of metadata in {metadata}",
-                total=num_lines,
+                prog_id,
+                "Validating metadata",
                 update=i,
-                label="metadata validation against catalog schema",
-                unit=" Lines",
+                noninteractive_level=logging.DEBUG,
             )
             meta_dict = json.loads(line.rstrip())
             # Check if item/line is a dict
@@ -694,6 +701,7 @@ def _validate_metadata(metadata: str):
                     f"Schema validation failed in LINE {i}/{num_lines}: \n\n{e}"
                 )
                 raise ValidationError(err_msg) from e
+        log_progress(lgr.info, prog_id, "Validation completed")
 
     msg = "Metadata successfully validated"
     yield get_status_dict(
