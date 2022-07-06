@@ -508,9 +508,8 @@ def _add_to_catalog(
                 f.seek(0)
                 json.dump(vars(inst), f)
                 f.truncate()
-
     yield get_status_dict(
-        res_kwargs,
+        **res_kwargs,
         status="ok",
         message=("Metadata items successfully added to catalog"),
     )
