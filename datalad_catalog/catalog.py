@@ -292,7 +292,9 @@ def _create_catalog(
             msg = ("Catalog assets successfully overwritten at: %s", catalog.location)
     # Yield created/overwitten status message
     yield get_status_dict(
-        action="catalog create", path=abspath(curdir), status="ok", message=msg
+        **res_kwargs,
+        status="ok",
+        message=msg
     )
     # If metadata was also supplied, add this to the catalog
     if metadata is not None:
@@ -428,13 +430,10 @@ def _remove_from_catalog(
     """
     [summary]
     """
-    # remove argument checks
-
     assert catalog  # to indicate that catalog will be used when implemented
     if not dataset_id or not dataset_version:
         yield get_status_dict(
-            action=f"catalog remove",
-            path=abspath(curdir),  # reported paths MUST be absolute
+            **res_kwargs,
             status="error",
             message=(
                 "Dataset ID and/or VERSION missing: datalad catalog remove "
@@ -511,7 +510,7 @@ def _set_super_of_catalog(
     catalog.set_main_dataset()
 
     yield get_status_dict(
-        action="catalog set-super",
+        action="catalog_set_super",
         path=abspath(curdir),
         status="ok",
         message=(
@@ -554,7 +553,7 @@ def _validate_metadata(metadata: str):
             i += 1
             log_progress(
                 lgr.info,
-                "catalogvalidate",
+                "catalog_validate",
                 f"Start validation of metadata in {metadata}",
                 total=num_lines,
                 update=i,
