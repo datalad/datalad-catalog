@@ -61,6 +61,43 @@ class Catalog(Interface):
     set-super``.
     """
 
+    # usage examples
+    _examples_ = [
+        dict(
+            text="Create a new catalog from scratch",
+            code_py="catalog('create', catalog_dir='/tmp/my-cat')",
+            code_cmd="datalad catalog create -c /tmp/my-cat",
+        ),
+        dict(
+            text="Add metadata to an existing catalog",
+            code_py=("catalog('add', catalog_dir='/tmp/my-cat', "
+                     "metadata='path/to/metadata.jsonl')"),
+            code_cmd=("datalad catalog add "
+                      "-c /tmp/my-cat -m path/to/metadata.jsonl"),
+        ),
+        dict(
+            text=("Set the superdataset of an existing catalog "
+                  "- the first dataset displayed when navigating "
+                  "to the root URL of the catalog."),
+            code_py=("catalog('set-super', catalog_dir='/tmp/my-cat', "
+                     "dataset_id='abcd', dataset_version='1234')"),
+            code_cmd=("datalad catalog set-super "
+                      "-c /tmp/my-cat -i abcd -v 1234"),
+        ),
+        dict(
+            text=("Serve the content of the catalog via a local HTTP server "
+                  "at http://localhost:8000"),
+            code_py="catalog('serve', catalog_dir='/tmp/my-cat/')",
+            code_cmd="datalad catalog serve -c /tmp/my-cat",
+        ),
+        dict(
+            text=("Check if metadata conforms to catalog schema "
+                  "without adding it to the catalog"),
+            code_py="catalog('validate', metadata='path/to/metadata.jsonl')",
+            code_cmd="datalad catalog validate -m path/to/metadata.jsonl",
+        ),
+    ]
+
     # parameters of the command, must be exhaustive
     _params_ = dict(
         # name of the parameter, must match argument name
