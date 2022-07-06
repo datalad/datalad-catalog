@@ -299,7 +299,7 @@ def _create_catalog(
     # If metadata was also supplied, add this to the catalog
     if metadata is not None:
         yield from _add_to_catalog(
-            catalog, metadata, dataset_id, dataset_version, force, config_file
+            catalog, metadata, res_kwargs
         )
 
 
