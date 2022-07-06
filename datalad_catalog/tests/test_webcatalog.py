@@ -1,5 +1,9 @@
-from ..webcatalog import WebCatalog, Node
 import pytest
+
+from datalad_catalog.webcatalog import (
+    Node,
+    WebCatalog,
+)
 
 
 @pytest.fixture

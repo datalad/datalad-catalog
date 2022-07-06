@@ -1,12 +1,18 @@
 import hashlib
-from pathlib import Path
-import pytest
-from .. import constants as cnst
-from ..meta_item import MetaItem
-from ..utils import read_json_file
-from ..webcatalog import Node, getNode, WebCatalog
-import os
 import json
+import os
+from pathlib import Path
+
+import pytest
+
+from datalad_catalog import constants as cnst
+from datalad_catalog.meta_item import MetaItem
+from datalad_catalog.utils import read_json_file
+from datalad_catalog.webcatalog import (
+    Node,
+    WebCatalog,
+    getNode,
+)
 
 tests_path = Path(__file__).resolve().parent
 data_path = tests_path / "data"

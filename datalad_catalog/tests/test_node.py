@@ -1,7 +1,13 @@
-from ..webcatalog import Node, getNode, WebCatalog
 import hashlib
+
 import pytest
-from .. import constants as cnst
+
+from datalad_catalog import constants as cnst
+from datalad_catalog.webcatalog import (
+    Node,
+    WebCatalog,
+    getNode,
+)
 
 
 @pytest.fixture

@@ -1,7 +1,9 @@
 from pathlib import Path
+
 import pytest
-from ..utils import read_json_file
-from ..webcatalog import WebCatalog
+
+from datalad_catalog.utils import read_json_file
+from datalad_catalog.webcatalog import WebCatalog
 
 CATALOG_NAME = "catalog_name"
 

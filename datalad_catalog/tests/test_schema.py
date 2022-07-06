@@ -1,15 +1,16 @@
-from ..catalog import Catalog
-from ..webcatalog import WebCatalog
 import pytest
+from pathlib import Path
 from datalad.support.exceptions import InsufficientArgumentsError
 from jsonschema import (
     Draft202012Validator,
-    validate,
-    ValidationError,
     RefResolver,
+    ValidationError,
+    validate,
 )
-from pathlib import Path
-from ..utils import read_json_file
+
+from datalad_catalog.catalog import Catalog
+from datalad_catalog.utils import read_json_file
+from datalad_catalog.webcatalog import WebCatalog
 
 # Setup schema parameters
 package_path = Path(__file__).resolve().parent.parent
