@@ -12,9 +12,8 @@ def test_catalog_no_argument():
     """
     Test if error is raised when no argument is supplied
     """
-    with pytest.raises(TypeError):
-        ctlg = Catalog()
-        ctlg()
+    ctlg = Catalog()
+    assert_raises(TypeError, ctlg)
 
 
 def test_catalog_wrong_action_argument():
