@@ -23,12 +23,14 @@ from ..catalog import (
 )
 
 
-minimal_metadata = '{' \
-    '   "type": "dataset",' \
-    '   "dataset_id": "0000",' \
-    '   "dataset_version": "000",' \
-    '   "name": "abc"' \
-    '}'
+minimal_metadata = (
+    "{"
+    '   "type": "dataset",'
+    '   "dataset_id": "0000",'
+    '   "dataset_version": "000",'
+    '   "name": "abc"'
+    "}"
+)
 
 default_kwargs = {
     "catalog_dir": ".",
@@ -36,13 +38,10 @@ default_kwargs = {
     "dataset_id": "0000-0000-0000",
     "dataset_version": "abcdef",
     "force": False,
-    "config_file": "catalog.conf"
+    "config_file": "catalog.conf",
 }
 
-result_template = {
-    "status": "ok",
-    "path": "/catalog"
-}
+result_template = {"status": "ok", "path": "/catalog"}
 
 
 def _unwind(
@@ -63,7 +62,9 @@ def test_empty_metadata_detection():
         InsufficientArgumentsError,
         _unwind,
         _validate_metadata,
-        [None,],
+        [
+            None,
+        ],
     )
 
 
@@ -73,7 +74,9 @@ def test_schema_violation_detection(metadata_file: str = ""):
         ValidationError,
         _unwind,
         _validate_metadata,
-        [metadata_file,],
+        [
+            metadata_file,
+        ],
     )
 
 
@@ -85,7 +88,9 @@ def test_metadata_type_mismatch_detection(metadata_file: str = ""):
             ValidationError,
             _unwind,
             _validate_metadata,
-            [metadata_file,],
+            [
+                metadata_file,
+            ],
         )
         assert_in(
             call(
@@ -100,9 +105,7 @@ def test_metadata_type_mismatch_detection(metadata_file: str = ""):
 # TODO: _validate does not validate semantics of dataset_id
 @with_tempfile(content=minimal_metadata)
 def test_proper_validation(metadata_file: str = ""):
-    result = tuple(
-        _validate_metadata(metadata_file)
-    )[0]
+    result = tuple(_validate_metadata(metadata_file))[0]
     assert_equal(result["status"], "ok")
 
 
@@ -110,24 +113,30 @@ def test_proper_validation(metadata_file: str = ""):
 @with_tempfile(content="key: value")
 def test_catalog_action_routing(temp_dir: str = "", config_file: str = ""):
     # expect that every mocked action handler is called
-    with patch("datalad_catalog.catalog._validate_metadata") as f1, \
-            patch("datalad_catalog.catalog._create_catalog") as f2, \
-            patch("datalad_catalog.catalog._serve_catalog") as f3, \
-            patch("datalad_catalog.catalog._add_to_catalog") as f4, \
-            patch("datalad_catalog.catalog._remove_from_catalog") as f5, \
-            patch("datalad_catalog.catalog._set_super_of_catalog") as f6:
+    with patch("datalad_catalog.catalog._validate_metadata") as f1, patch(
+        "datalad_catalog.catalog._create_catalog"
+    ) as f2, patch("datalad_catalog.catalog._serve_catalog") as f3, patch(
+        "datalad_catalog.catalog._add_to_catalog"
+    ) as f4, patch(
+        "datalad_catalog.catalog._remove_from_catalog"
+    ) as f5, patch(
+        "datalad_catalog.catalog._set_super_of_catalog"
+    ) as f6:
 
-        for mock, name in zip((f1, f2, f3, f4, f5, f6),
-                              (f"f{i}" for i in range(1, 7))):
-            mock.return_value = iter([{
-                **result_template,
-                "action": name
-            }])
+        for mock, name in zip(
+            (f1, f2, f3, f4, f5, f6), (f"f{i}" for i in range(1, 7))
+        ):
+            mock.return_value = iter([{**result_template, "action": name}])
 
         results = []
-        for action, create_dir in (("create", False), ("validate", False),
-                                   ("add", True), ("remove", True),
-                                   ("set-super", True), ("serve", True)):
+        for action, create_dir in (
+            ("create", False),
+            ("validate", False),
+            ("add", True),
+            ("remove", True),
+            ("set-super", True),
+            ("serve", True),
+        ):
 
             test_catalog_path = Path(temp_dir) / "test_catalog"
 
@@ -145,15 +154,19 @@ def test_catalog_action_routing(temp_dir: str = "", config_file: str = ""):
                 except FileNotFoundError:
                     pass
 
-            results.append(tuple(
-                Catalog()(**{
-                    **default_kwargs,
-                    "catalog_action": action,
-                    "config_file": config_file,
-                    "catalog_dir": str(Path(temp_dir) / "test_catalog"),
-                    "result_renderer": "disabled"
-                })
-            )[0]["action"])
+            results.append(
+                tuple(
+                    Catalog()(
+                        **{
+                            **default_kwargs,
+                            "catalog_action": action,
+                            "config_file": config_file,
+                            "catalog_dir": str(Path(temp_dir) / "test_catalog"),
+                            "result_renderer": "disabled",
+                        }
+                    )
+                )[0]["action"]
+            )
 
         for i in range(1, 7):
             assert_in(f"f{i}", results)

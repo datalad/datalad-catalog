@@ -239,11 +239,27 @@ class Catalog(Interface):
         # Call relevant function based on action
         # Action-specific argument parsing as well as results yielding are done within action-functions
         function, args = {
-            "create": (_create_catalog, (ctlg, metadata, dataset_id, dataset_version, force, config_file)),
+            "create": (
+                _create_catalog,
+                (
+                    ctlg,
+                    metadata,
+                    dataset_id,
+                    dataset_version,
+                    force,
+                    config_file,
+                ),
+            ),
             "serve": (_serve_catalog, (ctlg,)),
             "add": (_add_to_catalog, (ctlg, metadata)),
-            "remove": (_remove_from_catalog, (ctlg, dataset_id, dataset_version)),
-            "set-super": (_set_super_of_catalog, (ctlg, dataset_id, dataset_version)),
+            "remove": (
+                _remove_from_catalog,
+                (ctlg, dataset_id, dataset_version),
+            ),
+            "set-super": (
+                _set_super_of_catalog,
+                (ctlg, dataset_id, dataset_version),
+            ),
         }[catalog_action]
 
         yield from function(*args)
