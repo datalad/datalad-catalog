@@ -28,7 +28,7 @@ To create a new catalog, start by running ``datalad catalog create``
 
 .. code-block:: bash
 
-   datalad catalog create --catalog-dir /tmp/my-cat
+   datalad catalog create --catalog_dir /tmp/my-cat
 
 This will create a catalog with the following structure:
 
@@ -37,6 +37,7 @@ This will create a catalog with the following structure:
   the catalog
 - metadata: where metadata content for any datasets and files rendered by the
   catalog will be contained
+- index.html: the main HTML content rendered in the browser
 
 Add metadata
 ============
@@ -48,7 +49,7 @@ form of json lines, i.e. a text file (typically ``.json``, ``.jsonl``, or
 
 .. code-block:: bash
 
-   datalad catalog add --catalog-dir /tmp/my-cat --metadata path/to/metadata.jsonl
+   datalad catalog add --catalog_dir /tmp/my-cat --metadata path/to/metadata.jsonl
 
 
 The ``metadata`` directory is now populated.
@@ -74,7 +75,7 @@ catalog set-super``, specifying the dataset id and version.
 
 .. code-block:: bash
 
-   datalad catalog set-super --catalog-dir /tmp/my-cat --dataset_id abcd --dataset_version 1234
+   datalad catalog set-super --catalog_dir /tmp/my-cat --dataset_id abcd --dataset_version 1234
 
 Normally, the main dataset is a superdataset that contains other datasets from
 the catalog.
@@ -87,7 +88,7 @@ testing, run ``datalad catalog serve``.
 
 .. code-block:: bash
 
-   datalad catalog serve --catalog-dir /tmp/my-cat
+   datalad catalog serve --catalog_dir /tmp/my-cat
 
 Once the content is served, the catalog can be viewed by visiting the local URL.
 
@@ -100,7 +101,7 @@ metadata.
 
 .. code-block:: bash
 
-   datalad catalog add --catalog-dir /tmp/my-cat --metadata path/to/new/metadata.jsonl
+   datalad catalog add --catalog_dir /tmp/my-cat --metadata path/to/new/metadata.jsonl
 
 If a newly added dataset or version of a dataset was added incorrectly,
 ``datalad catalog remove`` can be used to get rid of the incorrect addition.
@@ -119,6 +120,6 @@ catalog creation.
 
 .. code-block:: bash
 
-   datalad catalog create --catalog-dir /tmp/my-custom-cat --config-file path/to/custom_config.json
+   datalad catalog create --catalog_dir /tmp/my-custom-cat --config-file path/to/custom_config.json
 
 If no config file is specified, a default config file is used.
