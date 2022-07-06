@@ -18,6 +18,7 @@ catalog_paths = [
     "artwork",
     "index.html",
     "config.json",
+    "README.md",
 ]
 
 

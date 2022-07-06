@@ -126,11 +126,13 @@ class WebCatalog(object):
             "assets": Path(self.package_path) / "catalog" / "assets",
             "artwork": Path(self.package_path) / "catalog" / "artwork",
             "html": Path(self.package_path) / "catalog" / "index.html",
+            "readme": Path(self.package_path) / "catalog" / "README.md",
         }
         out_dir_paths = {
             "assets": Path(self.location) / "assets",
             "artwork": Path(self.location) / "artwork",
             "html": Path(self.location) / "index.html",
+            "readme": Path(self.location) / "README.md",
         }
         for key in content_paths:
             copy_overwrite_path(
