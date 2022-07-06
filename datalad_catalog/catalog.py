@@ -251,7 +251,7 @@ class Catalog(Interface):
                     dataset_version,
                     force,
                     config_file,
-                    res_kwargs
+                    res_kwargs,
                 ),
             ),
             "serve": (_serve_catalog, (ctlg, res_kwargs)),
@@ -277,7 +277,7 @@ def _create_catalog(
     dataset_version: str,
     force: bool,
     config_file: str,
-    res_kwargs: Optional[Dict] = None
+    res_kwargs: Optional[Dict] = None,
 ):
     """"""
     # If catalog does not exist, create it
@@ -289,24 +289,19 @@ def _create_catalog(
     else:
         if force:
             catalog.create(force)
-            msg = ("Catalog assets successfully overwritten at: %s", catalog.location)
+            msg = (
+                "Catalog assets successfully overwritten at: %s",
+                catalog.location,
+            )
     # Yield created/overwitten status message
-    yield get_status_dict(
-        **res_kwargs,
-        status="ok",
-        message=msg
-    )
+    yield get_status_dict(**res_kwargs, status="ok", message=msg)
     # If metadata was also supplied, add this to the catalog
     if metadata is not None:
-        yield from _add_to_catalog(
-            catalog, metadata, res_kwargs
-        )
+        yield from _add_to_catalog(catalog, metadata, res_kwargs)
 
 
 def _add_to_catalog(
-    catalog: WebCatalog,
-    metadata,
-    res_kwargs: Optional[Dict] = None
+    catalog: WebCatalog, metadata, res_kwargs: Optional[Dict] = None
 ):
     """
     [summary]
@@ -320,7 +315,7 @@ def _add_to_catalog(
                 "metadata in the form of a path to a file containing a JSON "
                 "array, or JSON lines stream, using the argument: "
                 "-m, --metadata."
-            )
+            ),
         )
 
     # Then we need to do the following:
@@ -415,9 +410,7 @@ def _add_to_catalog(
     yield get_status_dict(
         res_kwargs,
         status="ok",
-        message=(
-            "Metadata items successfully added to catalog"
-        )
+        message=("Metadata items successfully added to catalog"),
     )
 
 
@@ -425,7 +418,7 @@ def _remove_from_catalog(
     catalog: WebCatalog,
     dataset_id: str,
     dataset_version: str,
-    res_kwargs: Optional[Dict] = None
+    res_kwargs: Optional[Dict] = None,
 ):
     """
     [summary]
@@ -440,15 +433,12 @@ def _remove_from_catalog(
                 "requires both the ID (-i, --dataset_id) and VERSION (-v, "
                 "--dataset_version) of the dataset to be removed from the "
                 "catalog"
-            )
+            ),
         )
         sys.exit(err_msg)
 
 
-def _serve_catalog(
-    catalog: WebCatalog,
-    res_kwargs: Optional[Dict] = None
-):
+def _serve_catalog(catalog: WebCatalog, res_kwargs: Optional[Dict] = None):
     """
     Start a local http server for viewing/testing a local catalog
 
@@ -467,6 +457,7 @@ def _serve_catalog(
     import socketserver
     from datalad.ui import ui
     import datalad.support.ansi_colors as ac
+
     PORT = 8000
     HOSTNAME = "localhost"
     # HOSTNAME = '127.0.0.1'
@@ -477,18 +468,12 @@ def _serve_catalog(
             "address in your browser to test the catalog locally - press "
             "CTRL+C to stop local testing\n".format(
                 host=ac.color_word(HOSTNAME, ac.BOLD),
-                port=ac.color_word(PORT, ac.BOLD)
+                port=ac.color_word(PORT, ac.BOLD),
             )
         )
         httpd.serve_forever()
 
-    yield get_status_dict(
-        **res_kwargs,
-        status="ok",
-        message=(
-            "Dataset served"
-        )
-    )
+    yield get_status_dict(**res_kwargs, status="ok", message=("Dataset served"))
 
 
 def _set_super_of_catalog(
@@ -513,9 +498,7 @@ def _set_super_of_catalog(
         action="catalog_set_super",
         path=abspath(curdir),
         status="ok",
-        message=(
-            "Superdataset successfully set for catalog"
-        )
+        message=("Superdataset successfully set for catalog"),
     )
 
 
@@ -584,9 +567,7 @@ def _validate_metadata(metadata: str):
         action="catalog_validate",
         path=Path(metadata),
         status="ok",
-        message=(
-            "Metadata successfully validated"
-        ),
+        message=("Metadata successfully validated"),
     )
 
 
