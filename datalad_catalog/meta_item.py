@@ -1,10 +1,16 @@
 # from abc import ABC, abstractmethod
-from pathlib import Path
-from . import constants as cnst
-from .webcatalog import WebCatalog, Node, getNode
-from .utils import read_json_file
-from datalad.interface.results import get_status_dict
 import logging
+from pathlib import Path
+
+from datalad.interface.results import get_status_dict
+
+from datalad_catalog import constants as cnst
+from datalad_catalog.utils import read_json_file
+from datalad_catalog.webcatalog import (
+    Node,
+    WebCatalog,
+    getNode,
+)
 
 lgr = logging.getLogger("datalad.catalog.meta_item")
 

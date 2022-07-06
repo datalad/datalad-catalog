@@ -1,24 +1,36 @@
-from os.path import curdir
-from os.path import abspath
-import logging
-from datalad.interface.base import Interface
-from datalad.interface.base import build_doc
-from datalad.interface.utils import eval_results
-from datalad.interface.results import get_status_dict
-from datalad.log import log_progress
-from datalad.support.param import Parameter
-from datalad.support.exceptions import InsufficientArgumentsError
-from datalad.distribution.dataset import datasetmethod
-from datalad.support.constraints import EnsureChoice
-import sys
-from pathlib import Path
 import json
+import logging
 import os
-from typing import Dict, List, Optional, Tuple, Union
-from .webcatalog import WebCatalog, Node
-from .utils import read_json_file
-from .meta_item import MetaItem
-from jsonschema import ValidationError, Draft202012Validator, RefResolver
+import sys
+from os.path import (
+    abspath,
+    curdir,
+)
+from pathlib import Path
+
+from datalad.distribution.dataset import datasetmethod
+from datalad.interface.base import (
+    Interface,
+    build_doc,
+)
+from datalad.interface.results import get_status_dict
+from datalad.interface.utils import eval_results
+from datalad.log import log_progress
+from datalad.support.constraints import EnsureChoice
+from datalad.support.exceptions import InsufficientArgumentsError
+from datalad.support.param import Parameter
+from jsonschema import (
+    Draft202012Validator,
+    RefResolver,
+    ValidationError,
+)
+
+from datalad_catalog.meta_item import MetaItem
+from datalad_catalog.utils import read_json_file
+from datalad_catalog.webcatalog import (
+    Node,
+    WebCatalog,
+)
 
 # Create named logger
 lgr = logging.getLogger("datalad.catalog.catalog")
@@ -162,7 +174,7 @@ class Catalog(Interface):
             args=("-y", "--config-file"),
             # documentation
             doc="""Path to config file in YAML or JSON format. Default config is read
-            from datalad_catalog/templates/config.json
+            from datalad_catalog/config/config.json
             Example: ''""",
         ),
     )
@@ -206,57 +218,107 @@ class Catalog(Interface):
         # TODO: check if schema is valid (move to tests)
         # Draft202012Validator.check_schema(schema)
 
+        # set common result kwargs:
+        action = "catalog_%s" % catalog_action
+        res_kwargs = dict(action=action)
         # If action is validate, only metadata required
         if catalog_action == "validate":
-            yield from _validate_metadata(
-                None,
-                metadata,
-                None,
-                None,
-                None,
-                None,
-            )
+            yield from _validate_metadata(metadata)
             return
 
         # Error out if `catalog_dir` argument was not supplied
         if catalog_dir is None:
-            err_msg = f"No catalog directory supplied: Datalad catalog can only operate on a path to a directory. Argument: -c, --catalog_dir."
-            raise InsufficientArgumentsError(err_msg)
+            yield dict(
+                **res_kwargs,
+                status="impossible",
+                message=(
+                    "Datalad catalog %s requires a path to operate on. "
+                    "Forgot -c, --catalog_dir?",
+                    catalog_action,
+                ),
+                path=None,
+            )
+            return
+        # now that we have a path, update result kwargs with it
+        res_kwargs["path"] = catalog_dir
 
         # Instantiate WebCatalog class
         ctlg = WebCatalog(catalog_dir, dataset_id, dataset_version, config_file)
         # catalog_path = Path(catalog_dir)
         # catalog_exists = catalog_path.exists() and catalog_path.is_dir()
 
-        # Hanlde case where a non-catalog directory already exists at path argument
-        # Should prevent overwriting
+        # Hanlde case where a non-catalog directory already exists at path
+        # argument. Should prevent overwriting
         if ctlg.path_exists() and not ctlg.is_created():
-            err_msg = f"A non-catalog directory already exists at {catalog_dir}. Please supply a different path."
-            raise FileExistsError(err_msg)
+            yield dict(
+                **res_kwargs,
+                status="error",
+                message=(
+                    "A non-catalog directory already exists at %s. "
+                    "Please supply a different path.",
+                    catalog_dir,
+                ),
+            )
+            return
 
-        # Catalog should exist for all actions except create (for create action: unless force flag supplied)
+        # Catalog should exist for all actions except create (for create action:
+        # unless force flag supplied)
         if not ctlg.is_created():
             if catalog_action != "create":
-                err_msg = f"Catalog does not exist: datalad catalog {catalog_action} can only operate on an existing catalog, please supply a path to an existing directory with the catalog argument: -c, --catalog_dir."
-                raise InsufficientArgumentsError(err_msg)
+                yield dict(
+                    **res_kwargs,
+                    status="impossible",
+                    message=(
+                        "Catalog does not exist: datalad catalog '%s' can only "
+                        "operate on an existing catalog, please supply a path "
+                        "to an existing directory with the catalog argument: "
+                        "-c, --catalog_dir.",
+                        catalog_action,
+                    ),
+                )
+                return
         else:
             if catalog_action == "create":
                 if not force:
-                    err_msg = f"Catalog already exists: overwriting catalog assets (not catalog metadata) is only possible when using the force argument: -f, --force."
-                    raise InsufficientArgumentsError(err_msg)
+                    yield dict(
+                        **res_kwargs,
+                        status="error",
+                        message=(
+                            "Found existing catalog at %s. Overwriting catalog "
+                            "assets (not catalog metadata) is only possible "
+                            "when using --force.",
+                            catalog_dir,
+                        ),
+                    )
+                    return
 
         # Call relevant function based on action
         # Action-specific argument parsing as well as results yielding are done within action-functions
-        CALL_ACTION = {
-            "create": _create_catalog,
-            "serve": _serve_catalog,
-            "add": _add_to_catalog,
-            "remove": _remove_from_catalog,
-            "set-super": _set_super_of_catalog,
-        }
-        yield from CALL_ACTION[catalog_action](
-            ctlg, metadata, dataset_id, dataset_version, force, config_file
-        )
+        function, args = {
+            "create": (
+                _create_catalog,
+                (
+                    ctlg,
+                    metadata,
+                    dataset_id,
+                    dataset_version,
+                    force,
+                    config_file,
+                ),
+            ),
+            "serve": (_serve_catalog, (ctlg,)),
+            "add": (_add_to_catalog, (ctlg, metadata)),
+            "remove": (
+                _remove_from_catalog,
+                (ctlg, dataset_id, dataset_version),
+            ),
+            "set-super": (
+                _set_super_of_catalog,
+                (ctlg, dataset_id, dataset_version),
+            ),
+        }[catalog_action]
+
+        yield from function(*args)
 
 
 # Internal functions to execute based on catalog_action parameter
@@ -310,10 +372,6 @@ def _create_catalog(
 def _add_to_catalog(
     catalog: WebCatalog,
     metadata,
-    dataset_id: str,
-    dataset_version: str,
-    force: bool,
-    config_file: str,
 ):
     """Add metadata entries to the catalog.
 
@@ -431,11 +489,8 @@ def _add_to_catalog(
 
 def _remove_from_catalog(
     catalog: WebCatalog,
-    metadata,
     dataset_id: str,
     dataset_version: str,
-    force: bool,
-    config_file: str,
 ):
     """Remove a dataset from the catalog.
 
@@ -452,6 +507,8 @@ def _remove_from_catalog(
         DataLad result record
     """
     # remove argument checks
+
+    assert catalog  # to indicate that catalog will be used when implemented
     if not dataset_id or not dataset_version:
         err_msg = f"Dataset ID and/or VERSION missing: datalad catalog remove requires both the ID (-i, --dataset_id) and VERSION (-v, --dataset_version) of the dataset to be removed from the catalog"
         yield get_status_dict(
@@ -465,11 +522,6 @@ def _remove_from_catalog(
 
 def _serve_catalog(
     catalog: WebCatalog,
-    metadata,
-    dataset_id: str,
-    dataset_version: str,
-    force: bool,
-    config_file: str,
 ):
     """Start a local http server for viewing/testing a local catalog.
 
@@ -507,11 +559,8 @@ def _serve_catalog(
 
 def _set_super_of_catalog(
     catalog: WebCatalog,
-    metadata,
     dataset_id: str,
     dataset_version: str,
-    force: bool,
-    config_file: str,
 ):
     """Set the catalog's main dataset (shown on home page).
 
@@ -553,14 +602,7 @@ def _set_super_of_catalog(
     )
 
 
-def _validate_metadata(
-    catalog: WebCatalog,
-    metadata,
-    dataset_id: str,
-    dataset_version: str,
-    force: bool,
-    config_file: str,
-):
+def _validate_metadata(metadata: str):
     """Validate supplied metadata entries against catalog schema.
 
     Parameters
@@ -580,11 +622,12 @@ def _validate_metadata(
 
     # Setup schema parameters
     package_path = Path(__file__).resolve().parent
-    templates_path = package_path / "templates"
+    config_dir = package_path / "config"
+    schema_dir = package_path / "schema"
     schemas = ["catalog", "dataset", "file", "authors", "extractors"]
     schema_store = {}
     for s in schemas:
-        schema_path = templates_path / str("jsonschema_" + s + ".json")
+        schema_path = schema_dir / str("jsonschema_" + s + ".json")
         schema = read_json_file(schema_path)
         schema_store[schema["$id"]] = schema
 
@@ -632,9 +675,6 @@ def _validate_metadata(
     )
 
 
-def _get_line_count(file):
+def _get_line_count(file: str) -> int:
     """A helper function to get a file line count"""
-    with open(file) as f:
-        for i, _ in enumerate(f):
-            pass
-    return i + 1
+    return sum(1 for _ in open(file))

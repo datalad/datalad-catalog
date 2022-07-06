@@ -1,18 +1,40 @@
 Pipeline Description
 ********************
 
-Creating a catalog for your data involves the use of several of DataLad's
-functionalities and extensions: mainly DataLad, DataLad MetaLad, and 
-DataLad Catalog. Below we describe a standard pipeline for building a
-user-friendly catalog from your (meta)data.
+The DataLad ecosystem provides a complete set of free and open source tools
+that, together, provide full control over dataset access and distribution,
+version control, provenance tracking, metadata addition, extraction, and
+aggregation, as well as catalog generation.
 
+DataLad itself can be used for decentralised management of data as lightweight,
+portable and extensible representations. DataLad MetaLad can extract structured
+high- and low-level metadata and associate it with these datasets or with
+individual files. Then at the end of this workflow, DataLad Catalog can turn the
+structured metadata into a user-friendly data browser.
+
+Importantly, DataLad Catalog can operate independently as well. Since it
+provides its own schema in a standard vocabulary, any metadata that conforms to
+this schema can be submitted to the tool in order to generate a catalog.
+Metadata items do not necessarily have to be derived from DataLad datasets, and
+the metadata extraction does not have to be conducted via DataLad MetaLad.
+
+Even so, the provided set of tools can be particularly powerful when used
+together in a distributed (meta)data management pipeline. Below is an example
+for building a catalog using the full DataLad toolset; from data management, to
+metadata handling, to the end result of catalog generation.
+
+.. image:: /_static/datacat3_the_toolset.svg
+
+An example end-to-end pipeline
+==============================
 
 Step 1 - Create/access a DataLad dataset
-========================================
+----------------------------------------
 
 Our fundamental operational unit is a DataLad dataset. In order to generate
 a minimal catalog, we have to start with this unit. We do this either by
 cloning a DataLad dataset from a known location, or by creating a new dataset.
+See the `DataLad Handbook`_ for more information on working with DataLad datasets.
 
 
 Clone:
@@ -29,7 +51,7 @@ Create:
 
 
 Step 2 - Add metadata
-=====================
+---------------------
 
 In order to extract arbitrary structured metadata from a DataLad dataset,
 this information first has to be added explicitly to the dataset. It can
@@ -48,12 +70,12 @@ Once the dataset has been updated with metadata, it has to be saved:
     datalad save -m "add metadata to mydataset"
 
 Various metadata formats are recognized by DataLad MetaLad's extractors.
-See :doc:`metadata_formats` for an overview and `DataLad Metalad`_'s 
+See :doc:`metadata_formats` for an overview and `DataLad Metalad`_'s
 documentation for more detail.
 
 
 Step 3 - Extract metadata
-=========================
+-------------------------
 
 With Datalad MetaLad we can extract implicit and explicit metadata from
 our dataset. This can be done on the dataset as well as file level through
@@ -68,15 +90,15 @@ to streamline this process, especially for large datasets:
 - ``meta-aggregate`` combines metadata from a number of sub-datasets into the
   root dataset
 - ``meta-conduct`` runs pipelines of extractors and adders on locally available
-  datatasets/files, in order to automatate metadata extraction and adding tasks
+  datatasets/files, in order to automate metadata extraction and adding tasks
 
 Below are example code snippets that can be run to extract metadata from the
-file and dataset level (repectively using the ``metalad_core``, and both the 
+file and dataset level (respectively using the ``metalad_core``, and both the
 ``metalad_core`` and ``metalad_studyminimeta`` extractors) and to subsequently
 write these metadata objects to disk in JSON format.
 
 From dataset
-------------
+############
 
 Extract and add:
 
@@ -143,7 +165,7 @@ Dump and write to disk:
     datalad meta-dump -d "$DATASET_PATH" -r "*" > "$METADATA_OUT_PATH"
 
 From files
-----------
+##########
 
 Extract and write to disk:
 
@@ -198,7 +220,7 @@ can be given as arguments to DataLad Catalog in order to generate the catalog.
 
 
 Step 4 - Run DataLad Catalog
-============================
+----------------------------
 
 .. note:: Detailed usage instructions for DataLad Catalog can be viewed in
     :doc:`usage` and :doc:`command_line_reference`.
@@ -222,7 +244,7 @@ To create a catalog from the metadata we generated above, we can run the followi
 
 
 Step 5 - Deploy the catalog
-===========================
+---------------------------
 
 .. admonition:: TODO
     
@@ -230,7 +252,7 @@ Step 5 - Deploy the catalog
 
 
 Step 6 - Update the catalog
-===========================
+---------------------------
 
 .. admonition:: TODO
     
@@ -238,4 +260,5 @@ Step 6 - Update the catalog
 
 
 
+.. _DataLad Handbook: https://handbook.datalad.org/en/latest/basics/basics-datasets.html
 .. _DataLad Metalad: https://github.com/datalad/datalad-metalad

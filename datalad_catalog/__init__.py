@@ -18,7 +18,7 @@ command_suite = (
             # optional name of the command in the cmdline API
             "catalog",
             # optional name of the command in the Python API
-            "catalog_cmd",
+            "catalog",
         ),
     ],
 )

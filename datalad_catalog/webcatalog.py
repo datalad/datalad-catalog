@@ -1,13 +1,21 @@
-import sys
-import json
-from pathlib import Path
-import shutil
 import hashlib
-from . import constants as cnst
+import json
 import logging
-from .utils import read_json_file, find_duplicate_object_in_list
-from jsonschema import Draft202012Validator, RefResolver
+import shutil
+import sys
+from pathlib import Path
+
 import yaml
+from jsonschema import (
+    Draft202012Validator,
+    RefResolver,
+)
+
+import datalad_catalog.constants as cnst
+from datalad_catalog.utils import (
+    find_duplicate_object_in_list,
+    read_json_file,
+)
 
 lgr = logging.getLogger("datalad.catalog.webcatalog")
 
@@ -46,11 +54,12 @@ class WebCatalog(object):
 
     # Get package-related paths
     package_path = Path(__file__).resolve().parent
-    templates_path = package_path / "templates"
+    config_dir = package_path / "config"
+    schema_dir = package_path / "schema"
     # Set up schema store and validator
     SCHEMA_STORE = {}
     for schema_type, schema_id in CATALOG_SCHEMA_IDS.items():
-        schema_path = templates_path / f"jsonschema_{schema_type}.json"
+        schema_path = schema_dir / f"jsonschema_{schema_type}.json"
         schema = read_json_file(schema_path)
         SCHEMA_STORE[schema["$id"]] = schema
     CATALOG_SCHEMA = SCHEMA_STORE[CATALOG_SCHEMA_IDS[cnst.CATALOG]]
@@ -114,14 +123,16 @@ class WebCatalog(object):
             Path(self.metadata_path).mkdir(parents=True)
 
         content_paths = {
-            "assets": Path(self.package_path) / "assets",
-            "artwork": Path(self.package_path) / "artwork",
-            "html": Path(self.package_path) / "index.html",
+            "assets": Path(self.package_path) / "catalog" / "assets",
+            "artwork": Path(self.package_path) / "catalog" / "artwork",
+            "html": Path(self.package_path) / "catalog" / "index.html",
+            "readme": Path(self.package_path) / "catalog" / "README.md",
         }
         out_dir_paths = {
             "assets": Path(self.location) / "assets",
             "artwork": Path(self.location) / "artwork",
             "html": Path(self.location) / "index.html",
+            "readme": Path(self.location) / "README.md",
         }
         for key in content_paths:
             copy_overwrite_path(
@@ -170,7 +181,7 @@ class WebCatalog(object):
             if source_str is not None:
                 return Path(source_str)
             else:
-                return Path(self.templates_path / "config.json")
+                return Path(self.config_dir / "config.json")
 
     def get_config(self):
         """"""

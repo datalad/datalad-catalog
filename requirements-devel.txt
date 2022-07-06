@@ -1,7 +1,16 @@
+# runtime requirements
+# datalad>=0.17
+git+https://github.com/datalad/datalad@master
+datalad-metalad>=0.3.10
+jsonschema
+yaml2
+
 # requirements for a development environment
 pytest
 nose
 coverage
+
+# requirements for a document building
 sphinx
 sphinx_rtd_theme
 sphinx_copybutton
