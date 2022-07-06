@@ -7,7 +7,10 @@ from os.path import (
     curdir,
 )
 from pathlib import Path
-
+from typing import (
+    Optional,
+    Dict,
+)
 from datalad.distribution.dataset import datasetmethod
 from datalad.interface.base import (
     Interface,
@@ -248,13 +251,14 @@ class Catalog(Interface):
                     dataset_version,
                     force,
                     config_file,
+                    res_kwargs
                 ),
             ),
-            "serve": (_serve_catalog, (ctlg,)),
-            "add": (_add_to_catalog, (ctlg, metadata)),
+            "serve": (_serve_catalog, (ctlg, res_kwargs)),
+            "add": (_add_to_catalog, (ctlg, metadata, res_kwargs)),
             "remove": (
                 _remove_from_catalog,
-                (ctlg, dataset_id, dataset_version),
+                (ctlg, dataset_id, dataset_version, res_kwargs),
             ),
             "set-super": (
                 _set_super_of_catalog,
@@ -273,6 +277,7 @@ def _create_catalog(
     dataset_version: str,
     force: bool,
     config_file: str,
+    res_kwargs: Optional[Dict] = None
 ):
     """"""
     # If catalog does not exist, create it
@@ -299,6 +304,7 @@ def _create_catalog(
 def _add_to_catalog(
     catalog: WebCatalog,
     metadata,
+    res_kwargs: Optional[Dict] = None
 ):
     """
     [summary]
@@ -402,6 +408,7 @@ def _remove_from_catalog(
     catalog: WebCatalog,
     dataset_id: str,
     dataset_version: str,
+    res_kwargs: Optional[Dict] = None
 ):
     """
     [summary]
@@ -422,6 +429,7 @@ def _remove_from_catalog(
 
 def _serve_catalog(
     catalog: WebCatalog,
+    res_kwargs: Optional[Dict] = None
 ):
     """
     Start a local http server for viewing/testing a local catalog
