@@ -343,7 +343,7 @@ const datasetView = {
       var d = new Date(0); // epoch date
       d.setUTCSeconds(utcSeconds);
       day = d.getDate();
-      month = d.getMonth();
+      month = d.getMonth() + 1;  // getMonth() returns the month as a zero-based value
       year = d.getFullYear();
       return year + '-' + (month > 9 ? month : '0' + month) + '-' + (day > 9 ? day : '0' + day)
     },
