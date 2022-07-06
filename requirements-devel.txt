@@ -3,7 +3,7 @@
 git+https://github.com/datalad/datalad@master
 datalad-metalad>=0.3.10
 jsonschema
-yaml2
+pyyaml
 
 # requirements for a development environment
 pytest
