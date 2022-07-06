@@ -329,7 +329,7 @@ class Node(object):
         path_right = dir_name[self._split_dir_length :]
         return path_left, path_right
 
-    def add_attribrutes(
+    def add_attributes(
         self, new_attributes: dict, catalog: WebCatalog, overwrite=False
     ):
         """Add attributes (key-value pairs) to a Node as instance variables"""
