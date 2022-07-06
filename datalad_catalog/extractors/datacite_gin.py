@@ -51,8 +51,8 @@ class DataciteGINDatasetExtractor(DatasetMetadataExtractor):
 
     def get_required_content(self) -> bool:
         result = self.dataset.get(
-            self.datacite_yaml_file_name,
-            result_renderer="disabled")
+            self.datacite_yaml_file_name, result_renderer="disabled"
+        )
         return result[0]["status"] in ("ok", "notneeded")
 
     def extract(self, _=None) -> ExtractorResult:

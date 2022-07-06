@@ -101,8 +101,7 @@ def test_datacite_extractor(temp_dir_name: str = ""):
     dataset.save(result_renderer="disabled")
 
     result = meta_extract(
-        dataset=str(dataset_dir),
-        extractorname="datacite_gin"
+        dataset=str(dataset_dir), extractorname="datacite_gin"
     )
     assert_equal(len(result), 1)
     extracted_metadata = result[0]["metadata_record"]["extracted_metadata"]
