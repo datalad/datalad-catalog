@@ -1,11 +1,32 @@
 Pipeline Description
 ********************
 
-Creating a catalog for your data involves the use of several of DataLad's
-functionalities and extensions: mainly DataLad, DataLad MetaLad, and 
-DataLad Catalog. Below we describe a standard pipeline for building a
-user-friendly catalog from your (meta)data.
+The DataLad ecosystem provides a complete set of free and open source tools
+that, together, provide full control over dataset access and distribution,
+version control, provenance tracking, metadata addition, extraction, and
+aggregation, as well as catalog generation.
 
+DataLad itself can be used for decentralised management of data as lightweight,
+portable and extensible representations. DataLad MetaLad can extract structured
+high- and low-level metadata and associate it with these datasets or with
+individual files. Then at the end of this workflow, DataLad Catalog can turn the
+structured metadata into a user-friendly data browser.
+
+Importantly, DataLad Catalog can operate independently as well. Since it
+provides its own schema in a standard vocabulary, any metadata that conforms to
+this schema can be submitted to the tool in order to generate a catalog.
+Metadata items do not necessarily have to be derived from DataLad datasets, and
+the metadata extraction does not have to be conducted via DataLad MetaLad.
+
+Even so, the provided set of tools can be particularly powerful when used
+together in a distributed (meta)data management pipeline. Below is an example
+for building a catalog using the full DataLad toolset; from data management, to
+metadata handling, to the end result of catalog generation.
+
+.. image:: /_static/datacat3_the_toolset.svg
+
+An example end-to-end pipeline
+==============================
 
 Step 1 - Create/access a DataLad dataset
 ========================================
