@@ -7,13 +7,6 @@ from os.path import (
     curdir,
 )
 from pathlib import Path
-from typing import (
-    Dict,
-    List,
-    Optional,
-    Tuple,
-    Union,
-)
 
 from datalad.distribution.dataset import datasetmethod
 from datalad.interface.base import (
@@ -174,14 +167,7 @@ class Catalog(Interface):
         res_kwargs = dict(action=action)
         # If action is validate, only metadata required
         if catalog_action == "validate":
-            yield from _validate_metadata(
-                None,
-                metadata,
-                None,
-                None,
-                None,
-                None,
-            )
+            yield from _validate_metadata(metadata)
             return
 
         # Error out if `catalog_dir` argument was not supplied
@@ -252,16 +238,15 @@ class Catalog(Interface):
 
         # Call relevant function based on action
         # Action-specific argument parsing as well as results yielding are done within action-functions
-        CALL_ACTION = {
-            "create": _create_catalog,
-            "serve": _serve_catalog,
-            "add": _add_to_catalog,
-            "remove": _remove_from_catalog,
-            "set-super": _set_super_of_catalog,
-        }
-        yield from CALL_ACTION[catalog_action](
-            ctlg, metadata, dataset_id, dataset_version, force, config_file
-        )
+        function, args = {
+            "create": (_create_catalog, (ctlg, metadata, dataset_id, dataset_version, force, config_file)),
+            "serve": (_serve_catalog, (ctlg,)),
+            "add": (_add_to_catalog, (ctlg, metadata)),
+            "remove": (_remove_from_catalog, (ctlg, dataset_id, dataset_version)),
+            "set-super": (_set_super_of_catalog, (ctlg, dataset_id, dataset_version)),
+        }[catalog_action]
+
+        yield from function(*args)
 
 
 # Internal functions to execute based on catalog_action parameter
@@ -298,10 +283,6 @@ def _create_catalog(
 def _add_to_catalog(
     catalog: WebCatalog,
     metadata,
-    dataset_id: str,
-    dataset_version: str,
-    force: bool,
-    config_file: str,
 ):
     """
     [summary]
@@ -403,16 +384,15 @@ def _add_to_catalog(
 
 def _remove_from_catalog(
     catalog: WebCatalog,
-    metadata,
     dataset_id: str,
     dataset_version: str,
-    force: bool,
-    config_file: str,
 ):
     """
     [summary]
     """
     # remove argument checks
+
+    assert catalog  # to indicate that catalog will be used when implemented
     if not dataset_id or not dataset_version:
         err_msg = f"Dataset ID and/or VERSION missing: datalad catalog remove requires both the ID (-i, --dataset_id) and VERSION (-v, --dataset_version) of the dataset to be removed from the catalog"
         yield get_status_dict(
@@ -426,11 +406,6 @@ def _remove_from_catalog(
 
 def _serve_catalog(
     catalog: WebCatalog,
-    metadata,
-    dataset_id: str,
-    dataset_version: str,
-    force: bool,
-    config_file: str,
 ):
     """
     Start a local http server for viewing/testing a local catalog
@@ -469,11 +444,8 @@ def _serve_catalog(
 
 def _set_super_of_catalog(
     catalog: WebCatalog,
-    metadata,
     dataset_id: str,
     dataset_version: str,
-    force: bool,
-    config_file: str,
 ):
     """
     [summary]
@@ -497,14 +469,7 @@ def _set_super_of_catalog(
     )
 
 
-def _validate_metadata(
-    catalog: WebCatalog,
-    metadata,
-    dataset_id: str,
-    dataset_version: str,
-    force: bool,
-    config_file: str,
-):
+def _validate_metadata(metadata: str):
     """"""
     # First check metadata was supplied via -m flag
     if metadata is None:
@@ -566,8 +531,5 @@ def _validate_metadata(
     )
 
 
-def _get_line_count(file):
-    with open(file) as f:
-        for i, _ in enumerate(f):
-            pass
-    return i + 1
+def _get_line_count(file: str) -> int:
+    return sum(1 for _ in open(file))

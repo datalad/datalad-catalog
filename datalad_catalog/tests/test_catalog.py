@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 from unittest.mock import (
@@ -64,7 +63,7 @@ def test_empty_metadata_detection():
         InsufficientArgumentsError,
         _unwind,
         _validate_metadata,
-        [None, None, None, None, False, None],
+        [None,],
     )
 
 
@@ -74,7 +73,7 @@ def test_schema_violation_detection(metadata_file: str = ""):
         ValidationError,
         _unwind,
         _validate_metadata,
-        [None, metadata_file, None, None, False, None],
+        [metadata_file,],
     )
 
 
@@ -86,7 +85,7 @@ def test_metadata_type_mismatch_detection(metadata_file: str = ""):
             ValidationError,
             _unwind,
             _validate_metadata,
-            [None, metadata_file, None, None, False, None],
+            [metadata_file,],
         )
         assert_in(
             call(
@@ -102,7 +101,7 @@ def test_metadata_type_mismatch_detection(metadata_file: str = ""):
 @with_tempfile(content=minimal_metadata)
 def test_proper_validation(metadata_file: str = ""):
     result = tuple(
-        _validate_metadata(None, metadata_file, None, None, False, None)
+        _validate_metadata(metadata_file)
     )[0]
     assert_equal(result["status"], "ok")
 
