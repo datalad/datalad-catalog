@@ -8,82 +8,35 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Metadata extractor for GIN-flavored datacite.yml information"""
 import logging
-from uuid import UUID
-from pathlib import Path
 import yaml
+from pathlib import Path
+from uuid import UUID
+
 from datalad_metalad.extractors.base import (
+    DatasetMetadataExtractor,
     DataOutputCategory,
     ExtractorResult,
-    DatasetMetadataExtractor,
 )
 from datalad.log import log_progress
 from datalad.metadata.definitions import vocabulary_id
 from datalad.utils import assure_unicode
 
+
 lgr = logging.getLogger("datalad.metadata.extractors.datacite_gin")
 
-vocabulary = {}
-
-# Main properties used in GIN-based datacite.yml
-class DATACITE_PROPERTIES:
-    # REQUIRED FIELDS
-    AUTHORS = "authors"
-    FIRSTNAME = "firstname"
-    LASTNAME = "lastname"
-    AFFILIATION = "affiliation"
-    ID = "id"  # CAN HAVE A TYPE: ORCID, RESEARCHERID
-    ORCID = "ORCID"
-    RESEARCHERID = "ResearcherID"
-    TITLE = "title"
-    DESCRIPTION = "description"
-    KEYWORDS = "keywords"
-    LICENSE = "license"
-    NAME = "name"  # OF LICENSE
-    URL = "url"  # OF LICENSE
-    # OPTIONAL FIELDS
-    FUNDING = "funding"  # FUNDER, GRANT NR
-    REFERENCES = "references"  # ID CAN BE: DOI, arxiv, pmid
-    CITATION = "citation"
-    DOI = "DOI"
-    REFTYPE = (
-        "reftype"  # CAN BE: IsSupplementTo, IsDescribedBy, IsReferencedBy.
-    )
-    ISSUPPLEMENTTO = "IsSupplementTo"
-    ISDESCRIBEDBY = "IsDescribedBy"
-    ISREFERENCEDBY = "IsReferencedBy"
-    RESOURCETYPE = (
-        "resourcetype"  # Default is Dataset, can also be: Software, Image, Text
-    )
-    TEMPLATEVERSION = "templateversion"
-
-
-DATACITECONTEXT = {
+datacite_context = {
     "@id": "https://gin.g-node.org/G-Node/Info/src/master/datacite.yml",
     "description": "ad-hoc vocabulary for the DataCite GIN yml format",
     "type": vocabulary_id,
 }
-
-DATASET = "dataset"
-
-# DATACITE_PROPERTIES_MAPPING= {
-#     # DATACITE_PROPERTIES.AUTHORS: DATACITE_PROPERTIES.AUTHORS,
-#     DATACITE_PROPERTIES.TITLE: SMMSchemaOrgProperties.NAME,
-#     DATACITE_PROPERTIES.DESCRIPTION: SMMSchemaOrgProperties.DESCRIPTION,
-#     DATACITE_PROPERTIES.KEYWORDS: SMMSchemaOrgProperties.KEYWORDS,
-#     DATACITE_PROPERTIES.LICENSE: DATACITE_PROPERTIES.LICENSE,
-#     DATACITE_PROPERTIES.FUNDING: DATACITE_PROPERTIES.FUNDING,
-#     DATACITE_PROPERTIES.REFERENCES: DATACITE_PROPERTIES.REFERENCES,
-#     DATACITE_PROPERTIES.RESOURCETYPE: DATACITE_PROPERTIES.RESOURCETYPE,
-# }
-
-# required_keys = DATACITE_PROPERTIES_MAPPING[:4]
-# optional_keys = DATACITE_PROPERTIES_MAPPING[4:]
 
 
 class DataciteGINDatasetExtractor(DatasetMetadataExtractor):
     """
     Inherits from metalad's DatasetMetadataExtractor class
     """
+
+    datacite_yaml_file_name = "datacite.yml"
 
     def get_id(self) -> UUID:
         # Note sure what the process should be for generating these
@@ -97,7 +50,10 @@ class DataciteGINDatasetExtractor(DatasetMetadataExtractor):
         return DataOutputCategory.IMMEDIATE
 
     def get_required_content(self) -> bool:
-        return False
+        result = self.dataset.get(
+            self.datacite_yaml_file_name, result_renderer="disabled"
+        )
+        return result[0]["status"] in ("ok", "notneeded")
 
     def extract(self, _=None) -> ExtractorResult:
         return ExtractorResult(
@@ -105,11 +61,11 @@ class DataciteGINDatasetExtractor(DatasetMetadataExtractor):
             extraction_parameter=self.parameter or {},
             extraction_success=True,
             datalad_result_dict={"type": "dataset", "status": "ok"},
-            immediate_data=DataciteGINmeta(self.dataset).get_metadata(),
+            immediate_data=DataciteGINMeta(self.dataset).get_metadata(),
         )
 
 
-class DataciteGINmeta(object):
+class DataciteGINMeta(object):
     """
     The Datacite GIN metadata extractor class that does the work
     """
@@ -117,7 +73,7 @@ class DataciteGINmeta(object):
     def __init__(self, dataset) -> None:
         self.dataset = dataset
 
-    def _get_datacite_yml_file_name(self):
+    def _get_datacite_yml_file_path(self) -> Path:
         return Path(self.dataset.path) / "datacite.yml"
 
     def get_metadata(self):
@@ -136,49 +92,25 @@ class DataciteGINmeta(object):
         )
 
         # Get datacite.yml file
-        self.datacite_fn = self._get_datacite_yml_file_name()
-        if not self.datacite_fn.exists():
-            msg = "File " + str(self.datacite_fn) + " could not be found"
+        datacite_file_path = self._get_datacite_yml_file_path()
+        if not datacite_file_path.exists():
+            msg = f"File {datacite_file_path} could not be found"
             lgr.warning(msg)
             return
         # Read metadata from file
-        with open(self.datacite_fn, "rt") as input_stream:
+        with open(datacite_file_path, "rt") as input_stream:
             metadata_object = yaml.safe_load(input_stream)
-        # try:
-        #     with open(self.datacite_fn, "rt") as input_stream:
-        #         metadata_object = yaml.safe_load(input_stream)
-        #         print(metadata_object)
-        # except FileNotFoundError:
-        #     msg = "file " + self.datacite_fn + " could not be opened"
-
-        #     yield {
-        #         "status": "error",
-        #         "metadata": {},
-        #         "type": "dataset",
-        #         "message": msg
-        #     }
-        #     return
-        # except yaml.YAMLError as e:
-        #     yield {
-        #         "status": "error",
-        #         "metadata": {},
-        #         "type": "dataset",
-        #         "message": "YAML parsing failed with: " + str(e)
-        #     }
-        #     return
-
-        # Write metadata fields into new dict
-        metadata = {k: v for k, v in metadata_object.items()}
-        return self._get_dsmeta(metadata)
+        return self._get_dsmeta(metadata_object)
 
     def _get_dsmeta(self, metadata):
         """"""
         # Format the description
         metadata["description"] = self._get_description(metadata["description"])
         # add context
-        metadata["@context"] = DATACITECONTEXT
-        # For now, keep all other fields as the are. Might format/translate in future
-        # See: https://github.com/datalad/datalad-metalad/issues/202#issuecomment-1024192167
+        metadata["@context"] = datacite_context
+        # For now, keep all other fields as they are. Might format/translate in
+        # the future. See:
+        # https://github.com/datalad/datalad-metalad/issues/202#issuecomment-1024192167
         return metadata
 
     def _get_description(self, description_in):

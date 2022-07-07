@@ -44,7 +44,7 @@ jobs:
     - name: Install datalad_catalog
       run: |
         # package install
-        python -m pip install --upgrade .
+        python -m pip install -e .
     - name: Run tests
       env:
         # forces all test repos/paths into the VFAT FS
