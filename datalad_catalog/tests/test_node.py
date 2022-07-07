@@ -1,7 +1,13 @@
-from ..webcatalog import Node, getNode, WebCatalog
 import hashlib
+
 import pytest
-from .. import constants as cnst
+
+from datalad_catalog import constants as cnst
+from datalad_catalog.webcatalog import (
+    Node,
+    WebCatalog,
+    getNode,
+)
 
 
 @pytest.fixture
@@ -114,7 +120,7 @@ def test_add_attributes(demo_catalog: WebCatalog, demo_node_directory: Node):
     test_value = "value1"
     test_attributes = {test_key: test_value}
     demo_node_directory.parent_catalog = demo_catalog
-    demo_node_directory.add_attribrutes(test_attributes, demo_catalog)
+    demo_node_directory.add_attributes(test_attributes, demo_catalog)
     assert hasattr(demo_node_directory, test_key)
     assert demo_node_directory.url == test_value
 

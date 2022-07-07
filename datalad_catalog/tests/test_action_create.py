@@ -1,8 +1,9 @@
 import pytest
-from datalad_catalog.webcatalog import WebCatalog
-from datalad_catalog.catalog import Catalog
 from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.tests.utils_pytest import assert_in_results
+
+from datalad_catalog.catalog import Catalog
+from datalad_catalog.webcatalog import WebCatalog
 
 # catalog_paths = [
 #     'assets/md5-2.3.0.js',

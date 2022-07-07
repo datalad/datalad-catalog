@@ -1,4 +1,4 @@
-from ..utils import find_duplicate_object_in_list
+from datalad_catalog.utils import find_duplicate_object_in_list
 
 test_list = [
     {"source": "metalad_studyminimeta", "content": ["mini1", "mini2", "mini3"]},

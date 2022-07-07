@@ -1,11 +1,15 @@
 from pathlib import Path
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import (
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+)
 from unittest.mock import (
     call,
     patch,
 )
-
-from jsonschema.exceptions import ValidationError
 
 from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.tests.utils import (
@@ -14,14 +18,13 @@ from datalad.tests.utils import (
     assert_raises,
     with_tempfile,
 )
+from jsonschema.exceptions import ValidationError
 
-
-from ..catalog import (
+from datalad_catalog.catalog import (
     Catalog,
     _get_line_count,
     _validate_metadata,
 )
-
 
 minimal_metadata = (
     "{"
