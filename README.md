@@ -1,6 +1,6 @@
 ## --- UNDER DEVELOPMENT ---
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-10-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 *This repository is undergoing continuous development and all branches should be considered unstable*
 
@@ -176,6 +176,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/christian-monch"><img src="https://avatars.githubusercontent.com/u/17925232?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Christian Mönch</b></sub></a><br /><a href="#ideas-christian-monch" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/mslw"><img src="https://avatars.githubusercontent.com/u/11985212?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Michał Szczepanik</b></sub></a><br /><a href="https://github.com/datalad/datalad-catalog/issues?q=author%3Amslw" title="Bug reports">🐛</a> <a href="https://github.com/datalad/datalad-catalog/commits?author=mslw" title="Code">💻</a> <a href="https://github.com/datalad/datalad-catalog/commits?author=mslw" title="Documentation">📖</a> <a href="https://github.com/datalad/datalad-catalog/commits?author=mslw" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/loj"><img src="https://avatars.githubusercontent.com/u/15157717?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Laura Waite</b></sub></a><br /><a href="#ideas-loj" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/datalad/datalad-catalog/commits?author=loj" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://manukapp.itch.io"><img src="https://avatars.githubusercontent.com/u/86295664?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Leonardo Muller-Rodriguez</b></sub></a><br /><a href="#userTesting-Manukapp" title="User Testing">📓</a> <a href="https://github.com/datalad/datalad-catalog/pulls?q=is%3Apr+reviewed-by%3AManukapp" title="Reviewed Pull Requests">👀</a></td>
   </tr>
 </table>
 
