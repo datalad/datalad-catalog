@@ -1,11 +1,12 @@
 name: crippled-filesystems
 
 on:
-  pull_request
+  pull_request:
+    branches:
+      - 'main'
   push:
     branches:
-    - 'main'
-
+      - 'main'
 
 jobs:
   test:
