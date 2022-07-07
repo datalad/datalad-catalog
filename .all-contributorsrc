@@ -102,7 +102,14 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/17925232?v=4",
       "profile": "https://github.com/christian-monch",
       "contributions": [
-        "ideas"
+        "ideas",
+        "bug",
+        "code",
+        "doc",
+        "test",
+        "question",
+        "review",
+        "design"
       ]
     },
     {
