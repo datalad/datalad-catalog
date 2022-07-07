@@ -116,6 +116,16 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "loj",
+      "name": "Laura Waite",
+      "avatar_url": "https://avatars.githubusercontent.com/u/15157717?v=4",
+      "profile": "https://github.com/loj",
+      "contributions": [
+        "ideas",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
