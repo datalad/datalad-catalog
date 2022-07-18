@@ -39,40 +39,35 @@ As a bonus, these processes can be applied in a decentralized and collaborative 
 
 Why use DataLad Catalog?
 ========================
- 
+
 Working collaboratively with large and distributed datasets poses particular
 challenges for FAIR data access, browsing, and usage.
 
-Data privacy regulations might restrict data from being shared or accessed 
-across multi-national sites, and the costs of combined data hosting and
-browsing infrastructure could be prohibitive. While free global and
-region- or domain-specific data sharing solutions exist, they are unlikely
-to provide the full set of features required by the wide range of data types,
-data structures, and data security standards in current use. In addition,
-centrally maintained infrastructure can be an administrative burden and slow
-to update. These challenges impede the many possible gains obtainable from
-distributed data sharing and access.
+- the **administrative burden of keeping track** of different versions of the
+  data, who contributed what, where/how to gain access, and representing this
+  information centrally and accessibly can be significant
+- **data privacy regulations** might restrict data from being shared or accessed
+  across multi-national sites
+- **costs of centrally maintained infrastructure** for data hosting and
+  web-portal type browsing could be prohibitive
 
-**To counter this, our approach with DataLad and its MetaLad and Catalog extensions
-is to improve FAIR data access by focusing on decentralization, modularity,
-extensibility and interoperability:**
+These challenges impede the many possible gains obtainable from distributed data
+sharing and access. Decisions might even be made to forego FAIR principles in
+favour of saving time, effort and money, leading to the view that these efforts
+have seemingly contradicting outcomes.
 
-- DataLad datasets are light-weight representations that are separate from
-  actual data content, thus ideal for access and browsing without touching
-  actual data.
-- DataLad datasets can be structured into modular, nestable, units, each
-  with their own version history and provenance records. This is ideal for
-  decentralized data management and contributions.
-- Adding and extracting metadata is straightforward with DataLad MetaLad, 
-  which is extensible through the addition of metadata extractors, on top
-  of its built-in file and dataset-level extractors.
-- The ability to add generic or custom metadata extractors improves interoperability 
-  with global or domain-specific (meta)data standards and formats.
-- DataLad Catalog adds user-friendly accessibility on top the above mentioned
-  features, while taking care of the complexities of metadata translation
-  and aggregation on your behalf.
-- Your catalog can be published online using a simple webserver, increasing the
-  findability of your data.
+.. image:: /_static/datacat1_the_challenge.svg
+
+**DataLad Catalog helps counter this** contradiction by focusing on
+interoperability with structured, linked, and machine-readable metadata.
+
+Metadata about datasets, their file content, and their links to other datasets
+can be used to create abstract representations of datasets that are separate
+from the actual data content. This means that data content can be stored
+securely while metadata can be shared and operated on widely, thus improving
+decentralization and FAIRness.
+
+.. image:: /_static/datacat2_the_opportunity.svg
 
 By combining these features, DataLad Catalog can create a user-friendly
 catalog of your dataset and make it publicly available, complete with all
@@ -85,39 +80,38 @@ metadata integrity.
 How does it work?
 =================
 
-With DataLad you can organize your data in modular, representational units 
-that are based on, but completely separate from, the actual data. These dataset
-representations, that is *DataLad datasets*, are ideally suited for decentralized
-access and contribution, with `git`_ providing the underlying version control and
-provenance tracking tools, and `git-annex`_ providing the underlying transport
-mechanism to obtain actual data files on-demand.
+DataLad Catalog can receive commands to ``create`` a new catalog, ``add`` and
+``remove`` metadata entries to/from an existing catalog, ``serve`` an existing
+catalog locally, and more. Metadata can be provided to DataLad Catalog from any
+number of arbitrary metadata sources, as an aggregated set or as individual
+items/objects. DataLad Catalog has a dedicated schema (using the `JSON Schema`_
+vocabulary) against which incoming metadata items are validated. This schema
+allows for standard metadata fields as one would expect for datasets of any kind
+(such as ``name``, ``doi``, ``url``, ``description``, ``license``, ``authors``,
+and more), as well as fields that support identification, versioning, dataset
+context and linkage, and file tree specification.
 
-The lightweight DataLad datasets can be hosted on your preferred open or private
-infrastructure, while the data remains securely under your control. A DataLad
-dataset can be accessed (cloned) from anywhere and by anyone with the required
-access permissions, while actual data files can be obtained on-demand. With this
-functionality, a distributed network of collaborators can access, provide metadata
-for, and extract metadata from a collection of DataLad datasets.
+The process of generating a catalog, after metadata entry validation, involves:
 
-After access, the first step is to add any and all additional metadata to the
-DataLad dataset. This could either be standardized metadata such as a `datacite.xml`
-file, or a basic README or unstandardized JSON file. This is followed by metadata
-extraction from the dataset and its files using DataLad MetaLad together with
-built-in or extensible metadata extractors.
+1. aggregation of the provided metadata into the catalog filetree
+2. generating the assets required to render the user interface in a browser
 
-When exported, all metadata objects can be passed to DataLad Catalog. This package
-translates the DataLad-generated metadata into structured data, which in turn is
-required by the `VueJS`_-based data browser interface. DataLad Catalog also
-generates the assets for the interface (artwork, CSS, JavaScript and HTML).
+The output is a set of structured metadata files, as well as a `Vue.js`_-based
+browser interface that understands how to render this metadata in the browser.
+What is left for the user is to host this content on their platform of choice
+and to serve it for the world to see.
 
-The resulting user-friendly catalog can be hosted as a standalone web application
-without requiring any prior building steps or complicated infrastructure.
+For an example of the result, visit our `demo catalog`_.
+
+.. image:: /_static/datacat4_the_catalog.svg
+
+
 
 .. note:: A detailed description of these steps can be found in the :doc:`pipeline_description`
 
 .. _DataLad: https://github.com/datalad/datalad
 .. _DataLad Metalad: https://github.com/datalad/datalad-metalad
-.. _git: https://git-scm.com/
-.. _git-annex: https://git-annex.branchable.com/
-.. _VueJS: https://vuejs.org/
+.. _JSON Schema: https://json-schema.org/
+.. _Vue.js: https://vuejs.org/
+.. _demo catalog: https://datalad.github.io/datalad-catalog/
 
