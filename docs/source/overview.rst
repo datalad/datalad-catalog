@@ -113,5 +113,5 @@ For an example of the result, visit our `demo catalog`_.
 .. _DataLad Metalad: https://github.com/datalad/datalad-metalad
 .. _JSON Schema: https://json-schema.org/
 .. _Vue.js: https://vuejs.org/
-.. _demo catalog: https://datalad.github.io/datalad-catalog/#/dataset/deabeb9b-7a37-4062-a1e0-8fcef7909609/6d7fb68264f9b9951ae141fc830712a8744e3293
+.. _demo catalog: https://datalad.github.io/datalad-catalog/
 
