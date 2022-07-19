@@ -207,7 +207,7 @@ class MetaItem(object):
                     cnst.DATASET_VERSION: subds_version,
                 }
                 node_instance = getNode(
-                    "directory",
+                    "dataset",
                     dataset_id=dataset_instance.dataset_id,
                     dataset_version=dataset_instance.dataset_version,
                     path=paths[i - 1],
