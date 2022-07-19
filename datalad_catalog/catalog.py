@@ -124,6 +124,40 @@ class Catalog(Interface):
             code_py="catalog('validate', metadata='path/to/metadata.jsonl')",
             code_cmd="datalad catalog validate -m path/to/metadata.jsonl",
         ),
+        dict(
+            text=(
+                "Run a workflow for recursive metadata extraction (using "
+                "datalad-metalad), translating metadata to the catalog schema "
+                "(using JQ bindings), and adding the translated metadata to a "
+                "new catalog."
+            ),
+            code_py=(
+                "catalog('workflow-new', catalog_dir='/tmp/my-cat/', "
+                "dataset_path='path/to/superdataset')"
+            ),
+            code_cmd=(
+                "datalad catalog workflow-new -c /tmp/my-cat "
+                "-d 'path/to/superdataset'"
+            ),
+        ),
+        dict(
+            text=(
+                "Run a workflow for updating a catalog after registering a "
+                "subdataset to the superdataset which the catalog represents. "
+                "This workflow includes extraction (using datalad-metalad), "
+                "translating metadata to the catalog schema (using JQ bindings)"
+                ", and adding the translated metadata to the existing catalog."
+            ),
+            code_py=(
+                "catalog('workflow-update', catalog_dir='/tmp/my-cat/', "
+                "dataset_path='path/to/superdataset'), "
+                "subdataset_path='path/to/subdataset')"
+            ),
+            code_cmd=(
+                "datalad catalog workflow-update -c /tmp/my-cat "
+                "-d 'path/to/superdataset' -s 'path/to/subdataset'"
+            ),
+        ),
     ]
 
     # parameters of the command, must be exhaustive
@@ -133,12 +167,14 @@ class Catalog(Interface):
             args=("catalog_action",),
             # documentation
             doc="""This is the subcommand to be executed by datalad-catalog.
-            Options include: create, add, remove, serve, set-super, and validate.
+            Options include: create, add, remove, serve, set-super, validate,
+            workflow-new, and workflow-update.
             Example: ''""",
             # type checkers, constraint definition is automatically
             # added to the docstring
             constraints=EnsureChoice(
-                "create", "add", "remove", "serve", "set-super", "validate"
+                "create", "add", "remove", "serve", "set-super", "validate",
+                "workflow-new", "workflow-update"
             ),
         ),
         catalog_dir=Parameter(
@@ -193,6 +229,23 @@ class Catalog(Interface):
             from datalad_catalog/config/config.json
             Example: ''""",
         ),
+        dataset_path=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("-d", "--dataset-path"),
+            # documentation
+            doc="""Path to dataset on which to run an extraction, translation
+            and catalog generation workflow.
+            Example: ''""",
+        ),
+        subdataset_path=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("-s", "--subdataset-path"),
+            # documentation
+            doc="""Path to dataset on which to run an extraction, translation
+            and catalog generation workflow. Used together with '-d',
+            '--dataset-path' when running 'workflow-update'.
+            Example: ''""",
+        ),
     )
 
     @staticmethod
@@ -210,7 +263,10 @@ class Catalog(Interface):
         dataset_version=None,
         force: bool = False,
         config_file=None,
+        dataset_path=None,
+        subdataset_path=None,
     ):
+    
         """
         [summary]
 
@@ -240,6 +296,8 @@ class Catalog(Interface):
             "add",
             "remove",
             "set-super",
+            "workflow-new",
+            "workflow-update",
         ]
         if catalog_action not in CALL_ACTION:
             raise ValueError(
@@ -293,10 +351,11 @@ class Catalog(Interface):
             )
             return
 
-        # Catalog should exist for all actions except create (for create action:
-        # unless force flag supplied)
+        # Catalog should exist for all actions except create and run-workflow 
+        # (for create action: unless force flag supplied)
         if not ctlg.is_created():
-            if catalog_action != "create":
+            if catalog_action != "create" and catalog_action != "workflow-new" \
+            and catalog_action != "workflow-update":
                 yield dict(
                     **res_kwargs,
                     status="impossible",
@@ -349,6 +408,15 @@ class Catalog(Interface):
                 _set_super_of_catalog,
                 (ctlg, dataset_id, dataset_version),
             ),
+            "workflow-new": (
+                _run_workflow,
+                ("new", ctlg, dataset_path, None, res_kwargs),
+            ),
+            "workflow-update": (
+                _run_workflow,
+                ("update", ctlg, dataset_path, subdataset_path, res_kwargs),
+            ),
+            
         }[catalog_action]
 
         yield from function(*args)
@@ -427,7 +495,7 @@ def _add_to_catalog(
     if metadata is None:
         yield dict(
             **res_kwargs,
-            status=impossible,
+            status="impossible",
             message=(
                 "No metadata supplied: Datalad catalog has to be supplied with "
                 "metadata in the form of a path to a file containing a JSON "
@@ -553,15 +621,16 @@ def _remove_from_catalog(
     """
     assert catalog  # to indicate that catalog will be used when implemented
     if not dataset_id or not dataset_version:
+        err_msg = (
+            "Dataset ID and/or VERSION missing: datalad catalog remove "
+            "requires both the ID (-i, --dataset_id) and VERSION (-v, "
+            "--dataset_version) of the dataset to be removed from the "
+            "catalog"
+        ),
         yield get_status_dict(
             **res_kwargs,
             status="error",
-            message=(
-                "Dataset ID and/or VERSION missing: datalad catalog remove "
-                "requires both the ID (-i, --dataset_id) and VERSION (-v, "
-                "--dataset_version) of the dataset to be removed from the "
-                "catalog"
-            ),
+            message=err_msg,
         )
         sys.exit(err_msg)
 
@@ -736,6 +805,52 @@ def _validate_metadata(metadata: str):
         status="ok",
         message=("Metadata successfully validated"),
     )
+
+
+def _run_workflow(
+    workflow_type: str,
+    catalog: WebCatalog,
+    dataset_path: str,
+    subdataset_path: str = None,
+    res_kwargs: Optional[Dict] = None,
+):
+    """
+    Run a workflow to create/update a catalog, including
+
+    Parameters
+    ----------
+    metadata : path-like object
+        metadata to be validated
+
+    Yields
+    ------
+    status_dict : dict
+        DataLad result record
+    """
+    if dataset_path is None:
+        yield dict(
+            **res_kwargs,
+            status="impossible",
+            message=(
+                "No dataset path supplied: catalog run-workflow has to be "
+                "supplied with a path to the (super)dataset for which "
+                "metadata extraction, translation, and catalog generation "
+                "is to take place, using the argument: -d, --dataset_path."
+            ),
+        )
+    
+    from datalad_catalog import workflows
+    if workflow_type == "new":
+        yield from workflows.super_workflow(
+            dataset_path=Path(dataset_path),
+            catalog=catalog,
+        )
+    if workflow_type == "update":
+        yield from workflows.update_workflow(
+            superds_path=Path(dataset_path),
+            subds_path=Path(subdataset_path),
+            catalog=catalog,
+        )
 
 
 def _get_line_count(file: str) -> int:
