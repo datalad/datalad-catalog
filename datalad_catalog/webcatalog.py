@@ -1,4 +1,5 @@
 import hashlib
+from http.client import FAILED_DEPENDENCY
 import json
 import logging
 import shutil
@@ -19,24 +20,6 @@ from datalad_catalog.utils import (
 
 lgr = logging.getLogger("datalad.catalog.webcatalog")
 
-# PSEUDOCODE/WORKFLOW:
-# 1) Command line call
-# 2) Incoming metadata
-# 3) class Catalog(Interface):
-#   - parses incoming data and arguments
-#   - handles argument errors/warnings
-#   - creates or accesses existing catalog via class WebCatalog
-#   - calls relevant function based on subcommand: [create / add / remove / serve / set-super
-# [create]:
-#   - if catalog does not exist, create it
-#   - if catalog exists and force flag is True, overwrite assets of existing catalog (not metadata)
-#   - if create was called together with metadata, pass on to [add]
-# [add]:
-#   - handles argument errors/warnings
-#   - establishes data input type: incoming stream vs file vs individual objects or other
-#   - loops through meta_objects in incoming stream/file:
-#       - handles individual objects via class Translator
-
 CATALOG_SCHEMA_IDS = {
     cnst.CATALOG: "https://datalad.org/catalog.schema.json",
     cnst.TYPE_DATASET: "https://datalad.org/catalog.dataset.schema.json",
@@ -51,7 +34,6 @@ class WebCatalog(object):
     """
     The main catalog class.
     """
-
     # Get package-related paths
     package_path = Path(__file__).resolve().parent
     config_dir = package_path / "config"
@@ -220,50 +202,76 @@ class Node(object):
     file will be created.
 
     Required arguments:
+    catalog -- catalog within which the node exists
     type -- 'directory' | 'dataset'
     dataset_id -- parent dataset id
     dataset_version -- parent dataset version
-    path -- path of node relevant to parent dataset
     """
 
     _split_dir_length = 3
     _instances = {}
 
     def __init__(
-        self, type=None, dataset_id=None, dataset_version=None, node_path=None
+        self,
+        catalog: WebCatalog,
+        type: str,
+        dataset_id: str,
+        dataset_version: str,
+        node_path=None,
     ) -> None:
         """
         type = 'directory' | 'dataset'
         """
+        # Set main instance variables
+        self.parent_catalog = catalog
+        self.type = type
         self.dataset_id = dataset_id
         self.dataset_version = dataset_version
         self.node_path = node_path
         self.long_name = self.get_long_name()
         self.md5_hash = self.md5hash(self.long_name)
-        self.type = type
-        self.file_name = None
-        # Children type: file, node(directory), dataset
+        # If corresponding file exists, set attributes
+        if self.is_created():
+            self.set_attributes_from_file()
         self.children = []
-        self._instances[self.md5_hash] = self
-        self.parent_catalog = None
 
     def is_created(self) -> bool:
         """
-        Check if node exists in metadata of catalog
+        Check if metadata file for Node exists in catalog
         """
         if self.get_location().exists() and self.get_location().is_file():
             return True
         return False
 
-    def create_file(self):
+    def write_attributes_to_file(self):
         """
-        Create catalog metadata file for current node
+        Create a catalog metadata file for the Node instance
         """
-        node_fn = self.get_location()
+        # First grab required fields
+        file_path = self.get_location()
+        parent_path = file_path.parents[0]
+        # And set correct attributes for instance of type 'directory': path+name
+        if hasattr(self, "node_path") and self.type == "directory":
+            setattr(self, "path", str(self.node_path))
+            setattr(self, "name", self.node_path.name)
+        # Create a dictionary from instance variables
+        meta_dict = vars(self)
+        # Remove attributes that are irrelevant for the catalog
+        keys_to_pop = [
+            "node_path",
+            "long_name",
+            "md5_hash",
+            "parent_catalog",
+        ]
+        for key in keys_to_pop:
+            meta_dict.pop(key, None)
+        # Write the dictionary to file
+        parent_path.mkdir(parents=True, exist_ok=True)
+        with open(file_path, "w") as f:
+            json.dump(meta_dict, f)
 
     def load_file(self):
-        """
-        Load content from catalog metadata file for current node
+        """Load content from catalog metadata file for current node
         """
         try:
             with open(self.get_location()) as f:
@@ -273,6 +281,16 @@ class Node(object):
         except:
             print("Unexpected error:", sys.exc_info()[0])
             raise
+
+    def set_attributes_from_file(self):
+        """Set a Node instance's attributes from its corresponding metadata file
+
+        This overwrites existing attributes on a Node instance, or creates new
+        attributes, with values contained in the JSON object in themetadata file
+        """
+        metadata = self.load_file()
+        for key in metadata.keys():
+            setattr(self, key, metadata[key])
 
     def get_long_name(self):
         """
@@ -330,11 +348,11 @@ class Node(object):
         return path_left, path_right
 
     def add_attributes(
-        self, new_attributes: dict, catalog: WebCatalog, overwrite=False
+        self, new_attributes: dict, overwrite=False
     ):
         """Add attributes (key-value pairs) to a Node as instance variables"""
         # Get config
-        dataset_config = catalog.config[cnst.PROPERTY_SOURCE][cnst.TYPE_DATASET]
+        dataset_config = self.parent_catalog.config[cnst.PROPERTY_SOURCE][cnst.TYPE_DATASET]
         # Get extractor / source. TODO: rework the extractors_used property, see https://github.com/datalad/datalad-catalog/issues/68
         try:
             data_source = new_attributes[cnst.EXTRACTORS_USED][0][
@@ -377,7 +395,6 @@ class Node(object):
         - merge the existing instance variable value with that of the incoming
           data
         - overwrite the existing instance variable value (if/when applicable)
-        -
         """
         # TODO: still need to use overwrite flag where it makes sense to do so
 
@@ -499,51 +516,6 @@ class Node(object):
             self.extractors_used.append(extractor_dict)
         else:
             pass
-
-    def write_to_file(self):
-        """"""
-        parent_path = self.get_location().parents[0]
-        fn = self.get_location()
-        created = self.is_created()
-
-        # if hasattr(self, 'node_path') and self.type != 'dataset':
-        #     setattr(self, 'path', str(self.node_path))
-        # if hasattr(self, 'node_path') and self.type == 'directory':
-        #     setattr(self, 'name', self.node_path.name)
-
-        meta_dict = vars(self)
-        keys_to_pop = [
-            "node_path",
-            "long_name",
-            "md5_hash",
-            "file_name",
-            "parent_catalog",
-        ]
-        for key in keys_to_pop:
-            meta_dict.pop(key, None)
-
-        if not created:
-            parent_path.mkdir(parents=True, exist_ok=True)
-            with open(fn, "w") as f:
-                json.dump(vars(self), f)
-        else:
-            with open(fn, "r+") as f:
-                f.seek(0)
-                json.dump(vars(self), f)
-                f.truncate()
-
-
-def getNode(type, dataset_id, dataset_version, path=None):
-    """"""
-    name = dataset_id + "-" + dataset_version
-    if path:
-        name = name + "-" + str(path)
-    md5_hash = hashlib.md5(name.encode("utf-8")).hexdigest()
-
-    if md5_hash in Node._instances.keys():
-        return Node._instances[md5_hash]
-    else:
-        return Node(type, dataset_id, dataset_version, path)
 
 
 def copy_overwrite_path(src: Path, dest: Path, overwrite: bool = False):
