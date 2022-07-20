@@ -1,3 +1,4 @@
+from cgi import test
 import hashlib
 
 import pytest
@@ -5,35 +6,8 @@ import pytest
 from datalad_catalog import constants as cnst
 from datalad_catalog.webcatalog import (
     Node,
-    WebCatalog,
-    getNode,
+    WebCatalog
 )
-
-
-@pytest.fixture
-def demo_node_dataset():
-    test_ds_id = "5df8eb3a-95c5-11ea-b4b9-a0369f287950"
-    test_ds_version = "dae38cf901995aace0dde5346515a0134f919523"
-    test_type = "dataset"
-    Node._split_dir_length = 3
-    return Node(
-        type=test_type, dataset_id=test_ds_id, dataset_version=test_ds_version
-    )
-
-
-@pytest.fixture
-def demo_node_directory():
-    test_ds_id = "5df8eb3a-95c5-11ea-b4b9-a0369f287950"
-    test_ds_version = "dae38cf901995aace0dde5346515a0134f919523"
-    test_type = "directory"
-    dir_path = "dir1/dir2"
-    Node._split_dir_length = 3
-    return Node(
-        type=test_type,
-        dataset_id=test_ds_id,
-        dataset_version=test_ds_version,
-        node_path=dir_path,
-    )
 
 
 @pytest.fixture
@@ -42,18 +16,36 @@ def demo_catalog(tmp_path):
     return WebCatalog(location=catalog_path)
 
 
-def test_node_instances_equal():
-    """
-    Assert that two instances with identical variables, one created via class
-    instantiation and one created via getNode method, are the same object
-    """
-    node_instance_1 = Node(
-        type="dataset", dataset_id="123", dataset_version="v1"
+@pytest.fixture
+def demo_node_dataset(demo_catalog):
+    test_ds_id = "5df8eb3a-95c5-11ea-b4b9-a0369f287950"
+    test_ds_version = "dae38cf901995aace0dde5346515a0134f919523"
+    test_type = "dataset"
+    test_path = None
+    Node._split_dir_length = 3
+    return Node(
+        catalog=demo_catalog,
+        type=test_type,
+        dataset_id=test_ds_id,
+        dataset_version=test_ds_version,
+        node_path=test_path,
     )
-    node_instance_2 = getNode(
-        type="dataset", dataset_id="123", dataset_version="v1"
+
+
+@pytest.fixture
+def demo_node_directory(demo_catalog):
+    test_ds_id = "5df8eb3a-95c5-11ea-b4b9-a0369f287950"
+    test_ds_version = "dae38cf901995aace0dde5346515a0134f919523"
+    test_type = "directory"
+    dir_path = "dir1/dir2"
+    Node._split_dir_length = 3
+    return Node(
+        catalog=demo_catalog,
+        type=test_type,
+        dataset_id=test_ds_id,
+        dataset_version=test_ds_version,
+        node_path=dir_path,
     )
-    assert node_instance_1 == node_instance_2
 
 
 def test_md5hash():

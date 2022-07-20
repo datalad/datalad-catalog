@@ -11,17 +11,10 @@ from datalad_catalog.utils import read_json_file
 from datalad_catalog.webcatalog import (
     Node,
     WebCatalog,
-    getNode,
 )
 
 tests_path = Path(__file__).resolve().parent
 data_path = tests_path / "data"
-
-
-@pytest.fixture
-def demo_metadata_item():
-    metadata_path = data_path / "catalog_metadata_dataset.json"
-    return read_json_file(metadata_path)
 
 
 @pytest.fixture
@@ -30,22 +23,28 @@ def demo_catalog(tmp_path):
     return WebCatalog(location=catalog_path)
 
 
-def test_translate_dataset(demo_metadata_item: dict, demo_catalog: WebCatalog):
-    """ """
-    Node._instances = {}
+@pytest.fixture
+def demo_metadata_item():
+    metadata_path = data_path / "catalog_metadata_dataset.json"
+    return read_json_file(metadata_path)
+
+
+def test_translate_dataset(demo_catalog: WebCatalog, demo_metadata_item: dict):
+    """"""
     demo_catalog.config = {"property_source": {"dataset": {}}}
     metatest = MetaItem(demo_catalog, demo_metadata_item)
-    assert len(Node._instances) == 1
+    assert len(metatest._node_instances) == 1
     new_node = [
-        Node._instances[n]
-        for n in Node._instances
-        if Node._instances[n].dataset_id == demo_metadata_item[cnst.DATASET_ID]
-        and Node._instances[n].dataset_version
+        metatest._node_instances[n]
+        for n in metatest._node_instances
+        if metatest._node_instances[n].dataset_id
+        == demo_metadata_item[cnst.DATASET_ID]
+        and metatest._node_instances[n].dataset_version
         == demo_metadata_item[cnst.DATASET_VERSION]
     ]
     assert len(new_node) == 1
     fn = new_node[0].get_location()
-    new_node[0].write_to_file()
+    new_node[0].write_attributes_to_file()
     translated_metadata = read_json_file(fn)
     for key in translated_metadata:
         if not bool(translated_metadata[key]):
