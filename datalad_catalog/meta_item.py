@@ -9,7 +9,7 @@ from datalad_catalog.utils import read_json_file
 from datalad_catalog.webcatalog import (
     Node,
     WebCatalog,
-    getNode,
+    md5sum_from_id_version_path,
 )
 
 lgr = logging.getLogger("datalad.catalog.meta_item")
@@ -39,36 +39,36 @@ class MetaItem(object):
         # Get dataset id and version
         d_id = meta_item[cnst.DATASET_ID]
         d_version = meta_item[cnst.DATASET_VERSION]
-        item_type = meta_item[cnst.TYPE]
-        self.metadata = meta_item
+        self._node_instances = {}
         # For both type dataset and type file, we need the dataset Node instance
         # Here we fetch or create this Node instance:
-        dataset_instance = getNode(
-            "dataset", dataset_id=d_id, dataset_version=d_version
+        dataset_instance = Node(
+            catalog=catalog,
+            type="dataset",
+            dataset_id=d_id,
+            dataset_version=d_version,
+            node_path=None,
         )
-        # Set parent catalog of dataset Node instance
-        if (
-            not hasattr(dataset_instance, "parent_catalog")
-            or not dataset_instance.parent_catalog
-        ):
-            dataset_instance.parent_catalog = catalog
+        self._node_instances[dataset_instance.md5_hash] = dataset_instance
         # Then do things based on metadata object type (dataset or file)
         if meta_item[cnst.TYPE] == cnst.TYPE_DATASET:
             # Dataset
-            self.process_dataset(dataset_instance, meta_item, catalog)
+            self.process_dataset(dataset_instance, meta_item)
         else:
             # File
-            # TODO: confirm what to do if meta_item for file from dataset arrives before meta_item for dataset
+            self.process_file(dataset_instance, meta_item)
+            # TODO: confirm what to do if meta_item for file from dataset
+            # arrives before meta_item for dataset.
             # For now: creating node for dataset, even if via file meta_item.
-            self.process_file(dataset_instance, meta_item, catalog)
+            # TODO: create cleanup function that removes all dangling node-
+            # files, i.e. ones for which the dataset node file does not have
+            # any additional metadata other than the id and version
 
     def __call__(self):
         """ """
         pass
 
-    def process_dataset(
-        self, dataset_instance: Node, meta_item: dict, catalog: WebCatalog
-    ):
+    def process_dataset(self, dataset_instance: Node, meta_item: dict):
         """"""
         # 1. If "subdatasets" field exists and the array is not empty,
         # add subdatasets as children and create Nodes
@@ -95,15 +95,12 @@ class MetaItem(object):
                         cnst.DATASET_VERSION: subds[cnst.DATASET_VERSION],
                     }
                     dataset_instance.add_child(subds_dict)
+        # 2. Add fields to node instance
+        dataset_instance.add_attributes(meta_item, overwrite=False)
 
-        # 2. Add fields to node instance; TODO: handle duplications (overwrite for now)
-        dataset_instance.add_attributes(meta_item, catalog, overwrite=False)
-
-    def process_file(
-        self, dataset_instance: Node, meta_item: dict, catalog: WebCatalog
-    ):
+    def process_file(self, dataset_instance: Node, meta_item: dict):
         """"""
-        #  Create standard node per path part; TODO: when adding file as child, also add translated_dict
+        #  Create standard node per path part
         f_path = meta_item[cnst.PATH]
         parts_in_path = list(Path(f_path.lstrip("/")).parts)
         nr_parts = len(parts_in_path)
@@ -112,8 +109,6 @@ class MetaItem(object):
         )  # this excludes the last part, which is the actual filename
         incremental_path = Path("")
         paths = []
-        # Assume for now that we're working purely with class instances during operation, then write to file at end
-        # IMPORTANT: this does not account for files that already exist, and their content ==> TODO
         for i, part in enumerate(parts_in_path):
             # Get node path
             incremental_path = incremental_path / part
@@ -136,31 +131,32 @@ class MetaItem(object):
                 meta_item.update(file_dict)
                 dataset_instance.add_child(meta_item)
                 break
-
             # If the file has one or more parent directories
             if i == 0:
                 # first dir in path, add as child to dataset node
                 dataset_instance.add_child(dir_dict)
             elif 0 < i < nr_dirs:
-                # 2nd...(N-1)th dir in path: create node for N-1, add current as child (dir) to node: bv i=1, create node for i=0
-                node_instance = getNode(
+                # 2nd...(N-1)th dir in path: create node for N-1,
+                # add current as child (dir) to node: bv i=1, create node for i=0
+                node_instance = self.getNode(
+                    dataset_instance.parent_catalog,
                     "directory",
-                    dataset_id=dataset_instance.dataset_id,
-                    dataset_version=dataset_instance.dataset_version,
-                    path=paths[i - 1],
+                    dataset_instance.dataset_id,
+                    dataset_instance.dataset_version,
+                    paths[i - 1],
                 )
-                node_instance.parent_catalog = catalog
                 node_instance.add_child(dir_dict)
             else:
-                # Nth (last) part in path = file: create node for N-1, add current as child (file) to node
+                # Nth (last) part in path = file: create node for N-1,
+                # add current as child (file) to node
                 meta_item.update(file_dict)
-                node_instance = getNode(
+                node_instance = self.getNode(
+                    dataset_instance.parent_catalog,
                     "directory",
-                    dataset_id=dataset_instance.dataset_id,
-                    dataset_version=dataset_instance.dataset_version,
-                    path=paths[i - 1],
+                    dataset_instance.dataset_id,
+                    dataset_instance.dataset_version,
+                    paths[i - 1],
                 )
-                node_instance.parent_catalog = catalog
                 node_instance.add_child(meta_item)
 
     def subdataset_path_to_nodes(
@@ -170,11 +166,9 @@ class MetaItem(object):
         Add parts of subdataset paths as nodes and children where relevant
         Function used when path to subdataset (relative to parent dataset) has multiple parts
         """
-        # print("In CoreTranslator.subdataset_path_to_nodes")
         nr_parts = len(parts_in_path)
         incremental_path = Path("")
         paths = []
-        # IMPORTANT: this does not account for files that already exist, and their content ==> TODO
         for i, part in enumerate(parts_in_path):
             # Create dictionary of type directory
             incremental_path = incremental_path / part
@@ -188,13 +182,15 @@ class MetaItem(object):
                 # first dir in path, add as child to dataset node
                 dataset_instance.add_child(dir_dict)
             elif i < nr_parts - 1:
-                # 2nd...(N-1)th dir in path: create node for N-1, add current as child (dir) to node: e.g. i=1, create node for i=0
+                # 2nd...(N-1)th dir in path: create node for N-1,
+                # add current as child (dir) to node: e.g. i=1, create node for i=0
                 # path for i: parent_dirs[nr_parts-1-i]
-                node_instance = getNode(
+                node_instance = self.getNode(
+                    dataset_instance.parent_catalog,
                     "directory",
-                    dataset_id=dataset_instance.dataset_id,
-                    dataset_version=dataset_instance.dataset_version,
-                    path=paths[i - 1],
+                    dataset_instance.dataset_id,
+                    dataset_instance.dataset_version,
+                    paths[i - 1],
                 )
                 node_instance.add_child(dir_dict)
             else:
@@ -206,10 +202,34 @@ class MetaItem(object):
                     cnst.DATASET_ID: subds_id,
                     cnst.DATASET_VERSION: subds_version,
                 }
-                node_instance = getNode(
-                    "dataset",
-                    dataset_id=dataset_instance.dataset_id,
-                    dataset_version=dataset_instance.dataset_version,
-                    path=paths[i - 1],
+                node_instance = self.getNode(
+                    dataset_instance.parent_catalog,
+                    "directory",
+                    dataset_instance.dataset_id,
+                    dataset_instance.dataset_version,
+                    paths[i - 1],
                 )
                 node_instance.add_child(subds_dict)
+
+    def write_nodes_to_files(self):
+        """"""
+        for n in self._node_instances.keys():
+            self._node_instances[n].write_attributes_to_file()
+
+    def getNode(self, catalog, type, dataset_id, dataset_version, path=None):
+        """Get existing or create new node"""
+        node_hash = md5sum_from_id_version_path(
+            dataset_id, dataset_version, path
+        )
+        if node_hash in self._node_instances:
+            return self._node_instances[node_hash]
+        else:
+            node_instance = Node(
+                catalog=catalog,
+                type=type,
+                dataset_id=dataset_id,
+                dataset_version=dataset_version,
+                node_path=path,
+            )
+            self._node_instances[node_instance.md5_hash] = node_instance
+            return node_instance

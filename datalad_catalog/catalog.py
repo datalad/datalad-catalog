@@ -427,7 +427,7 @@ def _add_to_catalog(
     if metadata is None:
         yield dict(
             **res_kwargs,
-            status=impossible,
+            status="impossible",
             message=(
                 "No metadata supplied: Datalad catalog has to be supplied with "
                 "metadata in the form of a path to a file containing a JSON "
@@ -435,33 +435,20 @@ def _add_to_catalog(
                 "-m, --metadata."
             ),
         )
-
-    # Then we need to do the following:
-    # 1. establish input type (file, file-with-json-array, file-with-json-lines, command line stdout / stream)
-
-    #    - for now: assume file-with-json-array (data exported by `datalad meta-dump` and all exported objects added to an array in file)
-    # 2. instantiate translator
-    # 3. read input based on type
-    #    - for now: load data from input file
-    # 4. For each metadata object in input, call translator
-
-    # 2. Instantiate single translator
-    # translate = Translator()
-
-    # TODO: Establish input type
-    # 3. Read input
-    # metadata = read_json_file(metadata)
-    # This metadata should be the dataset and file level metadata of a single dataset
-    # TODO: insert checks to verify this
-    # TODO: decide whether to allow metadata dictionaries from multiple datasets
-
+    # We need to do the following:
+    # 1. Establish input type (file-with-json-lines, command line stdout / stream)
+    #    - for now: assume file-with-json-lines (e.g. data exported by `datalad meta-dump`
+    #      and all exported objects written to file)
+    # 2. Read line into python dictionary
+    # 3. Validate the dictionary against the catalog schema
+    # 4. Instantiate the MetaItem class, which handles translation of a json line into
+    #    the catalog metadata (Node instances)
+    # 5. Per MetaItem instance, write all related Node instances to file
     with open(metadata) as file:
         i = 0
         for line in file:
             i += 1
-            # meta_dict = line.rstrip()
             meta_dict = json.loads(line.rstrip())
-
             # Check if item/line is a dict
             if not isinstance(meta_dict, dict):
                 err_msg = (
@@ -470,60 +457,16 @@ def _add_to_catalog(
                     "catalog schema."
                 )
                 lgr.warning(err_msg)
-                # raise TypeError(err_msg)
             # Validate dict against catalog schema
             try:
                 catalog.VALIDATOR.validate(meta_dict)
             except ValidationError as e:
                 err_msg = f"Schema validation failed in LINE {i}: \n\n{e}"
                 raise ValidationError(err_msg) from e
-            # If validation passed, translate into catalog files
-            MetaItem(catalog, meta_dict)
-            # Translator(catalog, meta_dict)
+            # If validation passed, translate into Node instances and their files
+            meta_item = MetaItem(catalog, meta_dict)
+            meta_item.write_nodes_to_files()
 
-    # TODO: should we write all files here?
-    # Set parent catalog of orphans
-    orphans = [
-        Node._instances[inst]
-        for inst in Node._instances
-        if not hasattr(Node._instances[inst], "parent_catalog")
-        or not Node._instances[inst].parent_catalog
-    ]
-    for orphan in orphans:
-        orphan.parent_catalog = catalog
-
-    # [inst for inst in Node._instances if not hasattr(Node._instances[inst], 'parent_catalog')]
-    for blob in Node._instances:
-        inst = Node._instances[blob]
-        parent_path = inst.get_location().parents[0]
-        fn = inst.get_location()
-        created = inst.is_created()
-
-        if hasattr(inst, "node_path") and inst.type != "dataset":
-            setattr(inst, "path", str(inst.node_path))
-        if hasattr(inst, "node_path") and inst.type == "directory":
-            setattr(inst, "name", inst.node_path.name)
-
-        meta_dict = vars(inst)
-        keys_to_pop = [
-            "node_path",
-            "long_name",
-            "md5_hash",
-            "file_name",
-            "parent_catalog",
-        ]
-        for key in keys_to_pop:
-            meta_dict.pop(key, None)
-
-        if not created:
-            parent_path.mkdir(parents=True, exist_ok=True)
-            with open(fn, "w") as f:
-                json.dump(vars(inst), f)
-        else:
-            with open(fn, "r+") as f:
-                f.seek(0)
-                json.dump(vars(inst), f)
-                f.truncate()
     yield get_status_dict(
         **res_kwargs,
         status="ok",
