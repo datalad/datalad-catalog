@@ -4,10 +4,7 @@ import hashlib
 import pytest
 
 from datalad_catalog import constants as cnst
-from datalad_catalog.webcatalog import (
-    Node,
-    WebCatalog
-)
+from datalad_catalog.webcatalog import Node, WebCatalog
 
 
 @pytest.fixture

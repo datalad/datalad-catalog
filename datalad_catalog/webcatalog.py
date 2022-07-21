@@ -34,6 +34,7 @@ class WebCatalog(object):
     """
     The main catalog class.
     """
+
     # Get package-related paths
     package_path = Path(__file__).resolve().parent
     config_dir = package_path / "config"
@@ -271,8 +272,7 @@ class Node(object):
             json.dump(meta_dict, f)
 
     def load_file(self):
-        """Load content from catalog metadata file for current node
-        """
+        """Load content from catalog metadata file for current node"""
         try:
             with open(self.get_location()) as f:
                 return json.load(f)
@@ -291,7 +291,6 @@ class Node(object):
         metadata = self.load_file()
         for key in metadata.keys():
             setattr(self, key, metadata[key])
-
 
     def get_long_name(self):
         """
@@ -348,12 +347,12 @@ class Node(object):
         path_right = dir_name[self._split_dir_length :]
         return path_left, path_right
 
-    def add_attributes(
-        self, new_attributes: dict, overwrite=False
-    ):
+    def add_attributes(self, new_attributes: dict, overwrite=False):
         """Add attributes (key-value pairs) to a Node as instance variables"""
         # Get config
-        dataset_config = self.parent_catalog.config[cnst.PROPERTY_SOURCE][cnst.TYPE_DATASET]
+        dataset_config = self.parent_catalog.config[cnst.PROPERTY_SOURCE][
+            cnst.TYPE_DATASET
+        ]
         # Get extractor / source. TODO: rework the extractors_used property, see https://github.com/datalad/datalad-catalog/issues/68
         try:
             data_source = new_attributes[cnst.EXTRACTORS_USED][0][
