@@ -230,10 +230,10 @@ class Node(object):
         self.node_path = node_path
         self.long_name = self.get_long_name()
         self.md5_hash = self.md5hash(self.long_name)
+        self.children = []
         # If corresponding file exists, set attributes
         if self.is_created():
             self.set_attributes_from_file()
-        self.children = []
 
     def is_created(self) -> bool:
         """
@@ -291,6 +291,7 @@ class Node(object):
         metadata = self.load_file()
         for key in metadata.keys():
             setattr(self, key, metadata[key])
+
 
     def get_long_name(self):
         """
@@ -535,3 +536,11 @@ def copy_overwrite_path(src: Path, dest: Path, overwrite: bool = False):
             if dest.exists():
                 shutil.rmtree(dest)
             shutil.copytree(src, dest)
+
+
+def md5sum_from_id_version_path(dataset_id, dataset_version, path=None):
+    """Helper to get md5 hash of concatenated input variables"""
+    long_name = dataset_id + "-" + dataset_version
+    if path:
+        long_name = long_name + "-" + str(path)
+    return hashlib.md5(long_name.encode("utf-8")).hexdigest()

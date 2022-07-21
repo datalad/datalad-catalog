@@ -8,7 +8,8 @@ from datalad_catalog import constants as cnst
 from datalad_catalog.utils import read_json_file
 from datalad_catalog.webcatalog import (
     Node,
-    WebCatalog
+    WebCatalog,
+    md5sum_from_id_version_path,
 )
 
 lgr = logging.getLogger("datalad.catalog.meta_item")
@@ -139,27 +140,25 @@ class MetaItem(object):
             elif 0 < i < nr_dirs:
                 # 2nd...(N-1)th dir in path: create node for N-1,
                 # add current as child (dir) to node: bv i=1, create node for i=0
-                node_instance = Node(
-                    catalog=dataset_instance.parent_catalog,
-                    type="directory",
-                    dataset_id=dataset_instance.dataset_id,
-                    dataset_version=dataset_instance.dataset_version,
-                    node_path=paths[i - 1],
+                node_instance = self.getNode(
+                    dataset_instance.parent_catalog,
+                    "directory",
+                    dataset_instance.dataset_id,
+                    dataset_instance.dataset_version,
+                    paths[i - 1]
                 )
-                self._node_instances[node_instance.md5_hash] = node_instance
                 node_instance.add_child(dir_dict)
             else:
                 # Nth (last) part in path = file: create node for N-1,
                 # add current as child (file) to node
                 meta_item.update(file_dict)
-                node_instance = Node(
-                    catalog=dataset_instance.parent_catalog,
-                    type="directory",
-                    dataset_id=dataset_instance.dataset_id,
-                    dataset_version=dataset_instance.dataset_version,
-                    node_path=paths[i - 1],
+                node_instance = self.getNode(
+                    dataset_instance.parent_catalog,
+                    "directory",
+                    dataset_instance.dataset_id,
+                    dataset_instance.dataset_version,
+                    paths[i - 1]
                 )
-                self._node_instances[node_instance.md5_hash] = node_instance
                 node_instance.add_child(meta_item)
 
     def subdataset_path_to_nodes(
@@ -169,7 +168,6 @@ class MetaItem(object):
         Add parts of subdataset paths as nodes and children where relevant
         Function used when path to subdataset (relative to parent dataset) has multiple parts
         """
-        # print("In CoreTranslator.subdataset_path_to_nodes")
         nr_parts = len(parts_in_path)
         incremental_path = Path("")
         paths = []
@@ -189,14 +187,13 @@ class MetaItem(object):
                 # 2nd...(N-1)th dir in path: create node for N-1,
                 # add current as child (dir) to node: e.g. i=1, create node for i=0
                 # path for i: parent_dirs[nr_parts-1-i]
-                node_instance = Node(
-                    catalog=dataset_instance.parent_catalog,
-                    type="directory",
-                    dataset_id=dataset_instance.dataset_id,
-                    dataset_version=dataset_instance.dataset_version,
-                    node_path=paths[i - 1],
+                node_instance = self.getNode(
+                    dataset_instance.parent_catalog,
+                    "directory",
+                    dataset_instance.dataset_id,
+                    dataset_instance.dataset_version,
+                    paths[i - 1]
                 )
-                self._node_instances[node_instance.md5_hash] = node_instance
                 node_instance.add_child(dir_dict)
             else:
                 # Nth (last) part in path = sub-dataset: create node for N-1, add current as child (dataset) to node
@@ -207,20 +204,36 @@ class MetaItem(object):
                     cnst.DATASET_ID: subds_id,
                     cnst.DATASET_VERSION: subds_version,
                 }
-                node_instance = Node(
-                    catalog=dataset_instance.parent_catalog,
-                    type="dataset",
-                    dataset_id=dataset_instance.dataset_id,
-                    dataset_version=dataset_instance.dataset_version,
-                    node_path=paths[i - 1],
+                node_instance = self.getNode(
+                    dataset_instance.parent_catalog,
+                    "directory",
+                    dataset_instance.dataset_id,
+                    dataset_instance.dataset_version,
+                    paths[i - 1]
                 )
-                self._node_instances[node_instance.md5_hash] = node_instance
                 node_instance.add_child(subds_dict)
 
     def write_nodes_to_files(self):
         """"""
-        for n in self._node_instances.values():
-            n.write_attributes_to_file()
+        for n in self._node_instances.keys():
+            self._node_instances[n].write_attributes_to_file()
 
-
-
+    def getNode(self, catalog, type, dataset_id, dataset_version, path=None):
+        """Get existing or create new node"""
+        node_hash = md5sum_from_id_version_path(
+            dataset_id,
+            dataset_version,
+            path
+        )
+        if node_hash in self._node_instances:
+            return self._node_instances[node_hash]
+        else:
+            node_instance = Node(
+                catalog=catalog,
+                type=type,
+                dataset_id=dataset_id,
+                dataset_version=dataset_version,
+                node_path=path,
+            )
+            self._node_instances[node_instance.md5_hash] = node_instance
+            return node_instance
