@@ -175,11 +175,17 @@ const datasetView = {
         dataset = this.selectedDataset;
         console.log(this.selectedDataset)
         disp_dataset = {};
-        // Populate short_name
-        if (!dataset.hasOwnProperty("short_name") || !dataset["short_name"]) {
-          disp_dataset["short_name"] = (dataset["name"].length > 30 ? dataset["name"].substring(0,30)+'...' : dataset["name"])
+        // Set name to unknown if not available
+        if (!dataset.hasOwnProperty("name") || !dataset["name"]) {
+          disp_dataset["name"] = "<UNSPECIFIED>"
+          disp_dataset["short_name"] = "<UNSPECIFIED>"
         } else {
-          disp_dataset["short_name"] = dataset["short_name"]
+          // Populate short_name
+          if (!dataset.hasOwnProperty("short_name") || !dataset["short_name"]) {
+            disp_dataset["short_name"] = (dataset["name"].length > 30 ? dataset["name"].substring(0,30)+'...' : dataset["name"])
+          } else {
+            disp_dataset["short_name"] = dataset["short_name"]
+          }
         }
         disp_dataset["display_name"] = ' - ' + disp_dataset["short_name"]
         // DOI
