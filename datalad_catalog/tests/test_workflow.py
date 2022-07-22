@@ -2,6 +2,7 @@ from pathlib import Path
 from datalad_catalog.utils import read_json_file
 from datalad_catalog.webcatalog import (
     WebCatalog,
+    md5sum_from_id_version_path,
 )
 from datalad_catalog.workflows import (
     translate_to_catalog,
@@ -14,10 +15,7 @@ from datalad.tests.utils_pytest import (
     assert_equal,
     assert_repo_status,
 )
-from datalad.api import (
-    create,
-    Dataset
-)
+from datalad.api import create, Dataset
 
 import json
 import pytest
@@ -29,7 +27,9 @@ schema_dir = package_path / "schema"
 test_data_paths = {
     "metalad_core": tests_path / "data" / "metadata_core.json",
     "datacite_gin": tests_path / "data" / "metadata_datacite_gin.json",
-    "metalad_studyminimeta": tests_path / "data" / "metadata_studyminimeta.json",
+    "metalad_studyminimeta": tests_path
+    / "data"
+    / "metadata_studyminimeta.json",
     "bids_dataset": tests_path / "data" / "metadata_bids_dataset2.json",
 }
 
@@ -254,12 +254,12 @@ templateversion: 1.2
 """
 
 super_ds_tree = {
-    'superdataset': {
-        '.studyminimeta.yaml': studyminimeta_content,
-        'random_file.txt': 'some content',
-        'some_dir': {
-            'file_in_dir.txt': 'some content in file in dir',
-        }
+    "superdataset": {
+        ".studyminimeta.yaml": studyminimeta_content,
+        "random_file.txt": "some content",
+        "some_dir": {
+            "file_in_dir.txt": "some content in file in dir",
+        },
     }
 }
 
@@ -283,10 +283,10 @@ catalog_paths = [
 #     for key in test_data_paths.keys():
 #         print(f"\n{key}")
 #         test_data = read_json_file(test_data_paths[key])
-        
+
 #         mapping_path = schema_dir / get_translation_map(key, "dataset")
 #         new_obj = translate_to_catalog(test_data, mapping_path)
-        # print(json.dumps(new_obj))
+# print(json.dumps(new_obj))
 
 
 # Description:
@@ -295,24 +295,26 @@ catalog_paths = [
 # 3 - run workflow
 
 super_ds_tree = {
-    'superdataset': {
-        '.studyminimeta.yaml': studyminimeta_content,
-        'random_file.txt': 'some content',
-        'some_dir': {
-            'file_in_dir.txt': 'some content in file in dir',
-            'subdataset': {
-                'datacite.yml': datacitegin_content,
-                'random_file.txt': 'some content',
-            }
-        }
+    "superdataset": {
+        ".studyminimeta.yaml": studyminimeta_content,
+        "random_file.txt": "some content",
+        "some_dir": {
+            "file_in_dir.txt": "some content in file in dir",
+            "subdataset": {
+                "datacite.yml": datacitegin_content,
+                "random_file.txt": "some content",
+            },
+        },
     }
 }
+
+
 @with_tree(tree=super_ds_tree)
 @with_tempfile(mkdir=True)
 def test_workflow_new(super_path=None, cat_path=None):
-    ckwa=dict(result_renderer='disabled')
+    ckwa = dict(result_renderer="disabled")
     # Create super and subdataset, save all
-    sub_ds = create(super_path + "/some_dir/subdataset",  force=True, **ckwa)
+    sub_ds = create(super_path + "/some_dir/subdataset", force=True, **ckwa)
     sub_ds.save(to_git=True, **ckwa)
     super_ds = create(super_path, force=True, **ckwa)
     super_ds.save(to_git=True, **ckwa)
@@ -322,7 +324,7 @@ def test_workflow_new(super_path=None, cat_path=None):
     cat.create(force=True)
     # Create catalog
     cat_path = Path(cat_path)
-    cat = WebCatalog(location=cat_path)
+    cat = WebCatalog(location=Path(cat_path).resolve())
     cat.create(force=True)
     assert cat_path.exists()
     assert cat_path.is_dir()
@@ -332,8 +334,22 @@ def test_workflow_new(super_path=None, cat_path=None):
     # Run workflow
     tuple(super_workflow(super_ds.path, cat))
     # Test workflow outputs
+    # - metadata directory
     meta_path = cat_path / "metadata"
     assert meta_path.exists()
+    # - "set-super" file
+    super_file = cat_path / "metadata" / "super.json"
+    assert super_file.exists()
+    assert super_file.is_file()
+    assert_equal(
+        json.dumps(read_json_file(super_file), sort_keys=True, indent=2),
+        f"""\
+{{
+  "dataset_id": {dataset_details["super_ds"][0]},
+  "dataset_version": {dataset_details["super_ds"][1]},
+}}""",
+    )
+    # - dataset metadata paths
     dataset_details = {
         "super_ds": get_id_and_version(super_ds),
         "sub_ds": get_id_and_version(sub_ds),
@@ -341,28 +357,19 @@ def test_workflow_new(super_path=None, cat_path=None):
     for ds in dataset_details.values():
         pth = meta_path / str(ds[0]) / str(ds[1])
         assert pth.exists()
-    super_file = cat_path / "metadata" / "super.json"
-    assert super_file.exists()
-    assert super_file.is_file()
-    assert_equal(
-    json.dumps(read_json_file(super_file), sort_keys=True, indent=2),
-    f"""\
-{{
-  "dataset_id": {dataset_details["super_ds"][0]},
-  "dataset_version": {dataset_details["super_ds"][1]},
-}}""")
+    # - Node metadata content
+    md5sum_from_id_version_path(dataset_id, dataset_version, path=None)
+
+    
 
 
 def get_id_and_version(dataset: Dataset, var_to_string=False):
-    """Helper to get a DataLad dataset's id and version
-    """
+    """Helper to get a DataLad dataset's id and version"""
     id = dataset.id
     # sync possible adjusted branch and account for
     # possibility of being on adjusted branch
     dataset.repo.localsync()
-    version = dataset.repo.get_hexsha(
-        dataset.repo.get_corresponding_branch()
-    )
+    version = dataset.repo.get_hexsha(dataset.repo.get_corresponding_branch())
     if var_to_string:
         return str(id), str(version)
     return id, version

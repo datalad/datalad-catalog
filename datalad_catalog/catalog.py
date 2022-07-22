@@ -173,8 +173,14 @@ class Catalog(Interface):
             # type checkers, constraint definition is automatically
             # added to the docstring
             constraints=EnsureChoice(
-                "create", "add", "remove", "serve", "set-super", "validate",
-                "workflow-new", "workflow-update"
+                "create",
+                "add",
+                "remove",
+                "serve",
+                "set-super",
+                "validate",
+                "workflow-new",
+                "workflow-update",
             ),
         ),
         catalog_dir=Parameter(
@@ -266,7 +272,7 @@ class Catalog(Interface):
         dataset_path=None,
         subdataset_path=None,
     ):
-    
+
         """
         [summary]
 
@@ -351,11 +357,14 @@ class Catalog(Interface):
             )
             return
 
-        # Catalog should exist for all actions except create and run-workflow 
+        # Catalog should exist for all actions except create and run-workflow
         # (for create action: unless force flag supplied)
         if not ctlg.is_created():
-            if catalog_action != "create" and catalog_action != "workflow-new" \
-            and catalog_action != "workflow-update":
+            if (
+                catalog_action != "create"
+                and catalog_action != "workflow-new"
+                and catalog_action != "workflow-update"
+            ):
                 yield dict(
                     **res_kwargs,
                     status="impossible",
@@ -416,7 +425,6 @@ class Catalog(Interface):
                 _run_workflow,
                 ("update", ctlg, dataset_path, subdataset_path, res_kwargs),
             ),
-            
         }[catalog_action]
 
         yield from function(*args)
@@ -565,11 +573,13 @@ def _remove_from_catalog(
     assert catalog  # to indicate that catalog will be used when implemented
     if not dataset_id or not dataset_version:
         err_msg = (
-            "Dataset ID and/or VERSION missing: datalad catalog remove "
-            "requires both the ID (-i, --dataset_id) and VERSION (-v, "
-            "--dataset_version) of the dataset to be removed from the "
-            "catalog"
-        ),
+            (
+                "Dataset ID and/or VERSION missing: datalad catalog remove "
+                "requires both the ID (-i, --dataset_id) and VERSION (-v, "
+                "--dataset_version) of the dataset to be removed from the "
+                "catalog"
+            ),
+        )
         yield get_status_dict(
             **res_kwargs,
             status="error",
@@ -781,8 +791,9 @@ def _run_workflow(
                 "is to take place, using the argument: -d, --dataset_path."
             ),
         )
-    
+
     from datalad_catalog import workflows
+
     if workflow_type == "new":
         yield from workflows.super_workflow(
             dataset_path=Path(dataset_path),
