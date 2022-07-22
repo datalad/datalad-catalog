@@ -175,11 +175,17 @@ const datasetView = {
         dataset = this.selectedDataset;
         console.log(this.selectedDataset)
         disp_dataset = {};
-        // Populate short_name
-        if (!dataset.hasOwnProperty("short_name") || !dataset["short_name"]) {
-          disp_dataset["short_name"] = (dataset["name"].length > 30 ? dataset["name"].substring(0,30)+'...' : dataset["name"])
+        // Set name to unknown if not available
+        if (!dataset.hasOwnProperty("name") || !dataset["name"]) {
+          disp_dataset["name"] = "<UNSPECIFIED>"
+          disp_dataset["short_name"] = "<UNSPECIFIED>"
         } else {
-          disp_dataset["short_name"] = dataset["short_name"]
+          // Populate short_name
+          if (!dataset.hasOwnProperty("short_name") || !dataset["short_name"]) {
+            disp_dataset["short_name"] = (dataset["name"].length > 30 ? dataset["name"].substring(0,30)+'...' : dataset["name"])
+          } else {
+            disp_dataset["short_name"] = dataset["short_name"]
+          }
         }
         disp_dataset["display_name"] = ' - ' + disp_dataset["short_name"]
         // DOI
@@ -343,7 +349,7 @@ const datasetView = {
       var d = new Date(0); // epoch date
       d.setUTCSeconds(utcSeconds);
       day = d.getDate();
-      month = d.getMonth();
+      month = d.getMonth() + 1;  // getMonth() returns the month as a zero-based value
       year = d.getFullYear();
       return year + '-' + (month > 9 ? month : '0' + month) + '-' + (day > 9 ? day : '0' + day)
     },
