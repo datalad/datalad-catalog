@@ -13,14 +13,13 @@ from datalad_catalog.webcatalog import WebCatalog
 from datalad_catalog.catalog import (
     _add_to_catalog,
 )
-from functools import partial
 
 # DETAILS FOR EXTRACTORS AND TRANSLATORS
 extractor_names_dataset = [
-    "metalad_core", 
-    "metalad_studyminimeta", 
+    "metalad_core",
+    "metalad_studyminimeta",
     "bids_dataset",
-    "datacite_gin"
+    "datacite_gin",
 ]
 extractor_names_file = [
     "metalad_core",
@@ -34,7 +33,7 @@ required_files = dict(
 translator_map = {
     "metalad_core": {
         "file": "_metaladcore2catalog_file.json",
-        "dataset": "_metaladcore2catalog_dataset.json"
+        "dataset": "_metaladcore2catalog_dataset.json",
     },
     "metalad_studyminimeta": "_studyminimeta2catalog.json",
     "bids_dataset": "_bidsdataset2catalog.json",
@@ -91,7 +90,7 @@ def super_workflow(dataset_path, catalog: WebCatalog):
             for partial_result in res.get('result', []):
                 yield partial_result
     except IncompleteResultsError as e:
-        print(f'Could run workflow for all datasets. Inspect errors:\n\n{e}')
+        print(f'Could not run workflow for all datasets. Inspect errors:\n\n{e}')
     
     # Set super dataset of catalog
     cat.main_id = ds.id
