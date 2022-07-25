@@ -15,6 +15,7 @@
     <!-- Required Stylesheets -->
     <link rel="stylesheet" type="text/css" href="assets/style.css"/>
     <link rel="stylesheet" type="text/css" href="assets/fontawesome.min.css"/>
+    <link rel="stylesheet" type="text/css" href="assets/brands.min.css"/>
     <link type="text/css" rel="stylesheet" href="assets/bootstrap.5.1.3.min.css"/>
     <link type="text/css" rel="stylesheet" href="assets/bootstrap-vue.2.21.2.min.css"/>
 
@@ -33,7 +34,7 @@
           <span v-else-if="isFolder && !isOpen"> <i class="far fa-folder"></i> {{ displayText }}</span>
           <span v-else-if="isDataset"> <i class="fas fa-database"></i> <a class="subdataset" @click="selectDataset(item, item.id)">{{ displayText }}</a></span>
           <!-- <span v-else> <i class="far fa-file-alt"></i> {{ displayText }} <span v-show="downloadURL"><a class="xsm-dl-button" :href="downloadURL" :download="displayText"><i class="fa fa-cloud-download" aria-hidden="true"></i></a></span><span class="filesize"><i class="fa fa-eye" aria-hidden="true"></i>{{byteText}}</span> </span> -->
-          <span v-else> <i class="far fa-file-alt"></i> {{ displayText }} <span class="filesize"><span v-show="downloadURL"><a class="xsm-dl-button" :href="downloadURL" :download="displayText"><i class="fa fa-cloud-download" aria-hidden="true"></i></a></span>{{byteText}}</span> </span>
+          <span v-else> <i class="far fa-file-alt"></i> {{ displayText }} <span class="filesize"><span v-show="downloadURL"><a class="xsm-dl-button" :href="downloadURL" :download="displayText"><i class="fas fa-cloud-download" aria-hidden="true"></i></a></span>{{byteText}}</span> </span>
         </div>
         <ul v-show="isOpen" v-if="isFolder">
           <tree-item class="item" v-for="(child, index) in item.children" :key="index" :index="index" :item="child"></tree-item>
