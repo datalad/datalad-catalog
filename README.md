@@ -9,7 +9,11 @@
 
 [![Documentation Status](https://readthedocs.org/projects/datalad-catalog/badge/?version=latest)](http://docs.datalad.org/projects/catalog/en/latest/?badge=latest)
 
-![](docs/source/_static/datacat0_hero.svg)
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/datacat0_hero.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/datacat0_hero_lightbg.svg">
+  <img alt="DataCat logo" src="docs/source/_static/datacat0_hero.svg">
+</picture>
 
 <br>
 
