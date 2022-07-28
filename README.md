@@ -9,7 +9,11 @@
 
 [![Documentation Status](https://readthedocs.org/projects/datalad-catalog/badge/?version=latest)](http://docs.datalad.org/projects/catalog/en/latest/?badge=latest)
 
-![](docs/source/_static/datacat0_hero.svg)
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/datacat0_hero.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/datacat0_hero_lightbg.svg">
+  <img alt="DataCat logo" src="docs/source/_static/datacat0_hero.svg">
+</picture>
 
 <br>
 
@@ -37,7 +41,11 @@ The output is a set of structured metadata files, as well as a [Vue.js](https://
 
 <br>
 <div style="text-align:center;">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/datacat4_the_catalog.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/datacat4_the_catalog_lightbg.svg">
     <img src="docs/source/_static/datacat4_the_catalog.svg" width="75%"></img>
+  </picture>
 </div>
 
 
@@ -123,7 +131,11 @@ Even so, the provided set of tools can be particularly powerful when used togeth
 
 <br>
 <div style="text-align:center;">
+  <picture>
+    <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/datacat3_the_toolset.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/source/_static/datacat3_the_toolset_lightbg.svg">
     <img src="docs/source/_static/datacat3_the_toolset.svg" width="75%"></img>
+  </picture>
 </div>
 
 
