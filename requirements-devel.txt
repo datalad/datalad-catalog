@@ -1,6 +1,6 @@
 # runtime requirements
 datalad>=0.17
-datalad-metalad>=0.3.10
+datalad-metalad>=0.4.1
 jsonschema
 pyyaml
 
