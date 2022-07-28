@@ -1,0 +1,171 @@
+{
+    "authors": [
+        {
+            "email": "s.heunis@fz-juelich.de",
+            "name": "Stephan Heunis"
+        },
+        {
+            "@id": "https://schema.datalad.org/person#g@fz-juelich.de",
+            "@type": "Person",
+            "email": "g@fz-juelich.de",
+            "familyName": "Hanke",
+            "givenName": "Michael",
+            "name": " Michael Hanke",
+            "sameAs": "0000-0001-6398-6370"
+        }
+    ],
+    "children": [
+        {
+            "name": "some_dir",
+            "path": "some_dir",
+            "type": "directory"
+        }
+    ],
+    "dataset_id": "201d7059-1491-4a4f-909f-5cd918d5d2ec",
+    "dataset_version": "4bea05fe4cb1ad3dfcef9a07437e5a0f3b2b445e",
+    "description": [
+        {
+            "content": "The StudyForrest project centers around the use of the movie Forrest Gump, which provides complex sensory input that is both reproducible and is also richly laden with real-life-like content and contexts. Since its initial release, the StudyForrest dataset has grown and been extended substantially, and now encompasses many hours of fMRI scans, structural brain scans, eye-tracking data, and extensive annotations of the movie.",
+            "source": "metalad_studyminimeta"
+        }
+    ],
+    "extractors_used": [
+        {
+            "agent_email": "s.heunis@fz-juelich.de",
+            "agent_name": "Stephan Heunis",
+            "extraction_parameter": {},
+            "extraction_time": 1659000881.718712,
+            "extractor_name": "metalad_core",
+            "extractor_version": "1"
+        },
+        {
+            "agent_email": "s.heunis@fz-juelich.de",
+            "agent_name": "Stephan Heunis",
+            "extraction_parameter": {},
+            "extraction_time": 1659000881.765142,
+            "extractor_name": "metalad_studyminimeta",
+            "extractor_version": "0.1"
+        }
+    ],
+    "keywords": [
+        "human",
+        "fMRI",
+        "task"
+    ],
+    "name": "StudyForrest",
+    "publications": [
+        {
+            "authors": [
+                {
+                    "@id": "https://schema.datalad.org/person#a@fz-juelich.de",
+                    "@type": "Person",
+                    "email": "a@fz-juelich.de",
+                    "familyName": "Sengupta",
+                    "givenName": "Ayan",
+                    "name": " Ayan Sengupta"
+                },
+                {
+                    "@id": "https://schema.datalad.org/person#b@fz-juelich.de",
+                    "@type": "Person",
+                    "email": "b@fz-juelich.de",
+                    "familyName": "Speck",
+                    "givenName": "Oliver",
+                    "name": " Oliver Speck"
+                },
+                {
+                    "@id": "https://schema.datalad.org/person#c@fz-juelich.de",
+                    "@type": "Person",
+                    "email": "c@fz-juelich.de",
+                    "familyName": "Yakupov",
+                    "givenName": "Renat",
+                    "name": " Renat Yakupov"
+                },
+                {
+                    "@id": "https://schema.datalad.org/person#d@fz-juelich.de",
+                    "@type": "Person",
+                    "email": "d@fz-juelich.de",
+                    "familyName": "Kanowski",
+                    "givenName": "Martin",
+                    "name": " Martin Kanowski"
+                },
+                {
+                    "@id": "https://schema.datalad.org/person#e@fz-juelich.de",
+                    "@type": "Person",
+                    "email": "e@fz-juelich.de",
+                    "familyName": "Tempelmann",
+                    "givenName": "Claus",
+                    "name": " Claus Tempelmann"
+                },
+                {
+                    "@id": "https://schema.datalad.org/person#f@fz-juelich.de",
+                    "@type": "Person",
+                    "email": "f@fz-juelich.de",
+                    "familyName": "Pollmann",
+                    "givenName": "Stefan",
+                    "name": " Stefan Pollmann"
+                },
+                {
+                    "@id": "https://schema.datalad.org/person#g@fz-juelich.de",
+                    "@type": "Person",
+                    "email": "g@fz-juelich.de",
+                    "familyName": "Hanke",
+                    "givenName": "Michael",
+                    "name": " Michael Hanke",
+                    "sameAs": "0000-0001-6398-6370"
+                }
+            ],
+            "datePublished": 2018,
+            "doi": "https://doi.org/10.1101/305417",
+            "publicationOutlet": "bioRxiv",
+            "title": "The effect of acquisition resolution on orientation decoding from V1: comparison of 3T and 7T",
+            "type": "ScholarlyArticle"
+        },
+        {
+            "authors": [
+                {
+                    "@id": "https://schema.datalad.org/person#a@fz-juelich.de",
+                    "@type": "Person",
+                    "email": "a@fz-juelich.de",
+                    "familyName": "Sengupta",
+                    "givenName": "Ayan",
+                    "name": " Ayan Sengupta"
+                },
+                {
+                    "@id": "https://schema.datalad.org/person#f@fz-juelich.de",
+                    "@type": "Person",
+                    "email": "f@fz-juelich.de",
+                    "familyName": "Pollmann",
+                    "givenName": "Stefan",
+                    "name": " Stefan Pollmann"
+                },
+                {
+                    "@id": "https://schema.datalad.org/person#g@fz-juelich.de",
+                    "@type": "Person",
+                    "email": "g@fz-juelich.de",
+                    "familyName": "Hanke",
+                    "givenName": "Michael",
+                    "name": " Michael Hanke",
+                    "sameAs": "0000-0001-6398-6370"
+                }
+            ],
+            "datePublished": 2018,
+            "doi": "https://doi.org/10.12688/f1000research.13689.2",
+            "publicationOutlet": "F1000Research",
+            "title": "Spatial band-pass filtering aids decoding musical genres from auditory cortex 7T fMRI",
+            "type": "ScholarlyArticle"
+        }
+    ],
+    "subdatasets": [
+        {
+            "dataset_id": "ce345be8-eba6-476a-a52c-94ed2ca535fe",
+            "dataset_path": "some_dir/subdataset",
+            "dataset_version": "d90b0dd1bc8f270ab16107dbeff77d54a50f298c",
+            "dirs_from_path": [
+                "some_dir",
+                "subdataset"
+            ]
+        }
+    ],
+    "type": "dataset",
+    "url": "https://github.com/psychoinformatics-de/studyforrest-data"
+}

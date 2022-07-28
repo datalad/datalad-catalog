@@ -3,6 +3,7 @@ from datalad_catalog.utils import read_json_file
 from datalad_catalog.webcatalog import (
     WebCatalog,
     md5sum_from_id_version_path,
+    Node,
 )
 from datalad_catalog.workflows import (
     translate_to_catalog,
@@ -253,17 +254,6 @@ templateversion: 1.2
 
 """
 
-super_ds_tree = {
-    "superdataset": {
-        ".studyminimeta.yaml": studyminimeta_content,
-        "random_file.txt": "some content",
-        "some_dir": {
-            "file_in_dir.txt": "some content in file in dir",
-        },
-    }
-}
-
-
 catalog_paths = [
     "assets/md5-2.3.0.js",
     "assets/vue_app.js",
@@ -273,7 +263,6 @@ catalog_paths = [
     "config.json",
     "README.md",
 ]
-
 
 # def test_basic_translations():
 #     """Test the output of translations using jq-bindings
@@ -295,20 +284,16 @@ catalog_paths = [
 # 3 - run workflow
 
 super_ds_tree = {
-    "superdataset": {
-        ".studyminimeta.yaml": studyminimeta_content,
-        "random_file.txt": "some content",
-        "some_dir": {
-            "file_in_dir.txt": "some content in file in dir",
-            "subdataset": {
-                "datacite.yml": datacitegin_content,
-                "random_file.txt": "some content",
-            },
+    ".studyminimeta.yaml": studyminimeta_content,
+    "random_file.txt": "some content",
+    "some_dir": {
+        "file_in_dir.txt": "some content in file in dir",
+        "subdataset": {
+            "datacite.yml": datacitegin_content,
+            "random_file.txt": "some content",
         },
     }
 }
-
-
 @with_tree(tree=super_ds_tree)
 @with_tempfile(mkdir=True)
 def test_workflow_new(super_path=None, cat_path=None):
@@ -319,12 +304,12 @@ def test_workflow_new(super_path=None, cat_path=None):
     super_ds = create(super_path, force=True, **ckwa)
     super_ds.save(to_git=True, **ckwa)
     assert_repo_status(super_ds.path)
-    # Create catalog
-    cat = WebCatalog(location=cat_path)
-    cat.create(force=True)
+    # Test if metadata files exist
+    assert (Path(sub_ds.path) / "datacite.yml").exists()
+    assert (Path(super_ds.path) / ".studyminimeta.yaml").exists()
     # Create catalog
     cat_path = Path(cat_path)
-    cat = WebCatalog(location=Path(cat_path).resolve())
+    cat = WebCatalog(location=cat_path)
     cat.create(force=True)
     assert cat_path.exists()
     assert cat_path.is_dir()
@@ -333,7 +318,14 @@ def test_workflow_new(super_path=None, cat_path=None):
         assert pth.exists()
     # Run workflow
     tuple(super_workflow(super_ds.path, cat))
-    # Test workflow outputs
+    # TODO: test interim workflow outputs, including:
+    # - extracted metadata file (amount of lines?)
+    # - translated metadata file (amount of lines?)
+    assert (Path(super_ds.path) / "translated_meta.json").exists()
+    assert (Path(super_ds.path) / "extracted_meta.json").exists()
+    assert (Path(sub_ds.path) / "translated_meta.json").exists()
+    assert (Path(sub_ds.path) / "extracted_meta.json").exists()
+    # Test final workflow outputs
     # - metadata directory
     meta_path = cat_path / "metadata"
     assert meta_path.exists()
@@ -341,26 +333,144 @@ def test_workflow_new(super_path=None, cat_path=None):
     super_file = cat_path / "metadata" / "super.json"
     assert super_file.exists()
     assert super_file.is_file()
-    assert_equal(
-        json.dumps(read_json_file(super_file), sort_keys=True, indent=2),
-        f"""\
-{{
-  "dataset_id": {dataset_details["super_ds"][0]},
-  "dataset_version": {dataset_details["super_ds"][1]},
-}}""",
-    )
-    # - dataset metadata paths
     dataset_details = {
         "super_ds": get_id_and_version(super_ds),
         "sub_ds": get_id_and_version(sub_ds),
     }
+    assert_equal(
+        json.dumps(read_json_file(super_file), sort_keys=True, indent=2),
+        f"""\
+{{
+  "dataset_id": "{dataset_details["super_ds"][0]}",
+  "dataset_version": "{dataset_details["super_ds"][1]}"
+}}""",
+    )
+    # - dataset metadata directory paths
     for ds in dataset_details.values():
         pth = meta_path / str(ds[0]) / str(ds[1])
         assert pth.exists()
-    # - Node metadata content
-    md5sum_from_id_version_path(dataset_id, dataset_version, path=None)
+    # - Node metadata directories and content: superdataset
+    superds_node_path = get_node_path(
+        meta_path,
+        dataset_details["super_ds"][0],
+        dataset_details["super_ds"][1]
+    )
+    assert superds_node_path.exists()
+    generated_meta = read_json_file(superds_node_path)
+    correct_meta_path = tests_path / "data" / "workflow_generated_meta_super.json"
+    correct_meta = read_json_file(correct_meta_path)
+    assert_equal(generated_meta.keys(), correct_meta.keys())
+    keys_to_test = [
+        "authors",
+        "children",
+        "description",
+        "keywords",
+        "name",
+        "publications",
+        "type",
+        "url",
+    ]
+    assert_dict_values_equal(
+        generated_meta,
+        correct_meta,
+        keys_to_test
+    )
+    assert_super_variable_values_equal(
+        generated_meta,
+        [
+            "subdatasets",
+            "extractors_used",
+            "dataset_id",
+            "dataset_version"
+        ],
+        dataset_details
+    )
+    # - Node metadata directories and content: superdataset subdir
+    super_subdir_node_path = get_node_path(
+        meta_path,
+        dataset_details["super_ds"][0],
+        dataset_details["super_ds"][1],
+        "some_dir",
+    )
+    assert super_subdir_node_path.exists()
+    generated_meta = read_json_file(super_subdir_node_path)
+    correct_meta_path = tests_path / "data" / "workflow_generated_meta_dir.json"
+    correct_meta = read_json_file(correct_meta_path)
+    assert_equal(generated_meta.keys(), correct_meta.keys())
+    keys_to_test = [
+        "path",
+        "name",
+        "type",
+    ]
+    assert_dict_values_equal(
+        generated_meta,
+        correct_meta,
+        keys_to_test
+    )
+    assert_dir_variable_values_equal(
+        generated_meta,
+        [
+            "children",
+            "dataset_id",
+            "dataset_version"
+        ],
+        dataset_details
+    )
+    # - Node metadata directories and content: subdataset
+    subds_node_path = get_node_path(
+        meta_path,
+        dataset_details["sub_ds"][0],
+        dataset_details["sub_ds"][1]
+    )
+    assert subds_node_path.exists()
+    generated_meta = read_json_file(subds_node_path)
+    correct_meta_path = tests_path / "data" / "workflow_generated_meta_sub.json"
+    correct_meta = read_json_file(correct_meta_path)
+    assert_equal(generated_meta.keys(), correct_meta.keys())
+    keys_to_test = [
+        "authors",
+        "children",
+        "description",
+        "funding",
+        "keywords",
+        "license",
+        "name",
+        "publications",
+        "type"
+    ]
+    assert_dict_values_equal(
+        generated_meta,
+        correct_meta,
+        keys_to_test
+    )
+    assert_sub_variable_values_equal(
+        generated_meta,
+        [
+            "extractors_used",
+            "dataset_id",
+            "dataset_version"
+        ],
+        dataset_details
+    )
 
     
+def get_node_path(root_path, dataset_id, dataset_version, node_path=None):
+    _split_dir_length = Node._split_dir_length
+    md5_hash = md5sum_from_id_version_path(
+        dataset_id,
+        dataset_version,
+        node_path,
+    )
+    path_left = md5_hash[: _split_dir_length]
+    path_right = md5_hash[_split_dir_length :]
+    node_fn = (
+        root_path
+        / dataset_id
+        / dataset_version
+        / path_left
+        / path_right
+    )
+    return node_fn.with_suffix(".json")
 
 
 def get_id_and_version(dataset: Dataset, var_to_string=False):
@@ -373,3 +483,91 @@ def get_id_and_version(dataset: Dataset, var_to_string=False):
     if var_to_string:
         return str(id), str(version)
     return id, version
+
+
+def assert_dict_values_equal(
+    dict_to_test: dict,
+    dict_correct: dict,
+    keys_to_test: list,
+    ):
+    """"""
+    for key in keys_to_test:
+        assert_equal(dict_to_test[key], dict_correct[key])
+
+def assert_super_variable_values_equal(
+    dict_to_test: dict,
+    keys_to_test: list,
+    dataset_details: dict,
+    ):
+    """"""
+    for key in keys_to_test:
+        assert key in dict_to_test
+    # id and version
+    assert_equal(dict_to_test["dataset_id"], dataset_details["super_ds"][0])
+    assert_equal(dict_to_test["dataset_version"], dataset_details["super_ds"][1])
+    # subdatasets
+    correct_subds = [{
+        "dataset_id": f"{dataset_details['sub_ds'][0]}",
+        "dataset_path": "some_dir/subdataset",
+        "dataset_version": f"{dataset_details['sub_ds'][1]}",
+        "dirs_from_path": [
+            "some_dir",
+            "subdataset"
+        ]
+    }]
+    assert_equal(dict_to_test["subdatasets"], correct_subds)
+    # extractors_used
+    assert_equal(len(dict_to_test["extractors_used"]), 2)
+    assert_equal(
+        dict_to_test["extractors_used"][0]["extractor_name"],
+        "metalad_core"
+    )
+    assert_equal(
+        dict_to_test["extractors_used"][1]["extractor_name"],
+        "metalad_studyminimeta"
+    )
+
+
+def assert_dir_variable_values_equal(
+    dict_to_test: dict,
+    keys_to_test: list,
+    dataset_details: dict,
+    ):
+    """"""
+    for key in keys_to_test:
+        assert key in dict_to_test
+    # id and version
+    assert_equal(dict_to_test["dataset_id"], dataset_details["super_ds"][0])
+    assert_equal(dict_to_test["dataset_version"], dataset_details["super_ds"][1])
+    # children
+    correct_children = [{
+        "dataset_id": f"{dataset_details['sub_ds'][0]}",
+        "dataset_version": f"{dataset_details['sub_ds'][1]}",
+        "name": "subdataset",
+        "path": "some_dir/subdataset",
+        "type": "dataset"
+    }]
+    assert_equal(dict_to_test["children"], correct_children)
+
+
+def assert_sub_variable_values_equal(
+    dict_to_test: dict,
+    keys_to_test: list,
+    dataset_details: dict,
+    ):
+    """"""
+    for key in keys_to_test:
+        assert key in dict_to_test
+    # id and version
+    assert_equal(dict_to_test["dataset_id"], dataset_details["sub_ds"][0])
+    assert_equal(dict_to_test["dataset_version"], dataset_details["sub_ds"][1])
+    # extractors_used
+    assert_equal(len(dict_to_test["extractors_used"]), 2)
+    assert_equal(
+        dict_to_test["extractors_used"][0]["extractor_name"],
+        "metalad_core"
+    )
+    assert_equal(
+        dict_to_test["extractors_used"][1]["extractor_name"],
+        "datacite_gin"
+    )

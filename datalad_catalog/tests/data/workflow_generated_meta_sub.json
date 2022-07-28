@@ -1,0 +1,139 @@
+{
+    "authors": [
+        {
+            "email": "s.heunis@fz-juelich.de",
+            "name": "Stephan Heunis"
+        },
+        {
+            "email": "",
+            "familyName": "Hanke",
+            "givenName": "Michael",
+            "honorificSuffix": "",
+            "identifiers": [
+                {
+                    "identifier": "0000-0001-6398-6370",
+                    "type": "ORCID"
+                }
+            ],
+            "name": ""
+        },
+        {
+            "email": "",
+            "familyName": "Adelh\u00f6fer",
+            "givenName": "Nico",
+            "honorificSuffix": "",
+            "name": ""
+        },
+        {
+            "email": "",
+            "familyName": "Kaule",
+            "givenName": "Falko R.",
+            "honorificSuffix": "",
+            "name": ""
+        },
+        {
+            "email": "",
+            "familyName": "Waite",
+            "givenName": "Laura",
+            "honorificSuffix": "",
+            "identifiers": [
+                {
+                    "identifier": "0000-0003-2213-7465",
+                    "type": "ORCID"
+                }
+            ],
+            "name": ""
+        },
+        {
+            "email": "",
+            "familyName": "M\u00f6nch",
+            "givenName": "Christian",
+            "honorificSuffix": "",
+            "identifiers": [
+                {
+                    "identifier": "0000-0002-3092-0612",
+                    "type": "ORCID"
+                }
+            ],
+            "name": ""
+        }
+    ],
+    "children": [],
+    "dataset_id": "ce345be8-eba6-476a-a52c-94ed2ca535fe",
+    "dataset_version": "d90b0dd1bc8f270ab16107dbeff77d54a50f298c",
+    "description": [
+        {
+            "content": "\"Extension of the dataset published in Hanke et al.\n (2014; doi:10.1038/sdata.2014.3) with additional acquisitions for 15 of\n the original 20 participants. These additions include: retinotopic mapping,\n a localizer paradigm for higher visual areas (FFA, EBA, PPA), and another\n 2h movie recording with 3T full-brain BOLD fMRI with simultaneous 1000 Hz\n eyetracking.\n\n This is an extension of the studyforrest project, all participants previously\n volunteered for the audio-only Forrest Gump study. The datset is structured in\n BIDS format, details of the files and metadata can be found at:\n\n   Ayan Sengupta, Falko R. Kaule, J. Swaroop Guntupalli, Michael B. Hoffmann,\n   Christian H\u00e4usler, J\u00f6rg Stadler, Michael Hanke. `An extension of the\n   studyforrest dataset for vision research\n   <http://biorxiv.org/content/early/2016/03/31/046573>`_. (submitted for\n   publication)\n\n   Michael Hanke, Nico Adelh\u00f6fer, Daniel Kottke, Vittorio Iacovella,\n   Ayan Sengupta, Falko R. Kaule, Roland Nigbur, Alexander Q. Waite,\n   Florian J. Baumgartner & J\u00f6rg Stadler. `Simultaneous fMRI and eye gaze\n   recordings during prolonged natural stimulation \u2013 a studyforrest extension\n   <http://biorxiv.org/content/early/2016/03/31/046581>`_. (submitted for\n   publication)\n\n For more information about the project visit: http://studyforrest.org\n\n We acknowledge the support of the Combinatorial NeuroImaging Core\n Facility at the Leibniz Institute for Neurobiology in Magdeburg, and\n the German federal state of Saxony-Anhalt, Project: Center for\n Behavioral Brain Sciences. This research was, in part, also supported\n by the German Federal Ministry of Education and Research (BMBF) as\n part of a US-German collaboration in computational neuroscience (CRCNS),\n co-funded by the BMBF and the US National Science Foundation\n (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology\n employed for this research was supported by US-German CRCNS project,\n co-funded by the BMBF and the US National Science Foundation\n (BMBF 01GQ1411; NSF 1429999).\"",
+            "source": "datacite_gin"
+        }
+    ],
+    "extractors_used": [
+        {
+            "agent_email": "s.heunis@fz-juelich.de",
+            "agent_name": "Stephan Heunis",
+            "extraction_parameter": {},
+            "extraction_time": 1659000883.00646,
+            "extractor_name": "metalad_core",
+            "extractor_version": "1"
+        },
+        {
+            "agent_email": "s.heunis@fz-juelich.de",
+            "agent_name": "Stephan Heunis",
+            "extraction_parameter": {},
+            "extraction_time": 1659000883.1729012,
+            "extractor_name": "datacite_gin",
+            "extractor_version": "0.0.1"
+        }
+    ],
+    "funding": [
+        {
+            "description": "",
+            "identifier": "",
+            "name": "BMBF, 01GQ1112"
+        },
+        {
+            "description": "",
+            "identifier": "",
+            "name": "NSF, 1129855"
+        },
+        {
+            "description": "",
+            "identifier": "",
+            "name": "BMBF, 01GQ1411"
+        },
+        {
+            "description": "",
+            "identifier": "",
+            "name": "NSF, 1429999"
+        }
+    ],
+    "keywords": [
+        "Neuroscience",
+        "Studyforrest",
+        "BIDS"
+    ],
+    "license": {
+        "name": "Open Data Commons Public Domain Dedication and License (PDDL)",
+        "url": "https://opendatacommons.org/licenses/pddl/"
+    },
+    "name": "Simultaneous fMRI/eyetracking while movie watching, plus visual localizers",
+    "publications": [
+        {
+            "authors": [],
+            "datePublished": "",
+            "doi": "doi:10.1038/sdata.2016.93",
+            "publicationOutlet": "",
+            "title": "Sengupta, A., Kaule, F. R., Guntupalli, J. S., Hoffmann, M. B., H\u00e4usler, C., Stadler, J., Hanke, M. (2016). A studyforrest extension, retinotopic mapping and localization of higher visual areas. Scientific Data, 3, 160093.",
+            "type": ""
+        },
+        {
+            "authors": [],
+            "datePublished": "",
+            "doi": "doi:10.1038/sdata.2016.92",
+            "publicationOutlet": "",
+            "title": "Hanke, M, Adelh\u00f6fer, N, Kottke, D, Iacovella, V, Sengupta, A, Kaule, FR, Nigbur, R, Waite, AQ, Baumgartner, F, Stadler, J (2016). A studyforrest extension, simultaneous fMRI and eye gaze recordings during prolonged natural stimulation. Scientific Data, 3, 160092.",
+            "type": ""
+        }
+    ],
+    "type": "dataset"
+}
