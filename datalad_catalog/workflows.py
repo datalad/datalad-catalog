@@ -201,8 +201,7 @@ def check_required_files(dataset: Dataset, extractor_name: str):
 
 def write_jsonline_to_file(filename, line):
     """Write a single JSON line to file"""
-    open_as = "a"
-    with open(filename, open_as) as f:
+    with open(filename, "a") as f:
         json.dump(line, f, cls=jsEncoder)
         f.write("\n")
 
