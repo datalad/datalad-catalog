@@ -59,15 +59,19 @@ Vue.component("tree-item", {
         this.isOpen = !this.isOpen;
       }
     },
-    async selectDataset(obj) {
-      file = getFilePath(obj.dataset_id, obj.dataset_version, "");
+    async selectDataset(obj, objId, objVersion) {
+      if (obj != null) {
+        objId = obj.dataset_id;
+        objVersion = obj.dataset_version;
+      }
+      file = getFilePath(objId, objVersion, "");
       fileExists = await checkFileExists(file);
       if (fileExists) {
         router.push({
           name: "dataset",
           params: {
-            dataset_id: obj.dataset_id,
-            dataset_version: obj.dataset_version,
+            dataset_id: objId,
+            dataset_version: objVersion,
           },
         });
       } else {
@@ -360,15 +364,20 @@ const datasetView = {
         this.showCopyCiteTooltip = false;
       }, 1000);
     },
-    async selectDataset(obj) {
-      file = getFilePath(obj.dataset_id, obj.dataset_version, obj.path);
+    async selectDataset(obj, objId, objVersion, objPath) {
+      if (obj != null) {
+        objId = obj.dataset_id;
+        objVersion = obj.dataset_version;
+        objPath = obj.path;
+      }
+      file = getFilePath(objId, objVersion, objPath);
       fileExists = await checkFileExists(file);
       if (fileExists) {
         router.push({
           name: "dataset",
           params: {
-            dataset_id: obj.dataset_id,
-            dataset_version: obj.dataset_version,
+            dataset_id: objId,
+            dataset_version: objVersion,
           },
         });
       } else {
@@ -669,8 +678,13 @@ const mainPage = {
     };
   },
   methods: {
-    selectDataset(obj, objId) {
-      id_and_version = obj.dataset_id + "-" + obj.dataset_version;
+    selectDataset(obj, objId, objVersion) {
+      if (obj != null) {
+        id_and_version = obj.dataset_id + "-" + obj.dataset_version;
+      } else {
+        id_and_version = objId + "-" + objVersion;
+      }
+      
       hash = md5(id_and_version);
       router.push({ name: "dataset", params: { blobId: hash } });
     },
