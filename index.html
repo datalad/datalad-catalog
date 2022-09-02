@@ -25,6 +25,7 @@
     <script src="assets/vue-router.3.5.3.min.js"></script>
     <script src="assets/md5-2.3.0.js"></script>
     <script src="assets/marked.4.0.17.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 
     <!-- Template for recursive tree item -->
     <script type="text/x-template" id="item-template">
@@ -401,6 +402,126 @@
                   </span>
                 </b-tab>
               </span>
+              <!-- PROVENANCE -->
+              <span v-if="selectedDataset.provenance && selectedDataset.provenance.length">
+                <b-tab>
+                  <template v-slot:title>
+                    <i class="fas fa-laptop-code"></i> Provenance
+                  </template>
+                  <span v-if="!selectedDataset.provenance || !selectedDataset.provenance.length"><em>There are no provenance records listed for the current dataset</em></span>
+                  <span v-else v-for="record in selectedDataset.provenance">
+                    <b-container>
+                      <b-row>
+                        <b-col>
+                          <b-card header-bg-variant="transparent" >
+                            <template v-slot:header>
+                              <b-row no-gutters>
+                                <b-col align-h="center" align-v="center" md="3">
+                                  <span class="lfont"><i class="fas fa-database"></i></span>
+                                </b-col>
+                                <b-col align-h="center" align-v="center" md="9">
+                                  <span><a @click="selectDataset(null, selectedDataset.dataset_id, record.previous_version)" class="newlink"><span class="lfont">Dataset:  <em>before</em></span></a></span>
+                                </b-col>
+                              </b-row>
+                              
+                            </template>
+                            <b-card-text class="text-muted">
+                              <small>
+                                <strong>ID: </strong>{{selectedDataset.dataset_id.slice(0,7)}}...<br>
+                                <strong>Version: </strong>{{record.previous_version.slice(0,7)}}...<br>
+                              </small>
+                            </b-card-text>
+                            <b-card-text >
+                              <small>
+                                <strong>Inputs: </strong>{{record.inputs}}<br>
+                              </small>
+                            </b-card-text>
+                          </b-card>
+
+                        </b-col>
+                        <b-col cols="1"></b-col>
+
+                        <b-col cols="5">
+                          <b-card border-variant="dark">
+                            <template v-slot:header class="text-center">
+                                <b-card-title class="text-center"><i class="fas fa-terminal"></i>&nbsp;&nbsp;run-record</strong></b-card-title>
+                                <!-- <span class="lfont"><i class="fas fa-terminal"></i>  run-record</strong></span> -->
+                            </template>
+                            <b-card-text class="text-center" >
+                              <small>
+                                <span class="text-muted"><i class="fas fa-code-commit"></i> {{record.dataset_version}}</span>
+                              </small>
+                            </b-card-text>
+                            
+                            <b-card-text class="border rounded p-2">
+                              {{record.description}}
+                            </b-card-text>
+                            <b-card-text >
+                              <small>
+                                <strong>&nbsp;Command: </strong><br>
+                                <div class="shadow p-3 mb-3 bg-white rounded">
+                                  <b-row>
+                                    <b-col cols="11">
+                                      <code id="command_code">
+                                        {{record.cmd}}
+                                      </code>
+                                    </b-col>
+                                    <b-col cols="1">
+                                    </b-col>
+                                  </b-row>
+                                </div>
+                                <!-- <code>{{record.cmd}}</code> -->
+                              </small>
+                            </b-card-text>
+                            <template v-slot:footer>
+                              <b-row no-gutters>
+                                <b-col >
+                                  <span class="lfont"><i class="fas fa-user-check"></i></span>&nbsp;&nbsp;{{record.author.name}}
+                                </b-col>
+                                <b-col align-h="right">
+                                  <small>{{record.datetime}}</small>
+                                </b-col>
+                              </b-row>
+                            </template>
+                          </b-card>
+                        </b-col>
+                        <b-col cols="1"></b-col>
+                        <b-col>
+                          <b-card header-bg-variant="transparent" >
+                            <template v-slot:header>
+                              <b-row no-gutters>
+                                <b-col align-h="center" align-v="center" md="3">
+                                  <span class="lfont"><i class="fas fa-database"></i></span>
+                                </b-col>
+                                <b-col align-h="center" align-v="center" md="9">
+                                  <span><a @click="selectDataset(null, selectedDataset.dataset_id, record.dataset_version)" class="newlink"><span class="lfont">Dataset:  <em>after</em></span></a></span>
+                                </b-col>
+                              </b-row>
+                              
+                            </template>
+                            <b-card-text class="text-muted">
+                                  <small>
+                                    <strong>ID: </strong>{{selectedDataset.dataset_id.slice(0,7)}}...<br>
+                                    <strong>Version: </strong>{{record.dataset_version.slice(0,7)}}...<br>
+                                  </small>
+                            </b-card-text>
+                            <b-card-text >
+                              <small>
+                                <strong>Outputs: </strong>{{record.outputs}}<br>
+                              </small>
+                            </b-card-text>
+                            
+                            
+                          </b-card>
+
+                        </b-col>
+                      </b-row>
+                    </b-container>
+                    <br>
+                    <hr class="mb-5 pb-1">
+                  </span>
+                </b-tab>
+              </span>
               <!-- EXTRA TABS -->
               <span v-if="selectedDataset.additional_display && selectedDataset.additional_display.length">
                 <span v-for="new_tab in selectedDataset.additional_display">
@@ -485,5 +606,6 @@
 
     <!-- Start running your app -->
     <script src="assets/vue_app.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true });</script>
   </body>
 </html>
