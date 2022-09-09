@@ -96,7 +96,7 @@ def super_workflow(dataset_path, catalog: WebCatalog):
             for partial_result in res.get("result", []):
                 yield partial_result
     except IncompleteResultsError as e:
-        print(
+        lgr.error(
             f"Could not run workflow for all datasets. Inspect errors:\n\n{e}"
         )
 
@@ -179,7 +179,8 @@ def dataset_workflow(ds: Dataset, catalog, **kwargs):
                     translate_to_catalog(meta_dict, mapping_path),
                 )
             except Exception as e:
-                raise (e)
+                lgr.error("Failed to translate line due to error: %s", str(e))
+                continue
     # 4. Add translated metadata to catalog
     return _add_to_catalog(catalog, translated_file, dict())
 
