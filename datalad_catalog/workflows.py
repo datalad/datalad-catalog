@@ -1,18 +1,23 @@
+import json
+import jq
+import logging
+from pathlib import Path
+from uuid import UUID
+
 from datalad.api import (
     meta_extract,
     meta_conduct,
 )
 from datalad.distribution.dataset import Dataset
+from datalad.local.wtf import _describe_metadata_elements
 from datalad.support.exceptions import IncompleteResultsError
-from pathlib import Path
-import json
-from uuid import UUID
-import jq
 from datalad_catalog.utils import read_json_file
 from datalad_catalog.webcatalog import WebCatalog
 from datalad_catalog.catalog import (
     _add_to_catalog,
 )
+
+lgr = logging.getLogger("datalad.catalog.workflows")
 
 # DETAILS FOR EXTRACTORS AND TRANSLATORS
 extractor_names_dataset = [
@@ -51,7 +56,6 @@ class jsEncoder(json.JSONEncoder):
         if isinstance(obj, UUID) or isinstance(obj, Path):
             # if the obj is uuid, we simply return the value of uuid
             return str(obj)
-
         return json.JSONEncoder.default(self, obj)
 
 
@@ -147,6 +151,13 @@ def dataset_workflow(ds: Dataset, catalog, **kwargs):
     # 1. Run dataset-level extraction
     extracted_file = Path(ds.path) / "extracted_meta.json"
     for name in extractor_names_dataset:
+        if name not in _getAvailableExtractors().keys():
+            warning_msg = (
+                f"Extractor '{name}' not available. Continuing "
+                "with available extractors."
+            )
+            lgr.warning(warning_msg)
+            continue
         if check_required_files(ds, name):
             metadata_record = extract_dataset_level(ds, name)
             write_jsonline_to_file(extracted_file, metadata_record)
@@ -245,3 +256,18 @@ def get_translation_map(extractor_name, extractor_type):
         return mapping_file
     except Exception as e:
         raise (e)
+
+
+def _getKnownExtractors():
+    # returns all extractors known to datalad-metalad
+    return _describe_metadata_elements("datalad.metadata.extractors")
+
+
+def _getAvailableExtractors():
+    # returns all extractors known to datalad-metalad, with no load errors
+    extractor_dict = _getKnownExtractors()
+    return {
+        name: extractor_dict[name]
+        for name in extractor_dict.keys()
+        if extractor_dict[name]["load_error"] is None
+    }
