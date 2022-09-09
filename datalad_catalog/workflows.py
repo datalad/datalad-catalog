@@ -84,6 +84,7 @@ def super_workflow(dataset_path, catalog: WebCatalog):
         return dataset_workflow(ds, catalog=cat, **kwargs)
 
     try:
+        # for the superdataset and all top-level subdatasets
         for res in ds.foreach_dataset(
             _dataset_workflow_inner,
             recursive=True,
