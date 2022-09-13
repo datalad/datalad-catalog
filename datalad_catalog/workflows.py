@@ -44,6 +44,12 @@ translator_map = {
     "bids_dataset": "_bidsdataset2catalog.json",
     "datacite_gin": "_datacitegin2catalog.json",
 }
+extractor_map = {
+    "metalad_core": "datalad-metalad",
+    "metalad_studyminimeta": "datalad-metalad",
+    "bids_dataset": "datalad-neuroimaging",
+    "datacite_gin": "datalad-catalog",
+}
 # INTERNAL PATHS
 package_path = Path(__file__).resolve().parent
 schema_dir = package_path / "schema"
@@ -157,10 +163,11 @@ def dataset_workflow(ds: Dataset, catalog, **kwargs):
     # 1. Run dataset-level extraction
     extracted_file = Path(ds.path) / "extracted_meta.json"
     for name in extractor_names_dataset:
-        if name not in _getAvailableExtractors().keys():
+        if (name not in _getAvailableExtractors().keys()
+        and check_required_files(ds, name)):
             warning_msg = (
-                f"Extractor '{name}' not available. Continuing "
-                "with available extractors."
+                f"Extractor '{name}' not available. Please install "
+                f"{extractor_map[name]} to include additional metadata."
             )
             lgr.warning(warning_msg)
             continue
