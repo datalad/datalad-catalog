@@ -1,7 +1,6 @@
 # 0.1.1 (Tue Sept 13 2022) -- release continued
 
 #### 💫 Enhancements and new features
-<<<<<<< HEAD
 - Adds automated workflow for PyPI release. [#197](https://github.com/datalad/datalad-catalog/pull/197) (by @jsheunis)
 
 #### 📝 Documentation
@@ -9,15 +8,6 @@
 
 #### 🛡 Tests
 - Updates appveyor setup to run tests with `pytest` [#197](https://github.com/datalad/datalad-catalog/pull/197) (by @jsheunis)
-=======
-- Adds automated workflow for PyPI release. [#pr](pr-url) (by @jsheunis)
-
-#### 📝 Documentation
-- Adds CHANGELOG. [#pr](pr-url) (by @jsheunis)
-
-#### 🛡 Tests
-- Updates appveyor setup to run tests with `pytest` [#pr](pr-url) (by @jsheunis)
->>>>>>> f72dca00363164db3c5ed0a1c196335de66ea831
 
 #### Authors: 1
 
