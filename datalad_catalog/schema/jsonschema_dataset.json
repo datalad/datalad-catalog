@@ -28,7 +28,7 @@
     },
     "description": {
       "description": "A 1-2 paragraph description of the dataset",
-      "type": "string"
+      "type": ["array", "string"]
     },
     "doi": {
       "description": "The dataset's digital object identifier",
