@@ -73,7 +73,12 @@ def super_workflow(dataset_path, catalog: WebCatalog):
     """
     # Install super and subdatasets
     ds = Dataset(dataset_path)
-    # ds.get(get_data=False, recursive=True)
+    ds.get(
+        get_data=False,
+        recursive=True,
+        recursion_limit=1,
+        on_failure="continue",
+    )
     # Create catalog
     cat = catalog
     if not cat.is_created():
