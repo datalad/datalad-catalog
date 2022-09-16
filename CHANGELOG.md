@@ -1,3 +1,14 @@
+# 0.1.2 (Fri Sept 16 2022) -- red tests
+
+#### 🛡 Tests
+- Adds test data to package_data to ensure availability when installing from pip with extras [#199](https://github.com/datalad/datalad-catalog/pull/199) (by @jsheunis)
+
+#### Authors: 1
+
+- Stephan Heunis (@jsheunis)
+
+---
+
 # 0.1.1 (Tue Sept 13 2022) -- release continued
 
 #### 💫 Enhancements and new features
