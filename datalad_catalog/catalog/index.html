@@ -285,7 +285,7 @@
                             <span class="xxlfont"><i class="fas fa-database"></i></span>
                           </b-col>
                           <b-col class="text-muted" md="7">
-                            <h5><a @click="console.log('fromhtml'); console.log(ds); selectDataset(ds)" class="stretched-link">{{ds.dirs_from_path.at(-1)}}</a></h5>
+                            <h5><a @click="console.log('fromhtml'); console.log(ds); selectDataset(ds)" class="newlink">{{ds.dirs_from_path.at(-1)}}</a></h5>
                             <span v-for="(author, index) in ds.authors">
                               <small>
                                 <span v-if="author.givenName">{{author.givenName}} {{author.familyName}}</span><span v-else>{{author.name}}</span><span v-if="index != ds.authors.length - 1">, </span>
@@ -300,7 +300,7 @@
                           </b-col>
                           <b-col md="4">
                             <b-card-text>
-                              <span v-for="keyword in ds.keywords"><b-button pill disabled size="sm" class="p-1" variant="outline-dark">{{keyword}}</b-button>&nbsp;</span>
+                              <span v-for="keyword in ds.keywords"><b-button pill size="sm" class="p-1" variant="outline-dark" @click="addSearchTag(keyword)">{{keyword}}</b-button>&nbsp;</span>
                             </b-card-text>
                           </b-col>
                         </b-row>
