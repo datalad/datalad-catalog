@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datalad.org/catalog.file.schema.json",
+  "title": "file",
+  "description": "A file in a DataLad Catalog",
+  "type": "object",
+  "properties": {
+    "type": {
+      "description": "The type of item",
+      "type": "string",
+      "pattern": "file"
+    },
+    "dataset_id": {
+      "description": "The parent dataset ID",
+      "type": "string"
+    },
+    "dataset_version": {
+      "description": "The parent dataset VERSION",
+      "type": "string"
+    },
+    "path": {
+      "description": "The path of the file relative to its parent dataset",
+      "type": "string"
+    },
+    "contentbytesize": {
+      "description": "The size of the file in bytes",
+      "type": "number"
+    },
+    "url": {
+      "description": "The location of the annexed file",
+      "type": ["array", "string"],
+      "items": {
+        "type": "string"
+      }
+    },
+    "extractors_used": {"$ref": "formschema_extractors.json"},
+    "additional_display": {
+      "description": "Additonal items to display on the file level",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the section that will appear as the tab name",
+            "type": "string"
+          },
+          "content": {
+            "description": "The content that will appear when selecting the file, specified as key-value pairs",
+            "type": "object"
+          }
+        },
+        "required": ["name", "content"]
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [ "type", "dataset_id", "dataset_version", "path"]
+}
+
