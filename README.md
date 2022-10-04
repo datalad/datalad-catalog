@@ -1,17 +1,17 @@
 ## --- UNDER DEVELOPMENT ---
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 *This repository is undergoing continuous development and all branches should be considered unstable*
 
 ---
-
-
 [![Documentation Status](https://readthedocs.org/projects/datalad-catalog/badge/?version=latest)](http://docs.datalad.org/projects/catalog/en/latest/?badge=latest)
+[![GitHub release](https://img.shields.io/github/release/datalad/datalad-catalog.svg)](https://GitHub.com/datalad/datalad-catalog/releases/)
+[![PyPI version fury.io](https://badge.fury.io/py/datalad-catalog.svg)](https://pypi.python.org/pypi/datalad-catalog/)
 [![docs](https://github.com/datalad/datalad-catalog/actions/workflows/docbuild.yml/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/docbuild.yml)
 [![crippled-filesystems](https://github.com/datalad/datalad-catalog/actions/workflows/test_crippledfs.yml/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/test_crippledfs.yml)
 [![pages-build-deployment](https://github.com/datalad/datalad-catalog/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/pages/pages-build-deployment)
-[![push_catalog_to_gh_pages](https://github.com/datalad/datalad-catalog/actions/workflows/deploy_demo.yml/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/deploy_demo.yml)
+[![push_catalog_to_gh_pages](https://github.com/datalad/datalad-catalog/actions/workflows/deploy_demo.yml/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/deploy_demo.yml)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/datacat0_hero.svg">
@@ -65,9 +65,16 @@ python -m venv my_catalog_env
 source my_catalog_env/bin/activate
 ```
 
-### Step 2 - Clone the repo and install the package
+### Step 2 - Install the package from PyPI
 
 Run the following from your command line:
+
+```
+pip install datald-catalog
+```
+
+If you are a developer and would like to contribute to the code, instead clone the code base from GitHub and install with `pip` local changes :
+
 ```
 git clone https://github.com/datalad/datalad-catalog.git
 cd datalad-catalog
@@ -78,7 +85,7 @@ Congratulations! You have now installed `datalad-catalog`.
 
 #### Note on dependencies:
 
-Because this is an extension to `datalad` and builds on metadata handling functionality, the installation process also installed [`datalad`](https://github.com/datalad/datalad) and [`datalad-metalad`](https://github.com/datalad/datalad-metalad) as dependencies, although these do not have to be used as the only sources of metadata for a catalog.
+Because this is an extension to `datalad` and builds on metadata handling functionality, the installation process also installs [`datalad`](https://github.com/datalad/datalad) and [`datalad-metalad`](https://github.com/datalad/datalad-metalad) as dependencies, although these do not have to be used as the only sources of metadata for a catalog.
 
 While the catalog generation process does not expect data to be structured as DataLad datasets, it can still be very useful to do so when building a full (meta)data management pipeline from raw data to catalog publishing. For complete instructions on how to install `datalad` and `git-annex`, please refer to the [DataLad Handbook](https://handbook.datalad.org/en/latest/intro/installation.html).
 
@@ -114,6 +121,11 @@ datalad catalog set-super -c <path/to/catalog/directory> -i <dataset_id> -v <dat
 datalad catalog serve -c <path/to/catalog/directory>
 # Serve the content of the catalog at location <path/to/catalog/directory> via a local HTTP server.
 
+datalad catalog workflow-new -c <path/to/catalog/directory> -d <path/to/superdataset>
+# Run a workflow for recursive metadata extraction (using datalad-metalad), translating metadata to the catalog schema (using JQ bindings), and adding the translated metadata to a new catalog.
+
+datalad catalog workflow-update -c <path/to/catalog/directory> -d <path/to/superdataset> -s <path/to/subdataset>
+# Run a workflow for updating a catalog after registering a subdataset to the superdataset which the catalog represents. This workflow includes extraction (using datalad-metalad), translating metadata to the catalog schema (using JQ bindings), and adding the translated metadata to the existing catalog.
 ```
 
 <div id="tutorial"><div>
@@ -171,6 +183,7 @@ To make a contribution to the code or documentation, please:
 - commit your changes,
 - push to your fork
 - create a pull request with a clear description of the changes
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
