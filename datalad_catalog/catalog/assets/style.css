@@ -78,6 +78,7 @@ body {
 }
 .newlink:hover {
   color: var(--link-hover-color);
+  cursor: pointer;
 }
 
 .xxlfont {
