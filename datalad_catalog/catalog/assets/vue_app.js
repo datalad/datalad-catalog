@@ -294,7 +294,7 @@ const datasetView = {
       subdatasets = this.filteredSubdatasets;
       return subdatasets.filter((c) => {
         if (this.search_tags.length == 0) return true;
-        return this.search_tags.every((v) => c.keywords.includes(v));
+        return this.search_tags.every((v) => c.keywords ? c.keywords.includes(v): null);
       });
     },
     sortedSubdatasets() {
@@ -484,7 +484,7 @@ const datasetView = {
         (x) => this.search_tags.indexOf(x) === -1
       );
       this.tag_options_filtered = this.tag_options_available.filter(
-        (str) => str.indexOf(this.tag_text) >= 0
+        (str) => str.toLowerCase().indexOf(this.tag_text.toLowerCase()) >= 0
       );
     },
     inputTagText() {
