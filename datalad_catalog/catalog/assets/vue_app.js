@@ -54,6 +54,20 @@ Vue.component("tree-item", {
         if (tempIsOpen && !this.item.hasOwnProperty("children")) {
           obj = await this.getChildren(this.item);
           this.item.children = obj["children"];
+          // go through all children, set state to enabled
+          // then set disabled state for subdatasets that aren't part of catalog
+          await Promise.all(
+            this.item.children.map(async (child, index) => {
+              child['state'] = 'enabled'
+              if (child.type == "dataset") {
+                file = getFilePath(child.dataset_id, child.dataset_version, "");
+                fileExists = await checkFileExists(file);
+                if (!fileExists) {
+                  child['state'] = 'disabled'
+                }
+              }
+            })
+          );
           this.files_ready = true;
         }
         this.isOpen = !this.isOpen;
@@ -64,6 +78,9 @@ Vue.component("tree-item", {
         objId = obj.dataset_id;
         objVersion = obj.dataset_version;
       }
+      // This check should not be necessary, because unavailable
+      // subdatasets are already disabled, but the check is left here
+      // to cover any other possible reasons for a file being unavailable
       file = getFilePath(objId, objVersion, "");
       fileExists = await checkFileExists(file);
       if (fileExists) {
