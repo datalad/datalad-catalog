@@ -65,10 +65,12 @@ body {
 .subdataset {
   color: var(--link-color);
   text-decoration: underline;
-
 }
 .subdataset:hover {
   color: var(--link-hover-color);
+}
+.subdataset-disabled {
+  color: rgb(172, 172, 172);
 }
 
 .newlink {
