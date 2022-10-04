@@ -533,7 +533,9 @@ const datasetView = {
     },
   },
   async beforeRouteUpdate(to, from, next) {
-    this.tabIndex = 0;
+    if (this.tabIndex != 1) {
+      this.tabIndex = 0;
+    }
     this.subdatasets_ready = false;
     this.dataset_ready = false;
 
