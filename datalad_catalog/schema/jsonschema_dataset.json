@@ -165,6 +165,10 @@
           "content": {
             "description": "The content that will appear in the tab when opened, specified as key-value pairs",
             "type": "object"
+          },
+          "icon": {
+            "description": "An icon from the Font Awesome Free collection (v6.1.1), e.g. 'fas fa-database', that will be displayed in the tab heading",
+            "type": "string"
           }
         },
         "required": ["name", "content"]
