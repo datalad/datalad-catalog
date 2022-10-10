@@ -70,7 +70,7 @@ source my_catalog_env/bin/activate
 Run the following from your command line:
 
 ```
-pip install datald-catalog
+pip install datalad-catalog
 ```
 
 If you are a developer and would like to contribute to the code, instead clone the code base from GitHub and install with `pip` local changes :
