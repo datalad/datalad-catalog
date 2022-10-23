@@ -6,6 +6,7 @@ const metadata_dir = "./metadata";
 const superdatasets_file = metadata_dir + "/super.json";
 const json_file = metadata_dir + "/datasets.json";
 const SPLIT_INDEX = 3;
+const SHORT_NAME_LENGTH = 0; // number of characters in name to display, zero if all
 const default_config = {
   catalog_name: "DataCat",
   link_color: "#fba304",
@@ -202,10 +203,16 @@ const datasetView = {
         } else {
           // Populate short_name
           if (!dataset.hasOwnProperty("short_name") || !dataset["short_name"]) {
-            disp_dataset["short_name"] =
-              dataset["name"].length > 30
-                ? dataset["name"].substring(0, 30) + "..."
-                : dataset["name"];
+
+            if (SHORT_NAME_LENGTH) {
+              disp_dataset["short_name"] =
+                dataset["name"].length > SHORT_NAME_LENGTH
+                  ? dataset["name"].substring(0, SHORT_NAME_LENGTH) + "..."
+                  : dataset["name"];
+            }
+            else {
+              disp_dataset["short_name"] = dataset["name"];
+            }
           } else {
             disp_dataset["short_name"] = dataset["short_name"];
           }
