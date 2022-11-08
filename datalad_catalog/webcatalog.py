@@ -91,7 +91,7 @@ class WebCatalog(object):
 
     def create(self, force=False):
         """
-        Create new catalog directory with assets (JS, CSS), artwork, config and the main html
+        Create new catalog directory with assets (JS, CSS), artwork, config, the main html, and html templates
         """
 
         # TODO: first validate config file (using jsonschema?)
@@ -110,12 +110,14 @@ class WebCatalog(object):
             "artwork": Path(self.package_path) / "catalog" / "artwork",
             "html": Path(self.package_path) / "catalog" / "index.html",
             "readme": Path(self.package_path) / "catalog" / "README.md",
+            "templates": Path(self.package_path) / "catalog" / "templates",
         }
         out_dir_paths = {
             "assets": Path(self.location) / "assets",
             "artwork": Path(self.location) / "artwork",
             "html": Path(self.location) / "index.html",
             "readme": Path(self.location) / "README.md",
+            "templates": Path(self.location) / "templates",
         }
         for key in content_paths:
             copy_overwrite_path(

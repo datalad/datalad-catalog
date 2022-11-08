@@ -1,0 +1,12 @@
+<li>
+    <div :class="{bold: isFolder}" @click="toggle">
+        <span v-if="isFolder && isOpen"> <i class="far fa-folder-open"></i> {{ displayText }}</span>
+        <span v-else-if="isFolder && !isOpen"> <i class="far fa-folder"></i> {{ displayText }}</span>
+        <span v-else-if="isDataset"><span v-if="item.state == 'disabled'" class="subdataset-disabled"> <i class="fas fa-database"></i> {{ displayText }}</span><span v-else> <i class="fas fa-database"></i> <a class="subdataset" @click="selectDataset(item, item.id)">{{ displayText }}</a></span></span>
+        <!-- <span v-else> <i class="far fa-file-alt"></i> {{ displayText }} <span v-show="downloadURL"><a class="xsm-dl-button" :href="downloadURL" :download="displayText"><i class="fa fa-cloud-download" aria-hidden="true"></i></a></span><span class="filesize"><i class="fa fa-eye" aria-hidden="true"></i>{{byteText}}</span> </span> -->
+        <span v-else> <i class="far fa-file-alt"></i> {{ displayText }} <span class="filesize"><span v-show="downloadURL"><a class="xsm-dl-button" :href="downloadURL" :download="displayText"><i class="fas fa-cloud-download" aria-hidden="true"></i></a></span>{{byteText}}</span> </span>
+    </div>
+    <ul v-show="isOpen" v-if="isFolder">
+        <tree-item class="item" v-for="(child, index) in item.children" :key="index" :index="index" :item="child"></tree-item>
+    </ul>
+</li>

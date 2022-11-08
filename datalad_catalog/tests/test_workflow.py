@@ -15,6 +15,7 @@ from datalad.tests.utils_pytest import (
     with_tempfile,
     assert_equal,
     assert_repo_status,
+    skip_if_adjusted_branch,
 )
 from datalad.api import create, Dataset
 
@@ -256,9 +257,10 @@ templateversion: 1.2
 
 catalog_paths = [
     "assets/md5-2.3.0.js",
-    "assets/vue_app.js",
+    "assets/app.js",
     "assets/style.css",
     "artwork",
+    "templates",
     "index.html",
     "config.json",
     "README.md",
@@ -296,6 +298,7 @@ super_ds_tree = {
 }
 
 
+@skip_if_adjusted_branch
 @with_tree(tree=super_ds_tree)
 @with_tempfile(mkdir=True)
 def test_workflow_new(super_path=None, cat_path=None):
