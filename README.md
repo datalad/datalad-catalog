@@ -6,7 +6,7 @@
 [![GitHub release](https://img.shields.io/github/release/datalad/datalad-catalog.svg)](https://GitHub.com/datalad/datalad-catalog/releases/)
 [![PyPI version fury.io](https://badge.fury.io/py/datalad-catalog.svg)](https://pypi.python.org/pypi/datalad-catalog/)
 [![docs](https://github.com/datalad/datalad-catalog/actions/workflows/docbuild.yml/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/docbuild.yml)
-[![crippled-filesystems](https://github.com/datalad/datalad-catalog/actions/workflows/test_crippledfs.yml/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/test_crippledfs.yml)
+[![tests](https://github.com/datalad/datalad-catalog/actions/workflows/test.yml/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/test.yml)
 [![pages-build-deployment](https://github.com/datalad/datalad-catalog/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/pages/pages-build-deployment)
 [![push_catalog_to_gh_pages](https://github.com/datalad/datalad-catalog/actions/workflows/deploy_demo.yml/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/deploy_demo.yml)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
