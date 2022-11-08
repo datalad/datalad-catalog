@@ -8,14 +8,6 @@ from datalad_catalog import utils
 from datalad_catalog.catalog import Catalog
 from datalad_catalog.webcatalog import WebCatalog
 
-catalog_paths = [
-    "assets/md5-2.3.0.js",
-    "assets/vue_app.js",
-    "assets/style.css",
-    "artwork",
-    "index.html",
-]
-
 
 @pytest.fixture
 def demo_catalog(tmp_path):

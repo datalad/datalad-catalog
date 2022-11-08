@@ -256,9 +256,10 @@ templateversion: 1.2
 
 catalog_paths = [
     "assets/md5-2.3.0.js",
-    "assets/vue_app.js",
+    "assets/app.js",
     "assets/style.css",
     "artwork",
+    "templates",
     "index.html",
     "config.json",
     "README.md",
