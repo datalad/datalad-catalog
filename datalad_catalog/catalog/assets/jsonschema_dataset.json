@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datalad.org/catalog.dataset.schema.json",
+  "title": "dataset",
+  "description": "A dataset in a DataLad Catalog",
+  "type": "object",
+  "properties": {
+    "type": {
+      "description": "The type of node",
+      "type": "string",
+      "pattern": "dataset"
+    },
+    "dataset_id": {
+      "description": "The dataset ID",
+      "type": "string"
+    },
+    "dataset_version": {
+      "description": "The dataset VERSION",
+      "type": "string"
+    },
+    "name":  {
+      "description": "The long name of the dataset",
+      "type": "string"
+    },
+    "short_name":  {
+      "description": "The short name of the dataset",
+      "type": "string"
+    },
+    "description": {
+      "description": "A 1-2 paragraph description of the dataset",
+      "type": ["array", "string"]
+    },
+    "doi": {
+      "description": "The dataset's digital object identifier",
+      "type": "string"
+    },
+    "url": {
+      "description": "The location of the datalad dataset's annex",
+      "type": ["array", "string"],
+      "items": {
+        "type": "string"
+      }
+    },
+    "license": {
+      "description": "The license under which the dataset is made available",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The license name",
+          "type": "string"
+        },
+        "url": {
+          "description": "A URL where a description of the license can be viewed",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "name": {
+          "required": ["name"]
+        },
+        "url": {
+          "required": ["name"]
+        }
+      }
+    },
+    "authors": { "$ref": "https://datalad.org/catalog.authors.schema.json"},
+    "keywords": {
+      "description": "Tags or keywords describing the dataset",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "funding": {
+      "description": "Sources of funding for the dataset",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the funding source, such as a funder or grant scheme",
+            "type": "string"
+          },
+          "identifier": {
+            "description": "Identifier of the fund, such as a grant number",
+            "type": "string"
+          },
+          "description": {
+            "description": "Free form description of grant or funding",
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "uniqueItems": true
+    },
+    "publications": {
+      "description": "Publications related to the dataset",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "Type of publication, such as a scholarly article, book, blog post",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title of the publication",
+            "type": "string"
+          },
+          "doi": {
+            "description": "The publication's digital object identifier",
+            "type": "string"
+          },
+          "datePublished": {
+            "description": "The publication date year",
+            "type": ["number", "string"]
+          },
+          "publicationOutlet": {
+            "description": "The publication outlet / venue, such as the journal, publisher name, or news outlet",
+            "type": "string"
+          },
+          "authors": { "$ref": "https://datalad.org/catalog.authors.schema.json"}
+        },
+        "required": ["title", "doi", "authors"]
+      },
+      "uniqueItems": true
+    },
+    "subdatasets": {
+      "description": "Subdatasets of the current dataset",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "dataset_id": {
+            "description": "The subdataset ID",
+            "type": "string"
+          },
+          "dataset_version": {
+            "description": "The subdataset VERSION",
+            "type": "string"
+          },
+          "dataset_path": {
+            "description": "The subdataset PATH relative to its parent",
+            "type": "string"
+          }
+        },
+        "required": ["dataset_id", "dataset_version", "dataset_path"]
+      },
+      "uniqueItems": true
+    },
+    "extractors_used": {"$ref": "https://datalad.org/catalog.extractors.schema.json"},
+    "additional_display": {
+      "description": "Additonal items to display in tabs on dataset page",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the section that will appear as the tab name",
+            "type": "string"
+          },
+          "content": {
+            "description": "The content that will appear in the tab when opened, specified as key-value pairs",
+            "type": "object"
+          },
+          "icon": {
+            "description": "An icon from the Font Awesome Free collection (v6.1.1), e.g. 'fas fa-database', that will be displayed in the tab heading",
+            "type": "string"
+          }
+        },
+        "required": ["name", "content"]
+      },
+      "uniqueItems": true
+    },
+    "top_display": {
+      "description": "Additonal items to display at the top of the dataset page (along with keywords, description, etc)",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the item that will appear as part of the top display",
+            "type": "string"
+          },
+          "value": {
+            "description": "Value of the item that will appear as part of the top display",
+            "type": ["number", "string"]
+          }
+        },
+        "required": ["name", "value"]
+      },
+      "uniqueItems": true,
+      "maxItems": 5
+    }
+  },
+  "required": [ "type", "dataset_id", "dataset_version", "name"]
+}
+
