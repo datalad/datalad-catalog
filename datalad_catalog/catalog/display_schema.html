@@ -64,7 +64,7 @@
                       <span v-if="(Array.isArray(item.type) ? item.type : [item.type]).indexOf('array') >= 0">
                         <b-row>
                           <b-col cols="3"><strong>Array Item Type:</strong></b-col>
-                          <b-col>{{item[kw]}}</b-col>
+                          <b-col>{{item.items.type}}</b-col>
                         </b-row>
                       </span>
                     </b-container>
