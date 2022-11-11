@@ -2,7 +2,20 @@
 // Components //
 /**************/
 
-const schema_file = "./assets/jsonschema_dataset.json";
+const dataset_schema_file = "./assets/jsonschema_dataset.json";
+const authors_schema_file = "./assets/jsonschema_authors.json";
+const file_schema_file = "./assets/jsonschema_file.json";
+const extractors_schema_file = "./assets/jsonschema_extractors.json";
+const catalog_schema_file = "./assets/jsonschema_catalog.json";
+
+
+schema_files = {
+  "jsonschema_catalog": catalog_schema_file,
+  "jsonschema_dataset": dataset_schema_file,
+  "jsonschema_file": file_schema_file,
+  "jsonschema_authors": authors_schema_file,
+  "jsonschema_extractors": extractors_schema_file,
+}
 
 schema_keywords = ["$schema", "$id"]
 instance_keywords = ["type"]
@@ -12,9 +25,12 @@ validation_keywords = ["properties", "additionalProperties", "required", "items"
 
 validation_keywords = {
   any: {
-    type: ["string", "array"],
+    // type
     enum: "array",
     const: "any",
+    anyOf: "array",
+    allOf: "array",
+    oneOf: "array",
   },
   number: {
     multipleOf: "number",
@@ -38,7 +54,7 @@ validation_keywords = {
   },
   array: {
     minItems: "integer",
-    minItems: "integer",
+    maxItems: "integer",
     uniqueItems: "boolean",
     maxContains: "integer",
     minContains: "integer",
@@ -49,7 +65,6 @@ validation_keywords = {
     dependentRequired: "object",
   },
 }
-
 
 // top_level_fields = {
 //   "$schema": "string",
@@ -179,6 +194,8 @@ Vue.component("schema-item", {
     'item',
     'defaults',
     'requireditems',
+    'isschema',
+    'schemas_json'
   ],
   data: function () {
     return {
@@ -191,18 +208,27 @@ Vue.component("schema-item", {
       var i = 0, type_arr, key_arr;
       if ('type' in this.item) {
         type_arr = Array.isArray(this.item.type) ? this.item.type : [this.item.type]
-        console.log(type_arr)
         for (var tp=0; tp<type_arr.length; tp++) {
           key_arr = Object.keys(this.defaults.validation_keywords[type_arr[tp]])
           for (var kw=0; kw<key_arr.length; kw++) {
-            console.log(key_arr[kw])
             if (key_arr[kw] in this.item) {
               i+=1;
             }
           }
         }
+        any_arr = Object.keys(this.defaults.validation_keywords.any)
+        for (var kw=0; kw<any_arr.length; kw++) {
+          if (any_arr[kw] in this.item) {
+            i+=1;
+          }
+        }
       }
       return (i > 0 ? true : false)
+    }
+  },
+  methods: {
+    selectRefSchema(ref_id) {
+
     }
   }
 })
@@ -224,7 +250,6 @@ Vue.component("t-input", {
   ],
   methods: {
     removeItemModal(idx) {
-      console.log(idx)
       this.$bvModal.msgBoxConfirm('This will delete the row from your metadata, are you sure you want to continue?.', {
         title: 'Please Confirm',
         size: 'sm',
@@ -295,8 +320,10 @@ Vue.component("t-input", {
 var form_app = new Vue({
   el: "#vue_app",
   data: {
-    schema_files: [schema_file],
+    schema_files: schema_files,
+    schemas_json: {},
     schema: {},
+    schemas_ready: false,
     defaults: defaults,
     searchText: "",
     headingText: "kaas",
@@ -412,29 +439,76 @@ var form_app = new Vue({
       //   this.show = true
       // })
     },
-    loadSchemas() {
-      
-    }
+    selectSchema(s) {
+      this.schema = this.schemas_json[s];
+      console.log(this.schema)
+    },
+    selectRefSchema(ref_id) {
+      filtered_schemas = Object.values(this.schemas_json).filter(
+        (obj) => {
+          if ('$id' in obj) {
+            return obj['$id'].toLowerCase().indexOf(ref_id.toLowerCase()) >= 0
+          }
+        }
+      );
+      if (Array.isArray(filtered_schemas)) {
+        this.schema = filtered_schemas[0]
+      }
+    },
+    gotoHome() {
+      router.push({ name: "home" });
+    },
+    gotoAbout() {
+      router.push({ name: "about" });
+    },
+    gotoExternal(dest) {
+      const destinations = {
+        github:
+          "https://github.com/datalad/datalad-catalog",
+        docs: "https://docs.datalad.org/projects/catalog/en/latest/",
+        twitter: "https://twitter.com/datalad",
+      };
+      if (dest in destinations) {
+        window.open(destinations[dest]);
+      } else {
+        window.open(dest);
+      }
+    },
+
   },
   beforeCreate() {
-    fetch(schema_file)
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          console.log(
-            "WARNING: schema file could not be loaded"
-          );
-        }
+    schemas_json = {}
+    schema = {}
+    this.schemas_ready = false;
+    Promise.all(
+      Object.keys(schema_files).map((key, index) => {
+        url = schema_files[key]
+        fetch(url)
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            console.log(
+              "WARNING: schema file could not be loaded:" + schema_files[key]
+            );
+          }
+        })
+        .then((responseJson) => {
+          obj = responseJson;
+          this.schemas_json[key] = obj;
+          if (index == 0) {
+            this.schema = obj
+          }
+        })
+        .catch((error) => {
+          console.log("Schema file error:");
+          console.log(error);
+        });
       })
-      .then((responseJson) => {
-        obj = responseJson;
-        console.log(obj)
-        this.schema = obj;
-      })
-      .catch((error) => {
-        console.log("Schema file error:");
-        console.log(error);
-      });
+    ).then(() => {
+        this.schemas_ready = true
+        console.log(this.schemas_json)
+      }
+    )
   },
 });

@@ -217,4 +217,13 @@ li[class="item"]:last-child {
   padding: 1px;
   padding-left: 2px;
   padding-right: 2px;
+  display: inline-block;
+}
+
+.reflink {
+  color: var(--refcolor);
+}
+.reflink:hover {
+  color: #75787b;
+  cursor: pointer;
 }

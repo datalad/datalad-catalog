@@ -24,15 +24,20 @@
           <b-card-body class="pb-0">
             <!-- ITEM TITLE -->
             <b-card-title>
-              <small>
-                <span class="item-line"></span>
-                <span v-if="'title' in item">
-                  <u>{{item.title}}</u>
-                </span>
-                <span v-else>
-                  <u>{{name}}</u>
-                </span>
-              </small>
+              <span v-if="isschema">
+                <u>Schema: {{item.title}}</u>
+              </span>
+              <span v-else>
+                <small>
+                  <span class="item-line"></span>
+                  <span v-if="'title' in item">
+                    <u>{{item.title}}</u>
+                  </span>
+                  <span v-else>
+                    <u>{{name}}</u>
+                  </span>
+                </small>
+              </span>
               <small>
                 <span v-if="'type' in item">
                   <span v-if="Array.isArray(item.type)">
@@ -43,14 +48,16 @@
                   <span v-else :style="'background-color:'+type_colors[item.type]+';'" class="type-indicator mfont" :id="name+'-'+item.type" v-b-tooltip.hover.righttop="'type: '+item.type">{{type_icons[item.type]}}</span>
                 </span>
                 <span v-if="'$ref' in item" :style="'background-color:'+type_colors['$ref']+';'" class="type-indicator mfont" :id="name+'-ref'" v-b-tooltip.hover.righttop="'type: $ref'">{{type_icons['$ref']}}</span>
-                <span v-if="requireditems && requireditems.indexOf(name) >= 0" class="type-indicator-required mfont">
-                  required</span>
-                <span v-else class="type-indicator-optional mfont">
-                  [optional]</span>
+                <span v-if="!isschema">
+                  <span v-if="requireditems && requireditems.indexOf(name) >= 0" class="type-indicator-required mfont">
+                    required</span>
+                  <span v-else class="type-indicator-optional mfont">
+                    [optional]</span>
+                </span>
               </small>
             </b-card-title>
-            <!-- ITEM ANNOTATIONS -->
-            <b-card-text class="mb-1 sfont">
+            <!-- ITEM ANNOTATIONS AND VALIDATIONS -->
+            <b-card-text :class="isschema ? 'mb-1' : 'mb-1 sfont'">
               <b-container style="padding-left: 0;">
                 <b-row>
                   <b-col cols="6">
@@ -58,7 +65,14 @@
                       <span v-for="kw in defaults.schema_keywords.concat(defaults.instance_keywords).concat(defaults.schema_annotations).concat(defaults.additional_keywords)">
                         <b-row  v-if="kw in item">
                           <b-col cols="3"><strong>{{kw}}:</strong></b-col>
-                          <b-col>{{item[kw]}}</b-col>
+                          <b-col>
+                            <span v-if="kw == '$ref'">
+                              <a class="reflink" :style="'--refcolor:' + type_colors['$ref']+';'" @click="$emit('refselected', item[kw])">{{item[kw]}}</a>
+                            </span>
+                            <span v-else>
+                              {{item[kw]}}
+                            </span>
+                          </b-col>
                         </b-row>
                       </span>
                       <span v-if="(Array.isArray(item.type) ? item.type : [item.type]).indexOf('array') >= 0">
@@ -71,11 +85,14 @@
                   </b-col>
                   <b-col>
                     <span v-if="'type' in item && hasvalidations">
-                      <em>Validations:</em>
+                      <em>Validations:</em><br>
                       <span v-for="tp in (Array.isArray(item.type) ? item.type : [item.type])">
                         <span v-for="(kw, index) in Object.keys(defaults.validation_keywords[tp])">
-                          <span v-if="kw in item" class="validation-text">{{kw}}: {{item[kw]}}</span>
+                          <span v-if="kw in item"><pre class="validation-text">{{kw}}: {{item[kw]}}</pre></span>
                         </span>
+                      </span>
+                      <span v-for="(kw, index) in Object.keys(defaults.validation_keywords.any)">
+                        <span v-if="kw in item && kw != 'type'"><pre class="validation-text">{{kw}}: {{item[kw]}}</pre></span>
                       </span>
                     </span>
                   </b-col>
@@ -84,11 +101,11 @@
             </b-card-text>
             <!-- OBJECT ITEM: PROPERTIES -->
             <b-card-text>
-              <span v-if="(Array.isArray(item.type) ? item.type : [item.type]).indexOf('object') >= 0">
+              <span v-if="(Array.isArray(item.type) ? item.type : [item.type]).indexOf('object') >= 0 && 'properties' in item">
                 <b-button size="sm" class="pt-0 pb-0" variant="outline-secondary" v-b-toggle="name+'-props'">Properties</b-button>
                 <b-collapse :id="name+'-props'">
                   <b-card no-body border-variant="default">
-                    <schema-item v-for="key in Object.keys(item.properties)" :name="key" :item="item.properties[key]" :defaults="defaults" :requireditems="item.required"></schema-item>
+                    <schema-item v-for="key in Object.keys(item.properties)" :name="key" :item="item.properties[key]" :defaults="defaults" :requireditems="item.required" :isschema="false" v-on="$listeners"></schema-item>
                   </b-card>
                 </b-collapse>
               </span>
@@ -98,7 +115,7 @@
                   <b-button size="sm" class="pt-0 pb-0" variant="outline-secondary" v-b-toggle="name+'items-props'">Array Item Properties</b-button>
                   <b-collapse :id="name+'items-props'">
                     <b-card no-body border-variant="default">
-                      <schema-item v-for="key in Object.keys(item.items.properties)" :name="key" :item="item.items.properties[key]" :defaults="defaults" :requireditems="item.items.required"></schema-item>
+                      <schema-item v-for="key in Object.keys(item.items.properties)" :name="key" :item="item.items.properties[key]" :defaults="defaults" :requireditems="item.items.required" :isschema="false" v-on="$listeners"></schema-item>
                     </b-card>
                   </b-collapse>
                 </span>
@@ -115,8 +132,58 @@
   <!-- Our application root element -->
   <body>
     <b-container id="vue_app">
-      <b-card no-body border-variant="dark">
+      <b-container style="margin-top:20px;">
+        <b-row align-v="end">
+          <b-col cols="9">
+            <span><a @click="gotoHome"><img :src="'artwork/catalog_logo.svg'" class="d-inline-block" alt="datalad" style="width:100%;"></a></span>
+          </b-col>
+          <b-col cols="1"></b-col>
+          <b-col cols="2" align-h="end">
+            <b-navbar toggleable="lg" type="light" variant="outline-dark">
+          
+              <b-navbar-toggle target="navbar-toggle-collapse">
+              </b-navbar-toggle>
+              <b-collapse id="navbar-toggle-collapse" is-nav>
+                <b-navbar-nav class="ml-auto mb-0 xlfont">
+                  <b-nav-item v-b-tooltip.hover title="About" @click="gotoAbout"><i class="fas fa-info-circle"></i></b-nav-item>
+                  <b-nav-item v-b-tooltip.hover title="Read documentation" @click="gotoExternal('docs')"><i class="fas fa-file-alt"></i></b-nav-item>
+                  <b-nav-item v-b-tooltip.hover title="View code base" @click="gotoExternal('github')"><i class="fab fa-github"></i></b-nav-item>
+                  <b-nav-item v-b-tooltip.hover title="Follow DataLad!" @click="gotoExternal('twitter')"><i class="fab fa-twitter"></i></b-nav-item>
+                </b-navbar-nav>
+              </b-collapse>
+            </b-navbar>
+          </b-col>
+        </b-row>
+      </b-container>
+      <br>
+      <b-card no-body border-variant="dark" v-show="schemas_ready">
         <b-card-body>
+          <b-card-title>
+            <u>Available schemas</u>
+          </b-card-title>
+          <b-card-text>
+            <b-container>
+              <b-row>
+                <b-col>
+                  <small>
+                    <b-list-group>
+                      <b-list-group-item button v-for="s in Object.keys(schema_files)" @click="selectSchema(s)">{{s}}</b-list-group-item>
+                    </b-list-group>
+                  </small>
+                </b-col>
+                <b-col>
+                </b-col>
+              </b-row>
+            </b-container>
+          </b-card-text>
+        </b-card-body>
+      </b-card>
+      
+      <br>
+
+      <b-card no-body border-variant="dark" v-show="schemas_ready">
+        <schema-item :name="schema.title" :item="schema" :defaults="defaults" :requireditems="schema.required" :isschema="true" @refselected="selectRefSchema"></schema-item>
+        <!-- <b-card-body>
           <b-card-title>
             <u>Schema: {{schema.title}}</u>
           </b-card-title>
@@ -143,12 +210,13 @@
               <b-button size="sm" class="pt-0 pb-0" variant="outline-secondary" v-b-toggle="'schema-props'">Properties</b-button>
               <b-collapse id="schema-props">
                 <b-card no-body border-variant="default">
-                  <schema-item v-for="key in Object.keys(schema.properties)" :name="key" :item="schema.properties[key]" :defaults="defaults" :requireditems="schema.required"></schema-item>
+                  <schema-item v-for="key in Object.keys(schema.properties)" :name="key" :item="schema.properties[key]" :defaults="defaults" :requireditems="schema.required" :isschema="true"></schema-item>
                 </b-card>
               </b-collapse>
             </span>
           </b-card-text>
-        </b-card-body>
+        </b-card-body> -->
+        <br>
       </b-card>
     </b-container>
     <br><br><br><br>
