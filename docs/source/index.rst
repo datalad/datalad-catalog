@@ -42,6 +42,7 @@ Index
    usage
    pipeline_description
    metadata_formats
+   catalog_schema
    examples
    design
    contributing

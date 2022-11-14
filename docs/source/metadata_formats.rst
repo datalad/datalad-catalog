@@ -31,8 +31,8 @@ standard files (such as `Digital Imaging and Communications in Medicine`_, i.e. 
 also supply embedded or sidecar metadata.
 
 .. note:: In order to create a user-friendly catalog, DataLad Catalog should receive 
-    structured metadata as input. This means that structured metadata first has to be
-    extracted from your DataLad dataset.
+    structured metadata adhering to a specified :doc:`catalog_schema` as input. This means
+    that structured metadata first has to be extracted from your DataLad dataset.
 
 
 Metadata Extractors
@@ -70,6 +70,3 @@ first having to add specific metadata content to the dataset) MetaLad has the bu
 .. _Extensible Metadata Platform: https://en.wikipedia.org/wiki/Extensible_Metadata_Platform
 .. _Frictionless Data Package: https://specs.frictionlessdata.io/data-package/
 .. _Digital Imaging and Communications in Medicine: https://www.dicomstandard.org/
-
-
-
