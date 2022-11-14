@@ -45,7 +45,8 @@ Add metadata
 To add metadata to an existing catalog, run ``datalad catalog add``, specifying
 the location of the metadata to add. The DataLad Catalog accepts metadata in the
 form of json lines, i.e. a text file (typically ``.json``, ``.jsonl``, or
-``.txt``) where each line is a single, correctly formatted JSON object.
+``.txt``) where each line is a single, correctly formatted JSON object. The correct
+format for the added metadata is specified by the :doc:`catalog_schema`.
 
 .. code-block:: bash
 
@@ -57,7 +58,7 @@ The ``metadata`` directory is now populated.
 Metadata validation
 -------------------
 To check if metadata is valid before adding it to a catalog, ``datalad catalog
-validate`` can be run to check if the metadata conforms to the Catalog schema.
+validate`` can be run to check if the metadata conforms to the :doc:`catalog_schema`.
 
 .. code-block:: bash
 

@@ -28,16 +28,28 @@ With `miniconda`_:
     conda activate my_catalog_env
 
 
-Step 2 - Clone the repo and install the package
-===============================================
+Step 2 - Install via `PyPI`_
+============================
+
+.. code-block:: bash
+
+    pip install datalad-catalog
+
+
+Congratulations! You have now installed DataLad Catalog!
+
+
+Optional - Clone the repo and install the package
+=================================================
+
+If you want to access the latest, unreleased version of the software or 
+contribute to the code, access the repository via `GitHub`_:
 
 .. code-block:: bash
 
     git clone https://github.com/datalad/datalad-catalog.git
     cd datalad-catalog
     pip install -e .
-
-Congratulations! You have now installed DataLad Catalog!
 
 
 Dependencies
@@ -60,8 +72,10 @@ metadata originating only from ``datalad-metalad``'s extractors, this tool has
 advanced metadata handling capabilities that will integrate seamlessly with
 DataLad datasets and the catalog generation process.
 
-.. _venv: https://github.com/pypa/virtualenv
-.. _miniconda: https://docs.conda.io/en/latest/miniconda.html
 .. _datalad: https://github.com/datalad/datalad
+.. _GitHub: https://github.com/datalad/datalad-catalog
 .. _datalad-metalad: https://github.com/datalad/datalad-metalad
 .. _DataLad Handbook: https://handbook.datalad.org/en/latest/intro/installation.html
+.. _miniconda: https://docs.conda.io/en/latest/miniconda.html
+.. _PyPI: https://pypi.org/project/datalad-catalog/
+.. _venv: https://github.com/pypa/virtualenv

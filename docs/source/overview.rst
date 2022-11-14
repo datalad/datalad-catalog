@@ -16,7 +16,8 @@ data catalog.
 
 |
 
-It is an extension to, and dependent on, `Datalad`_ and `Datalad Metalad`_:
+It is an extension to, and dependent on, `Datalad`_, and is interoperable with 
+`Datalad Metalad`_:
 
 - **DataLad** is a distributed data management system that keeps track of
   your data, creates structure, ensures reproducibility, supports collaboration,
@@ -84,12 +85,12 @@ DataLad Catalog can receive commands to ``create`` a new catalog, ``add`` and
 ``remove`` metadata entries to/from an existing catalog, ``serve`` an existing
 catalog locally, and more. Metadata can be provided to DataLad Catalog from any
 number of arbitrary metadata sources, as an aggregated set or as individual
-items/objects. DataLad Catalog has a dedicated schema (using the `JSON Schema`_
-vocabulary) against which incoming metadata items are validated. This schema
-allows for standard metadata fields as one would expect for datasets of any kind
-(such as ``name``, ``doi``, ``url``, ``description``, ``license``, ``authors``,
-and more), as well as fields that support identification, versioning, dataset
-context and linkage, and file tree specification.
+items/objects. DataLad Catalog has a dedicated :doc:`catalog_schema` (using the
+`JSON Schema`_ vocabulary) against which incoming metadata items are validated.
+This schema allows for standard metadata fields as one would expect for datasets
+of any kind (such as ``name``, ``doi``, ``url``, ``description``, ``license``,
+``authors``, and more), as well as fields that support identification, versioning,
+dataset context and linkage, and file tree specification.
 
 The process of generating a catalog, after metadata entry validation, involves:
 
@@ -111,7 +112,10 @@ For an example of the result, visit our `demo catalog`_.
 
 .. _DataLad: https://github.com/datalad/datalad
 .. _DataLad Metalad: https://github.com/datalad/datalad-metalad
+.. _demo catalog: https://datalad.github.io/datalad-catalog/
 .. _JSON Schema: https://json-schema.org/
 .. _Vue.js: https://vuejs.org/
-.. _demo catalog: https://datalad.github.io/datalad-catalog/
+
+
+
 
