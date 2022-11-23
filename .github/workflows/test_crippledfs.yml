@@ -1,4 +1,4 @@
-name: Tests
+name: crippled-filesystems
 
 on:
   pull_request:
@@ -12,10 +12,6 @@ jobs:
   test:
 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        flavor: ["normal", "crippled-tmp"]
-      fail-fast: false
 
     steps:
     - name: Set up system
@@ -27,15 +23,12 @@ jobs:
         sudo apt-get update -qq
         sudo apt-get install eatmydata
         sudo eatmydata apt-get install git-annex-standalone dosfstools
-        mkdir /tmp/TMP
-        if echo "${{ matrix.flavor }}" | grep -q "crippled" ; then
-            # 500 MB VFAT FS in a box
-            sudo dd if=/dev/zero of=/crippledfs.img count=500 bs=1M
-            sudo mkfs.vfat /crippledfs.img
-            # mount
-            sudo mkdir /crippledfs
-            sudo mount -o "uid=$(id -u),gid=$(id -g)" /crippledfs.img /tmp/TMP
-        fi
+        # 500 MB VFAT FS in a box
+        sudo dd if=/dev/zero of=/crippledfs.img count=500 bs=1M
+        sudo mkfs.vfat /crippledfs.img
+        # mount
+        sudo mkdir /crippledfs
+        sudo mount -o "uid=$(id -u),gid=$(id -g)" /crippledfs.img /crippledfs
     - name: Set up environment
       run: |
         git config --global user.email "test@github.land"
@@ -56,7 +49,7 @@ jobs:
     - name: Run tests
       env:
         # forces all test repos/paths into the VFAT FS
-        TMPDIR: /tmp/TMP
+        TMPDIR: /crippledfs
       run: |
         mkdir -p __testhome__
         cd __testhome__
