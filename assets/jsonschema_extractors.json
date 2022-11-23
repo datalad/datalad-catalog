@@ -9,26 +9,32 @@
     "properties": {
       "extractor_name": {
         "description": "The extractor name",
+        "title": "Extractor name",
         "type": "string"
       },
       "extractor_version": {
         "description": "The extractor version",
+        "title": "Extractor version",
         "type": "string"
       },
       "extraction_parameter": {
         "description": "Parameters used together with the extractor",
+        "title": "Extraction parameter",
         "type": "object"
       },
       "extraction_time": {
         "description": "The time (since epoch) when this extractor was used to extract the applicable metadata",
+        "title": "Extraction time",
         "type": "number"
       },
       "agent_name": {
         "description": "git identity name of person/process that extracted the metadata",
+        "title": "Agent name",
         "type": "string"
       },
       "agent_email": {
         "description": "git identity email of person/process that extracted the metadata",
+        "title": "Agent email",
         "type": "string"
       }
 
