@@ -67,6 +67,7 @@ environment:
       INSTALL_SYSPKGS: python3-virtualenv
       # system git-annex is way too old, use better one
       INSTALL_GITANNEX: git-annex -m deb-url --url http://snapshot.debian.org/archive/debian/20210906T204127Z/pool/main/g/git-annex/git-annex_8.20210903-1_amd64.deb
+      CODECOV_BINARY: https://uploader.codecov.io/latest/linux/codecov
     # Windows core tests
     - ID: WinP39core
       # ~35 min
@@ -82,10 +83,18 @@ environment:
       PY: 3.8
       INSTALL_GITANNEX: git-annex
       DATALAD_LOCATIONS_SOCKETS: /Users/appveyor/DLTMP/sockets
+      CODECOV_BINARY: https://uploader.codecov.io/latest/macos/codecov
 
 matrix:
   allow_failures:
     - KNOWN2FAIL: 1
+
+
+# do not run the CI if only documentation changes were made
+# documentation builds are tested elsewhere and cheaper
+skip_commits:
+  files:
+    - docs/
 
 
 # it is OK to specify paths that may not exist for a particular test run
@@ -158,6 +167,11 @@ install:
   # deploy git-annex, if desired
   - cmd: IF DEFINED INSTALL_GITANNEX datalad-installer --sudo ok %INSTALL_GITANNEX%
   - sh: "[ -n \"${INSTALL_GITANNEX}\" ] && datalad-installer --sudo ok ${INSTALL_GITANNEX}"
+# in case of a snapshot installation, use the following approach to adjust
+  # the PATH as necessary
+  #- sh: "[ -n \"${INSTALL_GITANNEX}\" ] && datalad-installer -E ${HOME}/dlinstaller_env.sh --sudo ok ${INSTALL_GITANNEX}"
+  # add location of datalad installer results to PATH
+  #- sh: "[ -f ${HOME}/dlinstaller_env.sh ] && . ${HOME}/dlinstaller_env.sh || true"
 
 
 #before_build:
@@ -183,21 +197,17 @@ test_script:
   - cmd: md __testhome__
   - sh: mkdir __testhome__
   - cd __testhome__
-    # run test selecion (--traverse-namespace needed from Python 3.8 onwards)
   - cmd: python -m pytest -s -v -m "not (turtle)" --doctest-modules --cov=datalad_catalog --pyargs %DTS%
   - sh:  python -m pytest -s -v -m "not (turtle)" --doctest-modules --cov=datalad_catalog --pyargs ${DTS}
 
 
 after_test:
-  # move coverage into the project dir to make default handling applicable
-  - cmd: move .coverage ..
-  - sh: mv .coverage ..
-  - cd ..
-  # use windows codecov uploader package
-  - cmd: choco install codecov
-  - cmd: python -m coverage xml
-  - cmd: codecov -f coverage.xml
-  - sh: bash <(curl -sfS https://codecov.io/bash)
+  - python -m coverage xml
+  - cmd: curl -fsSL -o codecov.exe "https://uploader.codecov.io/latest/windows/codecov.exe"
+  - cmd: .\codecov.exe -f "coverage.xml"
+  - sh: "curl -Os $CODECOV_BINARY"
+  - sh: chmod +x codecov
+  - sh: ./codecov
 
 
 #on_success:
