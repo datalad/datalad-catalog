@@ -126,6 +126,7 @@ const datasetView = () =>
               // URL
               disp_dataset.is_github = false; // Github / gitlab / url / binder
               disp_dataset.is_gitlab = false; // Github / gitlab / url / binder
+              disp_dataset.is_gin = false; // GIN
               disp_dataset.url = "";
               if (
                 dataset.hasOwnProperty("url") &&
@@ -136,6 +137,12 @@ const datasetView = () =>
                   if (dataset.url[i].toLowerCase().indexOf("github") >= 0) {
                     disp_dataset.is_github = true;
                     disp_dataset.url = dataset.url[i];
+                    disp_dataset.url = disp_dataset.url.replace('git@github.com:', 'https://github.com');
+                  }
+                  if (dataset.url[i].toLowerCase().indexOf("gin.g-node") >= 0) {
+                    disp_dataset.is_gin = true;
+                    disp_dataset.url = dataset.url[i];
+                    disp_dataset.url = disp_dataset.url.replace('git@gin.g-node.org:', 'https://gin.g-node.org');
                   }
                 }
                 if (!disp_dataset.url) {
