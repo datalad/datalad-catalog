@@ -19,8 +19,12 @@
     <script src="assets/bootstrap-vue.2.21.2.min.js"></script>
 
     <!-- Vue component templates -->
+
+    <!-- ================================= -->
+    <!-- SCHEMA ITEM: FOR SCHEMA RENDERING -->
+    <!-- ================================= -->
     <script type="text/x-template" id="schema-item">
-        <b-card no-body class="border-0">
+        <b-card no-body class="border-0" v-show="item">
           <b-card-body class="pb-0">
             <!-- ITEM TITLE -->
             <b-card-title>
@@ -42,12 +46,12 @@
                 <span v-if="'type' in item">
                   <span v-if="Array.isArray(item.type)">
                     <span v-for="tp in item.type">
-                      <span :style="'background-color:'+type_colors[tp]+';'" class="type-indicator mfont" :id="name+'-'+tp" v-b-tooltip.hover.righttop="'type: '+tp">{{type_icons[tp]}}</span>&nbsp;
+                      <span :style="'background-color:'+type_colors[tp]+';'" class="type-indicator mfont" :id="parent_name+'-'+name+'-'+tp" v-b-tooltip.hover.righttop="'type: '+tp">{{type_icons[tp]}}</span>&nbsp;
                     </span>
                   </span>
-                  <span v-else :style="'background-color:'+type_colors[item.type]+';'" class="type-indicator mfont" :id="name+'-'+item.type" v-b-tooltip.hover.righttop="'type: '+item.type">{{type_icons[item.type]}}</span>
+                  <span v-else :style="'background-color:'+type_colors[item.type]+';'" class="type-indicator mfont" :id="parent_name+'-'+name+'-'+item.type" v-b-tooltip.hover.righttop="'type: '+item.type">{{type_icons[item.type]}}</span>
                 </span>
-                <span v-if="'$ref' in item" :style="'background-color:'+type_colors['$ref']+';'" class="type-indicator mfont" :id="name+'-ref'" v-b-tooltip.hover.righttop="'type: $ref'">{{type_icons['$ref']}}</span>
+                <span v-if="'$ref' in item" :style="'background-color:'+type_colors['$ref']+';'" class="type-indicator mfont" :id="parent_name+'-'+name+'-ref'" v-b-tooltip.hover.righttop="'type: $ref'">{{type_icons['$ref']}}</span>
                 <span v-if="!isschema">
                   <span v-if="requireditems && requireditems.indexOf(name) >= 0" class="type-indicator-required mfont">
                     required</span>
@@ -55,6 +59,8 @@
                     [optional]</span>
                 </span>
               </small>
+              <b-button v-if="isschema" size ="sm" class="pt-0 pb-0 mb-0" variant="outline-dark" @click="$emit('showmetaform')"><i class="fas fa-pen-to-square"></i> Enter metadata</b-button>
+              <span v-if="isschema">&nbsp;<b-button size ="sm" class="pt-0 pb-0 mb-0" variant="outline-dark" @click="$emit('resolveschema')"><i class="fas fa-download"></i> Resolve schema</b-button></span>
             </b-card-title>
             <!-- ITEM ANNOTATIONS AND VALIDATIONS -->
             <b-card-text :class="isschema ? 'mb-1' : 'mb-1 sfont'">
@@ -78,7 +84,7 @@
                       <span v-if="(Array.isArray(item.type) ? item.type : [item.type]).indexOf('array') >= 0">
                         <b-row>
                           <b-col cols="3"><strong>Array Item Type:</strong></b-col>
-                          <b-col>{{item.items.type}}</b-col>
+                          <b-col><span v-if="'items' in item && 'type' in item.items">{{item.items.type}}</span><span v-else><em>unspecified</em></span></b-col>
                         </b-row>
                       </span>
                     </b-container>
@@ -101,37 +107,154 @@
             </b-card-text>
             <!-- OBJECT ITEM: PROPERTIES -->
             <b-card-text>
-              <span v-if="(Array.isArray(item.type) ? item.type : [item.type]).indexOf('object') >= 0 && 'properties' in item">
-                <b-button size="sm" class="pt-0 pb-0" variant="outline-secondary" v-b-toggle="name+'-props'">Properties</b-button>
-                <b-collapse :id="name+'-props'">
-                  <b-card no-body border-variant="default">
-                    <schema-item v-for="key in Object.keys(item.properties)" :name="key" :item="item.properties[key]" :defaults="defaults" :requireditems="item.required" :isschema="false" v-on="$listeners"></schema-item>
-                  </b-card>
-                </b-collapse>
-              </span>
-              <!-- ARRAY ITEM: DETAILS -->
-              <span v-if="(Array.isArray(item.type) ? item.type : [item.type]).indexOf('array') >= 0">
-                <span v-if="item.items.type == 'object'">
-                  <b-button size="sm" class="pt-0 pb-0" variant="outline-secondary" v-b-toggle="name+'items-props'">Array Item Properties</b-button>
-                  <b-collapse :id="name+'items-props'">
+              <span v-if="'type' in item && 'properties' in item">
+                <span v-if="(Array.isArray(item.type) ? item.type : [item.type]).indexOf('object') >= 0">
+                  <b-button size="sm" class="pt-0 pb-0" variant="outline-secondary" v-b-toggle="parent_name+'-'+name+'-props'">Properties</b-button>
+                  <b-collapse :id="parent_name+'-'+name+'-props'">
                     <b-card no-body border-variant="default">
-                      <schema-item v-for="key in Object.keys(item.items.properties)" :name="key" :item="item.items.properties[key]" :defaults="defaults" :requireditems="item.items.required" :isschema="false" v-on="$listeners"></schema-item>
+                      <schema-item v-for="key in Object.keys(item.properties)" :name="key" :parent_name="name" :item="item.properties[key]" :defaults="defaults" :requireditems="item.required" :isschema="false" v-on="$listeners"></schema-item>
                     </b-card>
                   </b-collapse>
+                </span>
+              </span>
+              <!-- ARRAY ITEM: DETAILS -->
+              <span v-if="'type' in item">
+                <span v-if="(Array.isArray(item.type) ? item.type : [item.type]).indexOf('array') >= 0">
+                  <span v-if="'items' in item && 'type' in item.items && item.items.type == 'object'">
+                    <b-button size="sm" class="pt-0 pb-0" variant="outline-secondary" v-b-toggle="parent_name+'-'+name+'items-props'">Array Item Properties</b-button>
+                    <b-collapse :id="parent_name+'-'+name+'items-props'">
+                      <b-card no-body border-variant="default">
+                        <schema-item v-for="key in Object.keys(item.items.properties)" :name="key" :parent_name="name" :item="item.items.properties[key]" :defaults="defaults" :requireditems="item.items.required" :isschema="false" v-on="$listeners"></schema-item>
+                      </b-card>
+                    </b-collapse>
+                  </span>
                 </span>
               </span>
             </b-card-text>
           </b-card-body>
         </b-card>
     </script>
+
+
+    <!-- ================================= -->
+    <!-- T-INPUT: FOR METADATA ITEM INPUT  -->
+    <!-- ================================= -->
+    <script type="text/x-template" id="input-template">
+      <b-form-group
+          :id="obj.input_group_id"
+          :label-for="obj.input_id"
+          ref="formgroup"
+          >
+          <template v-slot:label>
+            <strong>{{(i+1).toString() + '. ' + input_label }}</strong> <i class="fas fa-circle-info text-secondary" v-b-popover.hover.topleft="obj.description"></i> <span class="text-danger" v-if="obj.required">*</span>
+          </template>
+          <span v-if="obj.input_type == 'array'">
+            <b-table ref="itemtable" responsive striped bordered hover small v-bind:items="obj.value"
+              v-bind:fields="array_fields"
+              style="margin-bottom: 5px;">
+              <!-- Options column -->
+              <template #cell(opts)="data">
+                <div style="text-align: right">
+                  <b-button variant="outline-dark" size="sm" @click="addItemModal(data.index)"><i class="fas fa-pen-to-square"></i></b-button>
+                  <b-button variant="outline-dark" size="sm" @click="removeItemModal(data.index)" ><i class="fas fa-trash"></i></b-button>
+                </div>
+              </template>
+            </b-table>
+            <div style="text-align: right;">
+              <b-button variant="outline-dark" size="sm" @click="addItemModal({})">Add item</b-button>
+            </div>
+          </span>
+          <span v-else-if="obj.input_type == 'object'">
+            <b-card no-body>
+              <b-container>
+                <span v-for="ch in obj.children">
+                  <b-row >
+                    <b-col cols="3"><em>{{ch.label}}:</em></b-col>
+                    <b-col>
+                      <span v-if="ch.value">{{ch.value}}</span><span v-else>-</span>
+                    </b-col>
+                  </b-row>
+                </span>
+              </b-container>
+            </b-card>
+            <div style="text-align: right;">
+              <b-button variant="outline-dark" size="sm" @click="addItemModal(obj)">Add/edit data</b-button>
+            </div>
+          </span>
+          <span v-else>
+            <b-form-input :id="obj.input_id" :type="obj.input_type" v-model="obj.value" :placeholder="obj.placeholder" :required="obj.required"></b-form-input>
+          </span>
+          <b-modal ref="additem" @ok="saveItem()" title="Add/Edit item" size="xl" :hideHeaderClose="true" hide-footer>
+            <b-container fluid >
+              <span v-if="obj.input_type == 'array' && obj.children[0]">
+                <span v-if="obj.children[0].input_type == 'object'">
+                  <schema-form :title="obj.label" :form_config="obj.children[0]" :toplevel="false" @closemodal="closeItemModal"></schema-form>
+                </span>
+                <span v-else>
+                  <schema-form :title="obj.label" :form_config="obj" :toplevel="false" @closemodal="closeItemModal"></schema-form>
+                </span>
+              </span>
+              <span v-if="obj.input_type == 'array' && !obj.children[0]">
+                <b-form-group
+                  :id="obj.input_group_id"
+                  :label="obj.form_field"
+                  :label-for="obj.input_id">
+                  <b-form-input :id="obj.input_id" type="text"></b-form-input>
+                </b-form-group>
+              </span>
+              <span v-if="obj.input_type == 'object' && obj.children">
+                <schema-form :title="obj.label" :form_config="obj" :toplevel="false" @closemodal="closeItemModal"></schema-form>
+              </span>
+            </b-container>
+          </b-modal>
+          
+      </b-form-group>
+    </script>
+
+
+    <!-- ================================= -->
+    <!-- SCHEMA-FORM: METADATA INPUT FORM  -->
+    <!-- ================================= -->
+    <script type="text/x-template" id="form-template">
+      <b-card border-variant="dark">
+        <b-card-title>
+          <u>{{title}}</u>
+        </b-card-title>
+        <br>
+        <b-form @submit="onSubmit" @reset="onReset">
+            <span v-for="(field, i) in form_config.children">
+                <t-input ref="forminput" v-bind:obj="field" :i="i"></t-input>
+                <br>
+            </span>
+            <br><br>
+            <div style="text-align: right">
+              <span v-if="toplevel">
+                <b-button type="submit" variant="outline-dark"><i class="fas fa-download"></i> Download metadata</b-button>&nbsp;
+              </span>
+              <span v-else>
+                <b-button type="submit" variant="outline-dark"><i class="far fa-floppy-disk"></i> Save metadata</b-button>&nbsp;
+              </span>
+              <b-button type="reset" variant="outline-dark"><i class="fas fa-arrow-rotate-left"></i> Reset</b-button>
+              <b-button variant="outline-dark" @click="$emit('closemodal')"><i class="fas fa-xmark"></i> Cancel</b-button>
+            </div>
+        </b-form>
+        <br>
+      </b-card>
+    </script>
   </head>
+
+
+  
 
   <!-- ### -->
   <!-- ### -->
   <!-- ### -->
-  <!-- Our application root element -->
+  <!-- ================ -->
+  <!-- MAIN APPLICATION -->
+  <!-- ================ -->
   <body>
     <b-container id="vue_app">
+      <!-- HEADER -->
       <b-container style="margin-top:20px;">
         <b-row align-v="end">
           <b-col cols="9">
@@ -156,6 +279,7 @@
         </b-row>
       </b-container>
       <br>
+      <!-- LIST OF AVAILABLE SCHEMAS + UPLOAD -->
       <b-card no-body border-variant="dark" v-show="schemas_ready">
         <b-card-body>
           <b-card-title>
@@ -167,7 +291,7 @@
                 <b-col>
                   <small>
                     <b-list-group>
-                      <b-list-group-item button v-for="s in Object.keys(schema_files)" @click="selectSchema(s)">{{s}}</b-list-group-item>
+                      <b-list-group-item button v-for="s in Object.keys(schema_files)" @click="selectSchema(s)" :style="s==schema_name ? 'background-color: #fba30454': ''">{{s}}</b-list-group-item>
                     </b-list-group>
                   </small>
                 </b-col>
@@ -178,46 +302,27 @@
           </b-card-text>
         </b-card-body>
       </b-card>
-      
       <br>
 
+      <!-- SELECTED SCHEMA RENDERING -->
       <b-card no-body border-variant="dark" v-show="schemas_ready">
-        <schema-item :name="schema.title" :item="schema" :defaults="defaults" :requireditems="schema.required" :isschema="true" @refselected="selectRefSchema"></schema-item>
-        <!-- <b-card-body>
-          <b-card-title>
-            <u>Schema: {{schema.title}}</u>
-          </b-card-title>
-          <b-card-text class="mb-1">
-            <b-container style="padding-left: 0;">
-              <b-row>
-                <b-col cols="6">
-                  <b-container style="padding-left: 0;">
-                    <span v-for="kw in defaults.schema_keywords.concat(defaults.instance_keywords).concat(defaults.schema_annotations).concat(defaults.additional_keywords)">
-                      <b-row  v-if="kw in schema">
-                        <b-col cols="3"><strong>{{kw}}:</strong></b-col>
-                        <b-col>{{schema[kw]}}</b-col>
-                      </b-row>
-                    </span>
-                  </b-container>
-                </b-col>
-                <b-col>
-                </b-col>
-              </b-row>
-            </b-container>
-          </b-card-text>
-          <b-card-text>
-            <span v-if="schema.type == 'object'">
-              <b-button size="sm" class="pt-0 pb-0" variant="outline-secondary" v-b-toggle="'schema-props'">Properties</b-button>
-              <b-collapse id="schema-props">
-                <b-card no-body border-variant="default">
-                  <schema-item v-for="key in Object.keys(schema.properties)" :name="key" :item="schema.properties[key]" :defaults="defaults" :requireditems="schema.required" :isschema="true"></schema-item>
-                </b-card>
-              </b-collapse>
-            </span>
-          </b-card-text>
-        </b-card-body> -->
+        <schema-item
+          :name="schema.title"
+          :parent_name="''"
+          :item="schema"
+          :defaults="defaults"
+          :requireditems="schema.required"
+          :isschema="true"
+          @refselected="selectRefSchema"
+          @showmetaform="addMetadata(schema)"
+          @resolveschema="getResolvedSchema(schema)"></schema-item>
         <br>
       </b-card>
+      <br>
+
+      <!-- SELECTED SCHEMA FORM INPUT -->
+      <schema-form v-show="show_form" :title="schema.title" :form_config="form_config" :toplevel="true"></schema-form>
+
     </b-container>
     <br><br><br><br>
     <!-- Start running your app -->
