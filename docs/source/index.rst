@@ -43,8 +43,6 @@ Index
    pipeline_description
    metadata_formats
    catalog_schema
-   examples
-   design
    contributing
    command_line_reference
    python_module_reference
