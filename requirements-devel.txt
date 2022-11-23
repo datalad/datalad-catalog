@@ -6,6 +6,7 @@ pyyaml
 
 # requirements for a development environment
 pytest
+pytest-cov
 nose
 coverage
 
