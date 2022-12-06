@@ -71,6 +71,12 @@
           "email": "michael.hanke@gmail.com"
       }
   ],
+  "access_request_contact": {
+    "givenName": "Adina",
+    "familyName": "Wagner",
+    "email": "adina.wagner@t-online.de"
+  },
+  "access_request_url": "https://github.com/datalad/datalad-catalog",
   "keywords": [],
   "license": {},
   "funding": [],
