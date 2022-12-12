@@ -169,6 +169,26 @@ const datasetView = () =>
               ) {
                 this.description_ready = true;
               }
+              // Create href mailto for request access contact
+              if (
+                dataset.hasOwnProperty("access_request_contact") &&
+                dataset["access_request_contact"]
+              ) {
+                var email_to = dataset.access_request_contact.email
+                var email_subject = "Access request: " + disp_dataset.short_name
+
+                disp_dataset.access_request_mailto =
+                  "mailto:" + 
+                  email_to +
+                  "?subject=" +
+                  email_subject +
+                  "&body=Dear%20" +
+                  dataset.access_request_contact.givenName +
+                  "%20" + 
+                  dataset.access_request_contact.familyName;
+              }
+
+              // Write main derived variable and set to ready
               this.displayData = disp_dataset;
               this.display_ready = true;
             }
