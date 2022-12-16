@@ -24,16 +24,17 @@ class MetaItem(object):
     the item type (dataset / file) and the path of the item.
     """
 
-    # get validated item
-    # check whether file or dataset
-    # dataset:
-    # - create/get dataset node
-    # - loop through metaitem keys, copy values
-    # - loop through subdatasets, create children and directory nodes
-    # file:
-    # - create/get parent dataset node
-    # - loop through keys, copy values
-    # - create children and directory nodes
+    # PROCESS DESCRIPTION:
+    # 1. Receive a validated item
+    # 2. Check whether file or dataset:
+    # IF dataset:
+    #   - create/get dataset node
+    #   - loop through metaitem keys, copy values
+    #   - loop through subdatasets, create children and directory nodes
+    # IF file:
+    #   - create/get parent dataset node
+    #   - loop through keys, copy values
+    #   - create children and directory nodes
 
     def __init__(self, catalog: WebCatalog, meta_item: dict) -> None:
         # Get dataset id and version

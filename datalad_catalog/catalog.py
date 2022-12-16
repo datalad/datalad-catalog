@@ -168,8 +168,7 @@ class Catalog(Interface):
             # documentation
             doc="""This is the subcommand to be executed by datalad-catalog.
             Options include: create, add, remove, serve, set-super, validate,
-            workflow-new, and workflow-update.
-            Example: ''""",
+            workflow-new, and workflow-update.""",
             # type checkers, constraint definition is automatically
             # added to the docstring
             constraints=EnsureChoice(
@@ -187,8 +186,7 @@ class Catalog(Interface):
             # cmdline argument definitions, incl aliases
             args=("-c", "--catalog_dir"),
             # documentation
-            doc="""Directory where the catalog is located or will be created.
-            Example: ''""",
+            doc="""Directory where the catalog is located or will be created.""",
         ),
         metadata=Parameter(
             # cmdline argument definitions, incl aliases
@@ -197,22 +195,19 @@ class Catalog(Interface):
             doc="""Path to input metadata. Multiple input types are possible:
             - A '.json' file containing an array of JSON objects related to a
              single datalad dataset.
-            - A stream of JSON objects/lines
-            Example: ''""",
+            - A stream of JSON objects/lines""",
         ),
         dataset_id=Parameter(
             # cmdline argument definitions, incl aliases
             args=("-i", "--dataset_id"),
             # documentation
-            doc="""
-            Example: ''""",
+            doc="""""",
         ),
         dataset_version=Parameter(
             # cmdline argument definitions, incl aliases
             args=("-v", "--dataset_version"),
             # documentation
-            doc="""
-            Example: ''""",
+            doc="""""",
         ),
         force=Parameter(
             # cmdline argument definitions, incl aliases
@@ -222,8 +217,7 @@ class Catalog(Interface):
             directory, force this content to be overwritten. Content
             overwritten with this flag include the 'artwork' and 'assets'
             directories and the 'index.html' and 'config.json' files. Content in
-            the 'metadata' directory remain untouched.
-            Example: ''""",
+            the 'metadata' directory remain untouched.""",
             action="store_true",
             default=False,
         ),
@@ -232,16 +226,14 @@ class Catalog(Interface):
             args=("-y", "--config-file"),
             # documentation
             doc="""Path to config file in YAML or JSON format. Default config is read
-            from datalad_catalog/config/config.json
-            Example: ''""",
+            from datalad_catalog/config/config.json""",
         ),
         dataset_path=Parameter(
             # cmdline argument definitions, incl aliases
             args=("-d", "--dataset-path"),
             # documentation
             doc="""Path to dataset on which to run an extraction, translation
-            and catalog generation workflow.
-            Example: ''""",
+            and catalog generation workflow.""",
         ),
         subdataset_path=Parameter(
             # cmdline argument definitions, incl aliases
@@ -249,8 +241,7 @@ class Catalog(Interface):
             # documentation
             doc="""Path to dataset on which to run an extraction, translation
             and catalog generation workflow. Used together with '-d',
-            '--dataset-path' when running 'workflow-update'.
-            Example: ''""",
+            '--dataset-path' when running 'workflow-update'.""",
         ),
     )
 
@@ -311,9 +302,6 @@ class Catalog(Interface):
                 % (catalog_action, ", ".join(c for c in CALL_ACTION))
             )
 
-        # TODO: check if schema is valid (move to tests)
-        # Draft202012Validator.check_schema(schema)
-
         # set common result kwargs:
         action = "catalog_%s" % catalog_action
         res_kwargs = dict(action=action)
@@ -339,9 +327,13 @@ class Catalog(Interface):
         res_kwargs["path"] = catalog_dir
 
         # Instantiate WebCatalog class
-        ctlg = WebCatalog(catalog_dir, dataset_id, dataset_version, config_file)
-        # catalog_path = Path(catalog_dir)
-        # catalog_exists = catalog_path.exists() and catalog_path.is_dir()
+        ctlg = WebCatalog(
+            catalog_dir,
+            dataset_id,
+            dataset_version,
+            config_file,
+            catalog_action,
+        )
 
         # Hanlde case where a non-catalog directory already exists at path
         # argument. Should prevent overwriting
@@ -357,7 +349,7 @@ class Catalog(Interface):
             )
             return
 
-        # Catalog should exist for all actions except create and run-workflow
+        # Catalog should exist for all actions except create and workflow-[run|update]
         # (for create action: unless force flag supplied)
         if not ctlg.is_created():
             if (
@@ -511,15 +503,15 @@ def _add_to_catalog(
                 "-m, --metadata."
             ),
         )
-    # We need to do the following:
+    # PROCESS DESCRIPTION FOR "add" ACTION:
     # 1. Establish input type (file-with-json-lines, command line stdout / stream)
     #    - for now: assume file-with-json-lines (e.g. data exported by `datalad meta-dump`
     #      and all exported objects written to file)
-    # 2. Read line into python dictionary
-    # 3. Validate the dictionary against the catalog schema
-    # 4. Instantiate the MetaItem class, which handles translation of a json line into
-    #    the catalog metadata (Node instances)
-    # 5. Per MetaItem instance, write all related Node instances to file
+    # 2. Read lines into python dictionaries. For each line:
+    #    - Validate the dictionary against the catalog schema
+    #    - Instantiate the MetaItem class, which handles translation of a json line into
+    #      the Node instances that populate the catalog
+    #    - For the MetaItem instance, write all related Node instances to file
     with open(metadata) as file:
         i = 0
         for line in file:
@@ -696,7 +688,6 @@ def _validate_metadata(metadata: str):
 
     # Setup schema parameters
     package_path = Path(__file__).resolve().parent
-    config_dir = package_path / "config"
     schema_dir = package_path / "schema"
     schemas = ["catalog", "dataset", "file", "authors", "extractors"]
     schema_store = {}
