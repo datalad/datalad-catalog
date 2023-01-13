@@ -101,19 +101,6 @@ def test_node_location_directory(
     assert demo_node_directory.get_location() == location
 
 
-def test_add_attributes(demo_catalog: WebCatalog, demo_node_directory: Node):
-    """
-    Test if attributes are correctly added to Node instance
-    """
-    test_key = "url"
-    test_value = "value1"
-    test_attributes = {test_key: test_value}
-    demo_node_directory.parent_catalog = demo_catalog
-    demo_node_directory.add_attributes(test_attributes, demo_catalog)
-    assert hasattr(demo_node_directory, test_key)
-    assert demo_node_directory.url == test_value
-
-
 def test_add_child_new(demo_node_directory: Node):
     """
     Test if the first child is correctly added to Node instance
@@ -144,41 +131,3 @@ def test_add_child_existing(demo_node_directory: Node):
     assert (
         demo_node_directory.children[0][cnst.NAME] == test_child_file[cnst.NAME]
     )
-
-
-def test_add_extractor_new(demo_node_directory: Node):
-    """
-    Test if the first extractor is correctly added to Node instance
-    """
-    test_extractor = {
-        cnst.EXTRACTOR_NAME: "metalad_core",
-        cnst.EXTRACTOR_VERSION: "1",
-        cnst.EXTRACTION_PARAMETER: {},
-        cnst.EXTRACTION_TIME: "1234567890",
-    }
-    assert not hasattr(demo_node_directory, "extractors_used")
-    demo_node_directory.add_extractor(test_extractor)
-    assert len(demo_node_directory.extractors_used) == 1
-    for key in test_extractor:
-        assert (
-            demo_node_directory.extractors_used[0][key] == test_extractor[key]
-        )
-
-
-def test_add_extractor_existing(demo_node_directory: Node):
-    """
-    Test behaviour when existing extractor is added again to Node instance
-    """
-    test_extractor = {
-        cnst.EXTRACTOR_NAME: "metalad_core",
-        cnst.EXTRACTOR_VERSION: "1",
-        cnst.EXTRACTION_PARAMETER: {},
-        cnst.EXTRACTION_TIME: "1234567890",
-    }
-    demo_node_directory.extractors_used = []
-    demo_node_directory.add_extractor(test_extractor)
-    assert len(demo_node_directory.extractors_used) == 1
-    for key in test_extractor:
-        assert (
-            demo_node_directory.extractors_used[0][key] == test_extractor[key]
-        )

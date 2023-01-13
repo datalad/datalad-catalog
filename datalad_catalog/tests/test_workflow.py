@@ -314,7 +314,7 @@ def test_workflow_new(super_path=None, cat_path=None):
     assert (Path(super_ds.path) / ".studyminimeta.yaml").exists()
     # Create catalog
     cat_path = Path(cat_path)
-    cat = WebCatalog(location=cat_path)
+    cat = WebCatalog(location=cat_path, catalog_action="create")
     cat.create(force=True)
     assert cat_path.exists()
     assert cat_path.is_dir()

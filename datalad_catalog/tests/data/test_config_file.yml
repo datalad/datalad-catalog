@@ -1,3 +1,6 @@
+# TODO: this yml needs to be updated to use the most recent config structure,
+# see tests/data/test_config_file.json
+
 # Catalog properties
 catalog_name: "DataLad Catalog Config Test"
 

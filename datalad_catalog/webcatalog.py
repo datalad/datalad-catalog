@@ -16,6 +16,7 @@ import datalad_catalog.constants as cnst
 from datalad_catalog.utils import (
     find_duplicate_object_in_list,
     read_json_file,
+    merge_lists,
 )
 
 lgr = logging.getLogger("datalad.catalog.webcatalog")
@@ -179,9 +180,11 @@ class WebCatalog(object):
 
     def add_dataset():
         """"""
+        raise NotImplementedError
 
     def remove_dataset():
         """"""
+        raise NotImplementedError
 
     def set_main_dataset(self):
         """
@@ -326,6 +329,7 @@ class Node(object):
             "long_name",
             "md5_hash",
             "parent_catalog",
+            "config",
         ]
         for key in keys_to_pop:
             meta_dict.pop(key, None)
@@ -415,6 +419,8 @@ class Node(object):
             # If dataset-level config file DOES NOT exist:
             if self.parent_catalog.dataset_config is not None:
                 # If dataset-level config IS avaliable on catalog instance: load and create, return
+                # First create id and version directories in case they don't exist
+                dataset_config_path.parent.mkdir(parents=True, exist_ok=True)
                 dataset_config = self.parent_catalog.dataset_config
                 with open(dataset_config_path, "w") as f_config:
                     json.dump(dataset_config, f_config)
@@ -448,7 +454,7 @@ class Node(object):
     def add_attributes(self, new_attributes: dict, overwrite=False):
         """Add attributes (key-value pairs) to a Node as instance variables"""
         # Get dataset config
-        dataset_config = self.config[cnst.PROPERTY_SOURCE][cnst.TYPE_DATASET]
+        dataset_config = self.config[cnst.PROPERTY_SOURCES][cnst.TYPE_DATASET]
         # Get metadata source of incoming metadata
         # NOTE: this assumes that provided metadata item originates from a single source,
         # and wasnt collated beforehand. TODO: need to investigate and update the implementation
@@ -464,8 +470,7 @@ class Node(object):
             data_source = None
 
         # Add metadata source to Node (per-key mapping to source happens below)
-        self.add_metadata_source(self, data_source_dict)
-
+        self.add_metadata_source(data_source_dict)
         # Loop through provided keys
         for key in new_attributes.keys():
             new_value = new_attributes[key]
@@ -477,8 +482,11 @@ class Node(object):
                 continue
             # Isolate config rule and source
             key_config = dataset_config.get(key, None)
-            config_rule = key_config.get("rule", None)
-            config_source = key_config.get("source", None)
+            config_rule = None
+            config_source = None
+            if key_config is not None:
+                config_rule = key_config.get("rule", None)
+                config_source = key_config.get("source", None)
             if config_source and not isinstance(
                 config_source, list
             ):  # make all sources a list, exept for None
@@ -491,7 +499,6 @@ class Node(object):
                     key,
                     new_value,
                     data_source,
-                    data_source_dict,
                     config_rule,
                     config_source,
                     overwrite,
@@ -551,7 +558,7 @@ class Node(object):
         ]:
             config_rule = None
         # If config_source is "any" it implies the current source is allowed
-        if config_source == "any":
+        if config_source == ["any"]:
             config_source = [source_name]
 
         # NEXT: decide what to do based on config_rule and config_source:
@@ -573,7 +580,7 @@ class Node(object):
                     return new_value
                 else:
                     self.add_source_map_entry(key, source_name, "merge")
-                    return self.merge_meta_lists(existing_value, new_value)
+                    return merge_lists(existing_value, new_value)
         elif config_rule == "priority":
             if source_name not in config_source:
                 return existing_value
@@ -601,7 +608,7 @@ class Node(object):
                 self.add_source_map_entry(key, source_name, "replace")
                 return new_value
             else:
-                existing_value
+                return existing_value
 
     def add_child(self, meta_dict: dict):
         """
@@ -624,28 +631,9 @@ class Node(object):
         else:
             pass
 
-    def merge_meta_lists(existing_value, new_value):
-        """"""
-        if not isinstance(existing_value, list):
-            existing_value = [existing_value]
-        if not isinstance(new_value, list):
-            new_value = [new_value]
-        # Then determine type of variable in list and handle accordingly
-        if isinstance(new_value[0], (str, int)):
-            return list(set(existing_value + new_value))
-        if isinstance(new_value[0], object):
-            for new_object in new_value:
-                existing_object = find_duplicate_object_in_list(
-                    existing_value, new_object, new_object.keys()
-                )
-                if existing_object is None:
-                    existing_value.append(new_object)
-                else:
-                    continue
-            return existing_value
-
     def add_metadata_source(self, source_dict: dict):
         """"""
+        print(source_dict)
         # Initialise "metadata_sources" attribute if required
         if (
             not hasattr(self, cnst.METADATA_SOURCES)
@@ -677,7 +665,7 @@ class Node(object):
         # Initialise "metadata_sources['key_source_map']" attribute if required
         if (
             cnst.KEY_SOURCE_MAP not in self.metadata_sources
-            or not cnst.KEY_SOURCE_MAP[cnst.KEY_SOURCE_MAP]
+            or not self.metadata_sources[cnst.KEY_SOURCE_MAP]
         ):
             self.metadata_sources[cnst.KEY_SOURCE_MAP] = {}
         # Get existing sources, and replace / merge
@@ -689,7 +677,7 @@ class Node(object):
                 self.metadata_sources[cnst.KEY_SOURCE_MAP][key] = [source_name]
             if action == "merge":
                 self.metadata_sources[cnst.KEY_SOURCE_MAP][key] = list(
-                    set(sources + source_name)
+                    set(sources + [source_name])
                 )
 
     def get_source_map_entry(self, key: str):
@@ -697,7 +685,7 @@ class Node(object):
         # If "metadata_sources['key_source_map']" doesn't exist, no map:
         if (
             cnst.KEY_SOURCE_MAP not in self.metadata_sources
-            or not cnst.KEY_SOURCE_MAP[cnst.KEY_SOURCE_MAP]
+            or not self.metadata_sources[cnst.KEY_SOURCE_MAP]
         ):
             return None
         # Return none if no key, else key

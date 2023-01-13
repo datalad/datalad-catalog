@@ -20,7 +20,8 @@ data_path = tests_path / "data"
 @pytest.fixture
 def demo_catalog(tmp_path):
     catalog_path = tmp_path / "test_catalog"
-    return WebCatalog(location=catalog_path)
+
+    return WebCatalog(location=catalog_path, catalog_action="create")
 
 
 @pytest.fixture
@@ -31,7 +32,8 @@ def demo_metadata_item():
 
 def test_translate_dataset(demo_catalog: WebCatalog, demo_metadata_item: dict):
     """"""
-    demo_catalog.config = {"property_source": {"dataset": {}}}
+    assert demo_catalog.catalog_config
+    demo_catalog.catalog_config = {"property_sources": {"dataset": {}}}
     metatest = MetaItem(demo_catalog, demo_metadata_item)
     assert len(metatest._node_instances) == 1
     new_node = [
@@ -50,4 +52,5 @@ def test_translate_dataset(demo_catalog: WebCatalog, demo_metadata_item: dict):
         if not bool(translated_metadata[key]):
             continue
         assert key in demo_metadata_item
-        assert demo_metadata_item[key] == translated_metadata[key]
+        if key != "metadata_sources":
+            assert demo_metadata_item[key] == translated_metadata[key]
