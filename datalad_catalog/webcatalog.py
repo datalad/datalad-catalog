@@ -146,12 +146,11 @@ class WebCatalog(object):
         # TODO: first validate config file (using jsonschema?)
         # Check logo path, if added to config
         if (
-            cnst.LOGO_PATH in self.catalog_config
-            and self.catalog_config[cnst.LOGO_PATH]
+            self.catalog_config.get(cnst.LOGO_PATH) is not None
+            and not Path(self.catalog_config[cnst.LOGO_PATH]).exists():
         ):
-            if not Path(self.catalog_config[cnst.LOGO_PATH]).exists():
-                msg = f"Error in config: the specified logo does not exist at path: {self.catalog_config[cnst.LOGO_PATH]}"
-                raise FileNotFoundError(msg)
+            msg = f"Error in config: the specified logo does not exist at path: {self.catalog_config[cnst.LOGO_PATH]}"
+            raise FileNotFoundError(msg)
 
         # Get package-related paths/content
         if not (self.metadata_path.exists() and self.metadata_path.is_dir()):
