@@ -242,10 +242,7 @@ class WebCatalog(object):
         """"""
         # Copy content specified by config
         if (
-            cnst.LOGO_PATH in self.catalog_config
-            and self.catalog_config[cnst.LOGO_PATH]
-            and self.catalog_config[cnst.LOGO_PATH]
-            != "artwork/catalog_logo.svg"
+            self.config.get(cnst.LOGO_PATH) not in (None, "artwork/catalog_logo.svg")
         ):
             existing_path = Path(self.catalog_config[cnst.LOGO_PATH])
             existing_name = existing_path.name
