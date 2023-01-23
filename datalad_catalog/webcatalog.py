@@ -408,7 +408,7 @@ class Node(object):
             / self.dataset_version
             / "config.json"
         )
-        if dataset_config_path.exists() and dataset_config_path.is_file():
+        if dataset_config_path.is_file():
             # If dataset-level config file DOES exist, return it
             return load_config_file(dataset_config_path)
         else:
