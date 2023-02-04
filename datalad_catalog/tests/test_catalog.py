@@ -124,10 +124,12 @@ def test_catalog_action_routing(temp_dir: str = "", config_file: str = ""):
         "datalad_catalog.catalog._remove_from_catalog"
     ) as f5, patch(
         "datalad_catalog.catalog._set_super_of_catalog"
-    ) as f6:
+    ) as f6, patch(
+        "datalad_catalog.catalog._translate_metadata"
+    ) as f7:
 
         for mock, name in zip(
-            (f1, f2, f3, f4, f5, f6), (f"f{i}" for i in range(1, 7))
+            (f1, f2, f3, f4, f5, f6, f7), (f"f{i}" for i in range(1, 8))
         ):
             mock.return_value = iter([{**result_template, "action": name}])
 
@@ -139,6 +141,7 @@ def test_catalog_action_routing(temp_dir: str = "", config_file: str = ""):
             ("remove", True),
             ("set-super", True),
             ("serve", True),
+            ("translate", True),
         ):
 
             test_catalog_path = Path(temp_dir) / "test_catalog"
@@ -171,5 +174,5 @@ def test_catalog_action_routing(temp_dir: str = "", config_file: str = ""):
                 )[0]["action"]
             )
 
-        for i in range(1, 7):
+        for i in range(1, 8):
             assert_in(f"f{i}", results)

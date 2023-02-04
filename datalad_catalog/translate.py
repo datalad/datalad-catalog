@@ -92,6 +92,9 @@ class TranslatorNotFoundError(InsufficientArgumentsError):
 
 class Translate(object):
     """
+    Class responsible for executing translation of an extracted metadata record,
+    including finding a matching class (base class TranslatorBase) and running
+    metadata translation.
     """
     def __init__(self, meta_record: dict = None) -> None:
         """"""
@@ -100,7 +103,6 @@ class Translate(object):
             raise ValueError("No metadata record provided")
         self.match_translator()
 
-    
     def match_translator(self):
         """Match an extracted metadata record with an appropriate translator
 
