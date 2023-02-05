@@ -3,7 +3,7 @@
   "$id": "https://datalad.org/catalog.schema.json",
   "title": "catalog",
   "description": "The main catalog schema",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "object",
   "allOf": [
     {

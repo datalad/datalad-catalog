@@ -39,7 +39,7 @@
         "type": "string"
       }
     },
-    "extractors_used": {"$ref": "https://datalad.org/catalog.extractors.schema.json"},
+    "metadata_sources": {"$ref": "https://datalad.org/catalog.metadata_sources.schema.json"},
     "additional_display": {
       "description": "Additonal items to display on the file level",
       "title": "Additional display",
