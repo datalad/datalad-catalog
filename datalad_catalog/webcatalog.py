@@ -26,8 +26,7 @@ CATALOG_SCHEMA_IDS = {
     cnst.TYPE_DATASET: "https://datalad.org/catalog.dataset.schema.json",
     cnst.TYPE_FILE: "https://datalad.org/catalog.file.schema.json",
     cnst.AUTHORS: "https://datalad.org/catalog.authors.schema.json",
-    # cnst.CHILDREN: "https://datalad.org/catalog.children.schema.json",
-    cnst.EXTRACTORS: "https://datalad.org/catalog.extractors.schema.json",
+    cnst.METADATA_SOURCES: "https://datalad.org/catalog.metadata_sources.schema.json",
 }
 
 
@@ -644,7 +643,7 @@ class Node(object):
             self.metadata_sources[cnst.SOURCES] = []
         # Find the metadata_source element if it already exists in "sources" list
         # NOTE: currently identifying element based on source name and version only
-        extractor_found = next(
+        source_found = next(
             (
                 item
                 for item in self.metadata_sources[cnst.SOURCES]
@@ -654,7 +653,7 @@ class Node(object):
             ),
             False,
         )
-        if not extractor_found:
+        if not source_found:
             # append to source list
             self.metadata_sources[cnst.SOURCES].append(source_dict)
         else:

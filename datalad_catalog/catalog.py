@@ -712,7 +712,7 @@ def _validate_metadata(metadata: str):
     # Setup schema parameters
     package_path = Path(__file__).resolve().parent
     schema_dir = package_path / "schema"
-    schemas = ["catalog", "dataset", "file", "authors", "extractors"]
+    schemas = ["catalog", "dataset", "file", "authors", "metadata_sources"]
     schema_store = {}
     for s in schemas:
         schema_path = schema_dir / str("jsonschema_" + s + ".json")
