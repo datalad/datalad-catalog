@@ -13,7 +13,7 @@
         <!-- DATASET VERSION ETC -->
         <b-card-text>
           <strong>Version:</strong> {{selectedDataset.dataset_version.substring(0,7)}}&nbsp;
-          <strong>Metadata extracted:</strong> {{displayData.metadata_extracted}}&nbsp;
+          <strong>Last updated:</strong> {{displayData.last_updated}}&nbsp;
           <strong>DOI:</strong> <span v-if="selectedDataset.doi"><a :href="selectedDataset.doi" target="_blank"> {{selectedDataset.doi.replace("https://doi.org/", "")}}</a></span>
           <span v-else><em>not available</em></span>&nbsp;
           <strong>License:</strong> <span v-if="selectedDataset.license && selectedDataset.license.name"><a :href="selectedDataset.license.url" target="_blank"> {{selectedDataset.license.name}}</a></span>
@@ -220,7 +220,7 @@
                         <b-card-text>
                           <small>
                             <strong>Version:</strong> {{ds.dataset_version.substring(0,7)}}&nbsp;
-                            <strong>Modified:</strong> {{getDateFromUTCseconds(ds.extraction_time)}}&nbsp;
+                            <strong>Modified:</strong> {{getDateFromUTCseconds(ds.source_time)}}&nbsp;
                           </small>
                         </b-card-text>
                       </b-col>
