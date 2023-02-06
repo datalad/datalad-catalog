@@ -28,7 +28,7 @@ class BIDSDatasetTranslator(TranslatorBase):
         """
         Reports the version of the catalog schema supported by the translator
         """
-        return "0.1.0"
+        return "1.0.0"
 
     def get_supported_extractor_name(self):
         """
@@ -108,13 +108,18 @@ class BIDSTranslator:
         result = jq.first(program, self.extracted_metadata)
         return result if len(result) > 0 else None
 
-    def get_extractors_used(self):
-        keys = [
-            "extractor_name", "extractor_version",
-            "extraction_parameter", "extraction_time",
-            "agent_name", "agent_email",
-        ]
-        return [{k: self.metadata_record[k] for k in keys}]
+    def get_metadata_source(self):
+        program = (
+            "{\"key_source_map\": {},\"sources\": [{"
+            "\"source_name\": .extractor_name, "
+            "\"source_version\": .extractor_version, "
+            "\"source_parameter\": .extraction_parameter, "
+            "\"source_time\": .extraction_time, "
+            "\"agent_email\": .agent_email, "
+            "\"agent_name\": .agent_name}]}"
+        )
+        result = jq.first(program, self.metadata_record)
+        return result if len(result) > 0 else None
 
     def get_additional_display(self):
         program = "[{\"name\": \"BIDS\", \"content\": .entities}]"
@@ -141,7 +146,7 @@ class BIDSTranslator:
             "authors": self.get_authors(),
             "keywords": self.get_keywords(),
             "funding": self.get_funding(),
-            "extractors_used": self.get_extractors_used(),
+            "metadata_sources": self.get_metadata_source(),
             "additional_display": self.get_additional_display(),
             "top_display": self.get_top_display(),
         }

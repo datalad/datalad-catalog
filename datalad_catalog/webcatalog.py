@@ -632,7 +632,6 @@ class Node(object):
 
     def add_metadata_source(self, source_dict: dict):
         """"""
-        print(source_dict)
         # Initialise "metadata_sources" attribute if required
         if (
             not hasattr(self, cnst.METADATA_SOURCES)
@@ -647,7 +646,8 @@ class Node(object):
             (
                 item
                 for item in self.metadata_sources[cnst.SOURCES]
-                if item[cnst.SOURCE_NAME] == source_dict[cnst.SOURCE_NAME]
+                if cnst.SOURCE_NAME in item
+                and item[cnst.SOURCE_NAME] == source_dict[cnst.SOURCE_NAME]
                 and item[cnst.SOURCE_VERSION]
                 == source_dict[cnst.SOURCE_VERSION]
             ),

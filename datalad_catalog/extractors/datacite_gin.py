@@ -18,7 +18,7 @@ from datalad_metalad.extractors.base import (
     ExtractorResult,
 )
 from datalad.log import log_progress
-from datalad.utils import assure_unicode
+from datalad.utils import ensure_unicode
 
 
 lgr = logging.getLogger("datalad.metadata.extractors.datacite_gin")
@@ -118,5 +118,5 @@ class DataciteGINMeta(object):
 
     def _get_description(self, description_in):
         """"""
-        desc = assure_unicode(description_in)
+        desc = ensure_unicode(description_in)
         return desc.strip()

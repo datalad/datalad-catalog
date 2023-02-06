@@ -263,14 +263,17 @@
           ]
       }
   ],
-  "extractors_used": [
-      {
-          "extractor_name": "metalad_core",
-          "extractor_version": "1",
-          "extraction_parameter": {},
-          "extraction_time": 1649839999.652626,
-          "agent_name": "Stephan Heunis",
-          "agent_email": "s.heunis@fz-juelich.de"
-      }
-  ]
+  "metadata_sources": {
+    "key_source_map": {},
+    "sources": [
+        {
+            "source_name": "metalad_core",
+            "source_version": "1",
+            "source_parameter": {},
+            "source_time": 1649839999.652626,
+            "agent_name": "Stephan Heunis",
+            "agent_email": "s.heunis@fz-juelich.de"
+        }
+    ]
+  }
 }

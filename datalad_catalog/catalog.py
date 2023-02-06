@@ -17,7 +17,7 @@ from datalad.interface.base import (
     build_doc,
 )
 from datalad.interface.results import get_status_dict
-from datalad.interface.utils import eval_results
+from datalad.interface.base import eval_results
 from datalad.log import log_progress
 from datalad.support.constraints import EnsureChoice
 from datalad.support.exceptions import InsufficientArgumentsError

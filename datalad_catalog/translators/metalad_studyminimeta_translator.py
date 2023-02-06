@@ -28,7 +28,7 @@ class MetaladStudyminimetaTranslator(TranslatorBase):
         """
         Reports the version of the catalog schema supported by the translator
         """
-        return "0.1.0"
+        return "1.0.0"
 
     def get_supported_extractor_name(self):
         """
@@ -146,13 +146,18 @@ class MinimetaTranslator:
         result = jq.first(program, self.graph) #  [] if nothing found
         return result if len(result) > 0 else None
 
-    def get_extractors_used(self):
-        keys = [
-            "extractor_name", "extractor_version",
-            "extraction_parameter", "extraction_time",
-            "agent_name", "agent_email",
-        ]
-        return [{k: self.metadata_record[k] for k in keys}]
+    def get_metadata_source(self):
+        program = (
+            "{\"key_source_map\": {},\"sources\": [{"
+            "\"source_name\": .extractor_name, "
+            "\"source_version\": .extractor_version, "
+            "\"source_parameter\": .extraction_parameter, "
+            "\"source_time\": .extraction_time, "
+            "\"agent_email\": .agent_email, "
+            "\"agent_name\": .agent_name}]}"
+        )
+        result = jq.first(program, self.metadata_record)
+        return result if len(result) > 0 else None
 
     def translate(self):
         translated_record = {
@@ -167,7 +172,7 @@ class MinimetaTranslator:
             "funding": self.get_funding(),
             "publications": self.get_publications(),
             "subdatasets": self.get_subdatasets(),
-            "extractors_used": self.get_extractors_used(),
+            "metadata_sources": self.get_metadata_source(),
         }
 
         return {k: v for k, v in translated_record.items() if v is not None}
