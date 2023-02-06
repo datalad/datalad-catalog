@@ -14,6 +14,7 @@ from datalad_catalog.translate import TranslatorBase
 
 lgr = logging.getLogger("datalad.metadata.translators.bids_dataset_translator")
 
+
 class BIDSDatasetTranslator(TranslatorBase):
     """
     Translate metadata extracted with metalad and the bids_dataset extractor
@@ -21,6 +22,7 @@ class BIDSDatasetTranslator(TranslatorBase):
 
     Inherits from base class TranslatorBase.
     """
+
     def __init__(self):
         pass
 
@@ -67,7 +69,7 @@ class BIDSTranslator:
         return self.extracted_metadata.get("description")
 
     def get_license(self):
-        program = ".license | { \"name\": .name, \"url\":  \"\"}"
+        program = '.license | { "name": .name, "url":  ""}'
         result = jq.first(program, self.extracted_metadata)
         # todo check for license info missing
         return result if len(result) > 0 else None
@@ -75,8 +77,8 @@ class BIDSTranslator:
     def get_authors(self):
         program = (
             "[.Authors[]? as $auth | "
-            "{\"name\": $auth, \"givenName\":\"\", \"familyName\":\"\", "
-            "\"email\":\"\", \"honorificSuffix\":\"\", \"identifiers\":[]}]"
+            '{"name": $auth, "givenName":"", "familyName":"", '
+            '"email":"", "honorificSuffix":"", "identifiers":[]}]'
         )
         result = jq.first(program, self.extracted_metadata)
         return result if len(result) > 0 else None
@@ -89,7 +91,7 @@ class BIDSTranslator:
     def get_funding(self):
         program = (
             "[.Funding[]? as $fund | "
-            "{\"name\": \"\", \"grant\":\"\", \"description\":$fund}]"
+            '{"name": "", "grant":"", "description":$fund}]'
         )
         result = jq.first(program, self.extracted_metadata)
         return result if len(result) > 0 else None
@@ -97,41 +99,41 @@ class BIDSTranslator:
     def get_publications(self):
         program = (
             "[.references[]? as $pubin | "
-            "{\"type\":\"\", "
-            "\"title\":$pubin[\"citation\"], "
-            "\"doi\":"
-            "($pubin[\"id\"] | sub(\"DOI:\"; \"https://www.doi.org/\")), "
-            "\"datePublished\":\"\", "
-            "\"publicationOutlet\":\"\", "
-            "\"authors\": []}]"
+            '{"type":"", '
+            '"title":$pubin["citation"], '
+            '"doi":'
+            '($pubin["id"] | sub("DOI:"; "https://www.doi.org/")), '
+            '"datePublished":"", '
+            '"publicationOutlet":"", '
+            '"authors": []}]'
         )
         result = jq.first(program, self.extracted_metadata)
         return result if len(result) > 0 else None
 
     def get_metadata_source(self):
         program = (
-            "{\"key_source_map\": {},\"sources\": [{"
-            "\"source_name\": .extractor_name, "
-            "\"source_version\": .extractor_version, "
-            "\"source_parameter\": .extraction_parameter, "
-            "\"source_time\": .extraction_time, "
-            "\"agent_email\": .agent_email, "
-            "\"agent_name\": .agent_name}]}"
+            '{"key_source_map": {},"sources": [{'
+            '"source_name": .extractor_name, '
+            '"source_version": .extractor_version, '
+            '"source_parameter": .extraction_parameter, '
+            '"source_time": .extraction_time, '
+            '"agent_email": .agent_email, '
+            '"agent_name": .agent_name}]}'
         )
         result = jq.first(program, self.metadata_record)
         return result if len(result) > 0 else None
 
     def get_additional_display(self):
-        program = "[{\"name\": \"BIDS\", \"content\": .entities}]"
+        program = '[{"name": "BIDS", "content": .entities}]'
         result = jq.first(program, self.extracted_metadata)
         return result if len(result) > 0 else None
 
     def get_top_display(self):
         program = (
-            "[{\"name\": \"Subjects\", \"value\": (.entities.subject | length)}, "
-            "{\"name\": \"Sessions\", \"value\": (.entities.session | length)}, "
-            "{\"name\": \"Tasks\", \"value\": (.entities.task | length)}, "
-            "{\"name\": \"Runs\", \"value\": (.entities.run | length)}]"
+            '[{"name": "Subjects", "value": (.entities.subject | length)}, '
+            '{"name": "Sessions", "value": (.entities.session | length)}, '
+            '{"name": "Tasks", "value": (.entities.task | length)}, '
+            '{"name": "Runs", "value": (.entities.run | length)}]'
         )
         result = jq.first(program, self.extracted_metadata)
         return result if len(result) > 0 else None

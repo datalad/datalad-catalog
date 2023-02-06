@@ -2,10 +2,7 @@ import abc
 from pathlib import Path
 
 import datalad_catalog.constants as cnst
-from datalad_catalog.utils import (
-    read_json_file,
-    get_entry_points
-)
+from datalad_catalog.utils import read_json_file, get_entry_points
 from datalad.support.exceptions import InsufficientArgumentsError
 
 
@@ -31,12 +28,23 @@ class TranslatorBase(metaclass=abc.ABCMeta):
         Current criteria include extractor name and extractor version,
         and the catalog schema version
         """
-        extractor_name_match = self.get_supported_extractor_name() == source_name
-        extractor_version_match = self.get_supported_extractor_version() == source_version
-        schema_version_match = self.get_supported_schema_version() == self.get_current_schema_version()
+        extractor_name_match = (
+            self.get_supported_extractor_name() == source_name
+        )
+        extractor_version_match = (
+            self.get_supported_extractor_version() == source_version
+        )
+        schema_version_match = (
+            self.get_supported_schema_version()
+            == self.get_current_schema_version()
+        )
         # TODO: support partial matches of version (major/minor/patch)
 
-        return extractor_name_match & extractor_version_match & schema_version_match
+        return (
+            extractor_name_match
+            & extractor_version_match
+            & schema_version_match
+        )
 
     @abc.abstractmethod
     def translate(self, metadata):
@@ -52,7 +60,7 @@ class TranslatorBase(metaclass=abc.ABCMeta):
     def get_supported_schema_version(self) -> str:
         """
         Report the version of the catalog schema supported by the translator
-        
+
         It will be matched to the `version` field in
         `datalad_catalog/schema/jsonschema_catalog.json`.
         """
@@ -96,6 +104,7 @@ class Translate(object):
     including finding a matching class (base class TranslatorBase) and running
     metadata translation.
     """
+
     def __init__(self, meta_record: dict = None) -> None:
         """"""
         self.meta_record = meta_record
@@ -122,7 +131,7 @@ class Translate(object):
         source_version = self.meta_record.get(cnst.EXTRACTOR_VERSION)
         matched_translators = []
         for translator_name, translator_dict in get_translators().items():
-            translator_class = translator_dict['loader']()
+            translator_class = translator_dict["loader"]()
             translator_instance = translator_class()
             if translator_instance.match(source_name, source_version):
                 matched_translators.append(translator_instance)

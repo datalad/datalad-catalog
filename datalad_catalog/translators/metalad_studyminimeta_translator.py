@@ -12,7 +12,10 @@ import logging
 from pathlib import Path
 from datalad_catalog.translate import TranslatorBase
 
-lgr = logging.getLogger("datalad.metadata.translators.metalad_studyminimeta_translator")
+lgr = logging.getLogger(
+    "datalad.metadata.translators.metalad_studyminimeta_translator"
+)
+
 
 class MetaladStudyminimetaTranslator(TranslatorBase):
     """
@@ -21,6 +24,7 @@ class MetaladStudyminimetaTranslator(TranslatorBase):
 
     Inherits from base class TranslatorBase.
     """
+
     def __init__(self):
         pass
 
@@ -55,30 +59,31 @@ class MinimetaTranslator:
     to translate some fields, but introduces additional condition checks.
     Will not include empty values in its output.
     """
+
     def __init__(self, metadata_record):
         self.metadata_record = metadata_record
         self.extracted_metadata = self.metadata_record["extracted_metadata"]
 
         self.graph = self.extracted_metadata["@graph"]
         self.type_dataset = jq.first(
-            ".[] | select(.[\"@type\"] == \"Dataset\")",
+            '.[] | select(.["@type"] == "Dataset")',
             self.graph,
         )
         self.combinedpersonsids = self._jq_first_or_none(
             program=(
-                "{\"authordetails\": .[] | "
-                "select(.[\"@id\"] == \"#personList\") | "
-                ".[\"@list\"], \"authorids\": .[] | "
-                "select(.[\"@type\"] == \"Dataset\") | .author}"
+                '{"authordetails": .[] | '
+                'select(.["@id"] == "#personList") | '
+                '.["@list"], "authorids": .[] | '
+                'select(.["@type"] == "Dataset") | .author}'
             ),
-            entry=self.graph
+            entry=self.graph,
         )
         self.combinedpersonspubs = self._jq_first_or_none(
             program=(
-                "{\"authordetails\": .[] | "
-                "select(.[\"@id\"] == \"#personList\") | "
-                ".[\"@list\"], \"publications\": .[] | "
-                "select(.[\"@id\"] == \"#publicationList\") | .[\"@list\"]}"
+                '{"authordetails": .[] | '
+                'select(.["@id"] == "#personList") | '
+                '.["@list"], "publications": .[] | '
+                'select(.["@id"] == "#publicationList") | .["@list"]}'
             ),
             entry=self.graph,
         )
@@ -104,33 +109,32 @@ class MinimetaTranslator:
 
     def get_authors(self):
         if self.combinedpersonsids is not None:
-            program=(
-                ". as $parent | [.authorids[][\"@id\"] as $idin | "
-                "($parent.authordetails[] | select(.[\"@id\"] == $idin))]"
+            program = (
+                '. as $parent | [.authorids[]["@id"] as $idin | '
+                '($parent.authordetails[] | select(.["@id"] == $idin))]'
             )
             return jq.first(program, self.combinedpersonsids)
         return None
 
     def get_funding(self):
         program = (
-            ".[] | select(.[\"@type\"] == \"Dataset\") | [.funder[]? | "
-            "{\"name\": .name, \"identifier\": \"\", \"description\": \"\"}]"
+            '.[] | select(.["@type"] == "Dataset") | [.funder[]? | '
+            '{"name": .name, "identifier": "", "description": ""}]'
         )
-        result = jq.first(program, self.graph) #  [] if nothing found
+        result = jq.first(program, self.graph)  #  [] if nothing found
         return result if len(result) > 0 else None
-
 
     def get_publications(self):
         if self.combinedpersonspubs is not None:
             program = (
                 ". as $parent | [.publications[] as $pubin | "
-                "{\"type\":$pubin[\"@type\"], "
-                "\"title\":$pubin[\"headline\"], "
-                "\"doi\":$pubin[\"sameAs\"], "
-                "\"datePublished\":$pubin[\"datePublished\"], "
-                "\"publicationOutlet\":$pubin[\"publication\"][\"name\"], "
-                "\"authors\": ([$pubin.author[][\"@id\"] as $idin | "
-                "($parent.authordetails[] | select(.[\"@id\"] == $idin))])}]"
+                '{"type":$pubin["@type"], '
+                '"title":$pubin["headline"], '
+                '"doi":$pubin["sameAs"], '
+                '"datePublished":$pubin["datePublished"], '
+                '"publicationOutlet":$pubin["publication"]["name"], '
+                '"authors": ([$pubin.author[]["@id"] as $idin | '
+                '($parent.authordetails[] | select(.["@id"] == $idin))])}]'
             )
             return jq.first(program, self.combinedpersonspubs)
         else:
@@ -138,23 +142,23 @@ class MinimetaTranslator:
 
     def get_subdatasets(self):
         program = (
-            ".[]? | select(.[\"@type\"] == \"Dataset\") | [.hasPart[]? | "
-            "{\"dataset_id\": (.identifier | sub(\"^datalad:\"; \"\")), "
-            "\"dataset_version\": (.[\"@id\"] | sub(\"^datalad:\"; \"\")), "
-            "\"dataset_path\": .name, \"dirs_from_path\": []}]"
+            '.[]? | select(.["@type"] == "Dataset") | [.hasPart[]? | '
+            '{"dataset_id": (.identifier | sub("^datalad:"; "")), '
+            '"dataset_version": (.["@id"] | sub("^datalad:"; "")), '
+            '"dataset_path": .name, "dirs_from_path": []}]'
         )
-        result = jq.first(program, self.graph) #  [] if nothing found
+        result = jq.first(program, self.graph)  #  [] if nothing found
         return result if len(result) > 0 else None
 
     def get_metadata_source(self):
         program = (
-            "{\"key_source_map\": {},\"sources\": [{"
-            "\"source_name\": .extractor_name, "
-            "\"source_version\": .extractor_version, "
-            "\"source_parameter\": .extraction_parameter, "
-            "\"source_time\": .extraction_time, "
-            "\"agent_email\": .agent_email, "
-            "\"agent_name\": .agent_name}]}"
+            '{"key_source_map": {},"sources": [{'
+            '"source_name": .extractor_name, '
+            '"source_version": .extractor_version, '
+            '"source_parameter": .extraction_parameter, '
+            '"source_time": .extraction_time, '
+            '"agent_email": .agent_email, '
+            '"agent_name": .agent_name}]}'
         )
         result = jq.first(program, self.metadata_record)
         return result if len(result) > 0 else None

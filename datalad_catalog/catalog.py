@@ -41,6 +41,7 @@ from datalad_catalog.translate import (
 # Create named logger
 lgr = logging.getLogger("datalad.catalog.catalog")
 
+
 # Decoration auto-generates standard help
 @build_doc
 # All extension commands must be derived from Interface
@@ -168,12 +169,8 @@ class Catalog(Interface):
                 "provided and exposed as an entry point (e.g. via a DataLad "
                 "extension) as part of the 'datalad.metadata.translators' group."
             ),
-            code_py=(
-                "catalog('translate', metadata='path/to/metadata.jsonl')"
-            ),
-            code_cmd=(
-                "datalad catalog translate -m path/to/metadata.jsonl"
-            ),
+            code_py=("catalog('translate', metadata='path/to/metadata.jsonl')"),
+            code_cmd=("datalad catalog translate -m path/to/metadata.jsonl"),
         ),
     ]
 
@@ -281,7 +278,6 @@ class Catalog(Interface):
         dataset_path=None,
         subdataset_path=None,
     ):
-
         """
         [summary]
 
@@ -829,7 +825,7 @@ def _get_line_count(file: str) -> int:
 def _translate_metadata(metadata: str):
     """Translate a metadata item from a particular source structure
     into the catalog schema.
-    
+
     A dedicated translator should be provided and exposed as an entry
     point (e.g. via a DataLad extension) as part of the
     'datalad.metadata.translators' group."

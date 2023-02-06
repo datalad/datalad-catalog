@@ -14,6 +14,7 @@ from datalad_catalog.translate import TranslatorBase
 
 lgr = logging.getLogger("datalad.metadata.translators.datacite_gin_translator")
 
+
 class DataciteGINTranslator(TranslatorBase):
     """
     Translate metadata extracted with metalad and the datacite_gin extractor
@@ -21,6 +22,7 @@ class DataciteGINTranslator(TranslatorBase):
 
     Inherits from base class TranslatorBase.
     """
+
     def __init__(self):
         pass
 
@@ -66,7 +68,7 @@ class DataciteTranslator:
         return self.extracted_metadata.get("description")
 
     def get_license(self):
-        program = ".license | { \"name\": .name, \"url\": .url}"
+        program = '.license | { "name": .name, "url": .url}'
         result = jq.first(program, self.extracted_metadata)
         # todo check for license info missing
         return result if len(result) > 0 else None
@@ -74,11 +76,11 @@ class DataciteTranslator:
     def get_authors(self):
         program = (
             "[.authors[]? | "
-            "{\"name\":\"\", \"givenName\":.firstname, \"familyName\":.lastname"
-            ", \"email\":\"\", \"honorificSuffix\":\"\"} "
-            "+ if has(\"id\") then {\"identifiers\":[ "
-            "{\"type\":(.id | tostring | split(\":\") | .[0]),"
-            " \"identifier\":(.id | tostring | split(\":\") | .[1])}]} "
+            '{"name":"", "givenName":.firstname, "familyName":.lastname'
+            ', "email":"", "honorificSuffix":""} '
+            '+ if has("id") then {"identifiers":[ '
+            '{"type":(.id | tostring | split(":") | .[0]),'
+            ' "identifier":(.id | tostring | split(":") | .[1])}]} '
             "else null end]"
         )
         result = jq.first(program, self.extracted_metadata)
@@ -90,7 +92,7 @@ class DataciteTranslator:
     def get_funding(self):
         program = (
             "[.funding[]? as $element | "
-            "{\"name\": $element, \"identifier\": \"\", \"description\": \"\"}]"
+            '{"name": $element, "identifier": "", "description": ""}]'
         )
         result = jq.first(program, self.extracted_metadata)
         return result if len(result) > 0 else None
@@ -98,26 +100,26 @@ class DataciteTranslator:
     def get_publications(self):
         program = (
             "[.references[]? as $pubin | "
-            "{\"type\":\"\", "
-            "\"title\":$pubin[\"citation\"], "
-            "\"doi\":"
-            "($pubin[\"id\"] | sub(\"DOI:\"; \"https://www.doi.org/\")), "
-            "\"datePublished\":\"\", "
-            "\"publicationOutlet\":\"\", "
-            "\"authors\": []}]"
+            '{"type":"", '
+            '"title":$pubin["citation"], '
+            '"doi":'
+            '($pubin["id"] | sub("DOI:"; "https://www.doi.org/")), '
+            '"datePublished":"", '
+            '"publicationOutlet":"", '
+            '"authors": []}]'
         )
         result = jq.first(program, self.extracted_metadata)
         return result if len(result) > 0 else None
 
     def get_metadata_source(self):
         program = (
-            "{\"key_source_map\": {},\"sources\": [{"
-            "\"source_name\": .extractor_name, "
-            "\"source_version\": .extractor_version, "
-            "\"source_parameter\": .extraction_parameter, "
-            "\"source_time\": .extraction_time, "
-            "\"agent_email\": .agent_email, "
-            "\"agent_name\": .agent_name}]}"
+            '{"key_source_map": {},"sources": [{'
+            '"source_name": .extractor_name, '
+            '"source_version": .extractor_version, '
+            '"source_parameter": .extraction_parameter, '
+            '"source_time": .extraction_time, '
+            '"agent_email": .agent_email, '
+            '"agent_name": .agent_name}]}'
         )
         result = jq.first(program, self.metadata_record)
         return result if len(result) > 0 else None

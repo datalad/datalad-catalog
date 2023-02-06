@@ -43,22 +43,23 @@ def test_translator_not_found():
         TranslatorNotFoundError,
         ctlg,
         "translate",
-        metadata=demo_metafile_wrongname
+        metadata=demo_metafile_wrongname,
     )
     # Wrong version
     assert_raises(
         TranslatorNotFoundError,
         ctlg,
         "translate",
-        metadata=demo_metafile_wrongversion
+        metadata=demo_metafile_wrongversion,
     )
     # Nonsense metadata
     assert_raises(
         TranslatorNotFoundError,
         ctlg,
         "translate",
-        metadata=demo_metafile_nonsense
+        metadata=demo_metafile_nonsense,
     )
+
 
 def test_multiline_translation():
     ctlg = Catalog()

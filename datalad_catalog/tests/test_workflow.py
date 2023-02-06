@@ -317,9 +317,7 @@ def test_workflow_new(super_path=None, cat_path=None):
     # Create catalog
     cat_path = Path(cat_path)
     cat = WebCatalog(
-        location=cat_path,
-        catalog_action="create",
-        config_file=test_config_file
+        location=cat_path, catalog_action="create", config_file=test_config_file
     )
     cat.create(force=True)
     assert cat_path.exists()
@@ -372,7 +370,9 @@ def test_workflow_new(super_path=None, cat_path=None):
         tests_path / "data" / "workflow_generated_meta_super.json"
     )
     correct_meta = read_json_file(correct_meta_path)
-    assert_equal(list(generated_meta.keys()).sort(), list(correct_meta.keys()).sort())
+    assert_equal(
+        list(generated_meta.keys()).sort(), list(correct_meta.keys()).sort()
+    )
     keys_to_test = [
         "authors",
         "children",
@@ -425,7 +425,9 @@ def test_workflow_new(super_path=None, cat_path=None):
     generated_meta = read_json_file(subds_node_path)
     correct_meta_path = tests_path / "data" / "workflow_generated_meta_sub.json"
     correct_meta = read_json_file(correct_meta_path)
-    assert_equal(list(generated_meta.keys()).sort(), list(correct_meta.keys()).sort())
+    assert_equal(
+        list(generated_meta.keys()).sort(), list(correct_meta.keys()).sort()
+    )
     keys_to_test = [
         "authors",
         "children",
@@ -494,9 +496,9 @@ def assert_dict_values_in_list_equal(
     """"""
 
     for key in keys_to_test:
-        print('---')
+        print("---")
         print(key)
-        print('---')
+        print("---")
         assert_equal(len(dict_to_test[key]), len(dict_correct[key]))
         for val in dict_to_test[key]:
             first_key = list(val.keys())[0]
@@ -506,9 +508,10 @@ def assert_dict_values_in_list_equal(
             print(f"first_key: {first_key}")
             print(f"val[first_key]: {val[first_key]}")
             # print(f"x[first_key]: {x[first_key]}")
-            
 
-            found_obj = [x for x in dict_correct[key] if val[first_key] == x[first_key]]
+            found_obj = [
+                x for x in dict_correct[key] if val[first_key] == x[first_key]
+            ]
             assert_equal(len(found_obj), 1)
 
 
@@ -538,7 +541,8 @@ def assert_super_variable_values_equal(
     # extractors_used
     assert_equal(len(dict_to_test["metadata_sources"]["sources"]), 2)
     assert_equal(
-        dict_to_test["metadata_sources"]["sources"][0]["source_name"], "metalad_core"
+        dict_to_test["metadata_sources"]["sources"][0]["source_name"],
+        "metalad_core",
     )
     assert_equal(
         dict_to_test["metadata_sources"]["sources"][1]["source_name"],
@@ -586,8 +590,10 @@ def assert_sub_variable_values_equal(
     # extractors_used
     assert_equal(len(dict_to_test["metadata_sources"]["sources"]), 2)
     assert_equal(
-        dict_to_test["metadata_sources"]["sources"][0]["source_name"], "metalad_core"
+        dict_to_test["metadata_sources"]["sources"][0]["source_name"],
+        "metalad_core",
     )
     assert_equal(
-        dict_to_test["metadata_sources"]["sources"][1]["source_name"], "datacite_gin"
+        dict_to_test["metadata_sources"]["sources"][1]["source_name"],
+        "datacite_gin",
     )

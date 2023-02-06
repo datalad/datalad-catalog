@@ -14,6 +14,7 @@ from datalad_catalog.translate import TranslatorBase
 
 lgr = logging.getLogger("datalad.metadata.translators.metalad_core_translator")
 
+
 class MetaladCoreTranslator(TranslatorBase):
     """
     Translate metadata extracted with metalad and the metalad_core extractor
@@ -21,6 +22,7 @@ class MetaladCoreTranslator(TranslatorBase):
 
     Inherits from base class TranslatorBase.
     """
+
     def __init__(self):
         pass
 
@@ -70,39 +72,39 @@ class CoreTranslator:
 
     def get_url(self):
         program = (
-            ".[]? | select(.[\"@type\"] == \"Dataset\") | "
-            "[.distribution[]? | select(has(\"url\")) | .url]"
+            '.[]? | select(.["@type"] == "Dataset") | '
+            '[.distribution[]? | select(has("url")) | .url]'
         )
         return jq.first(program, self.graph)
 
     def get_authors(self):
         program = (
-            "[.[]? | select(.[\"@type\"]==\"agent\")] | "
-            "map(del(.[\"@id\"], .[\"@type\"]))"
+            '[.[]? | select(.["@type"]=="agent")] | '
+            'map(del(.["@id"], .["@type"]))'
         )
         return jq.first(program, self.graph)
 
     def get_subdatasets(self):
         program = (
-            ".[]? | select(.[\"@type\"] == \"Dataset\") | "
+            '.[]? | select(.["@type"] == "Dataset") | '
             "[.hasPart[]? | "
-            "{\"dataset_id\": (.[\"identifier\"] // \"\" | "
-            "sub(\"^datalad:\"; \"\")), \"dataset_version\": (.[\"@id\"] | "
-            "sub(\"^datalad:\"; \"\")), \"dataset_path\": .[\"name\"], "
-            "\"dirs_from_path\": []}]"
+            '{"dataset_id": (.["identifier"] // "" | '
+            'sub("^datalad:"; "")), "dataset_version": (.["@id"] | '
+            'sub("^datalad:"; "")), "dataset_path": .["name"], '
+            '"dirs_from_path": []}]'
         )
         result = jq.first(program, self.graph)
         return result if len(result) > 0 else None
 
     def get_metadata_source(self):
         program = (
-            "{\"key_source_map\": {},\"sources\": [{"
-            "\"source_name\": .extractor_name, "
-            "\"source_version\": .extractor_version, "
-            "\"source_parameter\": .extraction_parameter, "
-            "\"source_time\": .extraction_time, "
-            "\"agent_email\": .agent_email, "
-            "\"agent_name\": .agent_name}]}"
+            '{"key_source_map": {},"sources": [{'
+            '"source_name": .extractor_name, '
+            '"source_version": .extractor_version, '
+            '"source_parameter": .extraction_parameter, '
+            '"source_time": .extraction_time, '
+            '"agent_email": .agent_email, '
+            '"agent_name": .agent_name}]}'
         )
         result = jq.first(program, self.metadata_record)
         return result if len(result) > 0 else None
