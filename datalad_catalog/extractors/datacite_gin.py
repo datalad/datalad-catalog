@@ -18,11 +18,14 @@ from datalad_metalad.extractors.base import (
     ExtractorResult,
 )
 from datalad.log import log_progress
-from datalad.metadata.definitions import vocabulary_id
 from datalad.utils import assure_unicode
 
 
 lgr = logging.getLogger("datalad.metadata.extractors.datacite_gin")
+
+# From metalad legacy; TODO: remove/replace when it becomes useful
+# identifiers that defines an ontology as a whole
+vocabulary_id = 'http://purl.org/dc/dcam/VocabularyEncodingScheme'
 
 datacite_context = {
     "@id": "https://gin.g-node.org/G-Node/Info/src/master/datacite.yml",
