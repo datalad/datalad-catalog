@@ -1,1 +1,184 @@
-{"dataset_id": "3a8648b3-7df8-413f-8efb-4d39040ac174", "dataset_version": "10e23aafa8271f742e9022a3522d9a88d7fe30cf", "type": "dataset", "children": [], "url": ["http://psydata.ovgu.de/studyforrest/multires7t/.git", "https://datapub.fz-juelich.de/studyforrest/studyforrest.ria/3a8/648b3-7df8-413f-8efb-4d39040ac174"], "authors": [{"name": "Adina Wagner", "email": "adina.wagner@t-online.de"}, {"name": "Ayan Sengupta", "email": "uam111@gmail.com"}, {"name": "Christian M\u00f6nch", "email": "christian.moench@web.de"}, {"name": "Laura Waite", "email": "laura@waite.eu"}, {"name": "Michael Hanke", "email": "michael.hanke@gmail.com"}, {"name": "William Triplett", "email": "wtriplet@stanford.edu"}], "extractors_used": [{"extractor_name": "metalad_core", "extractor_version": "1", "extraction_parameter": {}, "extraction_time": 1652857182.148103, "agent_name": "Stephan Heunis", "agent_email": "s.heunis@fz-juelich.de"}, {"extractor_name": "bids_dataset", "extractor_version": "0.0.1", "extraction_parameter": {}, "extraction_time": 1652857220.577497, "agent_name": "Stephan Heunis", "agent_email": "s.heunis@fz-juelich.de"}, {"extractor_name": "datacite_gin", "extractor_version": "0.0.1", "extraction_parameter": {}, "extraction_time": 1652857221.792691, "agent_name": "Stephan Heunis", "agent_email": "s.heunis@fz-juelich.de"}], "name": "studyforrest_multires7t", "license": {"name": "PDDL", "url": ""}, "keywords": ["suffix", "orientation", "age", "Neuroscience", "subject", "handedness", "BIDS", "Studyforrest", "gender", "coverage"], "funding": [{"name": "", "grant": "", "description": "This research was supported by a grant from the German Research Foundation (DFG) awarded to S. Pollmann and O. Speck (DFG PO 548/15-1). This research was, in part, also supported by the German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this research was supported by US-German CRCNS project, co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1411; NSF 1429999)."}], "additional_display": [{"name": "BIDS", "content": {"subject": ["06", "20", "04", "21", "18", "17", "16"], "session": ["r20", "r08", "r14", "r30"], "task": ["coverage", "orientation"], "reconstruction": ["dico"], "run": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], "recording": ["motion"], "suffix": ["physio", "events", "description", "participants", "bold"], "datatype": ["func"], "extension": [".tsv.gz", ".tsv", ".json", ".nii.gz"]}}], "top_display": [{"name": "Subjects", "value": 7}, {"name": "Sessions", "value": 4}, {"name": "Tasks", "value": 2}, {"name": "Runs", "value": 11}], "description": [{"source": "datacite_gin", "content": "\"Extension of the dataset published in Hanke et al. (2014; doi:10.1038/sdata.2014.3) with\n additional acquisitions for 6 of the original 20 participants (and one additional participant).\n Participants performed a central fixation task while being stimulated with oriented gratings.\n The experiment was repeated in four different sessions with 7T BOLD fMRI acquisition, each\n with a different scan resolution (0.8, 1.4, 2.0, and 3.0 mm).\n \n This research was supported by a grant from the German Research Foundation (DFG) awarded to\n S. Pollmann and O. Speck (DFG PO 548/15-1). This research was, in part, also supported by the\n German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration\n in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science\n Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this\n research was supported by US-German CRCNS project, co-funded by the BMBF and the US National\n Science Foundation (BMBF 01GQ1411; NSF 1429999).\""}], "publications": [{"type": "", "title": "Hanke, M., Baumgartner, F., Ibe, P. et al. A high-resolution 7-Tesla fMRI dataset from complex natural stimulation with an audio movie. Sci Data 1, 140003 (2014).", "doi": "https://www.doi.org/10.1038/sdata.2014.3", "datePublished": "", "publicationOutlet": "", "authors": []}]}
+{
+    "dataset_id": "3a8648b3-7df8-413f-8efb-4d39040ac174",
+    "dataset_version": "10e23aafa8271f742e9022a3522d9a88d7fe30cf",
+    "type": "dataset",
+    "children": [],
+    "url": [
+        "http://psydata.ovgu.de/studyforrest/multires7t/.git",
+        "https://datapub.fz-juelich.de/studyforrest/studyforrest.ria/3a8/648b3-7df8-413f-8efb-4d39040ac174"
+    ],
+    "authors": [
+        {
+            "name": "Adina Wagner",
+            "email": "adina.wagner@t-online.de"
+        },
+        {
+            "name": "Ayan Sengupta",
+            "email": "uam111@gmail.com"
+        },
+        {
+            "name": "Christian M\u00f6nch",
+            "email": "christian.moench@web.de"
+        },
+        {
+            "name": "Laura Waite",
+            "email": "laura@waite.eu"
+        },
+        {
+            "name": "Michael Hanke",
+            "email": "michael.hanke@gmail.com"
+        },
+        {
+            "name": "William Triplett",
+            "email": "wtriplet@stanford.edu"
+        }
+    ],
+    "metadata_sources": {
+        "key_source_map": {},
+        "sources": [
+            {
+                "source_name": "metalad_core",
+                "source_version": "1",
+                "source_parameter": {},
+                "source_time": 1652857182.148103,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "bids_dataset",
+                "source_version": "0.0.1",
+                "source_parameter": {},
+                "source_time": 1652857220.577497,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "datacite_gin",
+                "source_version": "0.0.1",
+                "source_parameter": {},
+                "source_time": 1652857221.792691,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
+            }
+        ]
+    },
+    "name": "studyforrest_multires7t",
+    "license": {
+        "name": "PDDL",
+        "url": ""
+    },
+    "keywords": [
+        "suffix",
+        "orientation",
+        "age",
+        "Neuroscience",
+        "subject",
+        "handedness",
+        "BIDS",
+        "Studyforrest",
+        "gender",
+        "coverage"
+    ],
+    "funding": [
+        {
+            "name": "",
+            "grant": "",
+            "description": "This research was supported by a grant from the German Research Foundation (DFG) awarded to S. Pollmann and O. Speck (DFG PO 548/15-1). This research was, in part, also supported by the German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this research was supported by US-German CRCNS project, co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1411; NSF 1429999)."
+        }
+    ],
+    "additional_display": [
+        {
+            "name": "BIDS",
+            "content": {
+                "subject": [
+                    "06",
+                    "20",
+                    "04",
+                    "21",
+                    "18",
+                    "17",
+                    "16"
+                ],
+                "session": [
+                    "r20",
+                    "r08",
+                    "r14",
+                    "r30"
+                ],
+                "task": [
+                    "coverage",
+                    "orientation"
+                ],
+                "reconstruction": [
+                    "dico"
+                ],
+                "run": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8,
+                    9,
+                    10,
+                    11
+                ],
+                "recording": [
+                    "motion"
+                ],
+                "suffix": [
+                    "physio",
+                    "events",
+                    "description",
+                    "participants",
+                    "bold"
+                ],
+                "datatype": [
+                    "func"
+                ],
+                "extension": [
+                    ".tsv.gz",
+                    ".tsv",
+                    ".json",
+                    ".nii.gz"
+                ]
+            }
+        }
+    ],
+    "top_display": [
+        {
+            "name": "Subjects",
+            "value": 7
+        },
+        {
+            "name": "Sessions",
+            "value": 4
+        },
+        {
+            "name": "Tasks",
+            "value": 2
+        },
+        {
+            "name": "Runs",
+            "value": 11
+        }
+    ],
+    "description": [
+        {
+            "source": "datacite_gin",
+            "content": "\"Extension of the dataset published in Hanke et al. (2014; doi:10.1038/sdata.2014.3) with\n additional acquisitions for 6 of the original 20 participants (and one additional participant).\n Participants performed a central fixation task while being stimulated with oriented gratings.\n The experiment was repeated in four different sessions with 7T BOLD fMRI acquisition, each\n with a different scan resolution (0.8, 1.4, 2.0, and 3.0 mm).\n \n This research was supported by a grant from the German Research Foundation (DFG) awarded to\n S. Pollmann and O. Speck (DFG PO 548/15-1). This research was, in part, also supported by the\n German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration\n in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science\n Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this\n research was supported by US-German CRCNS project, co-funded by the BMBF and the US National\n Science Foundation (BMBF 01GQ1411; NSF 1429999).\""
+        }
+    ],
+    "publications": [
+        {
+            "type": "",
+            "title": "Hanke, M., Baumgartner, F., Ibe, P. et al. A high-resolution 7-Tesla fMRI dataset from complex natural stimulation with an audio movie. Sci Data 1, 140003 (2014).",
+            "doi": "https://www.doi.org/10.1038/sdata.2014.3",
+            "datePublished": "",
+            "publicationOutlet": "",
+            "authors": []
+        }
+    ]
+}

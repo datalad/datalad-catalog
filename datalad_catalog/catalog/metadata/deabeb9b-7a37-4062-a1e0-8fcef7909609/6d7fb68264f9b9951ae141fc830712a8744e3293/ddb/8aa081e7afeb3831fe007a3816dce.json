@@ -228,24 +228,27 @@
             ]
         }
     ],
-    "extractors_used": [
-        {
-            "extractor_name": "metalad_core",
-            "extractor_version": "1",
-            "extraction_parameter": {},
-            "extraction_time": 1652857118.979637,
-            "agent_name": "Stephan Heunis",
-            "agent_email": "s.heunis@fz-juelich.de"
-        },
-        {
-            "extractor_name": "metalad_studyminimeta",
-            "extractor_version": "0.1",
-            "extraction_parameter": {},
-            "extraction_time": 1652857119.960284,
-            "agent_name": "Stephan Heunis",
-            "agent_email": "s.heunis@fz-juelich.de"
-        }
-    ],
+    "metadata_sources": {
+        "key_source_map": {},
+        "sources": [
+            {
+                "source_name": "metalad_core",
+                "source_version": "1",
+                "source_parameter": {},
+                "source_time": 1652857118.979637,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "metalad_studyminimeta",
+                "source_version": "0.1",
+                "source_parameter": {},
+                "source_time": 1652857119.960284,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
+            }
+        ]
+    },
     "name": "StudyForrest",
     "description": [
         {
