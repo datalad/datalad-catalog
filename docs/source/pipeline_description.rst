@@ -56,7 +56,7 @@ Step 2 - Add metadata
 In order to extract arbitrary structured metadata from a DataLad dataset,
 this information first has to be added explicitly to the dataset. It can
 be added in your preferred location in the dataset tree. For example, here
-we add a ``studyminimeta.yaml`` file to the root directory of the dataset:
+we add a ``.studyminimeta.yaml`` file to the root directory of the dataset:
 
 .. code-block:: bash
    
@@ -69,7 +69,7 @@ Once the dataset has been updated with metadata, it has to be saved:
    
     datalad save -m "add metadata to mydataset"
 
-Various metadata formats are recognized by DataLad MetaLad's extractors.
+Various metadata formats can be recognized by DataLad MetaLad's extraction process.
 See :doc:`metadata_formats` for an overview and `DataLad Metalad`_'s
 documentation for more detail.
 
@@ -216,10 +216,30 @@ looks like this:
     }
 
 At the end of this process, you have two files with structured metadata that
-can be given as arguments to DataLad Catalog in order to generate the catalog.
+can eventually be provided to ``datalad-atalog`` in order to generate the catalog
+and its entries.
 
 
-Step 4 - Run DataLad Catalog
+Step 4 - Translate the metadata
+-------------------------------
+
+Before the extracted metadata can be provided to ``datalad-atalog``, it needs to be
+in a format/structure that will validate successfully against the catalog schema.
+Extracted metadata will typically be structured according to whatever schema was
+specified by the extractor, and information in such a schema will have to be translated
+to the catalog schema. For this purpose, ``datalad-catalog`` provides a ``translate``
+mechanism together with dedicated translators for specific metadata extractors.
+See :doc:`metadata_formats` and the :doc:`usage` instructions for more information.
+
+To translate the extracted metadata, we do the following:
+
+.. code-block:: bash
+   
+    datalad catalog translate -m [path/to/dataset_metadata.json] > [path/to/translated_dataset_metadata.json]
+    datalad catalog translate -m [path/to/file_metadata.json] > [path/to/translated_file_metadata.json]
+
+
+Step 5 - Run DataLad Catalog
 ----------------------------
 
 .. note:: Detailed usage instructions for DataLad Catalog can be viewed in
@@ -236,29 +256,24 @@ To create a catalog from the metadata we generated above, we can run the followi
 .. code-block:: bash
 
     #!/bin/zsh
-    DATASET_METADATA_OUT_PATH="path/to/dataset_metadata.json"
-    FILE_METADATA_OUT_PATH="path/to/file_metadata.json"
+    TRANSLATED_DATASET_METADATA_OUT_PATH="path/to/translated_dataset_metadata.json"
+    TRANSLATED_FILE_METADATA_OUT_PATH="path/to/translated_file_metadata.json"
     CATALOG_PATH="path/to/new/catalog"
-    datalad catalog create -c "$CATALOG_PATH" -m "$DATASET_METADATA_OUT_PATH"
-    datalad catalog add -c "$CATALOG_PATH" -m "$FILE_METADATA_OUT_PATH"
+    datalad catalog create -c "$CATALOG_PATH" -m "$TRANSLATED_DATASET_METADATA_OUT_PATH"
+    datalad catalog add -c "$CATALOG_PATH" -m "$TRANSLATED_FILE_METADATA_OUT_PATH"
 
 
-Step 5 - Deploy the catalog
----------------------------
+Step 6 - Next steps
+-------------------
 
-.. admonition:: TODO
-    
-    - add/update content
+Congratulations! You now have a catalog with multiple entries!
 
+This catalog can be served locally (``datalad catalog serve``) to view/test it, deployed
+to an open or/restricted cloud server in order to make it available to the public or 
+colleagues/collaborators (e.g. via GitHub Pages in the case of publicly available catalogs),
+and updated with new entries in future (with a ``datalad catalog add``).
 
-Step 6 - Update the catalog
----------------------------
-
-.. admonition:: TODO
-    
-    - add/update content
-
-
+Happy cataloging!
 
 .. _DataLad Handbook: https://handbook.datalad.org/en/latest/basics/basics-datasets.html
 .. _DataLad Metalad: https://github.com/datalad/datalad-metalad
