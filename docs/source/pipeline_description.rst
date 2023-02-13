@@ -194,7 +194,7 @@ Extract and write to disk:
 where the pipeline in ``path/to/extract_file_pipeline.json``
 looks like this:
 
-.. code-block:: json
+.. code-block:: javascript
 
     {
       "provider": {

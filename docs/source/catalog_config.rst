@@ -15,6 +15,7 @@ Catalog-level configuration
 
 Via the catalog-level config (provided during ``catalog create``) you can specify
 the following properties:
+
 - the catalog name
 - a path to a logo file to be used in the rendered catalog header
 - the HEX color code to be used for links in the rendered catalog
@@ -29,8 +30,7 @@ Dataset-level configuration
 The dataset-level config (provided during ``catalog add``) can specify the exact same content,
 although then the catalog-level properties mentioned above will be ignored.
 
-This configuration
-file will be located at: ``path-to-catalog/metadata/<dataset_id>/<dataset_version>/config.json.
+This configuration file will be located at: ``path-to-catalog/metadata/<dataset_id>/<dataset_version>/config.json``.
 
 This configuration file will be created for all dataset-level metadata items in the metadata
 provided to the ``add`` operation. For each dataset, this file will override the default
@@ -41,8 +41,7 @@ Inheritance rules
 
 - If not specified by the user on the catalog-level, a default built-in config file is used.
 - The catalog-level config serves as the default for dataset-level config.
-- If not specified on the dataset-level by the user, the rendering rules will be
-inherited from the catalog level.
+- If not specified on the dataset-level by the user, the rendering rules will be inherited from the catalog level.
 
 Prioritizing rendered metadata properties
 =========================================
@@ -62,7 +61,7 @@ and sources can be specified *per property* of a file and a dataset.
 
 Here is an example config structure:
 
-.. code-block:: json
+.. code-block:: javascript
 
    config = {
        ...
@@ -96,6 +95,7 @@ Rules
 -----
 
 A rule can be:
+
 - ``single``: only save metadata from a single specified source
 - ``merge``: merge specified sources together
 - ``priority``: save only one source from a list of sources, where the sources are prioritised based on the order in which they appear in the list
@@ -106,6 +106,7 @@ Sources
 -------
 
 A source is generally a list of strings, with the list containing:
+
 - a single element, when the ``single`` rule is specified
 - multiple elements, when the ``merge`` or ``priority`` rules are specified
 
@@ -133,7 +134,7 @@ and in this source information being tracked.
 The tracking process is done in the ``metadata_sources`` of the metadata entry for the
 specific dataset in the catalog. For example (before the metadata update):
 
-.. code-block:: json
+.. code-block:: javascript
 
    {
      "type": "dataset",
@@ -169,6 +170,7 @@ specific dataset in the catalog. For example (before the metadata update):
    }
 
 As can be seen in the above object, the structure of ``metadata_sources``, 
+
 - ``metadata_sources["sources"]`` contains a list of metadata sources (with extra info such as version, agent, etc) that have provided content for this particular metadata record.
 - ``metadata_sources["key_source_map"]`` provides a mapping of which metadata sources were used to provide content for which specific keys in the metadata record.
 
