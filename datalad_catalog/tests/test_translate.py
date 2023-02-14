@@ -3,6 +3,7 @@ from datalad_catalog.catalog import Catalog
 from datalad_catalog.translate import (
     Translate,
     TranslatorNotFoundError,
+    get_translators,
 )
 from datalad_catalog.utils import read_json_file
 from datalad.tests.utils import (
@@ -33,7 +34,7 @@ def test_correct_translation():
 
 def test_correct_translation_with_class():
     meta_dict = read_json_file(demo_metafile_datacite)
-    Translate(meta_dict).run_translator()
+    Translate(meta_dict, get_translators()).run_translator()
 
 
 def test_translator_not_found():

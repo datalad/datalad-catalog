@@ -36,6 +36,7 @@ from datalad_catalog.webcatalog import (
 )
 from datalad_catalog.translate import (
     Translate,
+    get_translators,
 )
 
 # Create named logger
@@ -848,6 +849,8 @@ def _translate_metadata(metadata: str):
             "or JSON lines stream, using the argument: -m, --metadata."
         )
         raise InsufficientArgumentsError(err_msg)
+    # Get available translators
+    translators = get_translators()
     # Open metadata file and translate line by line
     num_lines = _get_line_count(metadata)
     with open(metadata) as file:
@@ -880,7 +883,7 @@ def _translate_metadata(metadata: str):
                 )
                 lgr.warning(err_msg)
             # Translate dict
-            translated_meta = Translate(meta_dict).run_translator()
+            translated_meta = Translate(meta_dict, translators).run_translator()
             yield get_status_dict(
                 action="catalog_translate",
                 path=Path(metadata),

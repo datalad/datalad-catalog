@@ -105,11 +105,14 @@ class Translate(object):
     metadata translation.
     """
 
-    def __init__(self, meta_record: dict = None) -> None:
+    def __init__(self, meta_record: dict = None, translators: dict = None) -> None:
         """"""
         self.meta_record = meta_record
         if self.meta_record is None:
             raise ValueError("No metadata record provided")
+        self.available_translators = translators
+        if self.available_translators is None:
+            raise ValueError("No translators provided")
         self.match_translator()
 
     def match_translator(self):
@@ -130,11 +133,14 @@ class Translate(object):
         source_name = self.meta_record.get(cnst.EXTRACTOR_NAME)
         source_version = self.meta_record.get(cnst.EXTRACTOR_VERSION)
         matched_translators = []
-        for translator_name, translator_dict in get_translators().items():
+        for translator_name, translator_dict in self.available_translators.items():
             translator_class = translator_dict["loader"]()
             translator_instance = translator_class()
             if translator_instance.match(source_name, source_version):
+                # break on first match
                 matched_translators.append(translator_instance)
+                break
+        # Raise error if there was no match
         if not matched_translators:
             self.translator = None
             raise TranslatorNotFoundError(
@@ -165,10 +171,16 @@ def get_translators(include_load_error: bool = False) -> dict:
     """
     translator_dict = get_entry_points("datalad.metadata.translators")
     translator_eps = translator_dict
+    # Include all translator entrypoints vs only those without load errors
     if include_load_error:
         translator_eps = {
             name: translator_dict[name]
             for name in translator_dict.keys()
             if translator_dict[name]["load_error"] is None
         }
+    # Raise error if no translators found
+    if not bool(translator_eps):
+        raise TranslatorNotFoundError(
+            f"No metadata translators were found"
+        )
     return translator_eps

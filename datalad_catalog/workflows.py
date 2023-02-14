@@ -11,7 +11,10 @@ from datalad.api import (
 from datalad.distribution.dataset import Dataset
 from datalad.local.wtf import _describe_metadata_elements
 from datalad.support.exceptions import IncompleteResultsError
-from datalad_catalog.translate import Translate
+from datalad_catalog.translate import (
+    Translate,
+    get_translators,
+)
 from datalad_catalog.utils import read_json_file
 from datalad_catalog.webcatalog import WebCatalog
 from datalad_catalog.catalog import (
@@ -197,7 +200,7 @@ def dataset_workflow(ds: Dataset, catalog, **kwargs):
                 # )
                 write_jsonline_to_file(
                     translated_file,
-                    Translate(meta_dict).run_translator(),
+                    Translate(meta_dict, get_translators()).run_translator(),
                 )
             except Exception as e:
                 lgr.error("Failed to translate line due to error: %s", str(e))
