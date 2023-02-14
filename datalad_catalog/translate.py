@@ -19,7 +19,7 @@ class TranslatorBase(metaclass=abc.ABCMeta):
     @classmethod
     @abc.abstractmethod
     def match(
-        cls, source_name: str, source_version: str, source_id: str | None = None
+        cls, source_name: str, source_version: str, source_id: str = None
     ) -> bool:
         """
         Report the result of matching criteria applied to the translator
