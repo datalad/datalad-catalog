@@ -17,6 +17,7 @@ from datalad_metalad.extractors.base import (
     DataOutputCategory,
     ExtractorResult,
 )
+from datalad_metalad.extractors.legacy.definitions import vocabulary_id
 from datalad.log import log_progress
 from datalad.utils import ensure_unicode
 
