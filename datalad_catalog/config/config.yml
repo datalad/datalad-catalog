@@ -12,7 +12,7 @@ property_sources:
     dataset_id: 
       rule: "single"
       source: "metalad_core",
-    dataset_version: "metalad_core",
+    dataset_version:
       rule: "single"
       source: "metalad_core",
     type:
