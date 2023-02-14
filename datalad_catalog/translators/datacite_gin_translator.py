@@ -26,7 +26,9 @@ class DataciteGINTranslator(TranslatorBase):
     def __init__(self):
         pass
 
-    def match(cls, source_name: str, source_version: str, source_id: str | None = None) -> bool:
+    def match(
+        cls, source_name: str, source_version: str, source_id: str | None = None
+    ) -> bool:
         """
         Matching routine for the current translator
 
@@ -44,11 +46,8 @@ class DataciteGINTranslator(TranslatorBase):
             bool
                 True if the match is successful, else False.
         """
-        
-        extractor_name_match = (
-            
-            cls.get_supported_extractor_name() == source_name
-        )
+
+        extractor_name_match = cls.get_supported_extractor_name() == source_name
         extractor_version_match = (
             cls.get_supported_extractor_version() == source_version
         )
@@ -70,7 +69,7 @@ class DataciteGINTranslator(TranslatorBase):
         Reports the version of the catalog schema supported by the translator
         """
         return "1.0.0"
-    
+
     @classmethod
     def get_supported_extractor_name(self):
         """

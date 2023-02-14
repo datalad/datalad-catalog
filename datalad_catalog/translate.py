@@ -18,7 +18,9 @@ class TranslatorBase(metaclass=abc.ABCMeta):
 
     @classmethod
     @abc.abstractmethod
-    def match(cls, source_name: str, source_version: str, source_id: str | None = None) -> bool:
+    def match(
+        cls, source_name: str, source_version: str, source_id: str | None = None
+    ) -> bool:
         """
         Report the result of matching criteria applied to the translator
 
@@ -29,7 +31,7 @@ class TranslatorBase(metaclass=abc.ABCMeta):
         and the catalog schema version
         """
         raise NotImplementedError
-    
+
     @abc.abstractmethod
     def translate(self, metadata):
         """
@@ -39,7 +41,7 @@ class TranslatorBase(metaclass=abc.ABCMeta):
         object to the catalog schema (version-specific).
         """
         raise NotImplementedError
-    
+
     @classmethod
     def get_current_schema_version(self) -> str:
         """
@@ -64,7 +66,9 @@ class Translate(object):
     metadata translation.
     """
 
-    def __init__(self, meta_record: dict = None, translators: dict = None) -> None:
+    def __init__(
+        self, meta_record: dict = None, translators: dict = None
+    ) -> None:
         """"""
         self.meta_record = meta_record
         if self.meta_record is None:
@@ -92,7 +96,10 @@ class Translate(object):
         source_name = self.meta_record.get(cnst.EXTRACTOR_NAME)
         source_version = self.meta_record.get(cnst.EXTRACTOR_VERSION)
         matched_translators = []
-        for translator_name, translator_dict in self.available_translators.items():
+        for (
+            translator_name,
+            translator_dict,
+        ) in self.available_translators.items():
             translator_class = translator_dict["loader"]()
             translator_instance = translator_class()
             if translator_instance.match(source_name, source_version):
@@ -139,7 +146,5 @@ def get_translators(include_load_error: bool = False) -> dict:
         }
     # Raise error if no translators found
     if not bool(translator_eps):
-        raise TranslatorNotFoundError(
-            f"No metadata translators were found"
-        )
+        raise TranslatorNotFoundError(f"No metadata translators were found")
     return translator_eps

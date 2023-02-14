@@ -28,7 +28,9 @@ class MetaladStudyminimetaTranslator(TranslatorBase):
     def __init__(self):
         pass
 
-    def match(cls, source_name: str, source_version: str, source_id: str | None = None) -> bool:
+    def match(
+        cls, source_name: str, source_version: str, source_id: str | None = None
+    ) -> bool:
         """
         Matching routine for the current translator
 
@@ -46,11 +48,8 @@ class MetaladStudyminimetaTranslator(TranslatorBase):
             bool
                 True if the match is successful, else False.
         """
-        
-        extractor_name_match = (
-            
-            cls.get_supported_extractor_name() == source_name
-        )
+
+        extractor_name_match = cls.get_supported_extractor_name() == source_name
         extractor_version_match = (
             cls.get_supported_extractor_version() == source_version
         )
