@@ -146,7 +146,7 @@ class WebCatalog(object):
         # Check logo path, if added to config
         if (
             self.catalog_config.get(cnst.LOGO_PATH) is not None
-            and not Path(self.catalog_config[cnst.LOGO_PATH]).exists():
+            and not Path(self.catalog_config[cnst.LOGO_PATH]).exists()
         ):
             msg = f"Error in config: the specified logo does not exist at path: {self.catalog_config[cnst.LOGO_PATH]}"
             raise FileNotFoundError(msg)
@@ -241,7 +241,7 @@ class WebCatalog(object):
         """"""
         # Copy content specified by config
         if (
-            self.config.get(cnst.LOGO_PATH) not in (None, "artwork/catalog_logo.svg")
+            self.catalog_config.get(cnst.LOGO_PATH) not in (None, "artwork/catalog_logo.svg")
         ):
             existing_path = Path(self.catalog_config[cnst.LOGO_PATH])
             existing_name = existing_path.name
