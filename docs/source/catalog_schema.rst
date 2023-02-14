@@ -10,12 +10,11 @@ Source files defining the catalog's schema can be found here:
 - `dataset`_
 - `file`_
 - `authors`_
-- `extractors`_
+- `metadata_sources`_
 
 
 A rendering of the schema can be accessed at:
 https://datalad.github.io/datalad-catalog/display_schema.html
-
 
 
 .. _draft 2020-12: https://json-schema.org/specification.html
@@ -25,4 +24,4 @@ https://datalad.github.io/datalad-catalog/display_schema.html
 .. _dataset: https://raw.githubusercontent.com/datalad/datalad-catalog/main/datalad_catalog/schema/jsonschema_dataset.json
 .. _file: https://raw.githubusercontent.com/datalad/datalad-catalog/main/datalad_catalog/schema/jsonschema_file.json
 .. _authors: https://raw.githubusercontent.com/datalad/datalad-catalog/main/datalad_catalog/schema/jsonschema_authors.json
-.. _extractors: https://raw.githubusercontent.com/datalad/datalad-catalog/main/datalad_catalog/schema/jsonschema_extractors.json
+.. _metadata_sources: https://raw.githubusercontent.com/datalad/datalad-catalog/main/datalad_catalog/schema/jsonschema_metadata_sources.json

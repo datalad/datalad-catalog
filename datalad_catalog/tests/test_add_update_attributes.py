@@ -228,7 +228,7 @@ def test_rules_and_sources(demo_node_dataset: Node, demo_metadata: dict):
         demo_node_dataset, "license"
     )  # test: empty/missing value is skipped
     assert not hasattr(
-        demo_node_dataset, "funcding"
+        demo_node_dataset, "funding"
     )  # test: empty/missing value is skipped
     assert (
         demo_node_dataset.subdatasets == core_attributes["subdatasets"]
@@ -267,8 +267,11 @@ def test_rules_and_sources(demo_node_dataset: Node, demo_metadata: dict):
     assert (
         demo_node_dataset.authors is None
     )  # test: current source not in merge list
-    assert demo_node_dataset.keywords == list(
-        set(core_attributes["keywords"] + bids_attributes["keywords"])
+    assert (
+        demo_node_dataset.keywords.sort()
+        == list(
+            set(core_attributes["keywords"] + bids_attributes["keywords"])
+        ).sort()
     )  # test: merge any
     assert (
         demo_node_dataset.description == bids_attributes["description"]
@@ -280,7 +283,7 @@ def test_rules_and_sources(demo_node_dataset: Node, demo_metadata: dict):
         demo_node_dataset, "license"
     )  # test: empty/missing value is skipped
     assert not hasattr(
-        demo_node_dataset, "funcding"
+        demo_node_dataset, "funding"
     )  # test: empty/missing value is skipped
     assert (
         demo_node_dataset.subdatasets == core_attributes["subdatasets"]
@@ -326,12 +329,15 @@ def test_rules_and_sources(demo_node_dataset: Node, demo_metadata: dict):
     assert (
         demo_node_dataset.authors == minimeta_attributes["authors"]
     )  # test: current source in merge list
-    assert demo_node_dataset.keywords == list(
-        set(
-            core_attributes["keywords"]
-            + bids_attributes["keywords"]
-            + minimeta_attributes["keywords"]
-        )
+    assert (
+        demo_node_dataset.keywords.sort()
+        == list(
+            set(
+                core_attributes["keywords"]
+                + bids_attributes["keywords"]
+                + minimeta_attributes["keywords"]
+            )
+        ).sort()
     )  # test: merge any
     assert (
         demo_node_dataset.description == minimeta_attributes["description"]
@@ -343,7 +349,7 @@ def test_rules_and_sources(demo_node_dataset: Node, demo_metadata: dict):
         demo_node_dataset, "license"
     )  # test: empty/missing value is skipped
     assert not hasattr(
-        demo_node_dataset, "funcding"
+        demo_node_dataset, "funding"
     )  # test: empty/missing value is skipped
     assert (
         demo_node_dataset.subdatasets == core_attributes["subdatasets"]

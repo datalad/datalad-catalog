@@ -116,11 +116,104 @@ Configuration
 
 A useful feature of the catalog process is to be able to configure certain
 properties according to your preferences. This is done with help of a config
-file (in either ``JSON`` or ``YAML`` format) and the ``-y/--config-file`` flag during
-catalog creation.
+file (in either ``JSON`` or ``YAML`` format) and the ``-y/--config-file`` flag.
+A config file can be passed during catalog creation in order to set the config
+on the catalog level:
 
 .. code-block:: bash
 
    datalad catalog create --catalog_dir /tmp/my-custom-cat --config-file path/to/custom_config.json
 
-If no config file is specified, a default config file is used.
+A config file can also be passed when adding metadata in order to set the config
+on the dataset-level:
+
+.. code-block:: bash
+
+   datalad catalog add --catalog_dir /tmp/my-custom-cat --metadata path/to/metadata.jsonl --config-file path/to/custom_dataset_config.json
+
+In the latter case, the config will be set for all new dataset entries corresponding
+to metadata source objects in the metadata provided to the ``add`` operation.
+
+If no config file is specified on the catalog level, a default config file is used.
+The catalog-level config also serves as the default config on the dataset level,
+which is used if no config file is specified on the dataset-level.
+
+For detailed information on how to structure and use config files, please refer to
+the dedicated documentation in :doc:`catalog_config`.
+
+
+Translate
+=========
+
+``datalad-catalog`` can translate a metadata item originating from a particular
+source structure and extracted using ``datalad-metalad`` into the catalog schema.
+Before translation from a specific source will work, an extractor-specific translator
+should be provided and exposed as an entry point (via a DataLad extension) as part of the
+``datalad.metadata.translators`` group. Translate metadata as follows:
+
+.. code-block:: bash
+
+   datalad catalog translate --metadata path/to/extracted/metadata.jsonl
+
+This command will output the translated objects as JSON lines to ``stdout``, which can 
+be saved to disk and later used, for example, for catalog entry generation.
+
+Workflows
+=========
+
+Several subprocesses need to be run in order to create a new catalog with multiple entries,
+or in order to update an existing catalog with new entries. These processes can include:
+
+- tracking datasets that are intended to be entries in a catalog as subdatasets of a DataLad super-dataset
+- extracting (and temporarily storing) metadata from the super- and subdatasets
+- translating extracted metadata (and temporarily storing it)
+- creating a catalog
+- adding translated metadata to the catalog
+- updating the catalog's superdataset (i.e. homepage) if the DataLad superdataset version changed
+
+It is evident that these steps can become quite cumbersome and even resource intensive if run
+at scale. Therefore, in order to streamline these processes, to automate them as much as possible,
+and to shift the effort away from the user, ``datalad-catalog`` can run workflows for catalog 
+generation and updates. It builds on top of the following functionality:
+
+- *DataLad datasets* and nesting for maintaining a super-/subdataset hierarchy.
+- ``datalad-metalad``'s metadata extraction functionality
+- ``datalad-catalog``'s metadata translation functionality
+- ``datalad-catalog`` for maintaining a catalog
+
+``workflow-new``
+----------------
+
+To run a workflow from scratch on a dataset and all of its subdatasets:
+
+.. code-block:: bash
+
+   datalad catalog workflow-new --catalog_dir /tmp/my-cat --dataset-path path/to/super/dataset
+
+This workflow will:
+1. Clone the super-dataset and all its first-level subdatasets
+2. Create the catalog if it does not yet exists
+3. Run dataset-level metadata extraction on the super- and subdatasets
+4. Translate all extracted metadata to the catalog schema
+5. Add the translated metadata as entries to the catalog
+6. Set the catalog's super-dataset to the *id* and *version* of the DataLad super-dataset.
+
+``workflow-update``
+-------------------
+To run a workflow for updating an existing catalog after registering a new subdataset
+to the superdataset which the catalog represents:
+
+.. code-block:: bash
+
+   datalad catalog workflow-new --catalog_dir /tmp/my-cat --dataset-path path/to/super/dataset
+
+This workflow assumes:
+- The subdataset has already been added as a submodule to the parent dataset
+- The parent dataset already contains the subdataset commit
+
+This workflow will:
+1. Clone the super-dataset and new subdataset
+2. Run dataset-level metadata extraction on the super-dataset and new subdataset
+3. Translate all extracted metadata to the catalog schema
+4. Add the translated metadata as entries to the catalog
+5. Reset the catalog's super-dataset to the latest *id* and *version* of the DataLad super-dataset.

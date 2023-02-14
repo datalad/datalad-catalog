@@ -236,7 +236,7 @@
       },
       "uniqueItems": true
     },
-    "extractors_used": {"$ref": "https://datalad.org/catalog.extractors.schema.json"},
+    "metadata_sources": {"$ref": "https://datalad.org/catalog.metadata_sources.schema.json"},
     "additional_display": {
       "description": "Additonal items to display in tabs on dataset page",
       "title": "Additional display",

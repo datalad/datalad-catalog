@@ -1,1 +1,237 @@
-{"dataset_id": "5eaff716-54eb-11e8-803d-a0369f7c647e", "dataset_version": "72f835ada046bd0479009ea0ff933b30a95b0076", "type": "dataset", "children": [], "url": ["http://psydata.ovgu.de/studyforrest/phase2/.git", "https://datapub.fz-juelich.de/studyforrest/studyforrest.ria/5ea/ff716-54eb-11e8-803d-a0369f7c647e"], "authors": [{"name": "Adina Wagner", "email": "adina.wagner@t-online.de"}, {"name": "Christian M\u00f6nch", "email": "christian.moench@web.de"}, {"name": "Daniel Kottke", "email": "daniel.kottke@ovgu.de"}, {"name": "Daniel Kottke", "email": "daniel@kottke.eu"}, {"name": "Laura Waite", "email": "laura@waite.eu"}, {"name": "Michael Hanke", "email": "michael.hanke@gmail.com"}, {"name": "William Triplett", "email": "wtriplet@stanford.edu"}], "extractors_used": [{"extractor_name": "metalad_core", "extractor_version": "1", "extraction_parameter": {}, "extraction_time": 1652857226.1982641, "agent_name": "Stephan Heunis", "agent_email": "s.heunis@fz-juelich.de"}, {"extractor_name": "bids_dataset", "extractor_version": "0.0.1", "extraction_parameter": {}, "extraction_time": 1652857263.8858109, "agent_name": "Stephan Heunis", "agent_email": "s.heunis@fz-juelich.de"}, {"extractor_name": "datacite_gin", "extractor_version": "0.0.1", "extraction_parameter": {}, "extraction_time": 1652857264.862466, "agent_name": "Stephan Heunis", "agent_email": "s.heunis@fz-juelich.de"}], "name": "studyforrest_phase2", "license": {"name": "PDDL", "url": ""}, "keywords": ["forrest_seen_dist", "age", "forrest_av_fatigue", "movielocalizer", "forrest_av_feeling", "suffix", "forrest_ad_known", "Neuroscience", "movie", "retmapexp", "subject", "retmapcon", "forrest_seen_languages", "vision_problems_past", "objectcategories", "hearing_problems_current", "hearing_problems_past", "forrest_seen", "forrest_av_storydepth", "forrest_av_artist_count", "handedness", "retmapccw", "retmapclw", "forrest_seen_count", "Studyforrest", "forrest_av_rating", "vision_problems_current", "BIDS", "gender"], "funding": [{"name": "", "grant": "", "description": "We acknowledge the support of the Combinatorial NeuroImaging Core Facility at the Leibniz Institute for Neurobiology in Magdeburg, and the German federal state of Saxony-Anhalt, Project: Center for Behavioral Brain Sciences. This research was, in part, also supported by the German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this research was supported by US-German CRCNS project, co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1411; NSF 1429999)."}], "additional_display": [{"name": "BIDS", "content": {"subject": ["18", "26", "36", "01", "30", "03", "33", "14", "32", "28", "05", "06", "04", "27", "16", "22", "10", "31", "02", "09", "23", "19", "25", "24", "35", "17", "34", "20", "15", "29"], "session": ["localizer", "movie"], "task": ["retmapccw", "retmapcon", "movie", "objectcategories", "retmapclw", "movielocalizer", "retmapexp"], "run": [1, 2, 3, 4, 5, 6, 7, 8], "recording": ["eyegaze", "cardresp"], "suffix": ["participants", "bold", "description", "physio", "events"], "datatype": ["beh", "func"], "extension": [".json", ".tsv", ".tsv.gz", ".nii.gz"]}}], "top_display": [{"name": "Subjects", "value": 30}, {"name": "Sessions", "value": 2}, {"name": "Tasks", "value": 7}, {"name": "Runs", "value": 8}], "description": [{"source": "datacite_gin", "content": "\"Extension of the dataset published in Hanke et al.\n (2014; doi:10.1038/sdata.2014.3) with additional acquisitions for 15 of\n the original 20 participants. These additions include: retinotopic mapping,\n a localizer paradigm for higher visual areas (FFA, EBA, PPA), and another\n 2h movie recording with 3T full-brain BOLD fMRI with simultaneous 1000 Hz\n eyetracking.\n\n This is an extension of the studyforrest project, all participants previously\n volunteered for the audio-only Forrest Gump study. The datset is structured in\n BIDS format, details of the files and metadata can be found at:\n\n   Ayan Sengupta, Falko R. Kaule, J. Swaroop Guntupalli, Michael B. Hoffmann,\n   Christian H\u00e4usler, J\u00f6rg Stadler, Michael Hanke. `An extension of the\n   studyforrest dataset for vision research\n   <http://biorxiv.org/content/early/2016/03/31/046573>`_. (submitted for\n   publication)\n\n   Michael Hanke, Nico Adelh\u00f6fer, Daniel Kottke, Vittorio Iacovella,\n   Ayan Sengupta, Falko R. Kaule, Roland Nigbur, Alexander Q. Waite,\n   Florian J. Baumgartner & J\u00f6rg Stadler. `Simultaneous fMRI and eye gaze\n   recordings during prolonged natural stimulation \u2013 a studyforrest extension\n   <http://biorxiv.org/content/early/2016/03/31/046581>`_. (submitted for\n   publication)\n\n For more information about the project visit: http://studyforrest.org\n\n We acknowledge the support of the Combinatorial NeuroImaging Core\n Facility at the Leibniz Institute for Neurobiology in Magdeburg, and\n the German federal state of Saxony-Anhalt, Project: Center for\n Behavioral Brain Sciences. This research was, in part, also supported\n by the German Federal Ministry of Education and Research (BMBF) as\n part of a US-German collaboration in computational neuroscience (CRCNS),\n co-funded by the BMBF and the US National Science Foundation\n (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology\n employed for this research was supported by US-German CRCNS project,\n co-funded by the BMBF and the US National Science Foundation\n (BMBF 01GQ1411; NSF 1429999).\""}], "publications": [{"type": "", "title": "Sengupta, A., Kaule, F. R., Guntupalli, J. S., Hoffmann, M. B., H\u00e4usler, C., Stadler, J., Hanke, M. (2016). A studyforrest extension, retinotopic mapping and localization of higher visual areas. Scientific Data, 3, 160093.", "doi": "doi:10.1038/sdata.2016.93", "datePublished": "", "publicationOutlet": "", "authors": []}, {"type": "", "title": "Hanke, M, Adelh\u00f6fer, N, Kottke, D, Iacovella, V, Sengupta, A, Kaule, FR, Nigbur, R, Waite, AQ, Baumgartner, F, Stadler, J (2016). A studyforrest extension, simultaneous fMRI and eye gaze recordings during prolonged natural stimulation. Scientific Data, 3, 160092.", "doi": "doi:10.1038/sdata.2016.92", "datePublished": "", "publicationOutlet": "", "authors": []}]}
+{
+    "dataset_id": "5eaff716-54eb-11e8-803d-a0369f7c647e",
+    "dataset_version": "72f835ada046bd0479009ea0ff933b30a95b0076",
+    "type": "dataset",
+    "children": [],
+    "url": [
+        "http://psydata.ovgu.de/studyforrest/phase2/.git",
+        "https://datapub.fz-juelich.de/studyforrest/studyforrest.ria/5ea/ff716-54eb-11e8-803d-a0369f7c647e"
+    ],
+    "authors": [
+        {
+            "name": "Adina Wagner",
+            "email": "adina.wagner@t-online.de"
+        },
+        {
+            "name": "Christian M\u00f6nch",
+            "email": "christian.moench@web.de"
+        },
+        {
+            "name": "Daniel Kottke",
+            "email": "daniel.kottke@ovgu.de"
+        },
+        {
+            "name": "Daniel Kottke",
+            "email": "daniel@kottke.eu"
+        },
+        {
+            "name": "Laura Waite",
+            "email": "laura@waite.eu"
+        },
+        {
+            "name": "Michael Hanke",
+            "email": "michael.hanke@gmail.com"
+        },
+        {
+            "name": "William Triplett",
+            "email": "wtriplet@stanford.edu"
+        }
+    ],
+    "metadata_sources": {
+        "key_source_map": {},
+        "sources": [
+            {
+                "source_name": "metalad_core",
+                "source_version": "1",
+                "source_parameter": {},
+                "source_time": 1652857226.1982641,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "bids_dataset",
+                "source_version": "0.0.1",
+                "source_parameter": {},
+                "source_time": 1652857263.8858109,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "datacite_gin",
+                "source_version": "0.0.1",
+                "source_parameter": {},
+                "source_time": 1652857264.862466,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
+            }
+        ]
+    },
+    "name": "studyforrest_phase2",
+    "license": {
+        "name": "PDDL",
+        "url": ""
+    },
+    "keywords": [
+        "forrest_seen_dist",
+        "age",
+        "forrest_av_fatigue",
+        "movielocalizer",
+        "forrest_av_feeling",
+        "suffix",
+        "forrest_ad_known",
+        "Neuroscience",
+        "movie",
+        "retmapexp",
+        "subject",
+        "retmapcon",
+        "forrest_seen_languages",
+        "vision_problems_past",
+        "objectcategories",
+        "hearing_problems_current",
+        "hearing_problems_past",
+        "forrest_seen",
+        "forrest_av_storydepth",
+        "forrest_av_artist_count",
+        "handedness",
+        "retmapccw",
+        "retmapclw",
+        "forrest_seen_count",
+        "Studyforrest",
+        "forrest_av_rating",
+        "vision_problems_current",
+        "BIDS",
+        "gender"
+    ],
+    "funding": [
+        {
+            "name": "",
+            "grant": "",
+            "description": "We acknowledge the support of the Combinatorial NeuroImaging Core Facility at the Leibniz Institute for Neurobiology in Magdeburg, and the German federal state of Saxony-Anhalt, Project: Center for Behavioral Brain Sciences. This research was, in part, also supported by the German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this research was supported by US-German CRCNS project, co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1411; NSF 1429999)."
+        }
+    ],
+    "additional_display": [
+        {
+            "name": "BIDS",
+            "content": {
+                "subject": [
+                    "18",
+                    "26",
+                    "36",
+                    "01",
+                    "30",
+                    "03",
+                    "33",
+                    "14",
+                    "32",
+                    "28",
+                    "05",
+                    "06",
+                    "04",
+                    "27",
+                    "16",
+                    "22",
+                    "10",
+                    "31",
+                    "02",
+                    "09",
+                    "23",
+                    "19",
+                    "25",
+                    "24",
+                    "35",
+                    "17",
+                    "34",
+                    "20",
+                    "15",
+                    "29"
+                ],
+                "session": [
+                    "localizer",
+                    "movie"
+                ],
+                "task": [
+                    "retmapccw",
+                    "retmapcon",
+                    "movie",
+                    "objectcategories",
+                    "retmapclw",
+                    "movielocalizer",
+                    "retmapexp"
+                ],
+                "run": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8
+                ],
+                "recording": [
+                    "eyegaze",
+                    "cardresp"
+                ],
+                "suffix": [
+                    "participants",
+                    "bold",
+                    "description",
+                    "physio",
+                    "events"
+                ],
+                "datatype": [
+                    "beh",
+                    "func"
+                ],
+                "extension": [
+                    ".json",
+                    ".tsv",
+                    ".tsv.gz",
+                    ".nii.gz"
+                ]
+            }
+        }
+    ],
+    "top_display": [
+        {
+            "name": "Subjects",
+            "value": 30
+        },
+        {
+            "name": "Sessions",
+            "value": 2
+        },
+        {
+            "name": "Tasks",
+            "value": 7
+        },
+        {
+            "name": "Runs",
+            "value": 8
+        }
+    ],
+    "description": [
+        {
+            "source": "datacite_gin",
+            "content": "\"Extension of the dataset published in Hanke et al.\n (2014; doi:10.1038/sdata.2014.3) with additional acquisitions for 15 of\n the original 20 participants. These additions include: retinotopic mapping,\n a localizer paradigm for higher visual areas (FFA, EBA, PPA), and another\n 2h movie recording with 3T full-brain BOLD fMRI with simultaneous 1000 Hz\n eyetracking.\n\n This is an extension of the studyforrest project, all participants previously\n volunteered for the audio-only Forrest Gump study. The datset is structured in\n BIDS format, details of the files and metadata can be found at:\n\n   Ayan Sengupta, Falko R. Kaule, J. Swaroop Guntupalli, Michael B. Hoffmann,\n   Christian H\u00e4usler, J\u00f6rg Stadler, Michael Hanke. `An extension of the\n   studyforrest dataset for vision research\n   <http://biorxiv.org/content/early/2016/03/31/046573>`_. (submitted for\n   publication)\n\n   Michael Hanke, Nico Adelh\u00f6fer, Daniel Kottke, Vittorio Iacovella,\n   Ayan Sengupta, Falko R. Kaule, Roland Nigbur, Alexander Q. Waite,\n   Florian J. Baumgartner & J\u00f6rg Stadler. `Simultaneous fMRI and eye gaze\n   recordings during prolonged natural stimulation \u2013 a studyforrest extension\n   <http://biorxiv.org/content/early/2016/03/31/046581>`_. (submitted for\n   publication)\n\n For more information about the project visit: http://studyforrest.org\n\n We acknowledge the support of the Combinatorial NeuroImaging Core\n Facility at the Leibniz Institute for Neurobiology in Magdeburg, and\n the German federal state of Saxony-Anhalt, Project: Center for\n Behavioral Brain Sciences. This research was, in part, also supported\n by the German Federal Ministry of Education and Research (BMBF) as\n part of a US-German collaboration in computational neuroscience (CRCNS),\n co-funded by the BMBF and the US National Science Foundation\n (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology\n employed for this research was supported by US-German CRCNS project,\n co-funded by the BMBF and the US National Science Foundation\n (BMBF 01GQ1411; NSF 1429999).\""
+        }
+    ],
+    "publications": [
+        {
+            "type": "",
+            "title": "Sengupta, A., Kaule, F. R., Guntupalli, J. S., Hoffmann, M. B., H\u00e4usler, C., Stadler, J., Hanke, M. (2016). A studyforrest extension, retinotopic mapping and localization of higher visual areas. Scientific Data, 3, 160093.",
+            "doi": "doi:10.1038/sdata.2016.93",
+            "datePublished": "",
+            "publicationOutlet": "",
+            "authors": []
+        },
+        {
+            "type": "",
+            "title": "Hanke, M, Adelh\u00f6fer, N, Kottke, D, Iacovella, V, Sengupta, A, Kaule, FR, Nigbur, R, Waite, AQ, Baumgartner, F, Stadler, J (2016). A studyforrest extension, simultaneous fMRI and eye gaze recordings during prolonged natural stimulation. Scientific Data, 3, 160092.",
+            "doi": "doi:10.1038/sdata.2016.92",
+            "datePublished": "",
+            "publicationOutlet": "",
+            "authors": []
+        }
+    ]
+}

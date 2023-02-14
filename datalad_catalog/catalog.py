@@ -17,7 +17,7 @@ from datalad.interface.base import (
     build_doc,
 )
 from datalad.interface.results import get_status_dict
-from datalad.interface.utils import eval_results
+from datalad.interface.base import eval_results
 from datalad.log import log_progress
 from datalad.support.constraints import EnsureChoice
 from datalad.support.exceptions import InsufficientArgumentsError
@@ -34,9 +34,14 @@ from datalad_catalog.webcatalog import (
     Node,
     WebCatalog,
 )
+from datalad_catalog.translate import (
+    Translate,
+    get_translators,
+)
 
 # Create named logger
 lgr = logging.getLogger("datalad.catalog.catalog")
+
 
 # Decoration auto-generates standard help
 @build_doc
@@ -158,6 +163,16 @@ class Catalog(Interface):
                 "-d 'path/to/superdataset' -s 'path/to/subdataset'"
             ),
         ),
+        dict(
+            text=(
+                "Translate a metadata item from a particular source structure "
+                "into the catalog schema. A dedicated translator should be "
+                "provided and exposed as an entry point (e.g. via a DataLad "
+                "extension) as part of the 'datalad.metadata.translators' group."
+            ),
+            code_py=("catalog('translate', metadata='path/to/metadata.jsonl')"),
+            code_cmd=("datalad catalog translate -m path/to/metadata.jsonl"),
+        ),
     ]
 
     # parameters of the command, must be exhaustive
@@ -180,6 +195,7 @@ class Catalog(Interface):
                 "validate",
                 "workflow-new",
                 "workflow-update",
+                "translate",
             ),
         ),
         catalog_dir=Parameter(
@@ -263,7 +279,6 @@ class Catalog(Interface):
         dataset_path=None,
         subdataset_path=None,
     ):
-
         """
         [summary]
 
@@ -295,6 +310,7 @@ class Catalog(Interface):
             "set-super",
             "workflow-new",
             "workflow-update",
+            "translate",
         ]
         if catalog_action not in CALL_ACTION:
             raise ValueError(
@@ -308,6 +324,10 @@ class Catalog(Interface):
         # If action is validate, only metadata required
         if catalog_action == "validate":
             yield from _validate_metadata(metadata)
+            return
+        # If action is translate, only metadata required
+        if catalog_action == "translate":
+            yield from _translate_metadata(metadata)
             return
 
         # Error out if `catalog_dir` argument was not supplied
@@ -689,7 +709,7 @@ def _validate_metadata(metadata: str):
     # Setup schema parameters
     package_path = Path(__file__).resolve().parent
     schema_dir = package_path / "schema"
-    schemas = ["catalog", "dataset", "file", "authors", "extractors"]
+    schemas = ["catalog", "dataset", "file", "authors", "metadata_sources"]
     schema_store = {}
     for s in schemas:
         schema_path = schema_dir / str("jsonschema_" + s + ".json")
@@ -801,3 +821,74 @@ def _run_workflow(
 def _get_line_count(file: str) -> int:
     """A helper function to get a file line count"""
     return sum(1 for _ in open(file))
+
+
+def _translate_metadata(metadata: str):
+    """Translate a metadata item from a particular source structure
+    into the catalog schema.
+
+    A dedicated translator should be provided and exposed as an entry
+    point (e.g. via a DataLad extension) as part of the
+    'datalad.metadata.translators' group."
+
+    Parameters
+    ----------
+    metadata : path-like object
+        metadata to be translated
+
+    Yields
+    ------
+    status_dict : dict
+        DataLad result record
+    """
+    # First check metadata was supplied via -m flag
+    if metadata is None:
+        err_msg = (
+            "No metadata supplied: datalad catalog has to be supplied with "
+            "metadata in the form of a path to a file containing a JSON array, "
+            "or JSON lines stream, using the argument: -m, --metadata."
+        )
+        raise InsufficientArgumentsError(err_msg)
+    # Get available translators
+    translators = get_translators()
+    # Open metadata file and translate line by line
+    num_lines = _get_line_count(metadata)
+    with open(metadata) as file:
+        i = 0
+        prog_id = "catalogtranslate"
+        log_progress(
+            lgr.info,
+            prog_id,
+            "Translating metadata",
+            unit=" Lines",
+            label="Translating",
+            total=num_lines,
+        )
+        for line in file:
+            i += 1
+            log_progress(
+                lgr.info,
+                prog_id,
+                "Translating metadata",
+                update=i,
+                noninteractive_level=logging.DEBUG,
+            )
+            meta_dict = json.loads(line.rstrip())
+            # Check if item/line is a dict
+            if not isinstance(meta_dict, dict):
+                err_msg = (
+                    "Metadata item not of type dict: metadata items should be "
+                    "passed to datalad catalog as JSON objects adhering to the "
+                    "catalog schema."
+                )
+                lgr.warning(err_msg)
+            # Translate dict
+            translated_meta = Translate(meta_dict, translators).run_translator()
+            yield get_status_dict(
+                action="catalog_translate",
+                path=Path(metadata),
+                status="ok",
+                message=("Metadata successfully translated"),
+                translated_metadata=translated_meta,
+            )
+        log_progress(lgr.info, prog_id, "Translation completed")

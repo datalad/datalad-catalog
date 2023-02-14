@@ -72,10 +72,15 @@ metadata originating only from ``datalad-metalad``'s extractors, this tool has
 advanced metadata handling capabilities that will integrate seamlessly with
 DataLad datasets and the catalog generation process.
 
+In order to translate metadata extracted using ``datalad-metalad`` into the
+catalog schema, ``datalad-catalog`` provides tranlation modules that are
+dependent on `jq`_.
+
 .. _datalad: https://github.com/datalad/datalad
 .. _GitHub: https://github.com/datalad/datalad-catalog
 .. _datalad-metalad: https://github.com/datalad/datalad-metalad
 .. _DataLad Handbook: https://handbook.datalad.org/en/latest/intro/installation.html
+.. _jq: https://stedolan.github.io/jq/
 .. _miniconda: https://docs.conda.io/en/latest/miniconda.html
 .. _PyPI: https://pypi.org/project/datalad-catalog/
 .. _venv: https://github.com/pypa/virtualenv

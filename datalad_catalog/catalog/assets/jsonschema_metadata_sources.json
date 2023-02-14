@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datalad.org/catalog.metadata_sources.schema.json",
+  "title": "metadata_sources",
+  "description": "A list of sources of metadata for a dataset or file in the catalog, including which sources have provided content for which fields",
+  "type": "object",
+  "properties": {
+    "key_source_map": {
+      "title": "Key-source map",
+      "description": "A mapping of sources to catalog fields",
+      "type": "object"
+    },
+    "sources": {
+      "title": "Sources",
+      "description": "A list of sources of metadata for a dataset or file in the catalog",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source_name": {
+            "description": "The source name",
+            "title": "Source name",
+            "type": "string"
+          },
+          "source_version": {
+            "description": "The source version",
+            "title": "Source version",
+            "type": "string"
+          },
+          "source_parameter": {
+            "description": "Parameters used together with the source",
+            "title": "Source parameter",
+            "type": "object"
+          },
+          "source_time": {
+            "description": "The time (since epoch) when this source was used to provide the applicable metadata",
+            "title": "Source time",
+            "type": "number"
+          },
+          "agent_name": {
+            "description": "git identity name of person/process that sourced the metadata",
+            "title": "Agent name",
+            "type": "string"
+          },
+          "agent_email": {
+            "description": "git identity email of person/process that sourced the metadata",
+            "title": "Agent email",
+            "type": "string"
+          }
+        },
+        "required": ["source_name", "source_version"]
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    }
+  },
+  "required": ["sources"]
+}

@@ -15,7 +15,7 @@ from datalad_catalog.webcatalog import WebCatalog
 # Setup schema parameters
 package_path = Path(__file__).resolve().parent.parent
 schema_dir = package_path / "schema"
-schemas = ["dataset", "file", "authors", "extractors"]
+schemas = ["dataset", "file", "authors", "metadata_sources"]
 schema_store = {}
 for s in schemas:
     schema_path = schema_dir / str("jsonschema_" + s + ".json")

@@ -104,12 +104,12 @@ const datasetView = () =>
               ) {
                 disp_dataset["license"] = "not available";
               }
-              // Latest extracted time
-              sorted_extractors = dataset.extractors_used.sort(
-                (a, b) => b.extraction_time - a.extraction_time
+              // Most recent metadata update
+              sorted_metadata_sources = dataset.metadata_sources.sources.sort(
+                (a, b) => b.source_time - a.source_time
               );
-              disp_dataset.metadata_extracted = this.getDateFromUTCseconds(
-                sorted_extractors[0].extraction_time
+              disp_dataset.last_updated = this.getDateFromUTCseconds(
+                sorted_metadata_sources[0].source_time
               );
               // ID, version and location
               disp_dataset.file_path =
@@ -241,11 +241,11 @@ const datasetView = () =>
             } else {
               if (this.sort_modified) {
                 sorted = subdatasets.sort((a, b) =>
-                  a.extraction_time > b.extraction_time ? 1 : -1
+                  a.source_time > b.source_time ? 1 : -1
                 );
               } else {
                 sorted = subdatasets.sort((a, b) =>
-                  a.extraction_time < b.extraction_time ? 1 : -1
+                  a.source_time < b.source_time ? 1 : -1
                 );
               }
             }
@@ -495,11 +495,11 @@ const datasetView = () =>
             subds_json = await grabSubDatasets(this.$root);
             subds_json.forEach((subds, index) => {
               if (subds_json[index] != "unavailable") {
-                sorted_extractors = subds_json[index].extractors_used.sort(
-                  (a, b) => b.extraction_time - a.extraction_time
+                sorted_metadata_sources = subds_json[index].metadata_sources.sources.sort(
+                  (a, b) => b.source_time - a.source_time
                 );
-                this.$root.selectedDataset.subdatasets[index].extraction_time =
-                  sorted_extractors[0].extraction_time;
+                this.$root.selectedDataset.subdatasets[index].source_time =
+                  sorted_metadata_sources[0].source_time;
                 this.$root.selectedDataset.subdatasets[index].name = subds_json[index]
                   .name
                   ? subds_json[index].name
@@ -560,11 +560,11 @@ const datasetView = () =>
             subds_json = await grabSubDatasets(app);
             subds_json.forEach((subds, index) => {
               if (subds_json[index] != "unavailable") {
-                sorted_extractors = subds_json[index].extractors_used.sort(
-                  (a, b) => b.extraction_time - a.extraction_time
+                sorted_metadata_sources = subds_json[index].metadata_sources.sources.sort(
+                  (a, b) => b.source_time - a.source_time
                 );
-                this.$root.selectedDataset.subdatasets[index].extraction_time =
-                  sorted_extractors[0].extraction_time;
+                this.$root.selectedDataset.subdatasets[index].source_time =
+                  sorted_metadata_sources[0].source_time;
                 this.$root.selectedDataset.subdatasets[index].name =
                   subds_json[index].name;
                 this.$root.selectedDataset.subdatasets[index].short_name =

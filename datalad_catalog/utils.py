@@ -71,3 +71,49 @@ def merge_lists(existing_value, new_value):
             else:
                 continue
         return existing_value
+
+
+def get_entry_points(group: str) -> dict:
+    """Return all entrypoints of a specific group known to the current installation
+
+    Parameters
+    ----------
+    group : str
+        A string representing the group for which entrypoints will be listed
+
+    Returns
+    -------
+    entry_points : dict
+        A dictionary of entry points
+    """
+    from datalad.support.entrypoints import iter_entrypoints
+    from datalad.support.exceptions import CapturedException
+    from importlib import import_module
+
+    if sys.version_info < (3, 10):
+        # 3.10 is when it was no longer provisional
+        from importlib_metadata import distribution
+    else:
+        from importlib.metadata import distribution
+    entry_points = {}
+    for ename, emod, eload in iter_entrypoints(group):
+        info = {}
+        entry_points[f"{ename}"] = info
+        try:
+            info["module"] = emod
+            dist = distribution(emod.split(".", maxsplit=1)[0])
+            info["distribution"] = f"{dist.name} {dist.version}"
+            mod = import_module(emod, package="datalad")
+            version = getattr(mod, "__version__", None)
+            if version:
+                # no not clutter the report with no version
+                info["version"] = version
+            info["loader"] = eload
+            eload()
+            info["load_error"] = None
+        except Exception as e:
+            ce = CapturedException(e)
+            info["load_error"] = ce.format_short()
+            continue
+
+    return entry_points
