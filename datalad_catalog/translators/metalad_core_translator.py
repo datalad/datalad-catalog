@@ -26,18 +26,59 @@ class MetaladCoreTranslator(TranslatorBase):
     def __init__(self):
         pass
 
+    def match(cls, source_name: str, source_version: str, source_id: str | None = None) -> bool:
+        """
+        Matching routine for the current translator
+
+        Parameters
+        ----------
+        source_name: str
+            The name of the metadata extractor/source
+        source_version: str
+            The version of the metadata extractor/source
+        source_id: str | None, optional
+            The unique extractor/source ID. Defaults to None.
+
+        Returns
+        -------
+            bool
+                True if the match is successful, else False.
+        """
+        
+        extractor_name_match = (
+            
+            cls.get_supported_extractor_name() == source_name
+        )
+        extractor_version_match = (
+            cls.get_supported_extractor_version() == source_version
+        )
+        schema_version_match = (
+            cls.get_supported_schema_version()
+            == cls.get_current_schema_version()
+        )
+        # TODO: support partial matches of version (major/minor/patch)
+
+        return (
+            extractor_name_match
+            & extractor_version_match
+            & schema_version_match
+        )
+
+    @classmethod
     def get_supported_schema_version(self):
         """
         Reports the version of the catalog schema supported by the translator
         """
         return "1.0.0"
 
+    @classmethod
     def get_supported_extractor_name(self):
         """
         Reports the name of the extractor supported by the translator
         """
         return "metalad_core"
 
+    @classmethod
     def get_supported_extractor_version(self):
         """
         Reports the version of the extractor supported by the translator

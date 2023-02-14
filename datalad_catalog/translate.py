@@ -12,13 +12,13 @@ class TranslatorBase(metaclass=abc.ABCMeta):
     incoming metadata to a translator that inherits from this base class,
     as well as the following abstract methods that should be overridden
     by the inheriting class:
-        get_supported_schema_version()
-        get_supported_extractor_name()
-        get_supported_extractor_version()
+        match()
         translate()
     """
 
-    def match(self, source_name: str, source_version: str) -> bool:
+    @classmethod
+    @abc.abstractmethod
+    def match(cls, source_name: str, source_version: str, source_id: str | None = None) -> bool:
         """
         Report the result of matching criteria applied to the translator
 
@@ -28,24 +28,8 @@ class TranslatorBase(metaclass=abc.ABCMeta):
         Current criteria include extractor name and extractor version,
         and the catalog schema version
         """
-        extractor_name_match = (
-            self.get_supported_extractor_name() == source_name
-        )
-        extractor_version_match = (
-            self.get_supported_extractor_version() == source_version
-        )
-        schema_version_match = (
-            self.get_supported_schema_version()
-            == self.get_current_schema_version()
-        )
-        # TODO: support partial matches of version (major/minor/patch)
-
-        return (
-            extractor_name_match
-            & extractor_version_match
-            & schema_version_match
-        )
-
+        raise NotImplementedError
+    
     @abc.abstractmethod
     def translate(self, metadata):
         """
@@ -55,33 +39,8 @@ class TranslatorBase(metaclass=abc.ABCMeta):
         object to the catalog schema (version-specific).
         """
         raise NotImplementedError
-
-    @abc.abstractmethod
-    def get_supported_schema_version(self) -> str:
-        """
-        Report the version of the catalog schema supported by the translator
-
-        It will be matched to the `version` field in
-        `datalad_catalog/schema/jsonschema_catalog.json`.
-        """
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def get_supported_extractor_name(self) -> str:
-        """
-        Report the name of the extractor supported by the translator
-        """
-        raise NotImplementedError
-
-    @abc.abstractmethod
-    def get_supported_extractor_version(self) -> str:
-        """
-        Report the version of the extractor supported by the translator
-
-        Use semantic versioning where possible
-        """
-        raise NotImplementedError
-
+    
+    @classmethod
     def get_current_schema_version(self) -> str:
         """
         Retrieves schema version of current package installation
