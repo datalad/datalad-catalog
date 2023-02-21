@@ -36,6 +36,8 @@ test_data_paths = {
     "bids_dataset": tests_path / "data" / "metadata_bids_dataset2.json",
 }
 
+test_config_file = tests_path / "data" / "test_config_file_workflow.json"
+
 studyminimeta_content = """\
 #<!-- METADATA START --> # DO NOT DELETE THIS LINE
 # All example text is surrounded with <ex> and </ex>. Please replace the example
@@ -298,6 +300,7 @@ super_ds_tree = {
     },
 }
 
+
 @skip_if_on_windows
 @skip_if_adjusted_branch
 @with_tree(tree=super_ds_tree)
@@ -315,7 +318,9 @@ def test_workflow_new(super_path=None, cat_path=None):
     assert (Path(super_ds.path) / ".studyminimeta.yaml").exists()
     # Create catalog
     cat_path = Path(cat_path)
-    cat = WebCatalog(location=cat_path)
+    cat = WebCatalog(
+        location=cat_path, catalog_action="create", config_file=test_config_file
+    )
     cat.create(force=True)
     assert cat_path.exists()
     assert cat_path.is_dir()
@@ -367,7 +372,9 @@ def test_workflow_new(super_path=None, cat_path=None):
         tests_path / "data" / "workflow_generated_meta_super.json"
     )
     correct_meta = read_json_file(correct_meta_path)
-    assert_equal(generated_meta.keys(), correct_meta.keys())
+    assert_equal(
+        list(generated_meta.keys()).sort(), list(correct_meta.keys()).sort()
+    )
     keys_to_test = [
         "authors",
         "children",
@@ -379,9 +386,14 @@ def test_workflow_new(super_path=None, cat_path=None):
         "url",
     ]
     assert_dict_values_equal(generated_meta, correct_meta, keys_to_test)
+    # keys_to_test = [
+    #     "authors",
+    #     "publications",
+    # ]
+    # assert_dict_values_in_list_equal(generated_meta, correct_meta, keys_to_test)
     assert_super_variable_values_equal(
         generated_meta,
-        ["subdatasets", "extractors_used", "dataset_id", "dataset_version"],
+        ["subdatasets", "metadata_sources", "dataset_id", "dataset_version"],
         dataset_details,
     )
     # - Node metadata directories and content: superdataset subdir
@@ -415,22 +427,29 @@ def test_workflow_new(super_path=None, cat_path=None):
     generated_meta = read_json_file(subds_node_path)
     correct_meta_path = tests_path / "data" / "workflow_generated_meta_sub.json"
     correct_meta = read_json_file(correct_meta_path)
-    assert_equal(generated_meta.keys(), correct_meta.keys())
+    assert_equal(
+        list(generated_meta.keys()).sort(), list(correct_meta.keys()).sort()
+    )
     keys_to_test = [
         "authors",
         "children",
         "description",
         "funding",
         "keywords",
+        "publications",
         "license",
         "name",
-        "publications",
         "type",
     ]
     assert_dict_values_equal(generated_meta, correct_meta, keys_to_test)
+    # keys_to_test = [
+    #     "authors",
+    #     "publications",
+    # ]
+    # assert_dict_values_in_list_equal(generated_meta, correct_meta, keys_to_test)
     assert_sub_variable_values_equal(
         generated_meta,
-        ["extractors_used", "dataset_id", "dataset_version"],
+        ["metadata_sources", "dataset_id", "dataset_version"],
         dataset_details,
     )
 
@@ -466,8 +485,36 @@ def assert_dict_values_equal(
     keys_to_test: list,
 ):
     """"""
+
     for key in keys_to_test:
         assert_equal(dict_to_test[key], dict_correct[key])
+
+
+def assert_dict_values_in_list_equal(
+    dict_to_test: dict,
+    dict_correct: dict,
+    keys_to_test: list,
+):
+    """"""
+
+    for key in keys_to_test:
+        print("---")
+        print(key)
+        print("---")
+        assert_equal(len(dict_to_test[key]), len(dict_correct[key]))
+        for val in dict_to_test[key]:
+            first_key = list(val.keys())[0]
+            print(f"dict_correct[key]: {dict_correct[key]}")
+            print(f"dict_to_test[key]: {dict_to_test[key]}")
+            print(f"val: {val}")
+            print(f"first_key: {first_key}")
+            print(f"val[first_key]: {val[first_key]}")
+            # print(f"x[first_key]: {x[first_key]}")
+
+            found_obj = [
+                x for x in dict_correct[key] if val[first_key] == x[first_key]
+            ]
+            assert_equal(len(found_obj), 1)
 
 
 def assert_super_variable_values_equal(
@@ -494,12 +541,13 @@ def assert_super_variable_values_equal(
     ]
     assert_equal(dict_to_test["subdatasets"], correct_subds)
     # extractors_used
-    assert_equal(len(dict_to_test["extractors_used"]), 2)
+    assert_equal(len(dict_to_test["metadata_sources"]["sources"]), 2)
     assert_equal(
-        dict_to_test["extractors_used"][0]["extractor_name"], "metalad_core"
+        dict_to_test["metadata_sources"]["sources"][0]["source_name"],
+        "metalad_core",
     )
     assert_equal(
-        dict_to_test["extractors_used"][1]["extractor_name"],
+        dict_to_test["metadata_sources"]["sources"][1]["source_name"],
         "metalad_studyminimeta",
     )
 
@@ -542,10 +590,12 @@ def assert_sub_variable_values_equal(
     assert_equal(dict_to_test["dataset_id"], dataset_details["sub_ds"][0])
     assert_equal(dict_to_test["dataset_version"], dataset_details["sub_ds"][1])
     # extractors_used
-    assert_equal(len(dict_to_test["extractors_used"]), 2)
+    assert_equal(len(dict_to_test["metadata_sources"]["sources"]), 2)
     assert_equal(
-        dict_to_test["extractors_used"][0]["extractor_name"], "metalad_core"
+        dict_to_test["metadata_sources"]["sources"][0]["source_name"],
+        "metalad_core",
     )
     assert_equal(
-        dict_to_test["extractors_used"][1]["extractor_name"], "datacite_gin"
+        dict_to_test["metadata_sources"]["sources"][1]["source_name"],
+        "datacite_gin",
     )

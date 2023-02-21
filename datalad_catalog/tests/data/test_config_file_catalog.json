@@ -1,0 +1,79 @@
+{
+    "catalog_name": "DataCat",
+    "logo_path": "",
+    "link_color": "#fba304",
+    "link_hover_color": "#af7714",
+    "property_sources": {
+        "dataset": {
+            "dataset_id": {
+                "rule": "single",
+                "source": "metalad_core"
+            },
+            "dataset_version": {
+                "rule": "single",
+                "source": "metalad_core"
+            },
+            "type": {
+                "rule": "single",
+                "source": "metalad_core"
+            },
+            "children": {
+                "rule": "merge",
+                "source": "any"
+            },
+            "name": {
+                "rule": "single",
+                "source": "metalad_studyminimeta"
+            },
+            "short_name": {},
+            "description": {
+                "rule": "priority",
+                "source": [
+                    "catalog_readme",
+                    "metalad_studyminimeta",
+                    "datacite_gin",
+                    "bids_dataset"
+                ]
+            },
+            "doi": {
+                "rule": "xxxx",
+                "source": "yyy"
+            },
+            "url": {
+                "rule": "merge",
+                "source": "any"
+            },
+            "authors": {
+                "rule": "merge",
+                "source": [
+                    "metalad_studyminimeta"
+                ]
+            },
+            "keywords": {
+                "rule": "merge",
+                "source": "any"
+            },
+            "license": {},
+            "funding": {
+                "rule": "merge",
+                "source": "any"
+            },
+            "publications": {
+                "rule": "merge",
+                "source": "any"
+            },
+            "subdatasets": {
+                "rule": "merge",
+                "source": "any"
+            },
+            "additional_display": {
+                "rule": "merge",
+                "source": "any"
+            },
+            "top_display": {
+                "rule": "merge",
+                "source": "any"
+            }
+        }
+    }   
+}

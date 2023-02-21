@@ -1,4 +1,9 @@
 import platform
 
-if platform.system() == 'Windows':
-    collect_ignore_glob = ["*workflow.py", "*workflows.py"]
+if platform.system() == "Windows":
+    collect_ignore_glob = [
+        "*workflow.py",
+        "*workflows.py",
+        "*translate.py",
+        "*translator.py",
+    ]

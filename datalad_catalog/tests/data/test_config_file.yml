@@ -1,3 +1,6 @@
+# TODO: this yml needs to be updated to use the most recent config structure,
+# see tests/data/test_config_file.json
+
 # Catalog properties
 catalog_name: "DataLad Catalog Config Test"
 
@@ -7,24 +10,20 @@ link_color: "#fba304" # hex color code
 link_hover_color: "#af7714" # hex color code
 
 # Dealing with multiple sources of metadata
-# Options:
-# - prioritised list, show all and user selects ==> yaml list of extractors, top to bottom = high to low priority
-# - merge all sources ==> "merge"
-# - prioritised list, show one ==> yaml list of extractors, top to bottom = high to low priority
-# - single source ==> extractor name
-
-# Note 1: all sources do not have to be included in the ordered list. The ones that are included are taken as priority
-# in order of appearance. Sources that are not included in list below are still considered, see Note 2.
-
-# Note 2: for unspecified properties, default behaviour is to:
-# - overwrite if null/empty 
-# - if existing (do nothing? turn into array?)
 property_sources: #
   dataset:
-    authors: merge
+    authors:
+      rule: merge
+      source: any
     description:
-      display: all
-      source: []
-    keywords: merge
-    additional_display: merge
-    top_display: merge
+      rule: merge
+      source: any
+    keywords:
+      rule: merge
+      source: any
+    additional_display:
+      rule: merge
+      source: any
+    top_display:
+      rule: merge
+      source: any

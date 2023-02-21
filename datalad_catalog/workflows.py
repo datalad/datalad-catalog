@@ -11,11 +11,19 @@ from datalad.api import (
 from datalad.distribution.dataset import Dataset
 from datalad.local.wtf import _describe_metadata_elements
 from datalad.support.exceptions import IncompleteResultsError
+from datalad_catalog.translate import (
+    Translate,
+    get_translators,
+)
 from datalad_catalog.utils import read_json_file
 from datalad_catalog.webcatalog import WebCatalog
 from datalad_catalog.catalog import (
     _add_to_catalog,
 )
+
+# metadata_file = Path('datalad_catalog/tests/data/metadata_datacite_gin.json')
+# metadata_record = utils.read_json_file(metadata_file)
+# translate.Translate(metadata_record).run_translator()
 
 lgr = logging.getLogger("datalad.catalog.workflows")
 
@@ -89,6 +97,7 @@ def super_workflow(dataset_path, catalog: WebCatalog):
     cat = catalog
     if not cat.is_created():
         cat.create()
+
     # Call per-dataset workflow
     def _dataset_workflow_inner(ds, refds, **kwargs):
         """Internal function to allow passing"""
@@ -184,14 +193,14 @@ def dataset_workflow(ds: Dataset, catalog, **kwargs):
         for line in file:
             meta_dict = json.loads(line.rstrip())
             try:
-                extr_name = meta_dict["extractor_name"]
-                extr_type = meta_dict["type"]
-                mapping_path = schema_dir / get_translation_map(
-                    extr_name, extr_type
-                )
+                # extr_name = meta_dict["extractor_name"]
+                # extr_type = meta_dict["type"]
+                # mapping_path = schema_dir / get_translation_map(
+                #     extr_name, extr_type
+                # )
                 write_jsonline_to_file(
                     translated_file,
-                    translate_to_catalog(meta_dict, mapping_path),
+                    Translate(meta_dict, get_translators()).run_translator(),
                 )
             except Exception as e:
                 lgr.error("Failed to translate line due to error: %s", str(e))

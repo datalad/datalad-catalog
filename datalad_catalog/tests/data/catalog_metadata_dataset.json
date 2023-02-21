@@ -131,16 +131,21 @@
   "publications": [],
   "subdatasets": [],
   "children": [],
-  "extractors_used": [
-    {
-      "extractor_name": "bids_dataset",
-      "extractor_version": "0.0.1",
-      "extraction_parameter": {},
-      "extraction_time": 1643901350.65269,
-      "agent_name": "Stephan Heunis",
-      "agent_email": "s.heunis@fz-juelich.de"
-    }
-  ],
+  "metadata_sources": {
+    "key_source_map": {
+    },
+    "sources": [
+      {
+        "source_name": "bids_dataset",
+        "source_version": "0.0.1",
+        "source_parameter": {},
+        "source_time": 1643901350.65269,
+        "agent_name": "Stephan Heunis",
+        "agent_email": "s.heunis@fz-juelich.de"
+      }
+    ]
+
+  },
   "additional_display": [
     {
       "name": "BIDS",

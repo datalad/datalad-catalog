@@ -1,0 +1,36 @@
+{
+    "catalog_name": "DataLad Catalog Config Test Dataset",
+    "link_color": "#fba304",
+    "link_hover_color": "#af7714",
+    "property_sources": {
+        "dataset": {
+            "description": {
+                "rule": "priority",
+                "source": [
+                    "catalog_readme",
+                    "metalad_studyminimeta",
+                    "datacite_gin",
+                    "bids_dataset"
+                ]
+            },
+            "authors": {
+                "rule": "merge",
+                "source": [
+                    "metalad_studyminimeta"
+                ]
+            },
+            "keywords": {
+                "rule": "merge",
+                "source": "any"
+            },
+            "additional_display": {
+                "rule": "merge",
+                "source": "any"
+            },
+            "top_display": {
+                "rule": "merge",
+                "source": "any"
+            }
+        }
+    }
+}

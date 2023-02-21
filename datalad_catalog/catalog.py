@@ -17,7 +17,7 @@ from datalad.interface.base import (
     build_doc,
 )
 from datalad.interface.results import get_status_dict
-from datalad.interface.utils import eval_results
+from datalad.interface.base import eval_results
 from datalad.log import log_progress
 from datalad.support.constraints import EnsureChoice
 from datalad.support.exceptions import InsufficientArgumentsError
@@ -34,9 +34,14 @@ from datalad_catalog.webcatalog import (
     Node,
     WebCatalog,
 )
+from datalad_catalog.translate import (
+    Translate,
+    get_translators,
+)
 
 # Create named logger
 lgr = logging.getLogger("datalad.catalog.catalog")
+
 
 # Decoration auto-generates standard help
 @build_doc
@@ -158,6 +163,16 @@ class Catalog(Interface):
                 "-d 'path/to/superdataset' -s 'path/to/subdataset'"
             ),
         ),
+        dict(
+            text=(
+                "Translate a metadata item from a particular source structure "
+                "into the catalog schema. A dedicated translator should be "
+                "provided and exposed as an entry point (e.g. via a DataLad "
+                "extension) as part of the 'datalad.metadata.translators' group."
+            ),
+            code_py=("catalog('translate', metadata='path/to/metadata.jsonl')"),
+            code_cmd=("datalad catalog translate -m path/to/metadata.jsonl"),
+        ),
     ]
 
     # parameters of the command, must be exhaustive
@@ -168,8 +183,7 @@ class Catalog(Interface):
             # documentation
             doc="""This is the subcommand to be executed by datalad-catalog.
             Options include: create, add, remove, serve, set-super, validate,
-            workflow-new, and workflow-update.
-            Example: ''""",
+            workflow-new, and workflow-update.""",
             # type checkers, constraint definition is automatically
             # added to the docstring
             constraints=EnsureChoice(
@@ -181,14 +195,14 @@ class Catalog(Interface):
                 "validate",
                 "workflow-new",
                 "workflow-update",
+                "translate",
             ),
         ),
         catalog_dir=Parameter(
             # cmdline argument definitions, incl aliases
             args=("-c", "--catalog_dir"),
             # documentation
-            doc="""Directory where the catalog is located or will be created.
-            Example: ''""",
+            doc="""Directory where the catalog is located or will be created.""",
         ),
         metadata=Parameter(
             # cmdline argument definitions, incl aliases
@@ -197,22 +211,19 @@ class Catalog(Interface):
             doc="""Path to input metadata. Multiple input types are possible:
             - A '.json' file containing an array of JSON objects related to a
              single datalad dataset.
-            - A stream of JSON objects/lines
-            Example: ''""",
+            - A stream of JSON objects/lines""",
         ),
         dataset_id=Parameter(
             # cmdline argument definitions, incl aliases
             args=("-i", "--dataset_id"),
             # documentation
-            doc="""
-            Example: ''""",
+            doc="""""",
         ),
         dataset_version=Parameter(
             # cmdline argument definitions, incl aliases
             args=("-v", "--dataset_version"),
             # documentation
-            doc="""
-            Example: ''""",
+            doc="""""",
         ),
         force=Parameter(
             # cmdline argument definitions, incl aliases
@@ -222,8 +233,7 @@ class Catalog(Interface):
             directory, force this content to be overwritten. Content
             overwritten with this flag include the 'artwork' and 'assets'
             directories and the 'index.html' and 'config.json' files. Content in
-            the 'metadata' directory remain untouched.
-            Example: ''""",
+            the 'metadata' directory remain untouched.""",
             action="store_true",
             default=False,
         ),
@@ -232,16 +242,14 @@ class Catalog(Interface):
             args=("-y", "--config-file"),
             # documentation
             doc="""Path to config file in YAML or JSON format. Default config is read
-            from datalad_catalog/config/config.json
-            Example: ''""",
+            from datalad_catalog/config/config.json""",
         ),
         dataset_path=Parameter(
             # cmdline argument definitions, incl aliases
             args=("-d", "--dataset-path"),
             # documentation
             doc="""Path to dataset on which to run an extraction, translation
-            and catalog generation workflow.
-            Example: ''""",
+            and catalog generation workflow.""",
         ),
         subdataset_path=Parameter(
             # cmdline argument definitions, incl aliases
@@ -249,8 +257,7 @@ class Catalog(Interface):
             # documentation
             doc="""Path to dataset on which to run an extraction, translation
             and catalog generation workflow. Used together with '-d',
-            '--dataset-path' when running 'workflow-update'.
-            Example: ''""",
+            '--dataset-path' when running 'workflow-update'.""",
         ),
     )
 
@@ -272,7 +279,6 @@ class Catalog(Interface):
         dataset_path=None,
         subdataset_path=None,
     ):
-
         """
         [summary]
 
@@ -304,6 +310,7 @@ class Catalog(Interface):
             "set-super",
             "workflow-new",
             "workflow-update",
+            "translate",
         ]
         if catalog_action not in CALL_ACTION:
             raise ValueError(
@@ -311,15 +318,16 @@ class Catalog(Interface):
                 % (catalog_action, ", ".join(c for c in CALL_ACTION))
             )
 
-        # TODO: check if schema is valid (move to tests)
-        # Draft202012Validator.check_schema(schema)
-
         # set common result kwargs:
         action = "catalog_%s" % catalog_action
         res_kwargs = dict(action=action)
         # If action is validate, only metadata required
         if catalog_action == "validate":
             yield from _validate_metadata(metadata)
+            return
+        # If action is translate, only metadata required
+        if catalog_action == "translate":
+            yield from _translate_metadata(metadata)
             return
 
         # Error out if `catalog_dir` argument was not supplied
@@ -339,9 +347,13 @@ class Catalog(Interface):
         res_kwargs["path"] = catalog_dir
 
         # Instantiate WebCatalog class
-        ctlg = WebCatalog(catalog_dir, dataset_id, dataset_version, config_file)
-        # catalog_path = Path(catalog_dir)
-        # catalog_exists = catalog_path.exists() and catalog_path.is_dir()
+        ctlg = WebCatalog(
+            catalog_dir,
+            dataset_id,
+            dataset_version,
+            config_file,
+            catalog_action,
+        )
 
         # Hanlde case where a non-catalog directory already exists at path
         # argument. Should prevent overwriting
@@ -357,7 +369,7 @@ class Catalog(Interface):
             )
             return
 
-        # Catalog should exist for all actions except create and run-workflow
+        # Catalog should exist for all actions except create and workflow-[run|update]
         # (for create action: unless force flag supplied)
         if not ctlg.is_created():
             if (
@@ -511,15 +523,15 @@ def _add_to_catalog(
                 "-m, --metadata."
             ),
         )
-    # We need to do the following:
+    # PROCESS DESCRIPTION FOR "add" ACTION:
     # 1. Establish input type (file-with-json-lines, command line stdout / stream)
     #    - for now: assume file-with-json-lines (e.g. data exported by `datalad meta-dump`
     #      and all exported objects written to file)
-    # 2. Read line into python dictionary
-    # 3. Validate the dictionary against the catalog schema
-    # 4. Instantiate the MetaItem class, which handles translation of a json line into
-    #    the catalog metadata (Node instances)
-    # 5. Per MetaItem instance, write all related Node instances to file
+    # 2. Read lines into python dictionaries. For each line:
+    #    - Validate the dictionary against the catalog schema
+    #    - Instantiate the MetaItem class, which handles translation of a json line into
+    #      the Node instances that populate the catalog
+    #    - For the MetaItem instance, write all related Node instances to file
     with open(metadata) as file:
         i = 0
         for line in file:
@@ -696,9 +708,8 @@ def _validate_metadata(metadata: str):
 
     # Setup schema parameters
     package_path = Path(__file__).resolve().parent
-    config_dir = package_path / "config"
     schema_dir = package_path / "schema"
-    schemas = ["catalog", "dataset", "file", "authors", "extractors"]
+    schemas = ["catalog", "dataset", "file", "authors", "metadata_sources"]
     schema_store = {}
     for s in schemas:
         schema_path = schema_dir / str("jsonschema_" + s + ".json")
@@ -810,3 +821,74 @@ def _run_workflow(
 def _get_line_count(file: str) -> int:
     """A helper function to get a file line count"""
     return sum(1 for _ in open(file))
+
+
+def _translate_metadata(metadata: str):
+    """Translate a metadata item from a particular source structure
+    into the catalog schema.
+
+    A dedicated translator should be provided and exposed as an entry
+    point (e.g. via a DataLad extension) as part of the
+    'datalad.metadata.translators' group."
+
+    Parameters
+    ----------
+    metadata : path-like object
+        metadata to be translated
+
+    Yields
+    ------
+    status_dict : dict
+        DataLad result record
+    """
+    # First check metadata was supplied via -m flag
+    if metadata is None:
+        err_msg = (
+            "No metadata supplied: datalad catalog has to be supplied with "
+            "metadata in the form of a path to a file containing a JSON array, "
+            "or JSON lines stream, using the argument: -m, --metadata."
+        )
+        raise InsufficientArgumentsError(err_msg)
+    # Get available translators
+    translators = get_translators()
+    # Open metadata file and translate line by line
+    num_lines = _get_line_count(metadata)
+    with open(metadata) as file:
+        i = 0
+        prog_id = "catalogtranslate"
+        log_progress(
+            lgr.info,
+            prog_id,
+            "Translating metadata",
+            unit=" Lines",
+            label="Translating",
+            total=num_lines,
+        )
+        for line in file:
+            i += 1
+            log_progress(
+                lgr.info,
+                prog_id,
+                "Translating metadata",
+                update=i,
+                noninteractive_level=logging.DEBUG,
+            )
+            meta_dict = json.loads(line.rstrip())
+            # Check if item/line is a dict
+            if not isinstance(meta_dict, dict):
+                err_msg = (
+                    "Metadata item not of type dict: metadata items should be "
+                    "passed to datalad catalog as JSON objects adhering to the "
+                    "catalog schema."
+                )
+                lgr.warning(err_msg)
+            # Translate dict
+            translated_meta = Translate(meta_dict, translators).run_translator()
+            yield get_status_dict(
+                action="catalog_translate",
+                path=Path(metadata),
+                status="ok",
+                message=("Metadata successfully translated"),
+                translated_metadata=translated_meta,
+            )
+        log_progress(lgr.info, prog_id, "Translation completed")
