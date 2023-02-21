@@ -29,7 +29,7 @@ class MetaladStudyminimetaTranslator(TranslatorBase):
         pass
 
     def match(
-        cls, source_name: str, source_version: str, source_id: str | None = None
+        cls, source_name: str, source_version: str, source_id: str = None
     ) -> bool:
         """
         Matching routine for the current translator
@@ -40,7 +40,7 @@ class MetaladStudyminimetaTranslator(TranslatorBase):
             The name of the metadata extractor/source
         source_version: str
             The version of the metadata extractor/source
-        source_id: str | None, optional
+        source_id: str, optional
             The unique extractor/source ID. Defaults to None.
 
         Returns
