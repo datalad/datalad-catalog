@@ -16,6 +16,7 @@ from datalad.tests.utils_pytest import (
     assert_equal,
     assert_repo_status,
     skip_if_adjusted_branch,
+    skip_if_on_windows,
 )
 from datalad.api import create, Dataset
 
@@ -297,7 +298,7 @@ super_ds_tree = {
     },
 }
 
-
+@skip_if_on_windows
 @skip_if_adjusted_branch
 @with_tree(tree=super_ds_tree)
 @with_tempfile(mkdir=True)
