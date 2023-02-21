@@ -1,1 +1,38 @@
-{"dataset_id": "92e65958-4a5a-4c34-a4f4-ee070f7a123b", "dataset_version": "203aa983534fc2b823ff4777a85f4f80d7a68656", "type": "dataset", "children": [], "url": ["http://psydata.ovgu.de/studyforrest/visualrois/.git", "https://datapub.fz-juelich.de/studyforrest/studyforrest.ria/92e/65958-4a5a-4c34-a4f4-ee070f7a123b", "https://gin.g-node.org/studyforrest/visual-areas.git"], "authors": [{"name": "Adina Wagner", "email": "adina.wagner@t-online.de"}, {"name": "Laura Waite", "email": "laura@waite.eu"}, {"name": "Michael Hanke", "email": "michael.hanke@gmail.com"}], "extractors_used": [{"extractor_name": "metalad_core", "extractor_version": "1", "extraction_parameter": {}, "extraction_time": 1652857147.619349, "agent_name": "Stephan Heunis", "agent_email": "s.heunis@fz-juelich.de"}]}
+{
+    "dataset_id": "92e65958-4a5a-4c34-a4f4-ee070f7a123b",
+    "dataset_version": "203aa983534fc2b823ff4777a85f4f80d7a68656",
+    "type": "dataset",
+    "children": [],
+    "url": [
+        "http://psydata.ovgu.de/studyforrest/visualrois/.git",
+        "https://datapub.fz-juelich.de/studyforrest/studyforrest.ria/92e/65958-4a5a-4c34-a4f4-ee070f7a123b",
+        "https://gin.g-node.org/studyforrest/visual-areas.git"
+    ],
+    "authors": [
+        {
+            "name": "Adina Wagner",
+            "email": "adina.wagner@t-online.de"
+        },
+        {
+            "name": "Laura Waite",
+            "email": "laura@waite.eu"
+        },
+        {
+            "name": "Michael Hanke",
+            "email": "michael.hanke@gmail.com"
+        }
+    ],
+    "metadata_sources": {
+        "key_source_map": {},
+        "sources": [
+            {
+                "source_name": "metalad_core",
+                "source_version": "1",
+                "source_parameter": {},
+                "source_time": 1652857147.619349,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
+            }
+        ]
+    }
+}
