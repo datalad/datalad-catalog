@@ -83,13 +83,13 @@ class WebCatalog(object):
 
         # TODO: testing for the catalog_action assumes that the call was done via CLI and not Python API
         # Need to figure out how to achieve the same without relying on info coming only from CLI
-        if catalog_action == "create":
+        if catalog_action in ["create", "workflow-new"]:
             # Config file, if specified, belongs to catalog
             self.catalog_config_path = self.get_config_source(
                 source_str=config_file, config_level="catalog"
             )
             self.catalog_config = self.get_config(config_level="catalog")
-        elif catalog_action == "add":
+        elif catalog_action in ["add", "workflow-update"]:
             # NOTE: "add" implies that catalog already exists, i.e. .is_created() returns True
             # Config file, if specified, belongs to datasets/files
             # First get default catalog config source and set catalog config attribute
@@ -105,6 +105,16 @@ class WebCatalog(object):
                 self.dataset_config = self.get_config(config_level="dataset")
         else:
             # For all other actions: do nothing wrt config, even if supplied
+            # Must probably still set default if needed?
+            self.catalog_config_path = self.get_config_source(
+                source_str=None, config_level="catalog"
+            )
+            self.catalog_config = self.get_config(config_level="catalog")
+            self.dataset_config_path = self.get_config_source(
+                source_str=None, config_level="dataset"
+            )
+            if self.dataset_config_path:
+                self.dataset_config = self.get_config(config_level="dataset")
             # TODO: this is a silent pass; should probably give warning already in Catalog module
             pass
 
