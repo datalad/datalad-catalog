@@ -1,4 +1,4 @@
-# 0.2.1 (Tue Mar 7, 2023) -- circumvent `jq` on windows
+# 0.2.1 (Tue Mar 7, 2023) -- fix extension tests
 
 ### 🏠 Internal
 
