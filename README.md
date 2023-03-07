@@ -10,7 +10,9 @@
 [![codecov.io](https://codecov.io/github/datalad/datalad-catalog/coverage.svg?branch=main)](https://codecov.io/github/datalad/datalad-catalog?branch=main)
 [![crippled-filesystems](https://github.com/datalad/datalad-catalog/actions/workflows/test_crippledfs.yml/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/test_crippledfs.yml)
 [![pages-build-deployment](https://github.com/datalad/datalad-catalog/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/pages/pages-build-deployment)
-[![push_catalog_to_gh_pages](https://github.com/datalad/datalad-catalog/actions/workflows/deploy_demo.yml/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/deploy_demo.yml)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![push_catalog_to_gh_pages](https://github.com/datalad/datalad-catalog/actions/workflows/deploy_demo.yml/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/deploy_demo.yml)
+[![DOI](https://zenodo.org/badge/371040885.svg)](https://zenodo.org/badge/latestdoi/371040885)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
