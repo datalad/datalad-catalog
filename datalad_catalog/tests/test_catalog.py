@@ -85,7 +85,6 @@ def test_schema_violation_detection(metadata_file: str = ""):
 
 @with_tempfile(content="[]")
 def test_metadata_type_mismatch_detection(metadata_file: str = ""):
-
     with patch("datalad_catalog.catalog.lgr") as lgr_mock:
         assert_raises(
             ValidationError,
@@ -125,7 +124,6 @@ def test_catalog_action_routing(temp_dir: str = "", config_file: str = ""):
     ) as f5, patch(
         "datalad_catalog.catalog._set_super_of_catalog"
     ) as f6:
-
         for mock, name in zip(
             (f1, f2, f3, f4, f5, f6), (f"f{i}" for i in range(1, 7))
         ):
@@ -140,7 +138,6 @@ def test_catalog_action_routing(temp_dir: str = "", config_file: str = ""):
             ("set-super", True),
             ("serve", True),
         ):
-
             test_catalog_path = Path(temp_dir) / "test_catalog"
 
             if create_dir:

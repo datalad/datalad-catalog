@@ -38,6 +38,7 @@ from datalad_catalog.webcatalog import (
 # Create named logger
 lgr = logging.getLogger("datalad.catalog.catalog")
 
+
 # Decoration auto-generates standard help
 @build_doc
 # All extension commands must be derived from Interface
@@ -272,7 +273,6 @@ class Catalog(Interface):
         dataset_path=None,
         subdataset_path=None,
     ):
-
         """
         [summary]
 

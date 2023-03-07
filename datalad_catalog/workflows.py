@@ -89,6 +89,7 @@ def super_workflow(dataset_path, catalog: WebCatalog):
     cat = catalog
     if not cat.is_created():
         cat.create()
+
     # Call per-dataset workflow
     def _dataset_workflow_inner(ds, refds, **kwargs):
         """Internal function to allow passing"""
