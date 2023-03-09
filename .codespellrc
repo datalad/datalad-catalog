@@ -1,3 +1,4 @@
 [codespell]
 skip = .git,*.pdf,*.svg,venvs,versioneer.py,*.min.js,*.json
-# ignore-words-list = 
+# Claus - name
+ignore-words-list = claus
