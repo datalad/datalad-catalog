@@ -142,14 +142,14 @@ def test_dataset_config(tmp_path):
         "add",
     )
     # - Grab Node instance
-    nd = Node(
+    node = Node(
         catalog=ctlg, type="dataset", dataset_id=d_id, dataset_version=d_v
     )
     # config attribute should exist on node instance
-    assert hasattr(nd, "config")
+    assert hasattr(node, "config")
     # Config attribute should be set from catalog level (here, from specific file)
-    assert nd.config is not None
-    assert nd.config[CATALOG_NAME] == "DataLad Catalog Config Test"
+    assert node.config is not None
+    assert node.config[CATALOG_NAME] == "DataLad Catalog Config Test"
 
 
 def _get_value_from_file(metadata_path, key):
