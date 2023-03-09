@@ -73,7 +73,7 @@ advanced metadata handling capabilities that will integrate seamlessly with
 DataLad datasets and the catalog generation process.
 
 In order to translate metadata extracted using ``datalad-metalad`` into the
-catalog schema, ``datalad-catalog`` provides tranlation modules that are
+catalog schema, ``datalad-catalog`` provides translation modules that are
 dependent on `jq`_.
 
 .. _datalad: https://github.com/datalad/datalad

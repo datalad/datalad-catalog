@@ -28,7 +28,7 @@
 
 ### 🛡 Tests
 
-- Enable CI on appveyor for pull requests and pushes to the `main` branch, and reenable crippled filesystem test workflow with gh-actions. PR [#213](https://github.com/datalad/datalad-catalog/pull/213) + PR [#223](https://github.com/datalad/datalad-catalog/pull/223) (by [@jsheunis](https://github.com/jsheunis), [@yarikoptic](https://github.com/yarikoptic), [@mih](https://github.com/mih))
+- Enable CI on appveyor for pull requests and pushes to the `main` branch, and re-enable crippled filesystem test workflow with gh-actions. PR [#213](https://github.com/datalad/datalad-catalog/pull/213) + PR [#223](https://github.com/datalad/datalad-catalog/pull/223) (by [@jsheunis](https://github.com/jsheunis), [@yarikoptic](https://github.com/yarikoptic), [@mih](https://github.com/mih))
 
 ### 🪓 Deprecations and removals
 

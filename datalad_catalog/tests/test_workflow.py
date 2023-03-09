@@ -185,7 +185,7 @@ description: |
    eyetracking.
 
    This is an extension of the studyforrest project, all participants previously
-   volunteered for the audio-only Forrest Gump study. The datset is structured in
+   volunteered for the audio-only Forrest Gump study. The dataset is structured in
    BIDS format, details of the files and metadata can be found at:
 
      Ayan Sengupta, Falko R. Kaule, J. Swaroop Guntupalli, Michael B. Hoffmann,
