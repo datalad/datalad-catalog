@@ -41,7 +41,7 @@
     },
     "metadata_sources": {"$ref": "https://datalad.org/catalog.metadata_sources.schema.json"},
     "additional_display": {
-      "description": "Additonal items to display on the file level",
+      "description": "Additional items to display on the file level",
       "title": "Additional display",
       "type": "array",
       "items": {

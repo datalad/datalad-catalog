@@ -238,7 +238,7 @@
     },
     "metadata_sources": {"$ref": "https://datalad.org/catalog.metadata_sources.schema.json"},
     "additional_display": {
-      "description": "Additonal items to display in tabs on dataset page",
+      "description": "Additional items to display in tabs on dataset page",
       "title": "Additional display",
       "type": "array",
       "items": {
@@ -265,7 +265,7 @@
       "uniqueItems": true
     },
     "top_display": {
-      "description": "Additonal items to display at the top of the dataset page (along with keywords, description, etc)",
+      "description": "Additional items to display at the top of the dataset page (along with keywords, description, etc)",
       "title": "Top display",
       "type": "array",
       "items": {
