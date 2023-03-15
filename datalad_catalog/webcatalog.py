@@ -426,7 +426,7 @@ class Node(object):
         else:
             # If dataset-level config file DOES NOT exist:
             if self.parent_catalog.dataset_config is not None:
-                # If dataset-level config IS avaliable on catalog instance: load and create, return
+                # If dataset-level config IS available on catalog instance: load and create, return
                 # First create id and version directories in case they don't exist
                 dataset_config_path.parent.mkdir(parents=True, exist_ok=True)
                 dataset_config = self.parent_catalog.dataset_config
@@ -434,7 +434,7 @@ class Node(object):
                     json.dump(dataset_config, f_config)
                 return dataset_config
             else:
-                # If dataset-level config IS NOT avaliable on catalog instance,
+                # If dataset-level config IS NOT available on catalog instance,
                 # only load from catalog-level config file
                 return self.parent_catalog.catalog_config
 
@@ -465,7 +465,7 @@ class Node(object):
         dataset_config = self.config[cnst.PROPERTY_SOURCES][cnst.TYPE_DATASET]
         # Get metadata source of incoming metadata
         # NOTE: this assumes that provided metadata item originates from a single source,
-        # and wasnt collated beforehand. TODO: need to investigate and update the implementation
+        # and wasn't collated beforehand. TODO: need to investigate and update the implementation
         # if we want to support the addition of metadata items that have previously been constructed
         # from multiple sources
         try:
@@ -497,7 +497,7 @@ class Node(object):
                 config_source = key_config.get("source", None)
             if config_source and not isinstance(
                 config_source, list
-            ):  # make all sources a list, exept for None
+            ):  # make all sources a list, except for None
                 config_source = [config_source]
             # create new or update existing attribute/variable
             setattr(

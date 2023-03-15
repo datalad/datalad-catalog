@@ -355,7 +355,7 @@ class Catalog(Interface):
             catalog_action,
         )
 
-        # Hanlde case where a non-catalog directory already exists at path
+        # Handle case where a non-catalog directory already exists at path
         # argument. Should prevent overwriting
         if ctlg.path_exists() and not ctlg.is_created():
             yield dict(
@@ -483,7 +483,7 @@ def _create_catalog(
                 "Catalog assets successfully overwritten at: %s",
                 catalog.location,
             )
-    # Yield created/overwitten status message
+    # Yield created/overwritten status message
     yield get_status_dict(**res_kwargs, status="ok", message=msg)
     # If metadata was also supplied, add this to the catalog
     if metadata is not None:

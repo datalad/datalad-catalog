@@ -216,14 +216,14 @@ looks like this:
     }
 
 At the end of this process, you have two files with structured metadata that
-can eventually be provided to ``datalad-atalog`` in order to generate the catalog
+can eventually be provided to ``datalad-catalog`` in order to generate the catalog
 and its entries.
 
 
 Step 4 - Translate the metadata
 -------------------------------
 
-Before the extracted metadata can be provided to ``datalad-atalog``, it needs to be
+Before the extracted metadata can be provided to ``datalad-catalog``, it needs to be
 in a format/structure that will validate successfully against the catalog schema.
 Extracted metadata will typically be structured according to whatever schema was
 specified by the extractor, and information in such a schema will have to be translated
