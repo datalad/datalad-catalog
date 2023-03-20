@@ -108,14 +108,14 @@ Extract and add:
     DATASET_PATH="path/to/mydataset"
     PIPELINE_PATH="path/to/extract_dataset_pipeline.json"
     datalad meta-conduct "$PIPELINE_PATH" \
-        traverser:"$DATASET_PATH" \
-        traverser:dataset \
-        traverser:True \
-        extractor1:Dataset \
-        extractor1:metalad_core \
-        extractor2:Dataset \
-        extractor2:metalad_studyminimeta \
-        adder:True
+        traverser.top_level_dir=$DATASET_PATH \
+        traverser.item_type=dataset \
+        traverser.traverse_sub_datasets=True \
+        extractor1.extractor_type=dataset \
+        extractor1.extractor_name=metalad_core \
+        extractor2.extractor_type=dataset \
+        extractor2.extractor_name=metalad_studyminimeta \
+        adder.aggregate=True
 
 where the pipeline in ``path/to/extract_dataset_pipeline.json``
 looks like this:
@@ -124,33 +124,29 @@ looks like this:
 
     {
       "provider": {
-        "module": "datalad_metalad.provider.datasettraverse",
+        "module": "datalad_metalad.pipeline.provider.datasettraverse",
         "class": "DatasetTraverser",
         "name": "traverser",
-        "arguments": [],
-        "keyword_arguments": {}
+        "arguments": {}  
       },
       "processors": [
         {
-          "module": "datalad_metalad.processor.extract",
+          "module": "datalad_metalad.pipeline.processor.extract",
           "class": "MetadataExtractor",
           "name": "extractor1",
-          "arguments": [],
-          "keyword_arguments": {}
+          "arguments": {}    
         },
         {
-          "module": "datalad_metalad.processor.extract",
+          "module": "datalad_metalad.pipeline.processor.extract",
           "class": "MetadataExtractor",
           "name": "extractor2",
-          "arguments": [],
-          "keyword_arguments": {}
+          "arguments": {}    
         },
         {
           "name": "adder",
-          "module": "datalad_metalad.processor.add",
+          "module": "datalad_metalad.pipeline.processor.add",
           "class": "MetadataAdder",
-          "arguments": [],
-          "keyword_arguments": {}
+          "arguments": {}    
         }
       ]
     }
@@ -179,11 +175,11 @@ Extract and write to disk:
     echo "[" > "$METADATA_OUT_PATH"
     # Extract file-level metadata, add comma
     datalad -f json meta-conduct "$PIPELINE_PATH" \
-        traverser:"$DATASET_PATH" \
-        traverser:file \
-        traverser:True \
-        extractor:File \
-        extractor:metalad_core \
+        traverser.top_level_dir=$DATASET_PATH \
+        traverser.item_type=file \
+        traverser.traverse_sub_datasets=True \
+        extractor.extractor_type=file \
+        extractor.extractor_name=metalad_core \
         | jq '.["pipeline_element"]["result"]["metadata"][0]["metadata_record"]' \
         | jq -c . | sed 's/$/,/' >> "$METADATA_OUT_PATH"
     # Remove last comma
@@ -198,19 +194,17 @@ looks like this:
 
     {
       "provider": {
-        "module": "datalad_metalad.provider.datasettraverse",
+        "module": "datalad_metalad.pipeline.provider.datasettraverse",
         "class": "DatasetTraverser",
         "name": "traverser",
-        "arguments": [],
-        "keyword_arguments": {}
+        "arguments": {}
       },
       "processors": [
         {
-          "module": "datalad_metalad.processor.extract",
+          "module": "datalad_metalad.pipeline.processor.extract",
           "class": "MetadataExtractor",
           "name": "extractor",
-          "arguments": [],
-          "keyword_arguments": {}
+          "arguments": {}
         }
       ]
     }
