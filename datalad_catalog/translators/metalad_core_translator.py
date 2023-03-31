@@ -100,7 +100,7 @@ class CoreTranslator:
     def __init__(self, metadata_record):
         self.metadata_record = metadata_record
         self.extracted_metadata = self.metadata_record["extracted_metadata"]
-        self.graph = self.extracted_metadata["@graph"]
+        self.graph = self.extracted_metadata.get("@graph", [])
 
     def get_name(self):
         """Return an empty string as name
@@ -110,7 +110,7 @@ class CoreTranslator:
         """
         return ""
 
-    def get_url(self):
+    def get_dataset_url(self):
         program = (
             '.[]? | select(.["@type"] == "Dataset") | '
             '[.distribution[]? | select(has("url")) | .url]'
@@ -148,16 +148,42 @@ class CoreTranslator:
         )
         result = jq.first(program, self.metadata_record)
         return result if len(result) > 0 else None
-
+    
+    def get_file_url(self):
+        program = (
+            '.distribution? | .url?'
+        )
+        return jq.first(program, self.extracted_metadata)
+    
+    def get_file_path(self):
+        return self.metadata_record.get("path", None)
+    
+    def get_contentbytesize(self):
+        return self.extracted_metadata.get("contentbytesize", None)
+    
     def translate(self):
         translated_record = {
             "type": self.metadata_record["type"],
             "dataset_id": self.metadata_record["dataset_id"],
             "dataset_version": self.metadata_record["dataset_version"],
-            "name": self.get_name(),
-            "url": self.get_url(),
-            "authors": self.get_authors(),
-            "subdatasets": self.get_subdatasets(),
             "metadata_sources": self.get_metadata_source(),
         }
+        if translated_record["type"] == 'dataset':
+            translated_record.update(
+                {
+                    "name": self.get_name(),
+                    "url": self.get_url(),
+                    "authors": self.get_authors(),
+                    "subdatasets": self.get_subdatasets(),
+                }
+            )
+        if translated_record["type"] == 'file':
+            translated_record.update(
+                {
+                    "path": self.get_file_path(),
+                    "url": self.get_file_url(),
+                    "contentbytesize": self.get_contentbytesize(),
+                }
+            )
+            
         return {k: v for k, v in translated_record.items() if v is not None}
