@@ -237,7 +237,7 @@ class WebCatalog(object):
                 # Do not return default here, this will be done on the Node or MetaItem class,
                 # where dataset id and version are available.
                 return None
-            
+
     def get_logo_path(self):
         # Returns the absolute path to the logo
         # If none provided via config -> None

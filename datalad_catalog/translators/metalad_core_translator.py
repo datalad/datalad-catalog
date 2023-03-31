@@ -148,19 +148,17 @@ class CoreTranslator:
         )
         result = jq.first(program, self.metadata_record)
         return result if len(result) > 0 else None
-    
+
     def get_file_url(self):
-        program = (
-            '.distribution? | .url?'
-        )
+        program = ".distribution? | .url?"
         return jq.first(program, self.extracted_metadata)
-    
+
     def get_file_path(self):
         return self.metadata_record.get("path", None)
-    
+
     def get_contentbytesize(self):
         return self.extracted_metadata.get("contentbytesize", None)
-    
+
     def translate(self):
         translated_record = {
             "type": self.metadata_record["type"],
@@ -168,7 +166,7 @@ class CoreTranslator:
             "dataset_version": self.metadata_record["dataset_version"],
             "metadata_sources": self.get_metadata_source(),
         }
-        if translated_record["type"] == 'dataset':
+        if translated_record["type"] == "dataset":
             translated_record.update(
                 {
                     "name": self.get_name(),
@@ -177,7 +175,7 @@ class CoreTranslator:
                     "subdatasets": self.get_subdatasets(),
                 }
             )
-        if translated_record["type"] == 'file':
+        if translated_record["type"] == "file":
             translated_record.update(
                 {
                     "path": self.get_file_path(),
@@ -185,5 +183,5 @@ class CoreTranslator:
                     "contentbytesize": self.get_contentbytesize(),
                 }
             )
-            
+
         return {k: v for k, v in translated_record.items() if v is not None}
