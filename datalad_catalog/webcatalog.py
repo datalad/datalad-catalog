@@ -156,9 +156,10 @@ class WebCatalog(object):
         # Check logo path, if added to config
         if (
             self.catalog_config.get(cnst.LOGO_PATH) is not None
-            and not Path(self.catalog_config[cnst.LOGO_PATH]).exists()
+            and not self.get_logo_path().exists()
+            # and not Path(self.catalog_config[cnst.LOGO_PATH]).exists()
         ):
-            msg = f"Error in config: the specified logo does not exist at path: {self.catalog_config[cnst.LOGO_PATH]}"
+            msg = f"Error in config: the specified logo does not exist at path: {self.get_logo_path()}"
             raise FileNotFoundError(msg)
 
         # Get package-related paths/content
@@ -236,6 +237,21 @@ class WebCatalog(object):
                 # Do not return default here, this will be done on the Node or MetaItem class,
                 # where dataset id and version are available.
                 return None
+            
+    def get_logo_path(self):
+        # Returns the absolute path to the logo
+        # If none provided via config -> None
+        if self.catalog_config.get(cnst.LOGO_PATH) is None:
+            return None
+        # If the provided path is absolute, return it
+        # else assume that the provided path us relative to the
+        # parent directory of the config file (within which the
+        # logo path was specified)
+        if Path(self.catalog_config[cnst.LOGO_PATH]).is_absolute():
+            return self.catalog_config[cnst.LOGO_PATH]
+        else:
+            cfg_dir = self.catalog_config_path.parent
+            return cfg_dir / self.catalog_config[cnst.LOGO_PATH]
 
     def get_config(self, config_level: str = "catalog"):
         """"""
@@ -256,7 +272,8 @@ class WebCatalog(object):
             and self.catalog_config[cnst.LOGO_PATH]
             != "artwork/catalog_logo.svg"
         ):
-            existing_path = Path(self.catalog_config[cnst.LOGO_PATH])
+            # existing_path = Path(self.catalog_config[cnst.LOGO_PATH])
+            existing_path = self.get_logo_path()
             existing_name = existing_path.name
             new_path = Path(self.location) / "artwork" / existing_name
             copy_overwrite_path(
