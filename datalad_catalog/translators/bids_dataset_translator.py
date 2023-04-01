@@ -100,7 +100,6 @@ class BIDSTranslator:
     def __init__(self, metadata_record):
         self.metadata_record = metadata_record
         self.extracted_metadata = self.metadata_record["extracted_metadata"]
-        self.graph = self.extracted_metadata["@graph"]
 
     def get_name(self):
         return self.extracted_metadata.get("title", "")
