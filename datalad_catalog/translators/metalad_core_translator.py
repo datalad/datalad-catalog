@@ -170,7 +170,7 @@ class CoreTranslator:
             translated_record.update(
                 {
                     "name": self.get_name(),
-                    "url": self.get_url(),
+                    "url": self.get_dataset_url(),
                     "authors": self.get_authors(),
                     "subdatasets": self.get_subdatasets(),
                 }
