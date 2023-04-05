@@ -421,6 +421,7 @@ const datasetView = () =>
             return this.tag_options_available.indexOf(tag) >= 0;
           },
           getFiles() {
+            this.files_ready = false;
             this.$root.selectedDataset.tree = this.$root.selectedDataset["children"];
             this.files_ready = true;
           },
