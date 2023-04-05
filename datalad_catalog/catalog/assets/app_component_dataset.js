@@ -549,6 +549,13 @@ const datasetView = () =>
           );
           var app = this.$root;
           response = await fetch(file);
+          // Reroute to 404 if the dataset file is not found
+          if (response.status == 404) {
+            router.push({
+              name: "404",
+            });
+            return;
+          }
           text = await response.text();
           app.selectedDataset = JSON.parse(text);
           this.dataset_ready = true;
