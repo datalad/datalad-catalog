@@ -421,6 +421,7 @@ const datasetView = () =>
             return this.tag_options_available.indexOf(tag) >= 0;
           },
           getFiles() {
+            this.files_ready = false;
             this.$root.selectedDataset.tree = this.$root.selectedDataset["children"];
             this.files_ready = true;
           },
@@ -456,9 +457,7 @@ const datasetView = () =>
           },
         },
         async beforeRouteUpdate(to, from, next) {
-          if (this.tabIndex != 1) {
-            this.tabIndex = 0;
-          }
+          this.tabIndex = 0;
           this.subdatasets_ready = false;
           this.dataset_ready = false;
 
@@ -549,6 +548,13 @@ const datasetView = () =>
           );
           var app = this.$root;
           response = await fetch(file);
+          // Reroute to 404 if the dataset file is not found
+          if (response.status == 404) {
+            router.push({
+              name: "404",
+            });
+            return;
+          }
           text = await response.text();
           app.selectedDataset = JSON.parse(text);
           this.dataset_ready = true;
