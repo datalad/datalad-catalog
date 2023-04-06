@@ -146,7 +146,12 @@
             <template v-slot:title>
               <i class="fas fa-list-ol"></i> Subdatasets
             </template>
-            <span v-if="subdatasets_ready">
+            <span v-if="!subdatasets_ready">
+              <div class="d-flex justify-content-center mb-3">
+                <b-spinner label="Loading..."></b-spinner>
+              </div>
+            </span>
+            <span v-else>
               <span v-if="!sortedSubdatasets || !sortedSubdatasets.length"><em>There are no subdatasets listed for the current dataset</em></span>
               <span v-else>
                 <b-form>
@@ -240,35 +245,35 @@
             <template v-slot:title>
               <i class="far fa-folder"></i> Files
             </template>
-            <span v-if="!selectedDataset.tree || !selectedDataset.tree.length"><em>There are no files listed for the current dataset</em></span>
-            <span v-else>
-              <b-card no-body class="p-2">
-                <span v-if="files_ready">
+            <span v-if="files_ready">
+              <span v-if="!selectedDataset.tree || !selectedDataset.tree.length"><em>There are no files listed for the current dataset</em></span>
+              <span v-else>
+                <b-card no-body class="p-2">
                   <ul>
                     <tree-item class="item" v-for="item in selectedDataset.tree" :item="item"></tree-item>
                   </ul>
-                </span>
-                <span v-else>
-                  <div class="d-flex justify-content-center mb-3">
-                    <b-spinner label="Loading..."></b-spinner>
+                </b-card>
+              </span>
+              <b-modal id="modal-3" size="md"
+              header-bg-variant="light"
+              footer-bg-variant="light"
+              body-bg-variant="light"
+              body-text-variant="dark"
+              ok-only
+              >
+                <template #modal-header="{ close }">
+                  <div class="d-block text-center">
+                    <h3>Dataset not found</h3>
+                    <p class="my-4">The selected dataset is currently not available in the catalog.</p>
                   </div>
-                </span>
-              </b-card>
+                </template>
+              </b-modal>
             </span>
-            <b-modal id="modal-3" size="md"
-            header-bg-variant="light"
-            footer-bg-variant="light"
-            body-bg-variant="light"
-            body-text-variant="dark"
-            ok-only
-            >
-              <template #modal-header="{ close }">
-                <div class="d-block text-center">
-                  <h3>Dataset not found</h3>
-                  <p class="my-4">The selected dataset is currently not available in the catalog.</p>
-                </div>
-              </template>
-            </b-modal>
+            <span v-else>
+              <div class="d-flex justify-content-center mb-3">
+                <b-spinner label="Loading..."></b-spinner>
+              </div>
+            </span>
           </b-tab>
           <!-- PUBLICATIONS -->
           <span v-if="selectedDataset.publications && selectedDataset.publications.length">

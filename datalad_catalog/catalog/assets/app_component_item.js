@@ -16,6 +16,7 @@ Vue.component('tree-item', function (resolve, reject) {
               return {
                 isOpen: false,
                 files_ready: false,
+                spinner_on: null,
                 children: [],
               };
             },
@@ -41,6 +42,8 @@ Vue.component('tree-item', function (resolve, reject) {
                 if (this.isFolder) {
                   tempIsOpen = !this.isOpen;
                   if (tempIsOpen && !this.item.hasOwnProperty("children")) {
+                    this.files_ready = false;
+                    this.spinner_on = true;
                     obj = await this.getChildren(this.item);
                     this.item.children = obj["children"];
                     // go through all children, set state to enabled
@@ -58,6 +61,7 @@ Vue.component('tree-item', function (resolve, reject) {
                       })
                     );
                     this.files_ready = true;
+                    this.spinner_on = false;
                   }
                   this.isOpen = !this.isOpen;
                 }
