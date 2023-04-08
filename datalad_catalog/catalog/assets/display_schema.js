@@ -5,7 +5,7 @@
 const dataset_schema_file = "./assets/jsonschema_dataset.json";
 const authors_schema_file = "./assets/jsonschema_authors.json";
 const file_schema_file = "./assets/jsonschema_file.json";
-const sources_schema_file = "./assets/jsonschema__metadata_sources.json";
+const sources_schema_file = "./assets/jsonschema_metadata_sources.json";
 const catalog_schema_file = "./assets/jsonschema_catalog.json";
 
 const TYPES =  [
@@ -35,7 +35,7 @@ schema_files = {
   "jsonschema_dataset": dataset_schema_file,
   "jsonschema_file": file_schema_file,
   "jsonschema_authors": authors_schema_file,
-  "jsonschema__metadata_sources": sources_schema_file,
+  "jsonschema_metadata_sources": sources_schema_file,
 }
 
 schema_keywords = ["$schema", "$id"]
