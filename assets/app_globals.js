@@ -13,6 +13,15 @@ const default_config = {
   link_color: "#fba304",
   link_hover_color: "#af7714",
   logo_path: "artwork/catalog_logo.svg",
+  social_links: {
+    about: null,
+    documentation: null,
+    github: null,
+    twitter: null,
+  },
+  dataset_options: {
+    include_metadata_export: true,
+  }
 };
 const template_dir = "./templates";
 
