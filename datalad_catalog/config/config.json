@@ -3,6 +3,15 @@
     "logo_path": "",
     "link_color": "#fba304",
     "link_hover_color": "#af7714",
+    "social_links": {
+        "about": null,
+        "documentation": "https://docs.datalad.org/projects/catalog/en/latest/",
+        "github": "https://github.com/datalad/datalad-catalog",
+        "twitter": "https://twitter.com/datalad"
+    },
+    "dataset_options": {
+        "include_metadata_export": true
+    },
     "property_sources": {
         "dataset": {
             "dataset_id": {
