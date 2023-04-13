@@ -105,7 +105,19 @@ class BIDSTranslator:
         return self.extracted_metadata.get("title", "")
 
     def get_description(self):
-        return self.extracted_metadata.get("description")
+        bids_description = self.extracted_metadata.get("description")
+        if isinstance(bids_description, str):
+            return bids_description
+        elif isinstance(bids_description, list):
+            if len(bids_description) > 0:
+                # bids_description expected format = [{"extension": "", "text": "",}]
+                # TODO: figure out which extension has priority;
+                # take 1st element for now
+                return bids_description[0].get("text", None)
+            else:
+                return None
+        else:
+            return None
 
     def get_license(self):
         program = '.license | { "name": .name, "url":  ""}'
