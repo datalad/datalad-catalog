@@ -120,9 +120,14 @@ class BIDSTranslator:
             return None
 
     def get_license(self):
+        url_map = {
+            # only the licenses & links explicitly named in bids spec
+            "PDDL": "https://opendatacommons.org/licenses/pddl/",
+            "CC0": "https://creativecommons.org/publicdomain/zero/1.0/",
+        }
         license_name = self.extracted_metadata.get("License")
         if license_name is not None:
-            return {"name": license_name, "url": ""}
+            return {"name": license_name, "url": url_map.get(license_name, "")}
         return None
 
     def get_authors(self):
