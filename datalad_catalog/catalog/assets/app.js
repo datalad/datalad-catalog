@@ -8,6 +8,7 @@ var datacat = new Vue({
   data: {
     selectedDataset: {},
     logo_path: "",
+    links: {},
   },
   methods: {
     gotoHome() {
@@ -17,17 +18,7 @@ var datacat = new Vue({
       router.push({ name: "about" });
     },
     gotoExternal(dest) {
-      const destinations = {
-        github:
-          "https://github.com/datalad/datalad-catalog",
-        docs: "https://docs.datalad.org/projects/catalog/en/latest/",
-        twitter: "https://twitter.com/datalad",
-      };
-      if (dest in destinations) {
-        window.open(destinations[dest]);
-      } else {
-        window.open(dest);
-      }
+      window.open(dest);
     },
     async load() {
       // Load templates
@@ -61,6 +52,8 @@ var datacat = new Vue({
       })
       .then((responseJson) => {
         obj = responseJson;
+        // set social links
+        this.social_links = obj.social_links
         // Set color scheme
         const style_text =
           ":root{--link-color: " +
