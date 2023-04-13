@@ -13,6 +13,10 @@ social_links:
   github: "https://github.com/datalad/datalad-catalog"
   twitter: "https://twitter.com/datalad"
 
+# Render settings
+dataset_options:
+  include_metadata_export: true
+
 # Options for multiple sources of metadata:
 property_sources:
   dataset:

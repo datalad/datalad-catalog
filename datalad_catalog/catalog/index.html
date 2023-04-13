@@ -32,7 +32,7 @@
   <body id="mainbody">
     <!-- The application root element -->
     <b-container id="datacat" >
-      <b-container style="margin-top:20px;">
+      <b-container v-if="config_ready" style="margin-top:20px;">
         <b-row align-v="end">
           <b-col cols="9">
             <span v-show="logo_path"><a @click="gotoHome"><img :src="logo_path" class="d-inline-block" alt="datalad" style="width:100%;"></a></span>

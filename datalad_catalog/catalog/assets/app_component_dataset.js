@@ -187,7 +187,13 @@ const datasetView = () =>
                   "%20" + 
                   dataset.access_request_contact.familyName;
               }
-
+              // Rendering options for dataset page
+              if (this.$root.hasOwnProperty("dataset_options") && this.$root.dataset_options.hasOwnProperty("include_metadata_export")) {
+                disp_dataset.show_export = this.$root.dataset_options.include_metadata_export
+              }
+              else {
+                disp_dataset.show_export = false
+              }
               // Write main derived variable and set to ready
               this.displayData = disp_dataset;
               this.display_ready = true;

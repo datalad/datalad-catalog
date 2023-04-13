@@ -9,6 +9,9 @@
         "github": "https://github.com/datalad/datalad-catalog",
         "twitter": "https://twitter.com/datalad"
     },
+    "dataset_options": {
+        "include_metadata_export": true
+    },
     "property_sources": {
         "dataset": {
             "dataset_id": {

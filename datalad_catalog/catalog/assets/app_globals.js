@@ -18,6 +18,9 @@ const default_config = {
     documentation: null,
     github: null,
     twitter: null,
+  },
+  dataset_options: {
+    include_metadata_export: true,
   }
 };
 const template_dir = "./templates";

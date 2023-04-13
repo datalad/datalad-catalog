@@ -9,6 +9,8 @@ var datacat = new Vue({
     selectedDataset: {},
     logo_path: "",
     links: {},
+    dataset_options: {},
+    config_ready: false,
   },
   methods: {
     gotoHome() {
@@ -54,6 +56,8 @@ var datacat = new Vue({
         obj = responseJson;
         // set social links
         this.social_links = obj.social_links
+        // set dataset options
+        this.dataset_options = obj.dataset_options
         // Set color scheme
         const style_text =
           ":root{--link-color: " +
@@ -73,6 +77,7 @@ var datacat = new Vue({
           this.logo_path = default_config.logo_path;
         }
         // Settings for multiple property sources
+        this.config_ready = true
       })
       .catch((error) => {
         console.log("Config file error:");
