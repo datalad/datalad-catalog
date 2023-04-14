@@ -129,12 +129,14 @@
               <strong>Keywords:</strong> <br>
               <b-button pill disabled size="sm" variant="outline-dark" v-for="keyword in selectedDataset.keywords">{{keyword}}</b-button>
             </b-card-text>
-            <span v-if="selectedDataset.top_display && selectedDataset.top_display.length">
-              <b-card-text>
-                <strong>Properties:</strong> <br>
-                <span v-for="display_property in selectedDataset.top_display"><b-button disabled size="sm" variant="outline-dark">{{display_property.name}}: {{display_property.value}}</b-button>&nbsp;</span>
-              </b-card-text>
-            </span>
+
+            <b-card-text>
+              <strong>Properties:</strong> <br>
+              <span><b-button disabled size="sm" variant="outline-dark">Subdatasets: {{selectedDataset.subdatasets_available_count}}</b-button>&nbsp;</span>
+              <span v-if="selectedDataset.top_display && selectedDataset.top_display.length">
+                <span v-for="display_property in selectedDataset.top_display"><b-button disabled size="sm" variant="outline-dark">{{display_property.name}}: {{display_property.value}}</b-button>&nbsp;
+              </span>
+            </b-card-text>
           </b-col>
         </b-row>
       </b-card-body>
@@ -144,7 +146,7 @@
           <!-- SUBDATASETS -->
           <b-tab>
             <template v-slot:title>
-              <i class="fas fa-list-ol"></i> Subdatasets
+              <i class="fas fa-list-ol"></i> Subdatasets <span v-if="subdatasets_ready">({{selectedDataset.subdatasets_available_count}})</span>
             </template>
             <span v-if="!subdatasets_ready">
               <div class="d-flex justify-content-center mb-3">
@@ -216,7 +218,7 @@
                         <span class="xxlfont"><i class="fas fa-database"></i></span>
                       </b-col>
                       <b-col class="text-muted" md="7">
-                        <h5><a @click="selectDataset(ds)" class="newlink">{{ds.dirs_from_path.at(-1)}}</a></h5>
+                        <h5><a @click="selectDataset($event, ds)" class="newlink">{{ds.dirs_from_path.at(-1)}}</a></h5>
                         <span v-for="(author, index) in ds.authors">
                           <small>
                             <span v-if="author.givenName">{{author.givenName}} {{author.familyName}}</span><span v-else>{{author.name}}</span><span v-if="index != ds.authors.length - 1">, </span>
@@ -351,7 +353,7 @@
                               <span class="lfont"><i class="fas fa-database"></i></span>
                             </b-col>
                             <b-col align-h="center" align-v="center" md="9">
-                              <span><a @click="selectDataset(null, selectedDataset.dataset_id, record.previous_version)" class="newlink"><span class="lfont">Dataset:  <em>before</em></span></a></span>
+                              <span><a @click="selectDataset($event, null, selectedDataset.dataset_id, record.previous_version)" class="newlink"><span class="lfont">Dataset:  <em>before</em></span></a></span>
                             </b-col>
                           </b-row>
                         </template>
@@ -420,7 +422,7 @@
                               <span class="lfont"><i class="fas fa-database"></i></span>
                             </b-col>
                             <b-col align-h="center" align-v="center" md="9">
-                              <span><a @click="selectDataset(null, selectedDataset.dataset_id, record.dataset_version)" class="newlink"><span class="lfont">Dataset:  <em>after</em></span></a></span>
+                              <span><a @click="selectDataset($event, null, selectedDataset.dataset_id, record.dataset_version)" class="newlink"><span class="lfont">Dataset:  <em>after</em></span></a></span>
                             </b-col>
                           </b-row>
                         </template>

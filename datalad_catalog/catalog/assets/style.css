@@ -46,6 +46,10 @@ body {
   color: #444;
 }
 
+a:hover {
+  cursor: pointer;
+}
+
 .item {
   cursor: pointer;
   font-family: Menlo, Consolas, monospace;
