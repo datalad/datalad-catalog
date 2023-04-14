@@ -293,7 +293,8 @@ const datasetView = () =>
               this.showCopyCiteTooltip = false;
             }, 1000);
           },
-          async selectDataset(obj, objId, objVersion, objPath) {
+          async selectDataset(event, obj, objId, objVersion, objPath) {
+            var newBrowserTab = event.ctrlKey || event.metaKey || (event.button == 1)
             if (obj != null) {
               objId = obj.dataset_id;
               objVersion = obj.dataset_version;
@@ -302,13 +303,20 @@ const datasetView = () =>
             file = getFilePath(objId, objVersion, objPath);
             fileExists = await checkFileExists(file);
             if (fileExists) {
-              router.push({
+              const route_info = {
                 name: "dataset",
                 params: {
                   dataset_id: objId,
                   dataset_version: objVersion,
                 },
-              });
+              }
+              if (newBrowserTab) {
+                const routeData = router.resolve(route_info);
+                window.open(routeData.href, '_blank');
+              }
+              else {
+                router.push(route_info);
+              }
             } else {
               console.log(this.$root.subNotAvailable);
               this.$root.$emit("bv::show::modal", "modal-3", "#btnShow");

@@ -216,7 +216,7 @@
                         <span class="xxlfont"><i class="fas fa-database"></i></span>
                       </b-col>
                       <b-col class="text-muted" md="7">
-                        <h5><a @click="selectDataset(ds)" class="newlink">{{ds.dirs_from_path.at(-1)}}</a></h5>
+                        <h5><a @click="selectDataset($event, ds)" class="newlink">{{ds.dirs_from_path.at(-1)}}</a></h5>
                         <span v-for="(author, index) in ds.authors">
                           <small>
                             <span v-if="author.givenName">{{author.givenName}} {{author.familyName}}</span><span v-else>{{author.name}}</span><span v-if="index != ds.authors.length - 1">, </span>
@@ -351,7 +351,7 @@
                               <span class="lfont"><i class="fas fa-database"></i></span>
                             </b-col>
                             <b-col align-h="center" align-v="center" md="9">
-                              <span><a @click="selectDataset(null, selectedDataset.dataset_id, record.previous_version)" class="newlink"><span class="lfont">Dataset:  <em>before</em></span></a></span>
+                              <span><a @click="selectDataset($event, null, selectedDataset.dataset_id, record.previous_version)" class="newlink"><span class="lfont">Dataset:  <em>before</em></span></a></span>
                             </b-col>
                           </b-row>
                         </template>
@@ -420,7 +420,7 @@
                               <span class="lfont"><i class="fas fa-database"></i></span>
                             </b-col>
                             <b-col align-h="center" align-v="center" md="9">
-                              <span><a @click="selectDataset(null, selectedDataset.dataset_id, record.dataset_version)" class="newlink"><span class="lfont">Dataset:  <em>after</em></span></a></span>
+                              <span><a @click="selectDataset($event, null, selectedDataset.dataset_id, record.dataset_version)" class="newlink"><span class="lfont">Dataset:  <em>after</em></span></a></span>
                             </b-col>
                           </b-row>
                         </template>
