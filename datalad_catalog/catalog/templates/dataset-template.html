@@ -129,12 +129,14 @@
               <strong>Keywords:</strong> <br>
               <b-button pill disabled size="sm" variant="outline-dark" v-for="keyword in selectedDataset.keywords">{{keyword}}</b-button>
             </b-card-text>
-            <span v-if="selectedDataset.top_display && selectedDataset.top_display.length">
-              <b-card-text>
-                <strong>Properties:</strong> <br>
-                <span v-for="display_property in selectedDataset.top_display"><b-button disabled size="sm" variant="outline-dark">{{display_property.name}}: {{display_property.value}}</b-button>&nbsp;</span>
-              </b-card-text>
-            </span>
+
+            <b-card-text>
+              <strong>Properties:</strong> <br>
+              <span><b-button disabled size="sm" variant="outline-dark">Subdatasets: {{selectedDataset.subdatasets_available_count}}</b-button>&nbsp;</span>
+              <span v-if="selectedDataset.top_display && selectedDataset.top_display.length">
+                <span v-for="display_property in selectedDataset.top_display"><b-button disabled size="sm" variant="outline-dark">{{display_property.name}}: {{display_property.value}}</b-button>&nbsp;
+              </span>
+            </b-card-text>
           </b-col>
         </b-row>
       </b-card-body>
@@ -144,7 +146,7 @@
           <!-- SUBDATASETS -->
           <b-tab>
             <template v-slot:title>
-              <i class="fas fa-list-ol"></i> Subdatasets
+              <i class="fas fa-list-ol"></i> Subdatasets <span v-if="subdatasets_ready">({{selectedDataset.subdatasets_available_count}})</span>
             </template>
             <span v-if="!subdatasets_ready">
               <div class="d-flex justify-content-center mb-3">
