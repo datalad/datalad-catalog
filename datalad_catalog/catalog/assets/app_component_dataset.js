@@ -259,6 +259,11 @@ const datasetView = () =>
           },
         },
         methods: {
+          newTabActivated(newTabIndex, prevTabIndex, bvEvent) {
+            if (newTabIndex == 1) {
+              this.getFiles()
+            }
+          },
           copyCloneCommand(index) {
             // https://stackoverflow.com/questions/60581285/execcommand-is-now-obsolete-whats-the-alternative
             // https://www.sitepoint.com/clipboard-api/
@@ -471,6 +476,10 @@ const datasetView = () =>
           },
         },
         async beforeRouteUpdate(to, from, next) {
+          var has_subdatasets, has_files
+          console.log('\n---BEFORE ROUTE UPDATE---\n')
+          console.log(to.params.tab_name)
+          console.log('\n---BEFORE ROUTE UPDATE---\n')
           this.tabIndex = 0;
           this.subdatasets_ready = false;
           this.dataset_ready = false;
@@ -556,16 +565,62 @@ const datasetView = () =>
             this.$root.selectedDataset.subdatasets_available_count = subdatasets_available.length
             this.$root.selectedDataset.subdatasets_unavailable_count = subdatasets_unavailable.length
             this.subdatasets_ready = true;
+            has_subdatasets = true;
           } else {
             this.$root.selectedDataset.subdatasets = [];
             this.$root.selectedDataset.subdatasets_count = 0
             this.$root.selectedDataset.subdatasets_available_count = 0
             this.$root.selectedDataset.subdatasets_unavailable_count = 0
             this.subdatasets_ready = true;
+            has_subdatasets = false;
+            // Now check file content
+            this.files_ready = false;
+            this.$root.selectedDataset.tree = this.$root.selectedDataset["children"];
+            this.files_ready = true;
+            if (
+              this.$root.selectedDataset.hasOwnProperty("tree") &&
+              this.$root.selectedDataset.tree instanceof Array &&
+              this.$root.selectedDataset.tree.length > 0
+            ) {
+              has_files = true;
+            }
+            else {
+              has_files = false;
+            }
+          }
+          // now set the correct tab:
+          var tab_param = this.$route.params.tab_name;
+          if (!tab_param) {
+            if (has_subdatasets) {
+              this.tabIndex = 0;
+            }
+            else {
+              if (has_files) {
+                this.tabIndex = 1;
+              }
+              else {
+                this.tabIndex = 2;
+              }
+            }
+          }
+          else {
+            tabs = this.$refs['alltabs'].$children.filter(
+              child => typeof child.$vnode.key === 'string' || child.$vnode.key instanceof String
+            ).map(child => child.$vnode.key)
+            selectTab = tabs.indexOf(tab_param)
+            if (selectTab >= 0) {
+              this.tabIndex = selectTab;
+            } else {
+              this.tabIndex = 0;
+            }
           }
           next();
         },
         async created() {
+          var has_subdatasets, has_files
+          console.log('\n---CREATED---\n')
+          console.log(this.$route.params.tab_name)
+          console.log('\n---CREATED---\n')
           file = getFilePath(
             this.$route.params.dataset_id,
             this.$route.params.dataset_version,
@@ -623,12 +678,54 @@ const datasetView = () =>
             this.$root.selectedDataset.subdatasets_available_count = subdatasets_available.length
             this.$root.selectedDataset.subdatasets_unavailable_count = subdatasets_unavailable.length
             this.subdatasets_ready = true;
+            has_subdatasets = true;
           } else {
             this.$root.selectedDataset.subdatasets = [];
             this.$root.selectedDataset.subdatasets_count = 0
             this.$root.selectedDataset.subdatasets_available_count = 0
             this.$root.selectedDataset.subdatasets_unavailable_count = 0
             this.subdatasets_ready = true;
+            has_subdatasets = false;
+            // Now check file content
+            this.files_ready = false;
+            this.$root.selectedDataset.tree = this.$root.selectedDataset["children"];
+            this.files_ready = true;
+            if (
+              this.$root.selectedDataset.hasOwnProperty("tree") &&
+              this.$root.selectedDataset.tree instanceof Array &&
+              this.$root.selectedDataset.tree.length > 0
+            ) {
+              has_files = true;
+            }
+            else {
+              has_files = false;
+            }
+          }
+          // now set the correct tab:
+          var tab_param = this.$route.params.tab_name;
+          if (!tab_param) {
+            if (has_subdatasets) {
+              this.tabIndex = 0;
+            }
+            else {
+              if (has_files) {
+                this.tabIndex = 1;
+              }
+              else {
+                this.tabIndex = 2;
+              }
+            }
+          }
+          else {
+            tabs = this.$refs['alltabs'].$children.filter(
+              child => typeof child.$vnode.key === 'string' || child.$vnode.key instanceof String
+            ).map(child => child.$vnode.key)
+            selectTab = tabs.indexOf(tab_param)
+            if (selectTab >= 0) {
+              this.tabIndex = selectTab;
+            } else {
+              this.tabIndex = 0;
+            }
           }
         },
         mounted() {
