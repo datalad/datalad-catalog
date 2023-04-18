@@ -134,7 +134,7 @@
               <strong>Properties:</strong> <br>
               <span><b-button disabled size="sm" variant="outline-dark">Subdatasets: {{selectedDataset.subdatasets_available_count}}</b-button>&nbsp;</span>
               <span v-if="selectedDataset.top_display && selectedDataset.top_display.length">
-                <span v-for="display_property in selectedDataset.top_display"><b-button disabled size="sm" variant="outline-dark">{{display_property.name}}: {{display_property.value}}</b-button>&nbsp;
+                <span v-for="display_property in selectedDataset.top_display"><b-button disabled size="sm" variant="outline-dark">{{display_property.name}}: {{display_property.value}}</b-button>&nbsp;</span>
               </span>
             </b-card-text>
           </b-col>
@@ -142,9 +142,9 @@
       </b-card-body>
       <!-- BOTTOM SECTION WITH TABS-->
       <b-card-body>
-        <b-tabs card content-class="mt-3" fill active-nav-item-class="font-weight-bold" v-model="tabIndex">
+        <b-tabs card content-class="mt-3" fill active-nav-item-class="font-weight-bold" v-model="tabIndex" @activate-tab="newTabActivated" ref="alltabs">
           <!-- SUBDATASETS -->
-          <b-tab>
+          <b-tab key="subdatasets" ref="tabelement">
             <template v-slot:title>
               <i class="fas fa-list-ol"></i> Subdatasets <span v-if="subdatasets_ready">({{selectedDataset.subdatasets_available_count}})</span>
             </template>
@@ -174,7 +174,6 @@
                       </b-button-group>&nbsp;&nbsp;
                       <b-form-input id="input-1" type="search" placeholder="Search by dataset or author name" required v-model="search_text" ref="text_search_input"></b-form-input>
                     </b-input-group>
-                    
                     </b-col>
                     <b-col md="5">
                       <b-input-group>
@@ -243,7 +242,7 @@
             </span>
           </b-tab>
           <!-- FILE TREE -->
-          <b-tab @click="getFiles">
+          <b-tab @click="getFiles" key="content" ref="tabelement">
             <template v-slot:title>
               <i class="far fa-folder"></i> Content
             </template>
@@ -279,7 +278,7 @@
           </b-tab>
           <!-- PUBLICATIONS -->
           <span v-if="selectedDataset.publications && selectedDataset.publications.length">
-            <b-tab >
+            <b-tab key="publications" ref="tabelement">
               <template v-slot:title>
                 <i class="fas fa-book"></i> Publications
               </template>
@@ -312,7 +311,7 @@
           </span>
           <!-- FUNDING -->
           <span v-if="selectedDataset.funding && selectedDataset.funding.length">
-            <b-tab>
+            <b-tab key="funding" ref="tabelement">
               <template v-slot:title>
                 <i class="fas fa-dollar-sign"></i> Funding
               </template>
@@ -337,7 +336,7 @@
           </span>
           <!-- PROVENANCE -->
           <span v-if="selectedDataset.provenance && selectedDataset.provenance.length">
-            <b-tab>
+            <b-tab key="provenance" ref="tabelement">
               <template v-slot:title>
                 <i class="fas fa-laptop-code"></i> Provenance
               </template>
@@ -449,7 +448,7 @@
           <!-- EXTRA TABS -->
           <span v-if="selectedDataset.additional_display && selectedDataset.additional_display.length">
             <span v-for="new_tab in selectedDataset.additional_display">
-              <b-tab>
+              <b-tab :key="new_tab.name" ref="tabelement">
                 <template v-slot:title>
                   <span v-if="new_tab.icon"><i :class="new_tab.icon"></i></span><span v-else><i class="fas fa-bars"></i></span> {{new_tab.name}}
                 </template>
