@@ -36,7 +36,7 @@ const routes = [
     },
   },
   {
-    path: "/dataset/:dataset_id/:dataset_version/:tab_name?",
+    path: "/dataset/:dataset_id/:dataset_version",
     component: datasetView,
     name: "dataset",
   },
