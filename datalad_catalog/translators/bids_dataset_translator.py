@@ -102,7 +102,7 @@ class BIDSTranslator:
         self.extracted_metadata = self.metadata_record["extracted_metadata"]
 
     def get_name(self):
-        return self.extracted_metadata.get("title", "")
+        return self.extracted_metadata.get("Name", "")
 
     def get_description(self):
         bids_description = self.extracted_metadata.get("description")
@@ -120,10 +120,15 @@ class BIDSTranslator:
             return None
 
     def get_license(self):
-        program = '.license | { "name": .name, "url":  ""}'
-        result = jq.first(program, self.extracted_metadata)
-        # todo check for license info missing
-        return result if len(result) > 0 else None
+        url_map = {
+            # only the licenses & links explicitly named in bids spec
+            "PDDL": "https://opendatacommons.org/licenses/pddl/",
+            "CC0": "https://creativecommons.org/publicdomain/zero/1.0/",
+        }
+        license_name = self.extracted_metadata.get("License")
+        if license_name is not None:
+            return {"name": license_name, "url": url_map.get(license_name, "")}
+        return None
 
     def get_authors(self):
         program = (
@@ -199,6 +204,7 @@ class BIDSTranslator:
             "authors": self.get_authors(),
             "keywords": self.get_keywords(),
             "funding": self.get_funding(),
+            "license": self.get_license(),
             "metadata_sources": self.get_metadata_source(),
             "additional_display": self.get_additional_display(),
             "top_display": self.get_top_display(),
