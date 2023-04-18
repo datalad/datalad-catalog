@@ -245,10 +245,10 @@
           <!-- FILE TREE -->
           <b-tab @click="getFiles">
             <template v-slot:title>
-              <i class="far fa-folder"></i> Files
+              <i class="far fa-folder"></i> Content
             </template>
             <span v-if="files_ready">
-              <span v-if="!selectedDataset.tree || !selectedDataset.tree.length"><em>There are no files listed for the current dataset</em></span>
+              <span v-if="!selectedDataset.tree || !selectedDataset.tree.length"><em>There is no content available for the current dataset</em></span>
               <span v-else>
                 <b-card no-body class="p-2">
                   <ul>
@@ -279,7 +279,7 @@
           </b-tab>
           <!-- PUBLICATIONS -->
           <span v-if="selectedDataset.publications && selectedDataset.publications.length">
-            <b-tab>
+            <b-tab >
               <template v-slot:title>
                 <i class="fas fa-book"></i> Publications
               </template>
