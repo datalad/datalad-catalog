@@ -15,9 +15,9 @@
           <strong>Version:</strong> {{selectedDataset.dataset_version.substring(0,7)}}&nbsp;
           <strong>Last updated:</strong> {{displayData.last_updated}}&nbsp;
           <strong>DOI:</strong> <span v-if="selectedDataset.doi"><a :href="selectedDataset.doi" target="_blank"> {{selectedDataset.doi.replace("https://doi.org/", "")}}</a></span>
-          <span v-else><em>not available</em></span>&nbsp;
+          <span v-else><em>unknown</em></span>&nbsp;
           <strong>License:</strong> <span v-if="selectedDataset.license && selectedDataset.license.name"><a :href="selectedDataset.license.url" target="_blank"> {{selectedDataset.license.name}}</a></span>
-          <span v-else><em>not available</em></span>
+          <span v-else><em>unknown</em></span>
         </b-card-text>
         <!-- DATASET BUTTONS -->
         <div style="text-align: left;">
@@ -132,9 +132,9 @@
 
             <b-card-text>
               <strong>Properties:</strong> <br>
-              <span><b-button disabled size="sm" variant="outline-dark">Subdatasets: {{selectedDataset.subdatasets_available_count}}</b-button>&nbsp;</span>
+              <span v-if="selectedDataset.subdatasets_available_count"><b-button disabled size="sm" variant="outline-dark">Subdatasets: {{selectedDataset.subdatasets_available_count}}</b-button>&nbsp;</span>
               <span v-if="selectedDataset.top_display && selectedDataset.top_display.length">
-                <span v-for="display_property in selectedDataset.top_display"><b-button disabled size="sm" variant="outline-dark">{{display_property.name}}: {{display_property.value}}</b-button>&nbsp;</span>
+                <span v-for="display_property in selectedDataset.top_display" v-if="display_property.value"><b-button disabled size="sm" variant="outline-dark">{{display_property.name}}: {{display_property.value}}</b-button>&nbsp;</span>
               </span>
             </b-card-text>
           </b-col>
@@ -172,7 +172,7 @@
                           Modified
                         </b-button>
                       </b-button-group>&nbsp;&nbsp;
-                      <b-form-input id="input-1" type="search" placeholder="Search by dataset or author name" required v-model="search_text" ref="text_search_input"></b-form-input>
+                      <b-form-input id="input-1" type="search" placeholder="Filter by dataset or author name" required v-model="search_text" ref="text_search_input"></b-form-input>
                     </b-input-group>
                     </b-col>
                     <b-col md="5">
@@ -184,7 +184,7 @@
                                 v-bind="inputAttrs"
                                 v-model="tag_text"
                                 v-on="inputHandlers"
-                                placeholder="Search by keyword (select or press enter to add)"
+                                placeholder="Filter by keyword (select or press enter to add)"
                                 class="form-control"
                                 ref="tag_search_input"
                                 @input="inputTagText()"
@@ -313,7 +313,7 @@
           <span v-if="selectedDataset.funding && selectedDataset.funding.length">
             <b-tab key="funding" ref="tabelement">
               <template v-slot:title>
-                <i class="fas fa-dollar-sign"></i> Funding
+                <i class="fas fa-building-columns"></i> Funding
               </template>
               <span v-if="!selectedDataset.funding || !selectedDataset.funding.length"><em>There are no funding sources listed for the current dataset</em></span>
               <span v-else v-for="fund in selectedDataset.funding">
