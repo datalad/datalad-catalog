@@ -313,7 +313,7 @@
           <span v-if="selectedDataset.funding && selectedDataset.funding.length">
             <b-tab key="funding" ref="tabelement">
               <template v-slot:title>
-                <i class="fas fa-dollar-sign"></i> Funding
+                <i class="fas fa-building-columns"></i> Funding
               </template>
               <span v-if="!selectedDataset.funding || !selectedDataset.funding.length"><em>There are no funding sources listed for the current dataset</em></span>
               <span v-else v-for="fund in selectedDataset.funding">
