@@ -132,9 +132,9 @@
 
             <b-card-text>
               <strong>Properties:</strong> <br>
-              <span><b-button disabled size="sm" variant="outline-dark">Subdatasets: {{selectedDataset.subdatasets_available_count}}</b-button>&nbsp;</span>
+              <span v-if="selectedDataset.subdatasets_available_count"><b-button disabled size="sm" variant="outline-dark">Subdatasets: {{selectedDataset.subdatasets_available_count}}</b-button>&nbsp;</span>
               <span v-if="selectedDataset.top_display && selectedDataset.top_display.length">
-                <span v-for="display_property in selectedDataset.top_display"><b-button disabled size="sm" variant="outline-dark">{{display_property.name}}: {{display_property.value}}</b-button>&nbsp;</span>
+                <span v-for="display_property in selectedDataset.top_display" v-if="display_property.value"><b-button disabled size="sm" variant="outline-dark">{{display_property.name}}: {{display_property.value}}</b-button>&nbsp;</span>
               </span>
             </b-card-text>
           </b-col>
