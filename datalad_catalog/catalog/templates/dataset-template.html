@@ -172,7 +172,7 @@
                           Modified
                         </b-button>
                       </b-button-group>&nbsp;&nbsp;
-                      <b-form-input id="input-1" type="search" placeholder="Search by dataset or author name" required v-model="search_text" ref="text_search_input"></b-form-input>
+                      <b-form-input id="input-1" type="search" placeholder="Filter by dataset or author name" required v-model="search_text" ref="text_search_input"></b-form-input>
                     </b-input-group>
                     </b-col>
                     <b-col md="5">
@@ -184,7 +184,7 @@
                                 v-bind="inputAttrs"
                                 v-model="tag_text"
                                 v-on="inputHandlers"
-                                placeholder="Search by keyword (select or press enter to add)"
+                                placeholder="Filter by keyword (select or press enter to add)"
                                 class="form-control"
                                 ref="tag_search_input"
                                 @input="inputTagText()"
