@@ -271,6 +271,10 @@ const datasetView = () =>
             // https://stackoverflow.com/questions/60581285/execcommand-is-now-obsolete-whats-the-alternative
             // https://www.sitepoint.com/clipboard-api/
             selectText = document.getElementById("clone_code").textContent;
+            selectText = '\n      ' + selectText + '  \n\n  '
+            console.log(selectText)
+            selectText = selectText.replace(/^\s+|\s+$/g, '');
+            console.log(selectText)
             navigator.clipboard
               .writeText(selectText)
               .then(() => {})
