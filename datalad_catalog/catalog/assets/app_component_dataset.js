@@ -532,10 +532,22 @@ const datasetView = () =>
                 this.$root.selectedDataset.subdatasets[index].available = "false";
               }
             });
+            subdatasets_available = this.$root.selectedDataset.subdatasets.filter(
+              (obj) => obj.available == "true"
+            );
+            subdatasets_unavailable = this.$root.selectedDataset.subdatasets.filter(
+              (obj) => obj.available == "false"
+            );
+            this.$root.selectedDataset.subdatasets_count = this.$root.selectedDataset.subdatasets.length
+            this.$root.selectedDataset.subdatasets_available_count = subdatasets_available.length
+            this.$root.selectedDataset.subdatasets_unavailable_count = subdatasets_unavailable.length
             this.subdatasets_ready = true;
             console.log(this.subdatasets_ready);
           } else {
             this.$root.selectedDataset.subdatasets = [];
+            this.$root.selectedDataset.subdatasets_count = 0
+            this.$root.selectedDataset.subdatasets_available_count = 0
+            this.$root.selectedDataset.subdatasets_unavailable_count = 0
             this.subdatasets_ready = true;
           }
           next();
@@ -588,9 +600,21 @@ const datasetView = () =>
                 this.$root.selectedDataset.subdatasets[index].available = "false";
               }
             });
+            subdatasets_available = this.subdatasets.filter(
+              (obj) => obj.available == "true"
+            );
+            subdatasets_unavailable = this.subdatasets.filter(
+              (obj) => obj.available == "false"
+            );
+            this.$root.selectedDataset.subdatasets_count = this.$root.selectedDataset.subdatasets.length
+            this.$root.selectedDataset.subdatasets_available_count = subdatasets_available.length
+            this.$root.selectedDataset.subdatasets_unavailable_count = subdatasets_unavailable.length
             this.subdatasets_ready = true;
           } else {
             this.$root.selectedDataset.subdatasets = [];
+            this.$root.selectedDataset.subdatasets_count = 0
+            this.$root.selectedDataset.subdatasets_available_count = 0
+            this.$root.selectedDataset.subdatasets_unavailable_count = 0
             this.subdatasets_ready = true;
           }
         },

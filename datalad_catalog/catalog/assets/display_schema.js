@@ -2,6 +2,8 @@
 // Components //
 /**************/
 
+var input_count = 1
+
 const dataset_schema_file = "./assets/jsonschema_dataset.json";
 const authors_schema_file = "./assets/jsonschema_authors.json";
 const file_schema_file = "./assets/jsonschema_file.json";
@@ -179,7 +181,7 @@ type_colors = {
 
 // COMPONENTS
 
-// SCHEMA-ITEM
+// SCHEMA-ITEM FOR RENDERING
 Vue.component("schema-item", {
   template: "#schema-item",
   props: [
@@ -225,7 +227,111 @@ Vue.component("schema-item", {
 })
 
 
-// T-INPUT
+// SCHEMA-FORM: FOR ENTERING AND DOWNLOADING/SAVING METADATA
+Vue.component("schema-form", {
+  template: "#form-template",
+  props: [
+    'title',
+    'form_config',
+    'toplevel',
+  ],
+  data: function () {
+    return {
+      form_data_tmp: null
+    }
+  },
+  computed: {
+    form_data() {
+      var dat = {}
+      var fields = this.form_config.children
+      for (var i=0; i<fields.length; i++) {
+        var f = fields[i]
+        switch (f.input_type) {
+          case 'array':
+            dat[f.form_field] = [];
+            break;
+          case 'object':
+            dat[f.form_field] = {};
+            break;
+          case 'text':
+            dat[f.form_field] = '';
+            break;
+          default:
+            dat[f.form_field] = null;
+        }
+      }
+      return dat
+    }
+  },
+  methods: {
+    onSubmit(event) {
+      event.preventDefault()
+      // if (this.toplevel) {
+        // Download data
+        // downloadObjectAsJson(this.form, 'dataset_metadata.json')
+      var data = {}
+      for (var f=0; f<this.form_config.children.length; f++) {
+        child = this.form_config.children[f]
+        // child_val_init = child.value
+        data[child.form_field] = child.value
+        // child.value = child_val_init
+      }
+      // console.log(data)
+      this.$root.$emit('formSaved', {formatted_data: data, form_data: this.form_data_tmp})
+      // } 
+      // else {
+      //   var data = {}
+      //   for (var f=0; f<this.form_data_tmp.children.length; f++) {
+      //     child = this.form_data_tmp.children[f]
+      //     data[child.form_field] = child.value
+      //   }
+      //   console.log(data)
+      //   this.$root.$emit('formSaved', {formatted_data: data, form_data: this.form_data_tmp})
+      // } 
+    },
+    onReset(event) {
+      event.preventDefault()
+      if (this.toplevel) {
+        // Reset main schema
+      } else {
+        for (var f=0; f<this.form_data_tmp.children.length; f++) {
+          child = this.form_data_tmp.children[f]
+          child.value = null
+          // TODO: is recursion necessary here???
+        }
+      } 
+    },
+    onCancel(event) {
+      console.log(event)
+      console.log(event.target)
+      console.log(this.$refs)
+      console.log(this.$parent)
+      console.log(this.$parent.$refs)
+      console.log(this.$parent.$parent)
+      console.log(this.$parent.$parent.$refs)
+      console.log(this.$parent.$parent.$parent)
+      console.log(this.$parent.$parent.$parent.$refs)
+      // console.log()
+      // console.log(this.$refs)
+      if (!this.toplevel) {
+        // console.log(this.$refs.forminput[0].$refs.additem)
+        // this.$refs.forminput.length
+        // this.$parent.$parent.hide()
+        
+        // this.$refs['additem'].hide()
+      }
+      // event.preventDefault()
+    }
+  },
+  created() {
+    this.form_data_tmp = Vue.util.extend({}, this.form_config)
+  },
+})
+
+
+
+// T-INPUT: SINGLE INPUT ITEM FOR ENTERING METADATA INTO A SCHEMA-FORM
+// (could in turn contain another schema-form)
 Vue.component("t-input", {
   template: "#input-template",
   data: function () {
@@ -279,19 +385,22 @@ Vue.component("t-input", {
     closeItemModal() {
       this.$refs['additem'].hide()
     },
-    saveItem() {
-      if (this.edit_existing) {
-        this.obj.value[this.edit_index] = JSON.parse(JSON.stringify(this.edited_item))
-      }
-      else {
-        this.obj.value.push(this.edited_item)
-      }
-      this.edited_item = {}
-      this.edit_existing = null
-      this.edit_index = null
-      this.$refs['itemtable'].refresh()
-    }
-
+    // saveItem() {
+    //   if (this.edit_existing) {
+    //     this.obj.value[this.edit_index] = JSON.parse(JSON.stringify(this.edited_item))
+    //   }
+    //   else {
+    //     this.obj.value.push(this.edited_item)
+    //   }
+    //   this.edited_item = {}
+    //   this.edit_existing = null
+    //   this.edit_index = null
+    //   this.$refs['itemtable'].refresh()
+    // }
+    bleh(data) {
+      console.log("Receive input:")
+      console.log(data)
+    },
   },
   computed: {
     array_fields() {
@@ -322,93 +431,9 @@ Vue.component("t-input", {
     input_label() {
       return makeReadable(this.obj.label)
     }
-
-    // state() {
-    //   return this.obj.value.length == 4
-    // },
-    // invalidFeedback() {
-    //   if (this.obj.value.length > 0) {
-    //     return 'Enter at least 4 characters.'
-    //   }
-    //   return 'Please enter something.'
-    // }
   },
 })
 
-
-// SCHEMA-FORM
-Vue.component("schema-form", {
-  template: "#form-template",
-  props: [
-    'title',
-    'form_config',
-    'toplevel',
-  ],
-  data: function () {
-    return {
-    }
-  },
-  computed: {
-    form_data() {
-      var dat = {}
-      var fields = this.form_config.children
-      for (var i=0; i<fields.length; i++) {
-        var f = fields[i]
-        switch (f.input_type) {
-          case 'array':
-            dat[f.form_field] = [];
-            break;
-          case 'object':
-            dat[f.form_field] = {};
-            break;
-          case 'text':
-            dat[f.form_field] = '';
-            break;
-          default:
-            dat[f.form_field] = null;
-        }
-      }
-      return dat
-    }
-  },
-  methods: {
-    onSubmit(event) {
-      event.preventDefault()
-      // downloadObjectAsJson(this.form, 'dataset_metadata.json')
-    },
-    onReset(event) {
-      event.preventDefault()
-      // // Reset our form values
-      // this.form.name = '',
-      // this.form.description = '',
-      // this.form.url = '',
-      // this.form.doi = '',
-      // // Trick to reset/clear native browser form validation state
-      // this.show = false
-      // this.$nextTick(() => {
-      //   this.show = true
-      // })
-    },
-    onCancel(event) {
-      console.log(event)
-      console.log(event.target)
-      console.log(this.$refs)
-      console.log(this.$parent.$refs)
-      console.log(this.$parent.$parent.$refs)
-      console.log(this.$parent.$parent.$parent.$refs)
-      // console.log()
-      // console.log(this.$refs)
-      if (!this.toplevel) {
-        // console.log(this.$refs.forminput[0].$refs.additem)
-        // this.$refs.forminput.length
-        // this.$parent.$parent.hide()
-        
-        // this.$refs['additem'].hide()
-      }
-      // event.preventDefault()
-    },
-  },
-})
 
 
 /***********/
@@ -433,6 +458,9 @@ var form_app = new Vue({
     form_config: {},
   },
   methods: {
+    mainVueData(data) {
+      console.log(data)
+    },
     onSubmit(event) {
       event.preventDefault()
       // downloadObjectAsJson(this.form, 'dataset_metadata.json')
@@ -470,15 +498,36 @@ var form_app = new Vue({
       }
     },
     addMetadata(schema) {
+      // 1 - resolve the schema
       var resolved_schema = resolveSchemaNew(schema, this.schemas_json);
-      var name =  schema.title
-      this.form_config = parseSchema(name, resolved_schema, null, [])
+      // 2 - parse schema and transform into renderable objects
+      var name = schema.title
+      this.form_config = parseSchema(name, resolved_schema, [])
+      // 3 - if dataset schema, preset defaults
+      var child
+      if (this.form_config["form_field"] == "dataset") {
+        child = this.findChild(this.form_config, "form_field", "type")
+        child.value = "dataset";
+        child.disabled = true
+        child = this.findChild(this.form_config, "form_field", "dataset_id")
+        child.value = randomUUID();
+        child.disabled = true
+        child = this.findChild(this.form_config, "form_field", "dataset_version")
+        child.value = randomVersion();
+        child.disabled = true
+      }
+      // 4 - if file schema, preset defaults
+      if (this.form_config["form_field"] == "file") {
+        child = this.findChild(this.form_config, "form_field", "type")
+        child.value = "file";
+        child.disabled = true
+      }
       this.show_form = true;
     },
     getResolvedSchema(schema) {
       var resolved_schema = resolveSchemaNew(schema, this.schemas_json);
       var name =  schema.title
-      var form_config = parseSchema(name, resolved_schema, null, [])
+      var form_config = parseSchema(name, resolved_schema, [])
       downloadObjectAsJson(resolved_schema, 'resolved_schema')
       downloadObjectAsJson(form_config, 'form_config')
 
@@ -502,6 +551,31 @@ var form_app = new Vue({
         window.open(dest);
       }
     },
+    findChild(input_object, key, value, recurse = false) {
+      if (!input_object.children) {
+        return null
+      }
+      filtered_children = input_object.children.filter(
+        (obj) => {
+            return obj[key] == value
+        }
+      );
+      if (filtered_children && filtered_children.length > 0) {
+        console.log(filtered_children[0])
+        return filtered_children[0]
+      }
+      else if (recurse) {
+        for (var x=0; x<input_object.children.length; x++) {
+          child = input_object.children[x]
+          found_child = this.findChild(child, key, value, true)
+          if (found_child) {return found_child} else {continue}
+        }
+        return null
+      }
+      else {
+        return null
+      }
+    }
 
   },
   beforeCreate() {
@@ -540,12 +614,91 @@ var form_app = new Vue({
       }
     )
   },
+  mounted() {
+    // Set function that handles emitted data from (recursive) form submission
+    this.$on('formSaved', (data) => {
+      console.log('Emitted data:')
+      console.log(data)
+      var formatted_data = data.formatted_data
+      var form_data = data.form_data  
+      var key_to_match = "input_id"
+      console.log('Now searching for object with ' + key_to_match + ' == ' + form_data[key_to_match])
+      edited_child = this.findChild(this.form_config, key_to_match, form_data[key_to_match], true)
+      console.log("edited_child")
+      console.log(edited_child)
+      console.log("type")
+      type_array = edited_child["type"]
+      console.log(type_array)
+      console.log("value")
+      console.log(edited_child.value)
+
+      
+      if (type_array.includes(ARRAY)) {
+        edited_child.value.push(formatted_data)
+        //
+      }
+      else if (type_array.includes(OBJECT)) {
+        formatted_keys = Object.keys(formatted_data)
+        for (var k=0; k<formatted_keys.length; k++) {
+          key = formatted_keys[k]
+
+          indiv_child = this.findChild(edited_child, "form_field", key)
+          indiv_child.value = formatted_data[key]
+        }
+      }
+      else {
+        //
+      }
+      
+      // this.form_config.children[7].value.push("some_url")
+    })
+  },
 });
 
 
-function parseSchema(name, schema, input_count = null, required = []) {
 
-  console.log("parseschema called...")
+function randomUUID() {
+  return crypto.randomUUID()
+}
+
+function randomVersion() {
+  var parts = randomUUID().split('-')
+  var filler = randomString(4)
+  var version = ''
+  for (var p=0; p<parts.length; p++) {
+    if (p == parts.length-1) {
+      version = version.concat(parts[p])
+    } else {
+      version = version.concat(parts[p]).concat(filler.charAt(p))
+    }
+  }
+  return version
+}
+
+function randomString(length = 40) {
+  const chars = '0123456789abcdefghijklmnopqrstuvwxyz'
+  var result = '';
+  for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];
+  return result;
+}
+
+function setDatasetSchemaDefaults() {
+
+}
+
+
+/**
+ * Parse the incoming schema and transform it into data that can be rendered
+ * in the metadata entry form. A schema could also be a single property.
+ * @param {string} name - The name of the incoming schema
+ * @param {Object} schema The incoming schema
+ * @param {Array} required=[] - An array of required properties of the incoming schema
+ * @returns {}
+ */
+
+function parseSchema(name, schema, required = []) {
+
+  // console.log("parseschema called...")
   // assume schema has already been resolved
 
   // Schema should be an object
@@ -554,20 +707,13 @@ function parseSchema(name, schema, input_count = null, required = []) {
   //   return false
   // }
   // If schema has no type, cannot add metadata (ignore allOf etc for now... TODO)
-  console.log(schema)
+  // console.log(schema)
   if (!(TYPE in schema)) {
-    console.log("ERROR: schema has no 'type' or '$ref' at the top level and cannot be parsed")
+    console.error("ERROR: schema has no 'type' or '$ref' at the top level and cannot be parsed")
     return false
   }
 
-  // input count
-  if (!input_count) {
-    input_count = 1;
-  } else {
-    input_count++;
-  }
-
-  // initialise
+  // Initialize item to be rendered
   var item = {
     description: schema.description ? schema.description: "",
     input_id: "input-" + input_count.toString(), //"input-1"
@@ -579,10 +725,11 @@ function parseSchema(name, schema, input_count = null, required = []) {
     input_type: "", // 
     type: null,
     value: null,
+    disabled: false,
     validations: [],
     children: [],
   }
-
+  // Write standard JSONschema keywords and annotations to item
   schema_keywords.concat(schema_annotations).forEach(
     kw => {
       if (kw in schema) {
@@ -590,12 +737,16 @@ function parseSchema(name, schema, input_count = null, required = []) {
       }
     }
   );
+
   // Make sure type keyword exists, then parse
   if (TYPE in schema) {
     tp = schema[TYPE]
     // type could be an array or a string -> turn all into array
     var type_array = Array.isArray(tp) ? tp : [tp]
     item.type = type_array
+    // Set input type of item, this determines how the item will render
+    // (e.g. text/number input, object input, array input)
+    // If there are multiple input types, set to ""
     item.input_type = Array.isArray(tp) ? "" : TYPE_MAP[tp]
     if (allInArray(type_array, TYPES)) {
       // lets assume hierarchy for now (array -> object -> others),
@@ -605,33 +756,42 @@ function parseSchema(name, schema, input_count = null, required = []) {
         item.value = []
         if (ITEMS in schema ) {
           input_count++
-          arr_item = parseSchema(name, schema.items, input_count, schema[REQUIRED])
+          vv = input_count
+          arr_item = parseSchema(name, schema.items, schema[REQUIRED])
+
+          console.log('Array item: ' + vv.toString())
           item.children.push(arr_item)
+        } else {
+          // TODO: this is why description has no buttons, i think
         }
-        // addObjectToArray(arr_item, item.children, 'form_field')
       }
-      if (type_array.includes(OBJECT) && PROPERTIES in schema) {
+      else if (type_array.includes(OBJECT) && PROPERTIES in schema) {
         item.input_type = "object"
         for (prop in schema[PROPERTIES]) {
           input_count++
-          prop_item = parseSchema(prop, schema[PROPERTIES][prop], input_count, schema[REQUIRED])
+          pp = input_count
+          prop_item = parseSchema(prop, schema[PROPERTIES][prop], schema[REQUIRED])
+          console.log('Object item prop: ' + pp.toString())
           item.children.push(prop_item)
-          // addObjectToArray(prop_item, item.children, 'form_field')
         }
       }
-      
     } else {
       console.log("ERROR: type '" + type_array + "' not supported by jsonschema draft 2020-12" )
     }
   } else {
     // TODO: handle cases such as allof and whatever else!!!
-    console.log("ERROR: keyword 'type' not in schema")
+    console.error("ERROR: keyword 'type' not in schema")
     return false
   }
 
   return item
 }
 
+// function randomString(size = 40) {  
+//   return Crypto.randomBytes(size)
+//     .toString('hex')
+//     .slice(0, size)
+// }
 
 
 function resolveSchemaNew(schema, available_schemas) {
@@ -744,8 +904,14 @@ function addObjectToArray(obj, arr, prop_to_check) {
   }
 }
 
+
+/**
+ * Check if all elements of a smaller sized array are included in a larger-sized array
+ * @param {Array} small_array - The array whose elements are tested
+ * @param {Array} big_array - The array to test against
+ * @returns {boolean} - True if all elements of small_array are included in big_array
+ */
 function allInArray(small_array, big_array) {
-  // return true if all elements of small_array are in big_array
   return small_array.every(el => big_array.includes(el))
 }
 

@@ -17,6 +17,9 @@
     <script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
     <!-- <script src="assets/vue.2.6.14.min.js"></script> -->
     <script src="assets/bootstrap-vue.2.21.2.min.js"></script>
+    <script src="assets/md5-2.3.0.js"></script>
+    <!-- <script type="module" src="assets/jsmod.js"></script> -->
+
 
     <!-- Vue component templates -->
 
@@ -59,7 +62,7 @@
                     [optional]</span>
                 </span>
               </small>
-              <!-- <b-button v-if="isschema" size ="sm" class="pt-0 pb-0 mb-0" variant="outline-dark" @click="$emit('showmetaform')"><i class="fas fa-pen-to-square"></i> Enter metadata</b-button> -->
+              <b-button v-if="isschema" size ="sm" class="pt-0 pb-0 mb-0" variant="outline-dark" @click="$emit('showmetaform')"><i class="fas fa-pen-to-square"></i> Enter metadata</b-button>
               <span v-if="isschema">&nbsp;<b-button size ="sm" class="pt-0 pb-0 mb-0" variant="outline-dark" @click="$emit('resolveschema')"><i class="fas fa-download"></i> Resolve schema</b-button></span>
             </b-card-title>
             <!-- ITEM ANNOTATIONS AND VALIDATIONS -->
@@ -137,6 +140,49 @@
 
 
     <!-- ================================= -->
+    <!-- SCHEMA-FORM: METADATA INPUT FORM  -->
+    <!-- ================================= -->
+    <script type="text/x-template" id="form-template">
+      <b-card border-variant="dark">
+        <b-card-title>
+          <u>{{title}}</u>
+        </b-card-title>
+        <div>Form data temp: <br>{{form_data_tmp}}</div>
+        
+        <br>
+        <b-form @submit="onSubmit" @reset="onReset">
+          <span v-if="toplevel">
+            <span v-for="(field, i) in form_data_tmp.children">
+                <!-- don't think ref="forminput" is actually necessary or used - remove once confirmed -->
+                <t-input ref="forminput" v-bind:obj="field" :i="i"></t-input>
+                <br>
+            </span>
+          </span>
+          <span v-else>
+            <span v-for="(field, i) in form_data_tmp.children">
+              <!-- don't think ref="forminput" is actually necessary or used - remove once confirmed -->
+              <t-input ref="forminput" v-bind:obj="field" :i="i" @form-saved="console.log('kaas2')" v-on="$listeners"></t-input>
+              <br>
+          </span>
+          </span>
+            <br><br>
+            <div style="text-align: right">
+              <span v-if="toplevel">
+                <b-button type="submit" variant="outline-dark"><i class="fas fa-download"></i> Download</b-button>&nbsp;
+              </span>
+              <span v-else>
+                <b-button type="submit" variant="outline-dark"><i class="far fa-floppy-disk"></i> Save</b-button>&nbsp;
+              </span>
+              <b-button type="reset" variant="outline-dark"><i class="fas fa-arrow-rotate-left"></i> Reset</b-button>
+              <b-button variant="outline-dark" @click="$emit('closemodal')"><i class="fas fa-xmark"></i> Cancel</b-button>
+            </div>
+        </b-form>
+        <br>
+      </b-card>
+    </script>
+
+
+    <!-- ================================= -->
     <!-- T-INPUT: FOR METADATA ITEM INPUT  -->
     <!-- ================================= -->
     <script type="text/x-template" id="input-template">
@@ -148,6 +194,7 @@
           <template v-slot:label>
             <strong>{{(i+1).toString() + '. ' + input_label }}</strong> <i class="fas fa-circle-info text-secondary" v-b-popover.hover.topleft="obj.description"></i> <span class="text-danger" v-if="obj.required">*</span>
           </template>
+          <!-- INPUT FIELD FOR AN ARRAY -->
           <span v-if="obj.input_type == 'array'">
             <b-table ref="itemtable" responsive striped bordered hover small v-bind:items="obj.value"
               v-bind:fields="array_fields"
@@ -164,6 +211,7 @@
               <b-button variant="outline-dark" size="sm" @click="addItemModal({})">Add item</b-button>
             </div>
           </span>
+          <!-- INPUT FIELD FOR AN OBJECT -->
           <span v-else-if="obj.input_type == 'object'">
             <b-card no-body>
               <b-container>
@@ -178,20 +226,22 @@
               </b-container>
             </b-card>
             <div style="text-align: right;">
-              <b-button variant="outline-dark" size="sm" @click="addItemModal(obj)">Add/edit data</b-button>
+              <b-button variant="outline-dark" size="sm" @click="addItemModal(obj)">Edit</b-button>
             </div>
           </span>
+          <!-- INPUT FIELD FOR A BASIC TYPE (TEXT, EMAIL, NUMBER, ETC) -->
           <span v-else>
-            <b-form-input :id="obj.input_id" :type="obj.input_type" v-model="obj.value" :placeholder="obj.placeholder" :required="obj.required"></b-form-input>
+            <b-form-input :id="obj.input_id" :type="obj.input_type" v-model="obj.value" :disabled="obj.disabled" :placeholder="obj.placeholder" :required="obj.required"></b-form-input>
           </span>
-          <b-modal ref="additem" @ok="saveItem()" title="Add/Edit item" size="xl" :hideHeaderClose="true" hide-footer>
+          <!-- MODAL FOR ADDING/EDITING AN OBJECT OR ARRAY ITEM -->
+          <b-modal ref="additem" title="Add/Edit item" size="xl" :hideHeaderClose="true" hide-footer>
             <b-container fluid >
               <span v-if="obj.input_type == 'array' && obj.children[0]">
                 <span v-if="obj.children[0].input_type == 'object'">
-                  <schema-form :title="obj.label" :form_config="obj.children[0]" :toplevel="false" @closemodal="closeItemModal"></schema-form>
+                  <schema-form :title="obj.label" :form_config="obj.children[0]" :toplevel="false" @closemodal="closeItemModal" @form-saved="bleh" v-on="$listeners"></schema-form>
                 </span>
                 <span v-else>
-                  <schema-form :title="obj.label" :form_config="obj" :toplevel="false" @closemodal="closeItemModal"></schema-form>
+                  <schema-form :title="obj.label" :form_config="obj" :toplevel="false" @closemodal="closeItemModal" @form-saved="bleh" v-on="$listeners"></schema-form>
                 </span>
               </span>
               <span v-if="obj.input_type == 'array' && !obj.children[0]">
@@ -199,48 +249,17 @@
                   :id="obj.input_group_id"
                   :label="obj.form_field"
                   :label-for="obj.input_id">
-                  <b-form-input :id="obj.input_id" type="text"></b-form-input>
+                  <b-form-input :id="obj.input_id" type="text" :disabled="obj.disabled"></b-form-input>
                 </b-form-group>
               </span>
               <span v-if="obj.input_type == 'object' && obj.children">
-                <schema-form :title="obj.label" :form_config="obj" :toplevel="false" @closemodal="closeItemModal"></schema-form>
+                <schema-form :title="obj.label" :form_config="obj" :toplevel="false" @closemodal="closeItemModal" @form-saved="bleh" v-on="$listeners"></schema-form>
               </span>
             </b-container>
           </b-modal>
-          
       </b-form-group>
     </script>
 
-
-    <!-- ================================= -->
-    <!-- SCHEMA-FORM: METADATA INPUT FORM  -->
-    <!-- ================================= -->
-    <script type="text/x-template" id="form-template">
-      <b-card border-variant="dark">
-        <b-card-title>
-          <u>{{title}}</u>
-        </b-card-title>
-        <br>
-        <b-form @submit="onSubmit" @reset="onReset">
-            <span v-for="(field, i) in form_config.children">
-                <t-input ref="forminput" v-bind:obj="field" :i="i"></t-input>
-                <br>
-            </span>
-            <br><br>
-            <div style="text-align: right">
-              <span v-if="toplevel">
-                <b-button type="submit" variant="outline-dark"><i class="fas fa-download"></i> Download metadata</b-button>&nbsp;
-              </span>
-              <span v-else>
-                <b-button type="submit" variant="outline-dark"><i class="far fa-floppy-disk"></i> Save metadata</b-button>&nbsp;
-              </span>
-              <b-button type="reset" variant="outline-dark"><i class="fas fa-arrow-rotate-left"></i> Reset</b-button>
-              <b-button variant="outline-dark" @click="$emit('closemodal')"><i class="fas fa-xmark"></i> Cancel</b-button>
-            </div>
-        </b-form>
-        <br>
-      </b-card>
-    </script>
   </head>
 
 
@@ -321,7 +340,7 @@
       <br>
 
       <!-- SELECTED SCHEMA FORM INPUT -->
-      <schema-form v-show="show_form" :title="schema.title" :form_config="form_config" :toplevel="true"></schema-form>
+      <schema-form ref="main_schema" v-if="show_form" :title="schema.title" :form_config="form_config" :toplevel="true"></schema-form>
 
     </b-container>
     <br><br><br><br>
