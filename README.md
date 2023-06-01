@@ -1,7 +1,3 @@
-## --- UNDER DEVELOPMENT ---
-*This repository is undergoing continuous development and all branches should be considered unstable*
-
----
 [![Documentation Status](https://readthedocs.org/projects/datalad-catalog/badge/?version=latest)](http://docs.datalad.org/projects/catalog/en/latest/?badge=latest)
 [![GitHub release](https://img.shields.io/github/release/datalad/datalad-catalog.svg)](https://GitHub.com/datalad/datalad-catalog/releases/)
 [![PyPI version fury.io](https://badge.fury.io/py/datalad-catalog.svg)](https://pypi.python.org/pypi/datalad-catalog/)
@@ -26,6 +22,14 @@
 <br>
 
 DataLad Catalog is a free and open source command line tool, with a Python API, that assists with the automatic generation of user-friendly, browser-based data catalogs from structured metadata. It is an extension to [DataLad](https://datalad.org) and forms part of the broader ecosystem of DataLad's distributed metadata handling and (meta)data publishing tools.
+
+### Acknowledgements
+
+This software was developed with support from the German Federal Ministry of
+Education and Research (BMBF 01GQ1905), the US National Science Foundation
+(NSF 1912266), and the Deutsche Forschungsgemeinschaft (DFG, German Research
+Foundation) under grant SFB 1451 ([431549029](https://gepris.dfg.de/gepris/projekt/431549029),
+INF project).
 
 ## 1. Online demo
 
