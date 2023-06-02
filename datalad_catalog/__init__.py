@@ -20,6 +20,18 @@ command_suite = (
             # optional name of the command in the Python API
             "catalog",
         ),
+        (
+            "datalad_catalog.create",
+            "Create",
+            "catalog-create",
+            "catalog_create",
+        ),
+        (
+            "datalad_catalog.add",
+            "Add",
+            "catalog-add",
+            "catalog_add",
+        ),
     ],
 )
 
