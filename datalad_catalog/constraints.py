@@ -12,22 +12,37 @@ from datalad_catalog.webcatalog import (
     WebCatalog,
 )
 from datalad_next.constraints import (
+    AnyOf,
     Constraint,
+    EnsureGeneratorFromFileLike,
+    EnsureJSON,
+    EnsurePath,
+    WithDescription,
 )
-
-import logging
-from pathlib import Path
-
 
 __docformat__ = "restructuredtext"
 
 
+# metadata input via the Add/Create/Validate commands can be any of:
+# - a path to a file containing JSON lines
+# - valid JSON lines from STDIN
+# - a JSON serialized string
+metadata_constraint = WithDescription(
+    AnyOf(
+        WithDescription(
+            EnsureJSON(),
+            error_message='not valid JSON content',
+        ),
+        EnsureGeneratorFromFileLike(EnsureJSON(), exc_mode='yield'),
+    ),
+    error_message='No constraint satisfied:\n{__itemized_causes__}',
+)
+
+
+# Custom constraint classes
 class EnsureWebCatalog(Constraint):
     """"""
     def __call__(self, value) -> WebCatalog:
-
-        if value is None:
-            self.raise_for(value, "should either be a path or a WebCatalog instance")
 
         # Test for instance of WebCatalog or Path
         if isinstance(value, WebCatalog):
@@ -44,3 +59,12 @@ class EnsureWebCatalog(Constraint):
             self.raise_for(value, "should not be a path to a non-catalog directory")
         # Otherwise return catalog instance
         return ctlg
+
+
+class CatalogRequired(Constraint):
+    """"""
+    def __call__(self, value):
+        # Parameter is required
+        if value is None:
+            self.raise_for(value, "should either be a path or a WebCatalog instance")
+        return value

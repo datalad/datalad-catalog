@@ -32,6 +32,12 @@ command_suite = (
             "catalog-add",
             "catalog_add",
         ),
+        (
+            "datalad_catalog.validate",
+            "Validate",
+            "catalog-validate",
+            "catalog_validate",
+        ),
     ],
 )
 
