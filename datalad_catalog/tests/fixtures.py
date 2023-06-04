@@ -2,11 +2,11 @@
 
 from pathlib import Path
 import pytest
+from datalad_catalog.constants import (
+    package_path,
+    tests_path,
+)
 from datalad_catalog.webcatalog import WebCatalog
-
-# Directory paths
-tests_path = Path(__file__).resolve().parent
-package_path = tests_path.resolve().parent.parent
 
 class TestPaths(object):
     """Class to store paths to test data"""

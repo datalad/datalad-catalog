@@ -21,33 +21,11 @@ from datalad_catalog.utils import (
 
 lgr = logging.getLogger("datalad.catalog.webcatalog")
 
-CATALOG_SCHEMA_IDS = {
-    cnst.CATALOG: "https://datalad.org/catalog.schema.json",
-    cnst.TYPE_DATASET: "https://datalad.org/catalog.dataset.schema.json",
-    cnst.TYPE_FILE: "https://datalad.org/catalog.file.schema.json",
-    cnst.AUTHORS: "https://datalad.org/catalog.authors.schema.json",
-    cnst.METADATA_SOURCES: "https://datalad.org/catalog.metadata_sources.schema.json",
-}
-
 
 class WebCatalog(object):
     """
     The main catalog class.
     """
-
-    # Get package-related paths
-    package_path = Path(__file__).resolve().parent
-    default_config_dir = package_path / "config"
-    schema_dir = package_path / "schema"
-    # Set up schema store and validator
-    SCHEMA_STORE = {}
-    for schema_type, schema_id in CATALOG_SCHEMA_IDS.items():
-        schema_path = schema_dir / f"jsonschema_{schema_type}.json"
-        schema = read_json_file(schema_path)
-        SCHEMA_STORE[schema["$id"]] = schema
-    CATALOG_SCHEMA = SCHEMA_STORE[CATALOG_SCHEMA_IDS[cnst.CATALOG]]
-    RESOLVER = RefResolver.from_schema(CATALOG_SCHEMA, store=SCHEMA_STORE)
-    VALIDATOR = Draft202012Validator(CATALOG_SCHEMA, resolver=RESOLVER)
 
     def __init__(
         self,
@@ -61,6 +39,10 @@ class WebCatalog(object):
         self.main_id = main_id
         self.main_version = main_version
         self.metadata_path = Path(self.location) / "metadata"
+        
+        # SCHEMA SETUP
+        self.schema_store = self.get_schema_store()
+        self.schema_validator = self.get_schema_validator()
 
         # CONFIG SETUP
         self.catalog_config_path = None
@@ -167,17 +149,19 @@ class WebCatalog(object):
             Path(self.metadata_path).mkdir(parents=True)
 
         content_paths = {
-            "assets": Path(self.package_path) / "catalog" / "assets",
-            "artwork": Path(self.package_path) / "catalog" / "artwork",
-            "html": Path(self.package_path) / "catalog" / "index.html",
-            "readme": Path(self.package_path) / "catalog" / "README.md",
-            "templates": Path(self.package_path) / "catalog" / "templates",
+            "assets": cnst.catalog_path / "assets",
+            "artwork": cnst.catalog_path / "artwork",
+            "html": cnst.catalog_path / "index.html",
+            "readme": cnst.catalog_path / "README.md",
+            "schema": cnst.catalog_path / "schema",
+            "templates": cnst.catalog_path / "templates",
         }
         out_dir_paths = {
             "assets": Path(self.location) / "assets",
             "artwork": Path(self.location) / "artwork",
             "html": Path(self.location) / "index.html",
             "readme": Path(self.location) / "README.md",
+            "schema": Path(self.location) / "schema",
             "templates": Path(self.location) / "templates",
         }
         for key in content_paths:
@@ -223,13 +207,13 @@ class WebCatalog(object):
                 catalog_config_path = Path(self.location / "config.json")
                 if catalog_config_path.exists():
                     return catalog_config_path
-                return Path(self.default_config_dir / "config.json")
+                return cnst.default_config_dir / "config.json"
             else:
                 # If catalog does not exist, return config if specified, otherwise default
                 if source_str is not None:
                     return Path(source_str)
                 else:
-                    return Path(self.default_config_dir / "config.json")
+                    return cnst.default_config_dir / "config.json"
         if config_level == "dataset":
             if source_str is not None:
                 return Path(source_str)
@@ -284,6 +268,32 @@ class WebCatalog(object):
         new_config_path = Path(self.location) / "config.json"
         with open(new_config_path, "w") as f_config:
             json.dump(self.catalog_config, f_config)
+
+    def get_schema_store(self):
+        """Return schema store of catalog instance or package
+        whichever is found first"""
+        schema_store = {}
+        # If catalog has schema files in "<catalog-name>/schema" dir, use them,
+        # else use the schema files in the package default schema location
+        cat_schema_dir = Path(self.location) / 'schema' 
+        if (cat_schema_dir / 'jsonschema_catalog.json').exists():
+            schema_dir = cat_schema_dir
+        else:
+            schema_dir = cnst.schema_dir
+        # Now load all schema files into store
+        for schema_type, schema_id in cnst.CATALOG_SCHEMA_IDS.items():
+            schema_path = schema_dir / f"jsonschema_{schema_type}.json"
+            schema = read_json_file(schema_path)
+            schema_store[schema[cnst.DOLLARID]] = schema
+        return schema_store
+    
+    def get_schema_validator(self):
+        """Return schema validator"""
+        if not hasattr(self, 'schema_store'):
+            self.schema_store = self.get_schema_store()
+        catalog_schema = self.schema_store[cnst.CATALOG_SCHEMA_IDS[cnst.CATALOG]]
+        resolver = RefResolver.from_schema(catalog_schema, store=self.schema_store)
+        return Draft202012Validator(catalog_schema, resolver=resolver)
 
 
 class Node(object):

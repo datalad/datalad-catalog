@@ -8,7 +8,11 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Add metadata to an existing catalog
 """
-from datalad_catalog.constraints import EnsureWebCatalog
+from datalad_catalog.constraints import (
+    CatalogRequired,
+    EnsureWebCatalog,
+    metadata_constraint,
+)
 from datalad_catalog.webcatalog import WebCatalog
 from datalad_catalog.meta_item import MetaItem
 from datalad_next.commands import (
@@ -52,24 +56,9 @@ class AddParameterValidator(EnsureCommandParameterization):
     """"""
 
     def __init__(self):
-
-        # metadata input via the Add command can be any of:
-        # - a path to a file containing JSON lines
-        # - valid JSON lines from STDIN
-        # - a JSON serialized string
-        metadata_constraint = WithDescription(
-            AnyOf(
-                WithDescription(
-                    EnsureJSON(),
-                    error_message='not valid JSON content',
-                ),
-                EnsureGeneratorFromFileLike(EnsureJSON(), exc_mode='yield'),
-            ),
-            error_message='No constraint satisfied:\n{__itemized_causes__}',
-        )
         super().__init__(
             param_constraints=dict(
-                catalog=EnsureWebCatalog(),
+                catalog=CatalogRequired()&EnsureWebCatalog(),
                 metadata=metadata_constraint,
                 config_file=EnsurePath(lexists=True),
             ),
@@ -188,7 +177,7 @@ class Add(ValidatedInterface):
                 continue
             # Validate dict against catalog schema
             try:
-                ctlg.VALIDATOR.validate(meta_dict)
+                ctlg.schema_validator.validate(meta_dict)
             except ValidationError as e:
                 err_msg = f"Schema validation failed in LINE {i}: \n\n{e}"
                 yield get_status_dict(

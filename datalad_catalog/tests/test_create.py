@@ -12,6 +12,7 @@ catalog_paths = [
     "assets/style.css",
     "artwork",
     "templates",
+    "schema",
     "index.html",
     "config.json",
     "README.md",
@@ -46,6 +47,35 @@ def test_create(tmp_path):
     for p in catalog_paths:
         pth = catalog_path / p
         assert pth.exists()
+
+
+def test_create_with_metadata(tmp_path, test_data):
+    """
+    Test if catalog is created successfully given a path that 
+    does not yet exist and some metadata as the input args
+    """
+    catalog_path = tmp_path / "test_catalog"
+    res = catalog_create(
+        catalog=catalog_path,
+        metadata=test_data.catalog_metadata_dataset1,
+    )
+    assert_in_results(
+        res,
+        action="catalog_create",
+        status="ok",
+        path=catalog_path,
+    )
+    assert catalog_path.exists()
+    assert catalog_path.is_dir()
+    for p in catalog_paths:
+        pth = catalog_path / p
+        assert pth.exists()
+    assert_in_results(
+        res,
+        action="catalog_add",
+        status="ok",
+        path=catalog_path,
+    )
 
 
 def test_create_at_existing_noncatalog(tmp_path):

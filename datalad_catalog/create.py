@@ -9,11 +9,13 @@
 """Create a new catalog
 """
 from datalad_catalog.constraints import (
+    CatalogRequired,
     EnsureWebCatalog,
 )
 from datalad_catalog.webcatalog import (
     WebCatalog,
 )
+from datalad_catalog.add import Add
 from datalad_next.commands import (
     EnsureCommandParameterization,
     ValidatedInterface,
@@ -61,8 +63,7 @@ class CreateParameterValidator(EnsureCommandParameterization):
     def __init__(self):
         super().__init__(
             param_constraints=dict(
-                catalog=EnsureWebCatalog(),
-                metadata=EnsureGeneratorFromFileLike(EnsureJSON()),
+                catalog=CatalogRequired()&EnsureWebCatalog(),
                 config_file=EnsurePath(lexists=True),
                 force=EnsureBool(),
             ),
@@ -190,6 +191,13 @@ class Create(ValidatedInterface):
         # Yield created/overwritten status message
         yield get_status_dict(**res_kwargs, status="ok", message=msg)
         
-        # # If metadata was also supplied, add this to the catalog
-        # if metadata is not None:
-        #     yield from _add_to_catalog(catalog, metadata, res_kwargs)
+        # If metadata was also supplied, add this to the catalog
+        # TODO: implement instance method catalog.add() to be used here
+        # instead of going through another ValidatedInterface
+        # same method to be used in Add interface
+        if metadata is not None:
+            catalog_add = Add()
+            yield from catalog_add(
+                catalog=catalog,
+                metadata=metadata,
+            )
