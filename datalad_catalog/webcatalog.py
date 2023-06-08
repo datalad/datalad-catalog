@@ -5,6 +5,7 @@ import logging
 import shutil
 import sys
 from pathlib import Path
+import os
 
 import yaml
 from jsonschema import (
@@ -294,6 +295,36 @@ class WebCatalog(object):
         catalog_schema = self.schema_store[cnst.CATALOG_SCHEMA_IDS[cnst.CATALOG]]
         resolver = RefResolver.from_schema(catalog_schema, store=self.schema_store)
         return Draft202012Validator(catalog_schema, resolver=resolver)
+    
+    def serve(
+        self,
+        host: str = 'localhost',
+        port: int = 8000,
+    ):
+        """Serve a catalog via a local http server"""
+        os.chdir(self.location)
+        
+        import http.server
+        import socketserver
+        from datalad.ui import ui
+        import datalad.support.ansi_colors as ac
+
+        Handler = http.server.SimpleHTTPRequestHandler
+        try:
+            with socketserver.TCPServer((host, port), Handler) as httpd:
+                ui.message(
+                    "\nServing catalog at: http://{h}:{p}/ - navigate to this "
+                    "address in your browser to test the catalog locally - press "
+                    "CTRL+C to stop local testing\n".format(
+                        h=ac.color_word(host, ac.BOLD),
+                        p=ac.color_word(port, ac.BOLD),
+                    )
+                )
+                httpd.serve_forever()
+        except Exception as e:
+            lgr.error(msg='Unable to serve at the desired host and port', exc_info=e)
+            raise(e)
+
 
 
 class Node(object):
