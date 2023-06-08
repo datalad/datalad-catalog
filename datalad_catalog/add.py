@@ -21,30 +21,20 @@ from datalad_next.commands import (
     Parameter,
     build_doc,
     eval_results,
-    generic_result_renderer,
     get_status_dict,
 )
 from datalad_next.constraints import (
-    AnyOf,
-    EnsureGeneratorFromFileLike,
-    EnsureJSON,
     EnsurePath,
-    WithDescription,
 )
 from datalad_next.exceptions import (
     CapturedException
 )
-from datalad_next.constraints.dataset import EnsureDataset
+
 import json
+from jsonschema import ValidationError
 import logging
 from pathlib import Path
 from typing import Union
-
-from jsonschema import (
-    Draft202012Validator,
-    RefResolver,
-    ValidationError,
-)
 
 
 __docformat__ = "restructuredtext"
@@ -188,6 +178,7 @@ class Add(ValidatedInterface):
                 )
                 continue
             # If validation passed, translate into Node instances and their files
+            # TODO: implement instance method catalog.add() to be used here
             meta_item = MetaItem(catalog, meta_dict)
             meta_item.write_nodes_to_files()
             yield get_status_dict(

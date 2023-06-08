@@ -25,25 +25,12 @@ from datalad_next.commands import (
     ValidatedInterface,
     Parameter,
     build_doc,
-    datasetmethod,
     eval_results,
-    generic_result_renderer,
     get_status_dict,
 )
-from datalad_next.constraints import (
-    EnsureBool,
-    EnsureChoice,
-    EnsureGeneratorFromFileLike,
-    EnsureJSON,
-    EnsureNone,
-    EnsurePath,
-    EnsureStr,
-)
-from datalad_next.constraints.dataset import EnsureDataset
 from datalad_next.exceptions import (
     CapturedException
 )
-
 import json
 import logging
 from pathlib import Path
@@ -56,7 +43,6 @@ lgr = logging.getLogger("datalad.catalog.validate")
 
 class ValidateParameterValidator(EnsureCommandParameterization):
     """"""
-
     def __init__(self):
         super().__init__(
             param_constraints=dict(
@@ -178,8 +164,8 @@ def get_schema_store(catalog: WebCatalog = None):
     If the catalog argument is provided, first retrieve the catalog-specific
     schema store; else, retrieve the package default (i.e. latest) schema store
     """
-    schema_store = {}
     if catalog is None:
+        schema_store = {}
         # get store from package schema path
         for schema_type, schema_id in cnst.CATALOG_SCHEMA_IDS.items():
             schema_path = cnst.schema_dir / f"jsonschema_{schema_type}.json"
