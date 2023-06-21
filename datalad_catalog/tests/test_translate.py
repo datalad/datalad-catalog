@@ -6,7 +6,7 @@ from datalad_catalog.translate import (
     get_translators,
 )
 from datalad_catalog.utils import read_json_file
-from datalad.tests.utils import (
+from datalad.tests.utils_pytest import (
     assert_in_results,
     assert_raises,
     assert_result_count,
