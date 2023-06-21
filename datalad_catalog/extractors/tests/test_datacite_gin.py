@@ -3,7 +3,7 @@ from pathlib import Path
 import yaml
 from datalad.api import meta_extract
 from datalad.distribution.dataset import Dataset
-from datalad.tests.utils import (
+from datalad.tests.utils_pytest import (
     assert_equal,
     with_tempfile,
 )

@@ -12,7 +12,7 @@ from unittest.mock import (
 )
 
 from datalad.support.exceptions import InsufficientArgumentsError
-from datalad.tests.utils import (
+from datalad.tests.utils_pytest import (
     assert_equal,
     assert_in,
     assert_raises,
