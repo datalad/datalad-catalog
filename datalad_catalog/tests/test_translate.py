@@ -12,6 +12,11 @@ from datalad_catalog.webcatalog import (
     Node,
     WebCatalog,
 )
+from datalad.tests.utils_pytest import (
+    assert_in_results,
+    assert_raises,
+    assert_result_count,
+)
 
 tests_path = Path(__file__).resolve().parent
 data_path = tests_path / "data"
