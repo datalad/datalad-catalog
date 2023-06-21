@@ -44,6 +44,12 @@ command_suite = (
             "catalog-serve",
             "catalog_serve",
         ),
+        (
+            "datalad_catalog.get",
+            "Get",
+            "catalog-get",
+            "catalog_get",
+        ),
     ],
 )
 
