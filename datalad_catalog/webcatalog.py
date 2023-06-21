@@ -179,6 +179,55 @@ class WebCatalog(object):
     def remove_dataset():
         """"""
         raise NotImplementedError
+    
+    def get_record(self, 
+                   dataset_id: str,
+                   dataset_version: str,
+                   record_type: str = 'dataset',
+                   relpath: str = None,
+                   ):
+        """Find the metadata record of a dataset, directory, or file in a catalog.
+        """
+        # EnsureChoice
+        if record_type not in ('dataset', 'directory', 'file'):
+            error_msg = "Argument 'record_type' must be one of 'dataset', 'directory', 'file'"
+            raise ValueError(error_msg)
+        
+        if record_type in ('directory', 'file') and relpath == None:
+            error_msg = ("A relative path is required (argument 'relpath') "
+                         "for records of type 'directory' or 'file'")
+            raise ValueError(error_msg)
+        # set the correct node_type and node_path
+        node_type = record_type if record_type != 'file' else 'directory'
+        if node_type == 'dataset':
+            node_path = None
+        else:
+            node_path = Path(relpath)
+            if record_type == 'file':
+                node_path = node_path.parent
+        # get node instance
+        node_instance = Node(
+            catalog=self,
+            type=node_type,
+            dataset_id=dataset_id,
+            dataset_version=dataset_version,
+            node_path=node_path,
+        )
+        if node_instance.is_created():
+            if record_type == 'file':
+                children = [c for c in node_instance.children if c['path'] == relpath]
+                return children[0] if len(children) > 0 else None
+            else:
+                return vars(node_instance)
+        else:
+            return None
+
+    def get_main_dataset(self):
+        super_path = Path(self.metadata_path) / "super.json"
+        if not (super_path.exists() and super_path.is_file()):
+            error_msg = f'File does not exist at path: {super_path}'
+            raise FileNotFoundError(error_msg)
+        return read_json_file(super_path)
 
     def set_main_dataset(self):
         """
