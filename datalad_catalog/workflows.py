@@ -294,5 +294,5 @@ def _getAvailableExtractors():
     return {
         name: extractor_dict[name]
         for name in extractor_dict.keys()
-        if extractor_dict[name]["load_error"] is None
+        if extractor_dict[name].get("load_error", None) is None
     }
