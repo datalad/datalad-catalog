@@ -257,7 +257,6 @@ class Get(ValidatedInterface):
             if dataset_id and dataset_version:
                 # config level is dataset
                 # get config from Node
-                print('\n\nGetting dataset-level config\n\n')
                 dataset_node = catalog.get_record(
                     dataset_id=dataset_id,
                     dataset_version=dataset_version,
@@ -276,7 +275,6 @@ class Get(ValidatedInterface):
                                     message=msg,
                                     config=dataset_node['config'])
             else:
-                print('\n\nGetting catalog-level config\n\n')
                 try:
                     cfg = catalog.get_config()
                     msg = f"Catalog-level configuration retrieved"

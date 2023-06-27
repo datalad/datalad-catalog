@@ -33,10 +33,8 @@ def demo_catalog(tmp_path, test_data) -> WebCatalog:
     catalog_path = tmp_path / "test_catalog"
     catalog = WebCatalog(
         location=catalog_path,
-        config_file=str(test_data.demo_config_path_catalog),
-        catalog_action="create",
     )
-    catalog.create()
+    catalog.create(config_file=str(test_data.demo_config_path_catalog))
     return catalog
 
 @pytest.fixture
@@ -46,7 +44,6 @@ def demo_catalog_default_config(tmp_path) -> WebCatalog:
     catalog_path = tmp_path / "test_catalog_wo_config"
     catalog = WebCatalog(
         location=catalog_path,
-        catalog_action="create",
     )
     catalog.create()
     return catalog

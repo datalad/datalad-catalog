@@ -11,12 +11,14 @@
 from datalad_catalog.webcatalog import (
     WebCatalog,
 )
+
+from datalad_catalog.utils import dir_exists
+
 from datalad_next.constraints import (
     AnyOf,
     Constraint,
     EnsureGeneratorFromFileLike,
     EnsureJSON,
-    EnsurePath,
     WithDescription,
 )
 
@@ -52,10 +54,10 @@ class EnsureWebCatalog(Constraint):
                 location=str(value),
             )
         # Return the catalog instance if the path does not exist yet
-        if not ctlg.path_exists():
+        if not dir_exists(ctlg.location):
             return ctlg
         # Raise error of the path exists but does not have a catalog structure
-        if ctlg.path_exists() and not ctlg.is_created():
+        if dir_exists(ctlg.location) and not ctlg.is_created():
             self.raise_for(value, "should not be a path to a non-catalog directory")
         # Otherwise return catalog instance
         return ctlg

@@ -90,7 +90,6 @@ def test_add_from_stdin(monkeypatch, demo_catalog):
         on_failure="ignore",
         return_type="list",
     )
-    print(res)
     assert_result_count(
         res,
         2,

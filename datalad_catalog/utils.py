@@ -1,8 +1,55 @@
+import hashlib
 import json
+from pathlib import Path
 import sys
+import shutil
+import yaml
 
 """A module with miscellaneous utility functions that are used across other modules
 """
+
+def copy_overwrite_path(src: Path, dest: Path, overwrite: bool = False):
+    """
+    Copy or overwrite a directory or file
+    """
+    isFile = src.is_file()
+    if dest.exists() and not overwrite:
+        pass
+    else:
+        if isFile:
+            try:
+                shutil.copy2(src, dest)
+            except shutil.SameFileError:
+                pass
+        else:
+            if dest.exists():
+                shutil.rmtree(dest)
+            shutil.copytree(src, dest)
+
+
+def md5sum_from_id_version_path(dataset_id, dataset_version, path=None):
+    """Helper to get md5 hash of concatenated input variables"""
+    long_name = dataset_id + "-" + dataset_version
+    if path:
+        long_name = long_name + "-" + str(path)
+    return md5hash(long_name)
+
+
+def md5hash(txt):
+    """
+    Create md5 hash of the input string
+    """
+    txt_hash = hashlib.md5(txt.encode("utf-8")).hexdigest()
+    return txt_hash
+
+
+def load_config_file(file: Path):
+    """Helper to load content from JSON or YAML file"""
+    with open(file) as f:
+        if file.suffix == ".json":
+            return json.load(f)
+        if file.suffix in [".yml", ".yaml"]:
+            return yaml.safe_load(f)
 
 
 def read_json_file(file_path):
@@ -117,3 +164,14 @@ def get_entry_points(group: str) -> dict:
             continue
 
     return entry_points
+
+
+def dir_exists(location) -> bool:
+    """
+    Check if a directory exists at location
+    """
+    if not isinstance(location, Path):
+        location = Path(location)
+    if location.exists() and location.is_dir():
+        return True
+    return False

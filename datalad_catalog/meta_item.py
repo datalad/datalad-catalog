@@ -1,16 +1,8 @@
-# from abc import ABC, abstractmethod
 import logging
 from pathlib import Path
-
-from datalad.interface.results import get_status_dict
-
 from datalad_catalog import constants as cnst
-from datalad_catalog.utils import read_json_file
-from datalad_catalog.webcatalog import (
-    Node,
-    WebCatalog,
-    md5sum_from_id_version_path,
-)
+from datalad_catalog.utils import md5sum_from_id_version_path
+from datalad_catalog.node import Node
 
 lgr = logging.getLogger("datalad.catalog.meta_item")
 
@@ -36,7 +28,7 @@ class MetaItem(object):
     #   - loop through keys, copy values
     #   - create children and directory nodes
 
-    def __init__(self, catalog: WebCatalog, meta_item: dict) -> None:
+    def __init__(self, catalog, meta_item: dict, config_file: str = None) -> None:
         # Get dataset id and version
         d_id = meta_item[cnst.DATASET_ID]
         d_version = meta_item[cnst.DATASET_VERSION]
@@ -54,7 +46,7 @@ class MetaItem(object):
         # Then do things based on metadata object type (dataset or file)
         if meta_item[cnst.TYPE] == cnst.TYPE_DATASET:
             # Dataset
-            self.process_dataset(dataset_instance, meta_item)
+            self.process_dataset(dataset_instance, meta_item, config_file)
         else:
             # File
             self.process_file(dataset_instance, meta_item)
@@ -69,7 +61,10 @@ class MetaItem(object):
         """ """
         pass
 
-    def process_dataset(self, dataset_instance: Node, meta_item: dict):
+    def process_dataset(self,
+                        dataset_instance: Node,
+                        meta_item: dict,
+                        config_file: str):
         """"""
         # 1. If "subdatasets" field exists and the array is not empty,
         # add subdatasets as children and create Nodes
@@ -97,7 +92,7 @@ class MetaItem(object):
                     }
                     dataset_instance.add_child(subds_dict)
         # 2. Add fields to node instance
-        dataset_instance.add_attributes(meta_item, overwrite=False)
+        dataset_instance.add_attributes(meta_item, config_file=config_file, overwrite=False)
 
     def process_file(self, dataset_instance: Node, meta_item: dict):
         """"""
@@ -215,9 +210,14 @@ class MetaItem(object):
     def write_nodes_to_files(self):
         """"""
         for n in self._node_instances.keys():
-            self._node_instances[n].write_attributes_to_file()
+            self._node_instances[n].create()
 
-    def getNode(self, catalog, type, dataset_id, dataset_version, path=None):
+    def getNode(self, 
+                catalog,
+                type,
+                dataset_id,
+                dataset_version,
+                path=None):
         """Get existing or create new node"""
         node_hash = md5sum_from_id_version_path(
             dataset_id, dataset_version, path

@@ -14,7 +14,6 @@ from datalad_catalog.constraints import (
     metadata_constraint,
 )
 from datalad_catalog.webcatalog import WebCatalog
-from datalad_catalog.meta_item import MetaItem
 from datalad_next.commands import (
     EnsureCommandParameterization,
     ValidatedInterface,
@@ -44,7 +43,6 @@ lgr = logging.getLogger("datalad.catalog.add")
 
 class AddParameterValidator(EnsureCommandParameterization):
     """"""
-
     def __init__(self):
         super().__init__(
             param_constraints=dict(
@@ -52,7 +50,6 @@ class AddParameterValidator(EnsureCommandParameterization):
                 metadata=metadata_constraint,
                 config_file=EnsurePath(lexists=True),
             ),
-            joint_constraints=dict(),
         )
 
 
@@ -112,8 +109,6 @@ class Add(ValidatedInterface):
         else:
             ctlg = WebCatalog(
                 location=catalog,
-                config_file=config_file,
-                catalog_action='add',
             )
 
         res_kwargs = dict(
@@ -177,12 +172,22 @@ class Add(ValidatedInterface):
                     exception=e,                  
                 )
                 continue
-            # If validation passed, translate into Node instances and their files
-            # TODO: implement instance method catalog.add() to be used here
-            meta_item = MetaItem(catalog, meta_dict)
-            meta_item.write_nodes_to_files()
-            yield get_status_dict(
-                **res_kwargs,
-                status="ok",
-                message=("Metadata item successfully added to catalog"),
-            )
+            # If validation passed, add the record to the catalog
+            # This involves translating the record into Node instances
+            # and creating/updating their respective metadata files
+            try:
+                ctlg.add_record(meta_dict, config_file)
+                yield get_status_dict(
+                    **res_kwargs,
+                    status="ok",
+                    message=("Metadata item successfully added to catalog"),
+                )
+            except Exception as e:
+                err_msg = f"Catalog add operation failed in LINE {i}: \n\n{e}"
+                yield get_status_dict(
+                    **res_kwargs,
+                    status='error',
+                    message=err_msg,
+                    exception=e,                  
+                )
+                continue

@@ -37,7 +37,6 @@ from datalad_next.constraints import (
     EnsurePath,
     EnsureStr,
 )
-from datalad_next.constraints.dataset import EnsureDataset
 import logging
 from pathlib import Path
 from typing import Union
@@ -54,7 +53,6 @@ class CreateParameterValidator(EnsureCommandParameterization):
     def _check_force(self, catalog, force):
         """"""
         if catalog.is_created() and not force:
-
             self.raise_for(
                 dict(catalog=catalog, force=force),
                 'the force flag should be True to overwrite the assets of an existing catalog',
@@ -167,8 +165,6 @@ class Create(ValidatedInterface):
         else:
             ctlg = WebCatalog(
                 location=catalog,
-                config_file=config_file,
-                catalog_action='create',
             )
 
         res_kwargs = dict(
@@ -186,18 +182,19 @@ class Create(ValidatedInterface):
                     ctlg.location,
                 )
 
-        ctlg.create(force)
+        ctlg.create(config_file, force)
         
         # Yield created/overwritten status message
         yield get_status_dict(**res_kwargs, status="ok", message=msg)
         
         # If metadata was also supplied, add this to the catalog
-        # TODO: implement instance method catalog.add() to be used here
-        # instead of going through another ValidatedInterface
-        # same method to be used in Add interface
+        # Assume that config applies to catalog level since it was
+        # provide with 'create', i.e. no need to send to 'add'
+        # Dataset-level will inherit from catalog config in any case.
         if metadata is not None:
             catalog_add = Add()
             yield from catalog_add(
                 catalog=catalog,
                 metadata=metadata,
+                config_file=None,
             )
