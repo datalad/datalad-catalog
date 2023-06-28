@@ -1,26 +1,21 @@
-from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.tests.utils_pytest import (
     assert_in_results,
-    assert_result_count,
 )
-from datalad_catalog.catalog import Catalog
 import datalad_catalog.constants as cnst
 from datalad_catalog.add import Add
 from datalad_catalog.get import Get
+from datalad_catalog.node import Node
+from datalad_catalog.set import Set
 from datalad_catalog.utils import read_json_file
-
-import io
-import json
-from pathlib import Path
-import pytest
-
 
 from datalad_next.constraints.exceptions import CommandParametrizationError
 
+from pathlib import Path
+import pytest
+
 catalog_add = Add()
 catalog_get = Get()
-catalog_cmd = Catalog()
-
+catalog_set = Set()
 
 def test_arg_combinations(demo_catalog):
     """Test various incorrect combinations of arguments"""
@@ -98,19 +93,15 @@ def test_get_home(demo_catalog, test_data):
         path=demo_catalog.location,
     )
     # set home spec of demo catalog
-    # TODO: this is currently done via old API command and should
-    # be updated once the 'datalad_catalog.set' module is implemented
-    # Extra info: currently seeting the super id and version on a catalog
-    # is possible even if a dataset with the specified id and version
-    # is not contained in the catalog. This is obviously wrong, and will
-    # be fixed with the new 'set' command.
     home_id = "5df8eb3a-95c5-11ea-b4b9-a0369f287950"
     home_version = "dae38cf901995aace0dde5346515a0134f919523"
-    catalog_cmd(
-        "set-super",
-        catalog_dir=str(demo_catalog.location),
+    catalog_set(
+        catalog=demo_catalog,
+        property='home',
         dataset_id=home_id,
         dataset_version=home_version,
+        on_failure="ignore",
+        return_type="list",
     )
     # test existing home spec
     res = catalog_get(catalog=demo_catalog,
@@ -126,8 +117,8 @@ def test_get_home(demo_catalog, test_data):
     )
     assert 'home' in res[0]
     assert res[0]['home'] is not None
-    assert res[0]['home']['dataset_id'] == home_id
-    assert res[0]['home']['dataset_version'] == home_version
+    assert res[0]['home'][cnst.DATASET_ID] == home_id
+    assert res[0]['home'][cnst.DATASET_VERSION] == home_version
 
 
 def test_get_metadata(demo_catalog, test_data):
@@ -158,8 +149,8 @@ def test_get_metadata(demo_catalog, test_data):
     ds_meta = read_json_file(test_data.catalog_metadata_dataset1)
     res = catalog_get(catalog=demo_catalog,
                       property='metadata',
-                      dataset_id=ds_meta['dataset_id'],
-                      dataset_version=ds_meta['dataset_version'],
+                      dataset_id=ds_meta[cnst.DATASET_ID],
+                      dataset_version=ds_meta[cnst.DATASET_VERSION],
                       on_failure="ignore",
                       return_type="list",)
     assert_in_results(
@@ -171,8 +162,8 @@ def test_get_metadata(demo_catalog, test_data):
     )
     assert 'metadata' in res[0]
     assert res[0]['metadata'] is not None
-    assert res[0]['metadata']['dataset_id'] == ds_meta['dataset_id']
-    assert res[0]['metadata']['dataset_version'] == ds_meta['dataset_version']
+    assert res[0]['metadata'][cnst.DATASET_ID] == ds_meta[cnst.DATASET_ID]
+    assert res[0]['metadata'][cnst.DATASET_VERSION] == ds_meta[cnst.DATASET_VERSION]
     # add file-level metadata
     catalog_add(
         catalog=demo_catalog,
@@ -186,8 +177,8 @@ def test_get_metadata(demo_catalog, test_data):
     dir_path = str(Path(file_path).parent)
     res = catalog_get(catalog=demo_catalog,
                       property='metadata',
-                      dataset_id=file_meta['dataset_id'],
-                      dataset_version=file_meta['dataset_version'],
+                      dataset_id=file_meta[cnst.DATASET_ID],
+                      dataset_version=file_meta[cnst.DATASET_VERSION],
                       record_type='directory',
                       record_path=dir_path,
                       on_failure="ignore",
@@ -201,12 +192,12 @@ def test_get_metadata(demo_catalog, test_data):
     )
     assert 'metadata' in res[0]
     assert res[0]['metadata'] is not None
-    assert res[0]['metadata']['dataset_id'] == file_meta['dataset_id']
-    assert res[0]['metadata']['dataset_version'] == file_meta['dataset_version']
+    assert res[0]['metadata'][cnst.DATASET_ID] == file_meta[cnst.DATASET_ID]
+    assert res[0]['metadata'][cnst.DATASET_VERSION] == file_meta[cnst.DATASET_VERSION]
     res = catalog_get(catalog=demo_catalog,
                       property='metadata',
-                      dataset_id=file_meta['dataset_id'],
-                      dataset_version=file_meta['dataset_version'],
+                      dataset_id=file_meta[cnst.DATASET_ID],
+                      dataset_version=file_meta[cnst.DATASET_VERSION],
                       record_type='file',
                       record_path=file_path,
                       on_failure="ignore",
@@ -220,13 +211,13 @@ def test_get_metadata(demo_catalog, test_data):
     )
     assert 'metadata' in res[0]
     assert res[0]['metadata'] is not None
-    assert res[0]['metadata']['dataset_id'] == file_meta['dataset_id']
-    assert res[0]['metadata']['dataset_version'] == file_meta['dataset_version']
+    assert res[0]['metadata'][cnst.DATASET_ID] == file_meta[cnst.DATASET_ID]
+    assert res[0]['metadata'][cnst.DATASET_VERSION] == file_meta[cnst.DATASET_VERSION]
     # and lastly test a nonexisting dir
     res = catalog_get(catalog=demo_catalog,
                       property='metadata',
-                      dataset_id=file_meta['dataset_id'],
-                      dataset_version=file_meta['dataset_version'],
+                      dataset_id=file_meta[cnst.DATASET_ID],
+                      dataset_version=file_meta[cnst.DATASET_VERSION],
                       record_type='directory',
                       record_path=file_path + '/blabla',
                       on_failure="ignore",
@@ -269,26 +260,26 @@ def test_get_config(demo_catalog_default_config, demo_catalog, test_data):
         return_type="list",
     )
     # - Dataset config file should exist
-    # TODO: this fails. For some reason, the file is not created during
-    # the add operation. A similar test succeeds in 'test_config.py' but that
-    # code uses the old API 'datalad catalog add'.
-    # Check differences between old and new add to find issue.
     config_file_path = demo_catalog_default_config.location /\
-        "metadata" / ds_meta['dataset_id'] / ds_meta['dataset_version'] /\
+        "metadata" / ds_meta[cnst.DATASET_ID] / ds_meta[cnst.DATASET_VERSION] /\
             "config.json"
-    # assert config_file_path.exists()
-    # - Dataset config attribute should exist
-    assert hasattr(demo_catalog_default_config, "dataset_config")
+    assert config_file_path.exists()
+    # - config attribute should exist on Node
+    node_instance = Node(catalog=demo_catalog_default_config,
+                         dataset_id=ds_meta[cnst.DATASET_ID],
+                         dataset_version=ds_meta[cnst.DATASET_VERSION],
+                         type='dataset')
+    assert hasattr(node_instance, "config")
     # - Dataset config attribute should have correct dataset-specific content
-    assert demo_catalog_default_config.dataset_config is not None
+    assert node_instance.config is not None
     assert (
-        demo_catalog_default_config.dataset_config[cnst.CATALOG_NAME]
+        node_instance.config[cnst.CATALOG_NAME]
         == "DataLad Catalog Config Test Dataset"
     )
     res = catalog_get(catalog=demo_catalog_default_config,
                       property='config',
-                      dataset_id=ds_meta['dataset_id'],
-                      dataset_version=ds_meta['dataset_version'],
+                      dataset_id=ds_meta[cnst.DATASET_ID],
+                      dataset_version=ds_meta[cnst.DATASET_VERSION],
                       on_failure="ignore",
                       return_type="list",)
     assert_in_results(
