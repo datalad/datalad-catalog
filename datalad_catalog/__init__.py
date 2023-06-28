@@ -50,6 +50,12 @@ command_suite = (
             "catalog-get",
             "catalog_get",
         ),
+        (
+            "datalad_catalog.set",
+            "Set",
+            "catalog-set",
+            "catalog_set",
+        ),
     ],
 )
 
