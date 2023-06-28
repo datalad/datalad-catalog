@@ -54,9 +54,9 @@ class Node(object):
         # If Node metadata file exists, set attributes and config
         if self.is_created():
             self.set_attributes_from_file()
-            # cfg = self.get_config()
-            # self.config = cfg['config']
-            # self.config_source = cfg['source']
+            cfg = self.get_config()
+            self.config = cfg['config']
+            self.config_source = cfg['source']
         
     def is_created(self) -> bool:
         """

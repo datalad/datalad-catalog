@@ -145,7 +145,7 @@ class WebCatalog(object):
                 children = [c for c in node_instance.children if c['path'] == relpath]
                 return children[0] if len(children) > 0 else None
             else:
-                return vars(node_instance), node_instance
+                return vars(node_instance)
         else:
             return None
     
@@ -182,18 +182,17 @@ class WebCatalog(object):
             raise FileNotFoundError(error_msg)
         return read_json_file(super_path)
 
-    def set_main_dataset(self):
+    def set_main_dataset(self, dataset_id, dataset_version):
         """
-        Save self.main_id and self.main_version to the "super.json" file
+        Save dataset_id and dataset_version to the "super.json" file
         in order to link the main dataset to the catalog.
 
         If "super.json" file already exists:
             - currently overwrites
-            - TODO: provide warning (and instructions for how to overwrite?)
         """
         main_obj = {
-            cnst.DATASET_ID: self.main_id,
-            cnst.DATASET_VERSION: self.main_version,
+            cnst.DATASET_ID: dataset_id,
+            cnst.DATASET_VERSION: dataset_version,
         }
         main_file = Path(self.metadata_path) / "super.json"
         with open(main_file, "w") as f:
