@@ -27,7 +27,10 @@ class BIDSDatasetTranslator(TranslatorBase):
         pass
 
     def match(
-        cls, source_name: str, source_version: str, source_id: str = None
+        cls, schema_version: str,
+        source_name: str,
+        source_version: str,
+        source_id: str = None
     ) -> bool:
         """
         Matching routine for the current translator
@@ -52,8 +55,7 @@ class BIDSDatasetTranslator(TranslatorBase):
             cls.get_supported_extractor_version() == source_version
         )
         schema_version_match = (
-            cls.get_supported_schema_version()
-            == cls.get_current_schema_version()
+            cls.get_supported_schema_version() == schema_version
         )
         # TODO: support partial matches of version (major/minor/patch)
 
