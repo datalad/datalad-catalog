@@ -205,6 +205,8 @@ class Get(ValidatedInterface):
             path=catalog.location,
         )
 
+        # TODO: add property schema, schema:store, schema:version, schema:catalog, schema:dataset, etc
+
         # Yield error for get-operations that haven't been implemented yet
         if property in ('tree'):
             msg = f"catalog-get for property={property} is not yet implemented"
