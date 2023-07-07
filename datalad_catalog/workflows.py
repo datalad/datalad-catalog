@@ -13,7 +13,7 @@ from datalad.local.wtf import _describe_metadata_elements
 from datalad.support.exceptions import IncompleteResultsError
 from datalad_catalog.translate import (
     Translate,
-    get_translators,
+    get_all_translators,
 )
 from datalad_catalog.utils import read_json_file
 from datalad_catalog.webcatalog import WebCatalog

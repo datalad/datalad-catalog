@@ -56,6 +56,12 @@ command_suite = (
             "catalog-set",
             "catalog_set",
         ),
+        (
+            "datalad_catalog.translate",
+            "MetaTranslate",
+            "catalog-translate",
+            "catalog_translate",
+        ),
     ],
 )
 

@@ -25,7 +25,7 @@ from datalad_next.constraints import (
 __docformat__ = "restructuredtext"
 
 
-# metadata input via the Add/Create/Validate commands can be any of:
+# metadata input via the Add/Create/Validate/Translate commands can be any of:
 # - a path to a file containing JSON lines
 # - valid JSON lines from STDIN
 # - a JSON serialized string

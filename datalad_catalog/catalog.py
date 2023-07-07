@@ -36,7 +36,7 @@ from datalad_catalog.webcatalog import (
 )
 from datalad_catalog.translate import (
     Translate,
-    get_translators,
+    get_all_translators,
 )
 
 # Create named logger
@@ -850,7 +850,7 @@ def _translate_metadata(metadata: str):
         )
         raise InsufficientArgumentsError(err_msg)
     # Get available translators
-    translators = get_translators()
+    translators = get_all_translators()
     # Open metadata file and translate line by line
     num_lines = _get_line_count(metadata)
     with open(metadata) as file:
