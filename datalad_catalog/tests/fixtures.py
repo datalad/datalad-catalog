@@ -19,6 +19,11 @@ class TestPaths(object):
     catalog_metadata_file1 = data_path / "catalog_metadata_file_valid.jsonl"
     catalog_metadata_file_single = data_path / "catalog_metadata_file_valid_single.jsonl"
     catalog_metadata_valid_invalid = data_path / "catalog_metadata_valid_invalid.jsonl"
+    demo_metafile_datacite = data_path / "metadata_datacite_gin.jsonl"
+    demo_metafile_datacite_2items = data_path / "metadata_datacite_gin2.jsonl"
+    demo_metafile_wrongname = data_path / "metadata_translate_wrongname.jsonl"
+    demo_metafile_wrongversion = data_path / "metadata_translate_wrongversion.jsonl"
+    demo_metafile_nonsense = data_path / "metadata_translate_nonsense.jsonl"
 
 
 @pytest.fixture
