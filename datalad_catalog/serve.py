@@ -44,8 +44,8 @@ class ServeParameterValidator(EnsureCommandParameterization):
     def __init__(self):
         super().__init__(
             param_constraints=dict(
-                catalog=CatalogRequired()&EnsureWebCatalog(),
-                port=EnsureInt()&EnsureRange(1025, 9999),
+                catalog=CatalogRequired() & EnsureWebCatalog(),
+                port=EnsureInt() & EnsureRange(1025, 9999),
             ),
             joint_constraints=dict(),
         )
@@ -78,8 +78,7 @@ class Serve(ValidatedInterface):
         ),
     )
 
-    _examples_ = [
-    ]
+    _examples_ = []
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)
@@ -99,7 +98,8 @@ class Serve(ValidatedInterface):
             yield get_status_dict(
                 **res_kwargs,
                 status="ok",
-                message=("Catalog served successfully"))
+                message=("Catalog served successfully"),
+            )
         except Exception as e:
             yield get_status_dict(
                 **res_kwargs,

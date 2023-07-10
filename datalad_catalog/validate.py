@@ -28,9 +28,7 @@ from datalad_next.commands import (
     eval_results,
     get_status_dict,
 )
-from datalad_next.exceptions import (
-    CapturedException
-)
+from datalad_next.exceptions import CapturedException
 import json
 import logging
 from pathlib import Path
@@ -43,6 +41,7 @@ lgr = logging.getLogger("datalad.catalog.validate")
 
 class ValidateParameterValidator(EnsureCommandParameterization):
     """"""
+
     def __init__(self):
         super().__init__(
             param_constraints=dict(
@@ -83,8 +82,7 @@ class Validate(ValidatedInterface):
         ),
     )
 
-    _examples_ = [
-    ]
+    _examples_ = []
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)
@@ -93,7 +91,7 @@ class Validate(ValidatedInterface):
     # additional generic arguments are added by decorators
     def __call__(
         metadata,
-        catalog = None,
+        catalog=None,
     ):
         res_kwargs = dict(
             action="catalog_validate",
@@ -117,10 +115,10 @@ class Validate(ValidatedInterface):
                 # flow logic will decide if processing continues
                 yield get_status_dict(
                     **res_kwargs,
-                    status='error',
+                    status="error",
                     exception=line,
                 )
-                continue            
+                continue
             # load json object into dict
             if isinstance(line, str):
                 meta_dict = json.loads(line.rstrip())
@@ -135,8 +133,8 @@ class Validate(ValidatedInterface):
                 )
                 yield get_status_dict(
                     **res_kwargs,
-                    status='impossible',
-                    message=err_msg,                    
+                    status="impossible",
+                    message=err_msg,
                 )
                 continue
             # Validate dict against catalog schema
@@ -144,13 +142,13 @@ class Validate(ValidatedInterface):
                 schema_validator.validate(meta_dict)
                 yield get_status_dict(
                     **res_kwargs,
-                    status='ok',
+                    status="ok",
                 )
             except ValidationError as e:
                 err_msg = f"Schema validation failed for item {i}: {e}"
                 yield get_status_dict(
                     **res_kwargs,
-                    status='error',
+                    status="error",
                     message=err_msg,
                     exception=e,
                 )
@@ -160,7 +158,7 @@ class Validate(ValidatedInterface):
 def get_schema_store(catalog: WebCatalog = None):
     """Get the applicable schema store containing schemas against
     which incoming metadata should be validated
-    
+
     If the catalog argument is provided, first retrieve the catalog-specific
     schema store; else, retrieve the package default (i.e. latest) schema store
     """

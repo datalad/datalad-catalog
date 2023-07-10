@@ -25,9 +25,7 @@ from datalad_next.commands import (
 from datalad_next.constraints import (
     EnsurePath,
 )
-from datalad_next.exceptions import (
-    CapturedException
-)
+from datalad_next.exceptions import CapturedException
 
 import json
 from jsonschema import ValidationError
@@ -43,10 +41,11 @@ lgr = logging.getLogger("datalad.catalog.add")
 
 class AddParameterValidator(EnsureCommandParameterization):
     """"""
+
     def __init__(self):
         super().__init__(
             param_constraints=dict(
-                catalog=CatalogRequired()&EnsureWebCatalog(),
+                catalog=CatalogRequired() & EnsureWebCatalog(),
                 metadata=metadata_constraint,
                 config_file=EnsurePath(lexists=True),
             ),
@@ -92,8 +91,7 @@ class Add(ValidatedInterface):
         ),
     )
 
-    _examples_ = [
-    ]
+    _examples_ = []
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)
@@ -140,10 +138,10 @@ class Add(ValidatedInterface):
                 # flow logic will decide if processing continues
                 yield get_status_dict(
                     **res_kwargs,
-                    status='error',
+                    status="error",
                     exception=line,
                 )
-                continue            
+                continue
             # load json object into dict
             if isinstance(line, str):
                 meta_dict = json.loads(line.rstrip())
@@ -158,8 +156,8 @@ class Add(ValidatedInterface):
                 )
                 yield get_status_dict(
                     **res_kwargs,
-                    status='impossible',
-                    message=err_msg,                    
+                    status="impossible",
+                    message=err_msg,
                 )
                 continue
             # Validate dict against catalog schema
@@ -169,9 +167,9 @@ class Add(ValidatedInterface):
                 err_msg = f"Schema validation failed in LINE {i}: \n\n{e}"
                 yield get_status_dict(
                     **res_kwargs,
-                    status='error',
+                    status="error",
                     message=err_msg,
-                    exception=e,                  
+                    exception=e,
                 )
                 continue
             # If validation passed, add the record to the catalog
@@ -188,8 +186,8 @@ class Add(ValidatedInterface):
                 err_msg = f"Catalog add operation failed in LINE {i}: \n\n{e}"
                 yield get_status_dict(
                     **res_kwargs,
-                    status='error',
+                    status="error",
                     message=err_msg,
-                    exception=e,                  
+                    exception=e,
                 )
                 continue

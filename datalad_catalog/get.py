@@ -48,89 +48,111 @@ lgr = logging.getLogger("datalad.catalog.get")
 class GetParameterValidator(EnsureCommandParameterization):
     """"""
 
-    def _validate_combinations(self,
-                               catalog,
-                               property,
-                               dataset_id,
-                               dataset_version,
-                               record_type,
-                               record_path):
+    def _validate_combinations(
+        self,
+        catalog,
+        property,
+        dataset_id,
+        dataset_version,
+        record_type,
+        record_path,
+    ):
         """"""
         # parameter combinations for getting metadata
-        if property == 'metadata':
+        if property == "metadata":
             # always require both dataset_id and dataset_version
             if not dataset_id or not dataset_version:
                 self.raise_for(
-                    dict(catalog=catalog,
-                         property=property,
-                         dataset_id=dataset_id,
-                         dataset_version=dataset_version,
-                         record_type=record_type,
-                         record_path=record_path,
-                         ),
-                    ("both the 'dataset_id' and 'dataset_version' arguments are required "
-                     "when retrieving metadata")
+                    dict(
+                        catalog=catalog,
+                        property=property,
+                        dataset_id=dataset_id,
+                        dataset_version=dataset_version,
+                        record_type=record_type,
+                        record_path=record_path,
+                    ),
+                    (
+                        "both the 'dataset_id' and 'dataset_version' arguments are required "
+                        "when retrieving metadata"
+                    ),
                 )
             # require record_type if record_path is specified
             if record_path and not record_type:
                 self.raise_for(
-                    dict(catalog=catalog,
-                         property=property,
-                         dataset_id=dataset_id,
-                         dataset_version=dataset_version,
-                         record_type=record_type,
-                         record_path=record_path,
-                         ),
-                    ("the 'record_type' argument is required when specifying a specific "
-                     "'record_path'")
+                    dict(
+                        catalog=catalog,
+                        property=property,
+                        dataset_id=dataset_id,
+                        dataset_version=dataset_version,
+                        record_type=record_type,
+                        record_path=record_path,
+                    ),
+                    (
+                        "the 'record_type' argument is required when specifying a specific "
+                        "'record_path'"
+                    ),
                 )
 
             # require record_path for record_type in ('directory', 'file')
-            if record_type in ('directory', 'file') and not record_path:
+            if record_type in ("directory", "file") and not record_path:
                 self.raise_for(
-                    dict(catalog=catalog,
-                         property=property,
-                         dataset_id=dataset_id,
-                         dataset_version=dataset_version,
-                         record_type=record_type,
-                         record_path=record_path,
-                         ),
-                    ("a relative path is required (argument 'record_path') when "
-                     "specifying 'record_type' as 'directory' or 'file'")
+                    dict(
+                        catalog=catalog,
+                        property=property,
+                        dataset_id=dataset_id,
+                        dataset_version=dataset_version,
+                        record_type=record_type,
+                        record_path=record_path,
+                    ),
+                    (
+                        "a relative path is required (argument 'record_path') when "
+                        "specifying 'record_type' as 'directory' or 'file'"
+                    ),
                 )
         # parameter combinations for getting config
-        if property == 'config':
+        if property == "config":
             # require both dataset_id and dataset_version, or neither
-            if (dataset_id and not dataset_version) or (dataset_version and not dataset_id):
+            if (dataset_id and not dataset_version) or (
+                dataset_version and not dataset_id
+            ):
                 self.raise_for(
-                    dict(catalog=catalog,
-                         property=property,
-                         dataset_id=dataset_id,
-                         dataset_version=dataset_version,
-                         record_type=record_type,
-                         record_path=record_path,
-                         ),
-                    ("both the 'dataset_id' and 'dataset_version' arguments are required "
-                     "when retrieving dataset-level configuration; neither are required "
-                     "when retrieving catalog-level configuration")
+                    dict(
+                        catalog=catalog,
+                        property=property,
+                        dataset_id=dataset_id,
+                        dataset_version=dataset_version,
+                        record_type=record_type,
+                        record_path=record_path,
+                    ),
+                    (
+                        "both the 'dataset_id' and 'dataset_version' arguments are required "
+                        "when retrieving dataset-level configuration; neither are required "
+                        "when retrieving catalog-level configuration"
+                    ),
                 )
 
-
     def __init__(self):
-        all_params = ('catalog','property', 'dataset_id',
-                  'dataset_version', 'record_type', 'record_path')
+        all_params = (
+            "catalog",
+            "property",
+            "dataset_id",
+            "dataset_version",
+            "record_type",
+            "record_path",
+        )
         super().__init__(
             param_constraints=dict(
-                catalog=CatalogRequired()&EnsureWebCatalog(),
-                property=EnsureChoice('home', 'config', 'metadata', 'tree'),
+                catalog=CatalogRequired() & EnsureWebCatalog(),
+                property=EnsureChoice("home", "config", "metadata", "tree"),
                 dataset_id=EnsureStr(),
                 dataset_version=EnsureStr(),
-                record_type=EnsureChoice('dataset', 'directory', 'file'),
+                record_type=EnsureChoice("dataset", "directory", "file"),
                 record_path=EnsureStr(),
             ),
             joint_constraints={
-                ParameterConstraintContext(all_params, 'validate-parameter-combinations'):
-                self._validate_combinations,
+                ParameterConstraintContext(
+                    all_params, "validate-parameter-combinations"
+                ): self._validate_combinations,
             },
         )
 
@@ -140,7 +162,7 @@ class GetParameterValidator(EnsureCommandParameterization):
 # All extension commands must be derived from Interface
 class Get(ValidatedInterface):
     """Utility for getting various properties of a catalog, based on the specified property
-    
+
     Used to get the catalog home page, get config at catalog- or dataset-level,
     get the metadata for a specific dataset/version
     """
@@ -183,8 +205,7 @@ class Get(ValidatedInterface):
         ),
     )
 
-    _examples_ = [
-    ]
+    _examples_ = []
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)
@@ -208,34 +229,36 @@ class Get(ValidatedInterface):
         # TODO: add property schema, schema:store, schema:version, schema:catalog, schema:dataset, etc
 
         # Yield error for get-operations that haven't been implemented yet
-        if property in ('tree'):
+        if property in ("tree"):
             msg = f"catalog-get for property={property} is not yet implemented"
             yield get_status_dict(**res_kwargs, status="error", message=msg)
 
         # Get catalog home page
-        if property == 'home':
+        if property == "home":
             try:
                 home_spec = catalog.get_main_dataset()
-                msg = (f"Home page found: dataset_id={home_spec['dataset_id']}, "
-                       f"dataset_version={home_spec['dataset_version']}"
+                msg = (
+                    f"Home page found: dataset_id={home_spec['dataset_id']}, "
+                    f"dataset_version={home_spec['dataset_version']}"
                 )
-                yield get_status_dict(**res_kwargs,
-                                  status="ok",
-                                  message=msg,
-                                  home=home_spec)
+                yield get_status_dict(
+                    **res_kwargs, status="ok", message=msg, home=home_spec
+                )
             except Exception as e:
-                msg="No home page has been set for the catalog"
-                yield get_status_dict(**res_kwargs,
-                                  status="impossible",
-                                  message=msg,
-                                  exception=e,
-                                  home=None)
-        
+                msg = "No home page has been set for the catalog"
+                yield get_status_dict(
+                    **res_kwargs,
+                    status="impossible",
+                    message=msg,
+                    exception=e,
+                    home=None,
+                )
+
         # Get catalog metadata for dataset/directory/file
-        if property == 'metadata':
+        if property == "metadata":
             # set default record_type
             if record_type is None:
-                record_type = 'dataset'
+                record_type = "dataset"
             record = catalog.get_record(
                 dataset_id=dataset_id,
                 dataset_version=dataset_version,
@@ -243,51 +266,57 @@ class Get(ValidatedInterface):
                 relpath=record_path,
             )
             if record is None:
-                msg = ("The catalog does not contain a metadata record "
-                       "with the specified properties")
+                msg = (
+                    "The catalog does not contain a metadata record "
+                    "with the specified properties"
+                )
                 sts = "impossible"
             else:
-                msg = ("Metadata record retrieved")
+                msg = "Metadata record retrieved"
                 sts = "ok"
-            yield get_status_dict(**res_kwargs,
-                                  status=sts,
-                                  message=msg,
-                                  metadata=record)
-        
+            yield get_status_dict(
+                **res_kwargs, status=sts, message=msg, metadata=record
+            )
+
         # Get catalog-level or dataset-level config
-        if property == 'config':
+        if property == "config":
             if dataset_id and dataset_version:
                 # config level is dataset
                 # get config from Node
                 dataset_node = catalog.get_record(
                     dataset_id=dataset_id,
                     dataset_version=dataset_version,
-                    record_type='dataset',
+                    record_type="dataset",
                     relpath=None,
                 )
                 if dataset_node is None:
-                    msg = ("The catalog does not contain a dataset "
-                        "with the specified 'dataset_id' and 'dataset_version'")
+                    msg = (
+                        "The catalog does not contain a dataset "
+                        "with the specified 'dataset_id' and 'dataset_version'"
+                    )
                     sts = "impossible"
                 else:
-                    msg = ("Dataset-level configuration retrieved")
+                    msg = "Dataset-level configuration retrieved"
                     sts = "ok"
-                yield get_status_dict(**res_kwargs,
-                                    status=sts,
-                                    message=msg,
-                                    config=dataset_node['config'])
+                yield get_status_dict(
+                    **res_kwargs,
+                    status=sts,
+                    message=msg,
+                    config=dataset_node["config"],
+                )
             else:
                 try:
                     cfg = catalog.get_config()
                     msg = f"Catalog-level configuration retrieved"
-                    yield get_status_dict(**res_kwargs,
-                                    status="ok",
-                                    message=msg,
-                                    config=cfg)
+                    yield get_status_dict(
+                        **res_kwargs, status="ok", message=msg, config=cfg
+                    )
                 except Exception as e:
-                    msg="Catalog-level configuration has not been set"
-                    yield get_status_dict(**res_kwargs,
-                                    status="impossible",
-                                    message=msg,
-                                    exception=e,
-                                    config=None)
+                    msg = "Catalog-level configuration has not been set"
+                    yield get_status_dict(
+                        **res_kwargs,
+                        status="impossible",
+                        message=msg,
+                        exception=e,
+                        config=None,
+                    )

@@ -32,12 +32,12 @@ class WebCatalog(object):
         self.location = Path(location)
         self.metadata_path = Path(self.location) / "metadata"
         # The following attributes should be reset on create:
-        # STATE 
+        # STATE
         self.is_valid_catalog = self.is_created()
-        # SCHEMA SETUP 
+        # SCHEMA SETUP
         self.schema_store = self.get_schema_store()
         self.schema_validator = self.get_schema_validator()
-        # CONFIG SETUP 
+        # CONFIG SETUP
         self.config = self.get_config()
 
     def is_created(self) -> bool:
@@ -56,9 +56,7 @@ class WebCatalog(object):
             is_created = is_created and out_dir_paths[key].exists()
         return is_created
 
-    def create(self,
-               config_file: str = None,
-               force: bool = False):
+    def create(self, config_file: str = None, force: bool = False):
         """Create new catalog directory with assets (JS, CSS),
         artwork, config, the main html, and html templates
         """
@@ -67,7 +65,7 @@ class WebCatalog(object):
         if config_file:
             self.config_path = Path(config_file)
         else:
-            self.config_path = cnst.default_config_dir / 'config.json'
+            self.config_path = cnst.default_config_dir / "config.json"
         # Load config from source file
         self.config = load_config_file(self.config_path)
         # Check logo path, if added to config
@@ -107,30 +105,32 @@ class WebCatalog(object):
         self.schema_store = self.get_schema_store()
         self.schema_validator = self.get_schema_validator()
 
-    def get_record(self, 
-                   dataset_id: str,
-                   dataset_version: str,
-                   record_type: str = 'dataset',
-                   relpath: str = None,
-                   ):
-        """Find the metadata record of a dataset, directory, or file in a catalog.
-        """
+    def get_record(
+        self,
+        dataset_id: str,
+        dataset_version: str,
+        record_type: str = "dataset",
+        relpath: str = None,
+    ):
+        """Find the metadata record of a dataset, directory, or file in a catalog."""
         # EnsureChoice
-        if record_type not in ('dataset', 'directory', 'file'):
+        if record_type not in ("dataset", "directory", "file"):
             error_msg = "Argument 'record_type' must be one of 'dataset', 'directory', 'file'"
             raise ValueError(error_msg)
-        
-        if record_type in ('directory', 'file') and relpath == None:
-            error_msg = ("A relative path is required (argument 'relpath') "
-                         "for records of type 'directory' or 'file'")
+
+        if record_type in ("directory", "file") and relpath == None:
+            error_msg = (
+                "A relative path is required (argument 'relpath') "
+                "for records of type 'directory' or 'file'"
+            )
             raise ValueError(error_msg)
         # set the correct node_type and node_path
-        node_type = record_type if record_type != 'file' else 'directory'
-        if node_type == 'dataset':
+        node_type = record_type if record_type != "file" else "directory"
+        if node_type == "dataset":
             node_path = None
         else:
             node_path = Path(relpath)
-            if record_type == 'file':
+            if record_type == "file":
                 node_path = node_path.parent
         # get node instance
         node_instance = Node(
@@ -141,18 +141,17 @@ class WebCatalog(object):
             node_path=node_path,
         )
         if node_instance.is_created():
-            if record_type == 'file':
-                children = [c for c in node_instance.children if c['path'] == relpath]
+            if record_type == "file":
+                children = [
+                    c for c in node_instance.children if c["path"] == relpath
+                ]
                 return children[0] if len(children) > 0 else None
             else:
                 return vars(node_instance)
         else:
             return None
-    
-    def add_record(self, 
-                   metadata_record: dict,
-                   config_file: str = None
-                   ):
+
+    def add_record(self, metadata_record: dict, config_file: str = None):
         """Add a validated metadata record to the catalog
 
         This translates the record into a MetaItem instance
@@ -166,9 +165,9 @@ class WebCatalog(object):
         """
         # First translate the record into a MetaItem instance
         # that has multiple Node instances
-        meta_item = MetaItem(catalog=self,
-                             meta_item=metadata_record,
-                             config_file=config_file)
+        meta_item = MetaItem(
+            catalog=self, meta_item=metadata_record, config_file=config_file
+        )
         # Then create/update their respective metadata files
         meta_item.write_nodes_to_files()
         # TODO: return a value specifying whether the record
@@ -178,7 +177,7 @@ class WebCatalog(object):
     def get_main_dataset(self):
         super_path = Path(self.metadata_path) / "super.json"
         if not (super_path.exists() and super_path.is_file()):
-            error_msg = f'File does not exist at path: {super_path}'
+            error_msg = f"File does not exist at path: {super_path}"
             raise FileNotFoundError(error_msg)
         return read_json_file(super_path)
 
@@ -217,7 +216,7 @@ class WebCatalog(object):
     def get_config(self):
         """"""
         # Read config from file
-        config_path = cnst.default_config_dir / 'config.json'
+        config_path = cnst.default_config_dir / "config.json"
         if not config_path.exists():
             return None
         return load_config_file(config_path)
@@ -228,8 +227,7 @@ class WebCatalog(object):
         if (
             cnst.LOGO_PATH in self.config
             and self.config[cnst.LOGO_PATH]
-            and self.config[cnst.LOGO_PATH]
-            != "artwork/catalog_logo.svg"
+            and self.config[cnst.LOGO_PATH] != "artwork/catalog_logo.svg"
         ):
             existing_path = self.get_logo_path()
             existing_name = existing_path.name
@@ -249,8 +247,8 @@ class WebCatalog(object):
         schema_store = {}
         # If catalog has schema files in "<catalog-name>/schema" dir, use them,
         # else use the schema files in the package default schema location
-        cat_schema_dir = Path(self.location) / 'schema' 
-        if (cat_schema_dir / 'jsonschema_catalog.json').exists():
+        cat_schema_dir = Path(self.location) / "schema"
+        if (cat_schema_dir / "jsonschema_catalog.json").exists():
             schema_dir = cat_schema_dir
         else:
             schema_dir = cnst.schema_dir
@@ -260,23 +258,27 @@ class WebCatalog(object):
             schema = read_json_file(schema_path)
             schema_store[schema[cnst.DOLLARID]] = schema
         return schema_store
-    
+
     def get_schema_validator(self):
         """Return schema validator"""
-        if not hasattr(self, 'schema_store'):
+        if not hasattr(self, "schema_store"):
             self.schema_store = self.get_schema_store()
-        catalog_schema = self.schema_store[cnst.CATALOG_SCHEMA_IDS[cnst.CATALOG]]
-        resolver = RefResolver.from_schema(catalog_schema, store=self.schema_store)
+        catalog_schema = self.schema_store[
+            cnst.CATALOG_SCHEMA_IDS[cnst.CATALOG]
+        ]
+        resolver = RefResolver.from_schema(
+            catalog_schema, store=self.schema_store
+        )
         return Draft202012Validator(catalog_schema, resolver=resolver)
-    
+
     def serve(
         self,
-        host: str = 'localhost',
+        host: str = "localhost",
         port: int = 8000,
     ):
         """Serve a catalog via a local http server"""
         os.chdir(self.location)
-        
+
         import http.server
         import socketserver
         from datalad.ui import ui
@@ -295,5 +297,7 @@ class WebCatalog(object):
                 )
                 httpd.serve_forever()
         except Exception as e:
-            lgr.error(msg='Unable to serve at the desired host and port', exc_info=e)
-            raise(e)
+            lgr.error(
+                msg="Unable to serve at the desired host and port", exc_info=e
+            )
+            raise (e)

@@ -20,6 +20,7 @@ catalog_validate = Validate()
 # 1) if catalog is supplied as argument or not
 # 2) if catalog has schema folder or not.
 
+
 def test_no_args(demo_catalog, test_data):
     """The metadata argument is required, catalog is optional"""
     with pytest.raises(CommandParametrizationError):
@@ -28,9 +29,10 @@ def test_no_args(demo_catalog, test_data):
     with pytest.raises(CommandParametrizationError):
         catalog_validate(catalog=demo_catalog)
 
+
 def test_validation_failure(demo_catalog, test_data):
     """Validate catalog metadata from a json serialized string
-    
+
     Provided metadata does not include all required fields for a dataset
     """
     mdata = '{"dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609", "dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758", "type": "dataset"}'
@@ -46,6 +48,7 @@ def test_validation_failure(demo_catalog, test_data):
         status="error",
         path=demo_catalog.location,
     )
+
 
 def test_validate_from_file_faulty(demo_catalog, test_data):
     """Validate catalog metadata from a file with json lines
@@ -69,4 +72,3 @@ def test_validate_from_file_faulty(demo_catalog, test_data):
         status="error",
         path=demo_catalog.location,
     )
-

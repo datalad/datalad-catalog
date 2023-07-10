@@ -52,9 +52,7 @@ def demo_catalog_without_config(tmp_path):
 
 
 def test_config_with_file_yml(demo_catalog_with_config_yml):
-    assert (
-        demo_catalog_with_config_yml.config_path == demo_config_path_yml
-    )
+    assert demo_catalog_with_config_yml.config_path == demo_config_path_yml
     assert hasattr(demo_catalog_with_config_yml, "config")
     assert demo_catalog_with_config_yml.config is not None
     assert (
@@ -64,10 +62,7 @@ def test_config_with_file_yml(demo_catalog_with_config_yml):
 
 
 def test_config_with_file_json(demo_catalog_with_config_json):
-    assert (
-        demo_catalog_with_config_json.config_path
-        == demo_config_path_json
-    )
+    assert demo_catalog_with_config_json.config_path == demo_config_path_json
     assert hasattr(demo_catalog_with_config_json, "config")
     assert demo_catalog_with_config_json.config is not None
     assert (
@@ -77,9 +72,7 @@ def test_config_with_file_json(demo_catalog_with_config_json):
 
 
 def test_config_without_file(demo_catalog_without_config):
-    assert (
-        demo_catalog_without_config.config_path == default_config_path
-    )
+    assert demo_catalog_without_config.config_path == default_config_path
     assert hasattr(demo_catalog_without_config, "config")
     assert demo_catalog_without_config.config is not None
     assert demo_catalog_without_config.config[CATALOG_NAME] == "DataCat"
@@ -108,7 +101,7 @@ def test_dataset_config(tmp_path):
     # - Grab Node instance
     node_instance = Node(
         catalog=ctlg,
-        type='dataset',
+        type="dataset",
         dataset_id=d_id,
         dataset_version=d_v,
         node_path=None,
@@ -116,9 +109,9 @@ def test_dataset_config(tmp_path):
     cfg = node_instance.get_config()
     # - config attribute should have correct dataset-specific content
     assert cfg is not None
-    assert cfg.get('source') == 'dataset'
+    assert cfg.get("source") == "dataset"
     assert (
-        cfg.get('config').get(CATALOG_NAME)
+        cfg.get("config").get(CATALOG_NAME)
         == "DataLad Catalog Config Test Dataset"
     )
     # 2. Next, test dataset add with NO CONFIG
@@ -135,7 +128,7 @@ def test_dataset_config(tmp_path):
     # - Grab Node instance
     node_instance = Node(
         catalog=ctlg,
-        type='dataset',
+        type="dataset",
         dataset_id=d_id,
         dataset_version=d_v,
         node_path=None,
@@ -143,11 +136,8 @@ def test_dataset_config(tmp_path):
     cfg = node_instance.get_config()
     # config attribute should exist and be correct and from correct source
     assert cfg is not None
-    assert cfg.get('source') == 'catalog'
-    assert (
-        cfg.get('config').get(CATALOG_NAME)
-        == "DataLad Catalog Config Test"
-    )
+    assert cfg.get("source") == "catalog"
+    assert cfg.get("config").get(CATALOG_NAME) == "DataLad Catalog Config Test"
 
 
 def _get_value_from_file(metadata_path, key):

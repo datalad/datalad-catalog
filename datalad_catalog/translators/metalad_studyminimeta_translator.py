@@ -33,7 +33,7 @@ class MetaladStudyminimetaTranslator(TranslatorBase):
         schema_version: str,
         source_name: str,
         source_version: str,
-        source_id: str = None
+        source_id: str = None,
     ) -> bool:
         """
         Matching routine for the current translator

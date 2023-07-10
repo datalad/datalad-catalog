@@ -49,15 +49,15 @@ class Node(object):
 
         # Defaults for config
         self.config = None
-        self.config_source = None # 'catalog' or 'dataset'
+        self.config_source = None  # 'catalog' or 'dataset'
 
         # If Node metadata file exists, set attributes and config
         if self.is_created():
             self.set_attributes_from_file()
             cfg = self.get_config()
-            self.config = cfg['config']
-            self.config_source = cfg['source']
-        
+            self.config = cfg["config"]
+            self.config_source = cfg["source"]
+
     def is_created(self) -> bool:
         """
         Check if metadata file for Node exists in catalog
@@ -65,15 +65,16 @@ class Node(object):
         if self.get_location().exists() and self.get_location().is_file():
             return True
         return False
-    
+
     def create(self):
         """"""
         # Assumes that Node has been populated with attributes,
         # including config attribute (only applicable for dataset Node)
-        if self.type == 'dataset':
+        if self.type == "dataset":
             if self.config is None:
-                msg = ("config has not been set for this node",
-                    "neither from catalog- nor dataset-level"
+                msg = (
+                    "config has not been set for this node",
+                    "neither from catalog- nor dataset-level",
                 )
                 raise ValueError(msg)
             # create config file if necessary, i.e. if a config file
@@ -84,7 +85,10 @@ class Node(object):
                 / self.dataset_version
                 / "config.json"
             )
-            if not dataset_config_path.is_file() and self.config_source == 'dataset':
+            if (
+                not dataset_config_path.is_file()
+                and self.config_source == "dataset"
+            ):
                 # First create id and version directories in case they don't exist
                 dataset_config_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(dataset_config_path, "w") as f:
@@ -195,20 +199,20 @@ class Node(object):
         )
         if dataset_config_path.is_file():
             # If dataset-level config file DOES exist, return it
-            return dict(source='dataset',
-                        config=load_config_file(dataset_config_path))
+            return dict(
+                source="dataset", config=load_config_file(dataset_config_path)
+            )
         else:
             # If dataset-level config file DOES NOT exist:
             if config_file is not None:
                 # If config file passed: load and return
-                return dict(source='dataset',
-                            config=load_config_file(config_file))
+                return dict(
+                    source="dataset", config=load_config_file(config_file)
+                )
             else:
                 # If config file is not passed,
                 # only load from catalog-level config file
-                return dict(source='catalog',
-                            config=self.parent_catalog.config)
-            
+                return dict(source="catalog", config=self.parent_catalog.config)
 
     def split_dir_name(self, dir_name):
         """
@@ -224,16 +228,15 @@ class Node(object):
         path_right = dir_name[self._split_dir_length :]
         return path_left, path_right
 
-    def add_attributes(self,
-                       new_attributes: dict,
-                       config_file: str = None,
-                       overwrite=False):
+    def add_attributes(
+        self, new_attributes: dict, config_file: str = None, overwrite=False
+    ):
         """Add attributes (key-value pairs) to a Node as instance variables
         This is the point where a config is necessary"""
         # Get dataset config
         cfg = self.get_config(config_file)
-        self.config = cfg.get('config', None)
-        self.config_source = cfg['source']
+        self.config = cfg.get("config", None)
+        self.config_source = cfg["source"]
         dataset_config = self.config[cnst.PROPERTY_SOURCES][cnst.TYPE_DATASET]
         # Get metadata source of incoming metadata
         # NOTE: this assumes that provided metadata item originates from a single source,

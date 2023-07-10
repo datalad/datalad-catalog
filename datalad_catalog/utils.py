@@ -8,6 +8,7 @@ import yaml
 """A module with miscellaneous utility functions that are used across other modules
 """
 
+
 def copy_overwrite_path(src: Path, dest: Path, overwrite: bool = False):
     """
     Copy or overwrite a directory or file

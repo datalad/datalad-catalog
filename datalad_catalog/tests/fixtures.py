@@ -1,5 +1,3 @@
-
-
 from pathlib import Path
 import pytest
 from datalad_catalog.constants import (
@@ -8,21 +6,33 @@ from datalad_catalog.constants import (
 )
 from datalad_catalog.webcatalog import WebCatalog
 
+
 class TestPaths(object):
     """Class to store paths to test data"""
+
     data_path = tests_path / "data"
     default_config_path = package_path / "config" / "config.json"
     demo_config_path_catalog = data_path / "test_config_file_catalog.json"
     demo_config_path_dataset = data_path / "test_config_file_dataset.json"
-    catalog_metadata_dataset1 = data_path / "catalog_metadata_dataset_valid.jsonl"
-    catalog_metadata_dataset2 = data_path / "catalog_metadata_dataset_valid2.jsonl"
+    catalog_metadata_dataset1 = (
+        data_path / "catalog_metadata_dataset_valid.jsonl"
+    )
+    catalog_metadata_dataset2 = (
+        data_path / "catalog_metadata_dataset_valid2.jsonl"
+    )
     catalog_metadata_file1 = data_path / "catalog_metadata_file_valid.jsonl"
-    catalog_metadata_file_single = data_path / "catalog_metadata_file_valid_single.jsonl"
-    catalog_metadata_valid_invalid = data_path / "catalog_metadata_valid_invalid.jsonl"
+    catalog_metadata_file_single = (
+        data_path / "catalog_metadata_file_valid_single.jsonl"
+    )
+    catalog_metadata_valid_invalid = (
+        data_path / "catalog_metadata_valid_invalid.jsonl"
+    )
     demo_metafile_datacite = data_path / "metadata_datacite_gin.jsonl"
     demo_metafile_datacite_2items = data_path / "metadata_datacite_gin2.jsonl"
     demo_metafile_wrongname = data_path / "metadata_translate_wrongname.jsonl"
-    demo_metafile_wrongversion = data_path / "metadata_translate_wrongversion.jsonl"
+    demo_metafile_wrongversion = (
+        data_path / "metadata_translate_wrongversion.jsonl"
+    )
     demo_metafile_nonsense = data_path / "metadata_translate_nonsense.jsonl"
 
 
@@ -42,6 +52,7 @@ def demo_catalog(tmp_path, test_data) -> WebCatalog:
     catalog.create(config_file=str(test_data.demo_config_path_catalog))
     return catalog
 
+
 @pytest.fixture
 def demo_catalog_default_config(tmp_path) -> WebCatalog:
     """A simple WebCatalog instance with no added metadata
@@ -52,5 +63,3 @@ def demo_catalog_default_config(tmp_path) -> WebCatalog:
     )
     catalog.create()
     return catalog
-
-

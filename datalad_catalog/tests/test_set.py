@@ -24,25 +24,22 @@ def test_arg_combinations(demo_catalog):
         catalog_set(catalog=demo_catalog)
     # for property=home, always require both dataset_id and dataset_version
     with pytest.raises(CommandParametrizationError):
-        catalog_set(catalog=demo_catalog,
-                    property='home')
+        catalog_set(catalog=demo_catalog, property="home")
     with pytest.raises(CommandParametrizationError):
-        catalog_set(catalog=demo_catalog,
-                    property='home',
-                    dataset_id='1234')
+        catalog_set(catalog=demo_catalog, property="home", dataset_id="1234")
     with pytest.raises(CommandParametrizationError):
-        catalog_set(catalog=demo_catalog,
-                    property='home',
-                    dataset_version='v1')
+        catalog_set(catalog=demo_catalog, property="home", dataset_version="v1")
 
 
 def test_set_config(demo_catalog):
     """Tests for property: config"""
     # placeholder test until the tree functionality is implemented
-    res = catalog_set(catalog=demo_catalog,
-                      property='config',
-                      on_failure="ignore",
-                      return_type="list",)
+    res = catalog_set(
+        catalog=demo_catalog,
+        property="config",
+        on_failure="ignore",
+        return_type="list",
+    )
     assert_in_results(
         res,
         action="catalog_set",
@@ -67,7 +64,7 @@ def test_set_home(demo_catalog, test_data):
     # set home page
     res = catalog_set(
         catalog=demo_catalog,
-        property='home',
+        property="home",
         dataset_id=ds_meta[cnst.DATASET_ID],
         dataset_version=ds_meta[cnst.DATASET_VERSION],
         on_failure="ignore",
@@ -79,8 +76,10 @@ def test_set_home(demo_catalog, test_data):
         action_property="home",
         status="ok",
         path=demo_catalog.location,
-        home={cnst.DATASET_ID:ds_meta[cnst.DATASET_ID],
-              cnst.DATASET_VERSION:ds_meta[cnst.DATASET_VERSION]}
+        home={
+            cnst.DATASET_ID: ds_meta[cnst.DATASET_ID],
+            cnst.DATASET_VERSION: ds_meta[cnst.DATASET_VERSION],
+        },
     )
     # 3. Test when home page already set: reckless or not
     # first add another dataset
@@ -95,7 +94,7 @@ def test_set_home(demo_catalog, test_data):
     # set home page without overwrite
     res = catalog_set(
         catalog=demo_catalog,
-        property='home',
+        property="home",
         dataset_id=ds_meta2[cnst.DATASET_ID],
         dataset_version=ds_meta2[cnst.DATASET_VERSION],
         on_failure="ignore",
@@ -111,10 +110,10 @@ def test_set_home(demo_catalog, test_data):
     # set home page WITH overwrite
     res = catalog_set(
         catalog=demo_catalog,
-        property='home',
+        property="home",
         dataset_id=ds_meta2[cnst.DATASET_ID],
         dataset_version=ds_meta2[cnst.DATASET_VERSION],
-        reckless='overwrite',
+        reckless="overwrite",
         on_failure="ignore",
         return_type="list",
     )
@@ -124,10 +123,11 @@ def test_set_home(demo_catalog, test_data):
         action_property="home",
         status="ok",
         path=demo_catalog.location,
-        home={cnst.DATASET_ID:ds_meta2[cnst.DATASET_ID],
-              cnst.DATASET_VERSION:ds_meta2[cnst.DATASET_VERSION]}
+        home={
+            cnst.DATASET_ID: ds_meta2[cnst.DATASET_ID],
+            cnst.DATASET_VERSION: ds_meta2[cnst.DATASET_VERSION],
+        },
     )
-
 
 
 def test_set_home_outofcatalog(demo_catalog, test_data):
@@ -136,9 +136,9 @@ def test_set_home_outofcatalog(demo_catalog, test_data):
     # test without reckless=overwrite
     res = catalog_set(
         catalog=demo_catalog,
-        property='home',
-        dataset_id='id_not_in_ctalog',
-        dataset_version='version_not_in_ctalog',
+        property="home",
+        dataset_id="id_not_in_ctalog",
+        dataset_version="version_not_in_ctalog",
         on_failure="ignore",
         return_type="list",
     )
@@ -152,10 +152,10 @@ def test_set_home_outofcatalog(demo_catalog, test_data):
     # test WITH reckless=overwrite
     res = catalog_set(
         catalog=demo_catalog,
-        property='home',
-        dataset_id='id_not_in_ctalog',
-        dataset_version='version_not_in_ctalog',
-        reckless='overwrite',
+        property="home",
+        dataset_id="id_not_in_ctalog",
+        dataset_version="version_not_in_ctalog",
+        reckless="overwrite",
         on_failure="ignore",
         return_type="list",
     )
@@ -165,17 +165,19 @@ def test_set_home_outofcatalog(demo_catalog, test_data):
         action_property="home",
         status="ok",
         path=demo_catalog.location,
-        home={cnst.DATASET_ID:'id_not_in_ctalog',
-              cnst.DATASET_VERSION:'version_not_in_ctalog'}
+        home={
+            cnst.DATASET_ID: "id_not_in_ctalog",
+            cnst.DATASET_VERSION: "version_not_in_ctalog",
+        },
     )
     # 2. Test when home page already set, dataset NOT in catalog
     # test WITH reckless=overwrite
     res = catalog_set(
         catalog=demo_catalog,
-        property='home',
-        dataset_id='bla',
-        dataset_version='bla',
-        reckless='overwrite',
+        property="home",
+        dataset_id="bla",
+        dataset_version="bla",
+        reckless="overwrite",
         on_failure="ignore",
         return_type="list",
     )
@@ -185,6 +187,5 @@ def test_set_home_outofcatalog(demo_catalog, test_data):
         action_property="home",
         status="ok",
         path=demo_catalog.location,
-        home={cnst.DATASET_ID:'bla',
-              cnst.DATASET_VERSION:'bla'}
+        home={cnst.DATASET_ID: "bla", cnst.DATASET_VERSION: "bla"},
     )

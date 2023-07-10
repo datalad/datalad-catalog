@@ -20,11 +20,12 @@ catalog_paths = [
 
 catalog_create = Create()
 
+
 def test_no_args(tmp_path):
     """At least the catalog argument is required"""
     with pytest.raises(CommandParametrizationError):
         catalog_create()
-        
+
 
 def test_create(tmp_path):
     """
@@ -32,9 +33,7 @@ def test_create(tmp_path):
     where path does not yet exist
     """
     catalog_path = tmp_path / "test_catalog"
-    res = catalog_create(
-        catalog=catalog_path
-    )
+    res = catalog_create(catalog=catalog_path)
     assert_in_results(
         res,
         action="catalog_create",
@@ -51,7 +50,7 @@ def test_create(tmp_path):
 
 def test_create_with_metadata(tmp_path, test_data):
     """
-    Test if catalog is created successfully given a path that 
+    Test if catalog is created successfully given a path that
     does not yet exist and some metadata as the input args
     """
     catalog_path = tmp_path / "test_catalog"

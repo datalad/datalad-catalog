@@ -51,41 +51,46 @@ lgr = logging.getLogger("datalad.catalog.set")
 class SetParameterValidator(EnsureCommandParameterization):
     """"""
 
-    def _validate_combinations(self,
-                               catalog,
-                               property,
-                               dataset_id,
-                               dataset_version,):
+    def _validate_combinations(
+        self,
+        catalog,
+        property,
+        dataset_id,
+        dataset_version,
+    ):
         """"""
         # parameter combinations for setting homepage
-        if property == 'home':
+        if property == "home":
             # require both dataset_id and dataset_version
             if not dataset_id or not dataset_version:
                 self.raise_for(
-                    dict(catalog=catalog,
-                         property=property,
-                         dataset_id=dataset_id,
-                         dataset_version=dataset_version,
-                         ),
-                    ("both the 'dataset_id' and 'dataset_version' arguments are required "
-                     "when setting the catalog home page")
+                    dict(
+                        catalog=catalog,
+                        property=property,
+                        dataset_id=dataset_id,
+                        dataset_version=dataset_version,
+                    ),
+                    (
+                        "both the 'dataset_id' and 'dataset_version' arguments are required "
+                        "when setting the catalog home page"
+                    ),
                 )
         # if property == 'config':
 
-
     def __init__(self):
-        all_params = ('catalog','property', 'dataset_id', 'dataset_version')
+        all_params = ("catalog", "property", "dataset_id", "dataset_version")
         super().__init__(
             param_constraints=dict(
-                catalog=CatalogRequired()&EnsureWebCatalog(),
-                property=EnsureChoice('home', 'config'),
+                catalog=CatalogRequired() & EnsureWebCatalog(),
+                property=EnsureChoice("home", "config"),
                 dataset_id=EnsureStr(),
                 dataset_version=EnsureStr(),
-                reckless=EnsureChoice('overwrite'),
+                reckless=EnsureChoice("overwrite"),
             ),
             joint_constraints={
-                ParameterConstraintContext(all_params, 'validate-parameter-combinations'):
-                self._validate_combinations,
+                ParameterConstraintContext(
+                    all_params, "validate-parameter-combinations"
+                ): self._validate_combinations,
             },
         )
 
@@ -95,7 +100,7 @@ class SetParameterValidator(EnsureCommandParameterization):
 # All extension commands must be derived from Interface
 class Set(ValidatedInterface):
     """Utility for setting various properties of a catalog, based on the specified subcommand
-    
+
     Used to set the catalog home page, or to reset config at catalog- or dataset-level.
     """
 
@@ -126,11 +131,10 @@ class Set(ValidatedInterface):
             doc="""Set the property in a potentially unsafe way.
             Supported modes are:
             ["overwrite"]: if the property is already set, overwrite it""",
-        ),   
+        ),
     )
 
-    _examples_ = [
-    ]
+    _examples_ = []
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)
@@ -151,30 +155,35 @@ class Set(ValidatedInterface):
         )
 
         # Yield error for set-operations that haven't been implemented yet
-        if property in ('config'):
+        if property in ("config"):
             msg = f"catalog-set for property={property} is not yet implemented"
             yield get_status_dict(**res_kwargs, status="error", message=msg)
 
         # Set catalog home page
-        if property == 'home':
+        if property == "home":
             # First check if a corresponding record with dataset id and version is
             # actually in the catalog
             existing_record = catalog.get_record(dataset_id, dataset_version)
             if existing_record is None:
-                if reckless != 'overwrite':
-                    msg = (f"No dataset record found in catalog for: dataset_id="
-                           f"{dataset_id}, dataset_version={dataset_version}."
-                           " Home page should not be set to a nonexisting dataset."
-                           " To ignore this check and continue to set the home page,"
-                           " use '--reckless overwrite'."
+                if reckless != "overwrite":
+                    msg = (
+                        f"No dataset record found in catalog for: dataset_id="
+                        f"{dataset_id}, dataset_version={dataset_version}."
+                        " Home page should not be set to a nonexisting dataset."
+                        " To ignore this check and continue to set the home page,"
+                        " use '--reckless overwrite'."
                     )
-                    yield get_status_dict(**res_kwargs,
-                                  status="impossible",
-                                  message=msg,
-                                  home=None)
+                    yield get_status_dict(
+                        **res_kwargs,
+                        status="impossible",
+                        message=msg,
+                        home=None,
+                    )
 
-            success_msg = (f"Home page successfully set to: dataset_id={dataset_id}, "
-                           f"dataset_version={dataset_version}.")
+            success_msg = (
+                f"Home page successfully set to: dataset_id={dataset_id}, "
+                f"dataset_version={dataset_version}."
+            )
             success_home_spec = {
                 cnst.DATASET_ID: dataset_id,
                 cnst.DATASET_VERSION: dataset_version,
@@ -183,28 +192,32 @@ class Set(ValidatedInterface):
             try:
                 home_spec = catalog.get_main_dataset()
                 # if home already set and reckless specified, overwrite
-                if reckless == 'overwrite':
+                if reckless == "overwrite":
                     catalog.set_main_dataset(dataset_id, dataset_version)
-                    yield get_status_dict(**res_kwargs,
-                                  status="ok",
-                                  message=success_msg,
-                                  home=success_home_spec)
+                    yield get_status_dict(
+                        **res_kwargs,
+                        status="ok",
+                        message=success_msg,
+                        home=success_home_spec,
+                    )
                 # if home already set and no reckless mode, yield impossible
-                msg = (f"Home page already set: dataset_id={home_spec[cnst.DATASET_ID]}, "
-                       f"dataset_version={home_spec[cnst.DATASET_VERSION]}."
-                       "To overwrite this property, use '--reckless overwrite'"
+                msg = (
+                    f"Home page already set: dataset_id={home_spec[cnst.DATASET_ID]}, "
+                    f"dataset_version={home_spec[cnst.DATASET_VERSION]}."
+                    "To overwrite this property, use '--reckless overwrite'"
                 )
-                yield get_status_dict(**res_kwargs,
-                                      status="impossible",
-                                      message=msg,
-                                      home=home_spec)
+                yield get_status_dict(
+                    **res_kwargs,
+                    status="impossible",
+                    message=msg,
+                    home=home_spec,
+                )
             except FileNotFoundError:
                 # if home not set, set it
                 catalog.set_main_dataset(dataset_id, dataset_version)
-                yield get_status_dict(**res_kwargs,
-                                  status="ok",
-                                  message=success_msg,
-                                  home=success_home_spec)
-            
-
-            
+                yield get_status_dict(
+                    **res_kwargs,
+                    status="ok",
+                    message=success_msg,
+                    home=success_home_spec,
+                )

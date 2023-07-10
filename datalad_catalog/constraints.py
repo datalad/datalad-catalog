@@ -33,19 +33,19 @@ metadata_constraint = WithDescription(
     AnyOf(
         WithDescription(
             EnsureJSON(),
-            error_message='not valid JSON content',
+            error_message="not valid JSON content",
         ),
-        EnsureGeneratorFromFileLike(EnsureJSON(), exc_mode='yield'),
+        EnsureGeneratorFromFileLike(EnsureJSON(), exc_mode="yield"),
     ),
-    error_message='No constraint satisfied:\n{__itemized_causes__}',
+    error_message="No constraint satisfied:\n{__itemized_causes__}",
 )
 
 
 # Custom constraint classes
 class EnsureWebCatalog(Constraint):
     """"""
-    def __call__(self, value) -> WebCatalog:
 
+    def __call__(self, value) -> WebCatalog:
         # Test for instance of WebCatalog or Path
         if isinstance(value, WebCatalog):
             ctlg = value
@@ -58,15 +58,20 @@ class EnsureWebCatalog(Constraint):
             return ctlg
         # Raise error of the path exists but does not have a catalog structure
         if dir_exists(ctlg.location) and not ctlg.is_created():
-            self.raise_for(value, "should not be a path to a non-catalog directory")
+            self.raise_for(
+                value, "should not be a path to a non-catalog directory"
+            )
         # Otherwise return catalog instance
         return ctlg
 
 
 class CatalogRequired(Constraint):
     """"""
+
     def __call__(self, value):
         # Parameter is required
         if value is None:
-            self.raise_for(value, "should either be a path or a WebCatalog instance")
+            self.raise_for(
+                value, "should either be a path or a WebCatalog instance"
+            )
         return value

@@ -55,20 +55,20 @@ class CreateParameterValidator(EnsureCommandParameterization):
         if catalog.is_created() and not force:
             self.raise_for(
                 dict(catalog=catalog, force=force),
-                'the force flag should be True to overwrite the assets of an existing catalog',
+                "the force flag should be True to overwrite the assets of an existing catalog",
             )
 
     def __init__(self):
         super().__init__(
             param_constraints=dict(
-                catalog=CatalogRequired()&EnsureWebCatalog(),
+                catalog=CatalogRequired() & EnsureWebCatalog(),
                 config_file=EnsurePath(lexists=True),
                 force=EnsureBool(),
             ),
             joint_constraints={
-                ParameterConstraintContext(('catalog', 'force'),
-                                            'force-when-existing'):
-                    self._check_force,
+                ParameterConstraintContext(
+                    ("catalog", "force"), "force-when-existing"
+                ): self._check_force,
             },
         )
 
@@ -183,10 +183,10 @@ class Create(ValidatedInterface):
                 )
 
         ctlg.create(config_file, force)
-        
+
         # Yield created/overwritten status message
         yield get_status_dict(**res_kwargs, status="ok", message=msg)
-        
+
         # If metadata was also supplied, add this to the catalog
         # Assume that config applies to catalog level since it was
         # provide with 'create', i.e. no need to send to 'add'

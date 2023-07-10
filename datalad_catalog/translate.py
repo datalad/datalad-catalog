@@ -29,9 +29,7 @@ from datalad_next.commands import (
     eval_results,
     get_status_dict,
 )
-from datalad_next.exceptions import (
-    CapturedException
-)
+from datalad_next.exceptions import CapturedException
 from datalad.support.exceptions import InsufficientArgumentsError
 
 import abc
@@ -57,6 +55,7 @@ class MetaTranslateParameterValidator(EnsureCommandParameterization):
             ),
             joint_constraints=dict(),
         )
+
 
 # Decoration auto-generates standard help
 @build_doc
@@ -96,8 +95,7 @@ class MetaTranslate(ValidatedInterface):
         ),
     )
 
-    _examples_ = [
-    ]
+    _examples_ = []
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)
@@ -116,7 +114,7 @@ class MetaTranslate(ValidatedInterface):
         if isinstance(metadata, (str, dict)):
             metadata = [metadata]
         # 1b. catalog
-        # If the catalog argument is provided, ensure that the 
+        # If the catalog argument is provided, ensure that the
         # catalog is instantiated correctly
         if catalog is not None:
             # Instantiate WebCatalog class if necessary
@@ -142,11 +140,11 @@ class MetaTranslate(ValidatedInterface):
             )
             yield get_status_dict(
                 **res_kwargs,
-                status='impossible',
+                status="impossible",
                 message=err_msg,
                 exception=e,
             )
-        # 3. Prepare standard arguments for result record 
+        # 3. Prepare standard arguments for result record
         res_kwargs = dict(
             action="catalog_translate",
             path=catalog.location if catalog is not None else os.getcwd(),
@@ -160,10 +158,10 @@ class MetaTranslate(ValidatedInterface):
                 # flow logic will decide if processing continues
                 yield get_status_dict(
                     **res_kwargs,
-                    status='error',
+                    status="error",
                     exception=line,
                 )
-                continue 
+                continue
             # load json object into dict
             if isinstance(line, str):
                 meta_dict = json.loads(line.rstrip())
@@ -178,8 +176,8 @@ class MetaTranslate(ValidatedInterface):
                 )
                 yield get_status_dict(
                     **res_kwargs,
-                    status='error',
-                    message=err_msg,                    
+                    status="error",
+                    message=err_msg,
                 )
                 continue
             # Translate dict
@@ -188,8 +186,9 @@ class MetaTranslate(ValidatedInterface):
                     meta_record=meta_dict,
                     schema_version=schema_version,
                     available_translators=all_translators,
-                    loaded_translators=loaded_translators).run_translator()
-    
+                    loaded_translators=loaded_translators,
+                ).run_translator()
+
                 yield get_status_dict(
                     **res_kwargs,
                     status="ok",
@@ -199,7 +198,7 @@ class MetaTranslate(ValidatedInterface):
             except Exception as e:
                 yield get_status_dict(
                     **res_kwargs,
-                    status='error',
+                    status="error",
                     exception=e,
                 )
 
@@ -210,9 +209,10 @@ class Translate(object):
     including finding a matching class (base class TranslatorBase) and running
     metadata translation.
     """
-    
+
     def __init__(
-        self, meta_record: dict,
+        self,
+        meta_record: dict,
         schema_version: str,
         available_translators: dict = {},
         loaded_translators: list = [],
@@ -244,12 +244,15 @@ class Translate(object):
         source_version = self.meta_record.get(cnst.EXTRACTOR_VERSION)
         # If the relevant translator has already been matched and loaded,
         # access it
-        matched_loaded = [t for t in self.loaded_translators
-                          if t.get('source_name') == source_name
-                          and t.get('source_version') == source_version
-                          and t.get('schema_version') == self.schema_version]
+        matched_loaded = [
+            t
+            for t in self.loaded_translators
+            if t.get("source_name") == source_name
+            and t.get("source_version") == source_version
+            and t.get("schema_version") == self.schema_version
+        ]
         if len(matched_loaded) > 0:
-            self.translator = matched_loaded[0].get('translator_instance')
+            self.translator = matched_loaded[0].get("translator_instance")
         else:
             # Else run through all translators and run their matching methods
             matched_translators = []
@@ -260,9 +263,8 @@ class Translate(object):
                 translator_class = translator_dict["loader"]()
                 translator_instance = translator_class()
                 if translator_instance.match(
-                    self.schema_version,
-                    source_name,
-                    source_version):
+                    self.schema_version, source_name, source_version
+                ):
                     # break on first match
                     matched_translators.append(translator_instance)
                     break
@@ -278,11 +280,11 @@ class Translate(object):
             self.translator = matched_translators[0]
             self.loaded_translators.append(
                 {
-                    'translator_name': translator_name,
-                    'source_name': source_name,
-                    'source_version': source_version,
-                    'schema_version': self.schema_version,
-                    'translator_instance': self.translator,
+                    "translator_name": translator_name,
+                    "source_name": source_name,
+                    "source_version": source_version,
+                    "schema_version": self.schema_version,
+                    "translator_instance": self.translator,
                 }
             )
 
@@ -300,6 +302,7 @@ class TranslatorBase(metaclass=abc.ABCMeta):
         match()
         translate()
     """
+
     @classmethod
     @abc.abstractmethod
     def match(
@@ -307,7 +310,7 @@ class TranslatorBase(metaclass=abc.ABCMeta):
         schema_version: str,
         source_name: str,
         source_version: str,
-        source_id: str = None
+        source_id: str = None,
     ) -> bool:
         """
         Report the result of matching criteria applied to the translator
@@ -329,7 +332,7 @@ class TranslatorBase(metaclass=abc.ABCMeta):
         object to the catalog schema (version-specific).
         """
         raise NotImplementedError
-    
+
     @abc.abstractmethod
     def get_supported_schema_version(self):
         """
@@ -377,7 +380,7 @@ def get_all_translators(include_load_error: bool = False) -> dict:
         translator_eps = {
             name: translator_dict[name]
             for name in translator_dict.keys()
-            if translator_dict[name].get("load_error",None) is None
+            if translator_dict[name].get("load_error", None) is None
         }
     # Raise error if no translators found
     if not bool(translator_eps):
