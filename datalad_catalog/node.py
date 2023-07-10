@@ -116,6 +116,7 @@ class Node(object):
             "md5_hash",
             "parent_catalog",
             "config",
+            "config_source",
         ]
         for key in keys_to_pop:
             meta_dict.pop(key, None)

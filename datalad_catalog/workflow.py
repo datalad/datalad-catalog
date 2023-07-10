@@ -8,9 +8,7 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Run a workflow to create or update a catalog
 """
-# from datalad.api import (
-#     meta_extract,
-# )
+
 from datalad.distribution.dataset import Dataset
 from datalad.support.exceptions import IncompleteResultsError
 from datalad_catalog.constraints import (
@@ -268,7 +266,7 @@ def super_workflow(
     # Call per-dataset workflow
     def _dataset_workflow_inner(ds, refds, **kwargs):
         """Internal function to allow passing"""
-        return dataset_workflow(ds, catalog=cat, **kwargs)
+        return dataset_workflow(ds, catalog=cat, extractors=extractors, **kwargs)
 
     try:
         # for the superdataset and all top-level subdatasets
@@ -278,7 +276,7 @@ def super_workflow(
             recursion_limit=1,
             state="any",
             return_type="generator",
-            on_failure="continue",
+            on_failure="ignore",
         ):
             # unwind result generator
             for partial_result in res.get("result", []):
@@ -360,6 +358,15 @@ def dataset_workflow(ds: Dataset, catalog, extractors, **kwargs):
     # 1. Run dataset-level extraction
     extracted_file = Path(ds.path) / "extracted_meta.json"
     for name in extractors:
+        # these are hacks to deal with extractors no yielding
+        # results in an ideal way
+        # TODO
+        if name == 'metalad_studyminimeta' and not \
+        (Path(ds.path) / '.studyminimeta.yaml').exists():
+            continue
+        if name == 'datacite_gin' and not \
+        (Path(ds.path) / 'datacite.yml').exists():
+            continue
         metadata_record = extract_dataset_level(ds, name)
         write_jsonline_to_file(extracted_file, metadata_record)
     # 2. Run file-level extraction, add output to same file
@@ -367,22 +374,16 @@ def dataset_workflow(ds: Dataset, catalog, extractors, **kwargs):
     # 3. Run translation
     translated_file = Path(ds.path) / "translated_meta.json"
     catalog_translate = MetaTranslate()
-    with open(extracted_file) as file:
-        for line in file:
-            meta_dict = json.loads(line.rstrip())
-            try:
-                res = catalog_translate(
-                    catalog=catalog,
-                    metadata=meta_dict,
-                    result_renderer="disabled",
-                )
-                write_jsonline_to_file(
-                    translated_file,
-                    res.get("translated_metadata"),
-                )
-            except Exception as e:
-                lgr.error("Failed to translate line due to error: %s", str(e))
-                continue
+    res = catalog_translate(
+        catalog=catalog,
+        metadata=extracted_file,
+        result_renderer="disabled",
+    )
+    for r in res:
+        write_jsonline_to_file(
+            translated_file,
+            r.get("translated_metadata"),
+        )
     # 4. Add translated metadata to catalog
     catalog_add = Add()
     return catalog_add(
@@ -393,6 +394,9 @@ def dataset_workflow(ds: Dataset, catalog, extractors, **kwargs):
 
 def extract_dataset_level(dataset, extractor_name):
     """Extract dataset-level metadata using metalad and a specific extractor"""
+    from datalad.api import (
+        meta_extract,
+    )
     res = meta_extract(
         extractorname=extractor_name,
         dataset=dataset,
