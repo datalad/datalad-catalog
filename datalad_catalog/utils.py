@@ -170,8 +170,7 @@ def get_entry_points(group: str) -> dict:
     return entry_points
 
 
-def get_available_entrypoints(group,
-                               include_load_error: bool = False) -> dict:
+def get_available_entrypoints(group, include_load_error: bool = False) -> dict:
     """Return all entrypoints of a specific group known to the current
     installation
 
@@ -193,7 +192,7 @@ def get_available_entrypoints(group,
         entrypoints = {
             name: ep_dict[name]
             for name in ep_dict.keys()
-            if ep_dict[name].get("load_error",None) is None
+            if ep_dict[name].get("load_error", None) is None
         }
     # Raise error if no translators found
     if not bool(entrypoints):
@@ -218,6 +217,7 @@ def dir_exists(location) -> bool:
 
 class jsEncoder(json.JSONEncoder):
     """Class to return objects as strings for correct JSON encoding"""
+
     def default(self, obj):
         if isinstance(obj, UUID) or isinstance(obj, Path):
             # if the obj is uuid, we simply return the value of uuid

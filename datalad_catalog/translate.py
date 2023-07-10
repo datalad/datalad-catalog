@@ -130,7 +130,7 @@ class MetaTranslate(ValidatedInterface):
         schema_version = schema_store[schema_id][cnst.VERSION]
         # 2. Get all available translators via entrypoints:
         try:
-            all_translators = get_available_entrypoints(group='translators')
+            all_translators = get_available_entrypoints(group="translators")
             loaded_translators = []
         except EntryPointsNotFoundError as e:
             err_msg = (
@@ -293,8 +293,10 @@ class Translate(object):
         """"""
         return self.translator.translate(self.meta_record)
 
+
 class TranslatorNotFoundError(InsufficientArgumentsError):
     pass
+
 
 class TranslatorBase(metaclass=abc.ABCMeta):
     """

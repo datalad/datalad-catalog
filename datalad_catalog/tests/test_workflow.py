@@ -12,9 +12,7 @@ from datalad_catalog.workflows_old import (
     get_translation_map,
     super_workflow,
 )
-from datalad_catalog.workflow import (
-    Workflow
-)
+from datalad_catalog.workflow import Workflow
 from datalad.tests.utils_pytest import (
     with_tree,
     with_tempfile,
@@ -292,8 +290,10 @@ super_ds_tree = {
     },
 }
 
+
 def get_test_data(test_data):
     return test_data
+
 
 @skip_if_on_windows
 @skip_if_adjusted_branch
