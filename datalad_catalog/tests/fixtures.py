@@ -32,6 +32,10 @@ class TestPaths(object):
     catalog_metadata_file_single = (
         data_path / "catalog_metadata_file_valid_single.jsonl"
     )
+    catalog_metadata_valid = data_path / "catalog_metadata_dataset_valid.json"
+    catalog_metadata_invalid = (
+        data_path / "catalog_metadata_dataset_invalid.json"
+    )
     catalog_metadata_valid_invalid = (
         data_path / "catalog_metadata_valid_invalid.jsonl"
     )
@@ -305,34 +309,35 @@ templateversion: 1.2
 
 @pytest.fixture
 def workflow_catalog_path(tmp_path):
-    return tmp_path / 'workflow_catalog'
+    return tmp_path / "workflow_catalog"
+
 
 @pytest.fixture
 def workflow_dataset_path(tmp_path):
-    superds_path = tmp_path / 'workflow_superdataset'
+    superds_path = tmp_path / "workflow_superdataset"
     superds_path.mkdir()
-    studyminimeta = superds_path / '.studyminimeta.yaml'
-    with studyminimeta.open("w", encoding ="utf-8") as f:
+    studyminimeta = superds_path / ".studyminimeta.yaml"
+    with studyminimeta.open("w", encoding="utf-8") as f:
         f.write(studyminimeta_content)
     # studyminimeta.write_text(studyminimeta_content)
-    file1 = superds_path / 'random_file.txt'
-    with file1.open("w", encoding ="utf-8") as f:
-        f.write('some content')
+    file1 = superds_path / "random_file.txt"
+    with file1.open("w", encoding="utf-8") as f:
+        f.write("some content")
     # file1.write_text('some content')
-    dir1 = superds_path / 'some_dir'
+    dir1 = superds_path / "some_dir"
     dir1.mkdir()
-    file2 = dir1 / 'file_in_dir.txt'
-    with file2.open("w", encoding ="utf-8") as f:
-        f.write('some content in file in dir')
+    file2 = dir1 / "file_in_dir.txt"
+    with file2.open("w", encoding="utf-8") as f:
+        f.write("some content in file in dir")
     # file2.write_text('some content in file in dir')
-    dir2 = dir1 / 'subdataset'
+    dir2 = dir1 / "subdataset"
     dir2.mkdir()
-    datacite = dir2 / 'datacite.yml'
-    with datacite.open("w", encoding ="utf-8") as f:
+    datacite = dir2 / "datacite.yml"
+    with datacite.open("w", encoding="utf-8") as f:
         f.write(datacitegin_content)
     # datacite.write_text(datacitegin_content)
-    file3 = dir2 / 'random_file.txt'
-    with file3.open("w", encoding ="utf-8") as f:
-        f.write('some content')
+    file3 = dir2 / "random_file.txt"
+    with file3.open("w", encoding="utf-8") as f:
+        f.write("some content")
     # file3.write_text('some content')
     return superds_path

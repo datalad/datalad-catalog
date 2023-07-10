@@ -43,7 +43,9 @@ catalog_paths = [
 ]
 
 
-@pytest.mark.xfail(sys.platform == "win32", reason="jq does not build on windows")
+@pytest.mark.xfail(
+    sys.platform == "win32", reason="jq does not build on windows"
+)
 def test_workflow_new(test_data, workflow_catalog_path, workflow_dataset_path):
     cat_path = workflow_catalog_path
     super_path = workflow_dataset_path
@@ -56,7 +58,7 @@ def test_workflow_new(test_data, workflow_catalog_path, workflow_dataset_path):
     assert_repo_status(super_ds.path)
     # Test if metadata files exist
     assert (Path(super_ds.path) / ".studyminimeta.yaml").exists()
-    assert (Path(sub_ds.path) / "datacite.yml").exists()    
+    assert (Path(sub_ds.path) / "datacite.yml").exists()
     # Create catalog
     cat_path = Path(cat_path)
     cat = WebCatalog(location=cat_path)
@@ -68,9 +70,9 @@ def test_workflow_new(test_data, workflow_catalog_path, workflow_dataset_path):
         assert pth.exists()
     # Run workflow
     extractors = [
-        'metalad_core',
-        'metalad_studyminimeta',
-        'datacite_gin',
+        "metalad_core",
+        "metalad_studyminimeta",
+        "datacite_gin",
     ]
     tuple(super_workflow(super_ds, cat, extractors))
     # TODO: test interim workflow outputs, including:
@@ -80,7 +82,7 @@ def test_workflow_new(test_data, workflow_catalog_path, workflow_dataset_path):
     assert (Path(sub_ds.path) / "extracted_meta.json").exists()
     assert (Path(super_ds.path) / "translated_meta.json").exists()
     assert (Path(sub_ds.path) / "translated_meta.json").exists()
-    
+
     # Test final workflow outputs
     # - metadata directory
     meta_path = cat_path / "metadata"

@@ -266,7 +266,9 @@ def super_workflow(
     # Call per-dataset workflow
     def _dataset_workflow_inner(ds, refds, **kwargs):
         """Internal function to allow passing"""
-        return dataset_workflow(ds, catalog=cat, extractors=extractors, **kwargs)
+        return dataset_workflow(
+            ds, catalog=cat, extractors=extractors, **kwargs
+        )
 
     try:
         # for the superdataset and all top-level subdatasets
@@ -361,11 +363,15 @@ def dataset_workflow(ds: Dataset, catalog, extractors, **kwargs):
         # these are hacks to deal with extractors no yielding
         # results in an ideal way
         # TODO
-        if name == 'metalad_studyminimeta' and not \
-        (Path(ds.path) / '.studyminimeta.yaml').exists():
+        if (
+            name == "metalad_studyminimeta"
+            and not (Path(ds.path) / ".studyminimeta.yaml").exists()
+        ):
             continue
-        if name == 'datacite_gin' and not \
-        (Path(ds.path) / 'datacite.yml').exists():
+        if (
+            name == "datacite_gin"
+            and not (Path(ds.path) / "datacite.yml").exists()
+        ):
             continue
         metadata_record = extract_dataset_level(ds, name)
         write_jsonline_to_file(extracted_file, metadata_record)
@@ -397,6 +403,7 @@ def extract_dataset_level(dataset, extractor_name):
     from datalad.api import (
         meta_extract,
     )
+
     res = meta_extract(
         extractorname=extractor_name,
         dataset=dataset,

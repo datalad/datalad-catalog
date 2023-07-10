@@ -13,8 +13,8 @@ tests_path = Path(__file__).resolve().parent
 package_path = Path(__file__).resolve().parent.parent
 data_path = tests_path / "data"
 default_config_path = package_path / "config" / "config.json"
-demo_config_path_catalog = data_path / "test_config_file_dataset.json"
-demo_config_path_dataset = data_path / "test_config_file_catalog.json"
+demo_config_path_catalog = data_path / "test_config_file_catalog.json"
+demo_config_path_dataset = data_path / "test_config_file_dataset.json"
 metadata_path1 = data_path / "catalog_metadata_dataset.jsonl"
 metadata_path2 = data_path / "catalog_metadata_dataset2.jsonl"
 
@@ -64,16 +64,6 @@ demo_config = {
 
 
 @pytest.fixture
-def demo_catalog(tmp_path):
-    catalog_path = tmp_path / "test_catalog"
-    return WebCatalog(
-        location=catalog_path,
-        config_file=str(demo_config_path_catalog),
-        catalog_action="create",
-    )
-
-
-@pytest.fixture
 def demo_node_dataset(demo_catalog):
     test_ds_id = "5df8eb3a-95c5-11ea-b4b9-a0369f287950"
     test_ds_version = "dae38cf901995aace0dde5346515a0134f919523"
@@ -88,6 +78,7 @@ def demo_node_dataset(demo_catalog):
         node_path=test_path,
     )
     node_instance.config = demo_config
+    node_instance.config_source = "dataset"
     return node_instance
 
 
@@ -233,9 +224,7 @@ def test_rules_and_sources(demo_node_dataset: Node, demo_metadata: dict):
     assert (
         demo_node_dataset.subdatasets == core_attributes["subdatasets"]
     )  # test: no rule, core, first come first served
-    assert (
-        demo_node_dataset.name == core_attributes["name"]
-    )  # test: no rule, no source, first come first served
+    assert demo_node_dataset.name == None  # test: single source not current
     assert (
         demo_node_dataset.dataset_version == orig_version
     )  # test: single, no source, ignore incoming
@@ -246,10 +235,6 @@ def test_rules_and_sources(demo_node_dataset: Node, demo_metadata: dict):
     assert (
         "metalad_core"
         in demo_node_dataset.metadata_sources["key_source_map"]["keywords"]
-    )
-    assert (
-        "metalad_core"
-        in demo_node_dataset.metadata_sources["key_source_map"]["name"]
     )
     assert (
         "metalad_core"
@@ -288,9 +273,7 @@ def test_rules_and_sources(demo_node_dataset: Node, demo_metadata: dict):
     assert (
         demo_node_dataset.subdatasets == core_attributes["subdatasets"]
     )  # test: no rule, core, first come first served already applied
-    assert (
-        demo_node_dataset.name == core_attributes["name"]
-    )  # test: no rule, no source, first come first served already applied
+    assert demo_node_dataset.name == None  # test: single source, not current
     assert (
         demo_node_dataset.dataset_version == orig_version
     )  # test: single, no source, ignore incoming
@@ -355,8 +338,8 @@ def test_rules_and_sources(demo_node_dataset: Node, demo_metadata: dict):
         demo_node_dataset.subdatasets == core_attributes["subdatasets"]
     )  # test: no rule, core, first come first served already applied
     assert (
-        demo_node_dataset.name == core_attributes["name"]
-    )  # test: no rule, no source, first come first served already applied
+        demo_node_dataset.name == minimeta_attributes["name"]
+    )  # test: single source, now incoming
     assert (
         demo_node_dataset.dataset_version == orig_version
     )  # test: single, no source, ignore incoming
@@ -379,6 +362,10 @@ def test_rules_and_sources(demo_node_dataset: Node, demo_metadata: dict):
     assert (
         "metalad_studyminimeta"
         in demo_node_dataset.metadata_sources["key_source_map"]["keywords"]
+    )
+    assert (
+        "metalad_studyminimeta"
+        in demo_node_dataset.metadata_sources["key_source_map"]["name"]
     )
     assert {
         "source_name": "metalad_core"
