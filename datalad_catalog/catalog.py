@@ -29,14 +29,16 @@ from jsonschema import (
 )
 
 from datalad_catalog.meta_item import MetaItem
-from datalad_catalog.utils import read_json_file
+from datalad_catalog.utils import (
+    read_json_file,
+    get_available_entrypoints,
+)
 from datalad_catalog.webcatalog import (
     Node,
     WebCatalog,
 )
 from datalad_catalog.translate import (
     Translate,
-    get_all_translators,
 )
 
 # Create named logger
@@ -803,15 +805,15 @@ def _run_workflow(
             ),
         )
 
-    from datalad_catalog import workflows
+    from datalad_catalog import workflows_old
 
     if workflow_type == "new":
-        yield from workflows.super_workflow(
+        yield from workflows_old.super_workflow(
             dataset_path=Path(dataset_path),
             catalog=catalog,
         )
     if workflow_type == "update":
-        yield from workflows.update_workflow(
+        yield from workflows_old.update_workflow(
             superds_path=Path(dataset_path),
             subds_path=Path(subdataset_path),
             catalog=catalog,

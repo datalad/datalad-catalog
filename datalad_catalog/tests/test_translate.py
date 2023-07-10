@@ -2,8 +2,6 @@ from pathlib import Path
 from datalad_catalog.catalog import Catalog
 from datalad_catalog.translate import (
     MetaTranslate,
-    TranslatorNotFoundError,
-    get_all_translators,
 )
 from datalad_catalog.utils import read_json_file
 from datalad.tests.utils_pytest import (

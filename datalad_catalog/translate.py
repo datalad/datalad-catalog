@@ -15,7 +15,8 @@ from datalad_catalog.constraints import (
     metadata_constraint,
 )
 from datalad_catalog.utils import (
-    get_entry_points,
+    get_available_entrypoints,
+    EntryPointsNotFoundError,
 )
 from datalad_catalog.validate import get_schema_store
 from datalad_catalog.webcatalog import (
@@ -129,9 +130,9 @@ class MetaTranslate(ValidatedInterface):
         schema_version = schema_store[schema_id][cnst.VERSION]
         # 2. Get all available translators via entrypoints:
         try:
-            all_translators = get_all_translators()
+            all_translators = get_available_entrypoints(group='translators')
             loaded_translators = []
-        except TranslatorNotFoundError as e:
+        except EntryPointsNotFoundError as e:
             err_msg = (
                 "No translators found: there are no translators available "
                 "to the current environment. Relevant translators have to be "
@@ -292,6 +293,8 @@ class Translate(object):
         """"""
         return self.translator.translate(self.meta_record)
 
+class TranslatorNotFoundError(InsufficientArgumentsError):
+    pass
 
 class TranslatorBase(metaclass=abc.ABCMeta):
     """
@@ -353,36 +356,3 @@ class TranslatorBase(metaclass=abc.ABCMeta):
         Reports the version of the extractor supported by the translator
         """
         raise NotImplementedError
-
-
-class TranslatorNotFoundError(InsufficientArgumentsError):
-    pass
-
-
-def get_all_translators(include_load_error: bool = False) -> dict:
-    """Return all translators known to the current installation
-
-    Parameters
-    ----------
-    include_load_error: bool
-        Set to True if entry points with load errors should be included
-        in the returned dictionary (default is False)
-
-    Returns
-    -------
-    translator_eps : dict
-        A dictionary of translator entry points with no load_errors
-    """
-    translator_dict = get_entry_points("datalad.metadata.translators")
-    translator_eps = translator_dict
-    # Include all translator entrypoints vs only those without load errors
-    if include_load_error:
-        translator_eps = {
-            name: translator_dict[name]
-            for name in translator_dict.keys()
-            if translator_dict[name].get("load_error", None) is None
-        }
-    # Raise error if no translators found
-    if not bool(translator_eps):
-        raise TranslatorNotFoundError(f"No metadata translators were found")
-    return translator_eps

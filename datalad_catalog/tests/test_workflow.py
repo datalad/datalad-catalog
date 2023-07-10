@@ -1,14 +1,19 @@
 from pathlib import Path
-from datalad_catalog.utils import read_json_file
+from datalad_catalog.utils import (
+    read_json_file,
+    md5sum_from_id_version_path,
+)
 from datalad_catalog.webcatalog import (
     WebCatalog,
-    md5sum_from_id_version_path,
     Node,
 )
-from datalad_catalog.workflows import (
+from datalad_catalog.workflows_old import (
     translate_to_catalog,
     get_translation_map,
     super_workflow,
+)
+from datalad_catalog.workflow import (
+    Workflow
 )
 from datalad.tests.utils_pytest import (
     with_tree,
@@ -23,20 +28,7 @@ from datalad.api import create, Dataset
 import json
 import pytest
 
-package_path = Path(__file__).resolve().parent.parent
-tests_path = Path(__file__).resolve().parent
-schema_dir = package_path / "schema"
-
-test_data_paths = {
-    "metalad_core": tests_path / "data" / "metadata_core.json",
-    "datacite_gin": tests_path / "data" / "metadata_datacite_gin.json",
-    "metalad_studyminimeta": tests_path
-    / "data"
-    / "metadata_studyminimeta.json",
-    "bids_dataset": tests_path / "data" / "metadata_bids_dataset2.json",
-}
-
-test_config_file = tests_path / "data" / "test_config_file_workflow.json"
+catalog_workflow = Workflow()
 
 studyminimeta_content = """\
 #<!-- METADATA START --> # DO NOT DELETE THIS LINE
@@ -300,12 +292,16 @@ super_ds_tree = {
     },
 }
 
+def get_test_data(test_data):
+    return test_data
 
 @skip_if_on_windows
 @skip_if_adjusted_branch
 @with_tree(tree=super_ds_tree)
 @with_tempfile(mkdir=True)
-def test_workflow_new(super_path=None, cat_path=None):
+def test_workflow_new(super_path, cat_path):
+    test_data = get_test_data()
+
     ckwa = dict(result_renderer="disabled")
     # Create super and subdataset, save all
     sub_ds = create(super_path + "/some_dir/subdataset", force=True, **ckwa)
@@ -318,10 +314,8 @@ def test_workflow_new(super_path=None, cat_path=None):
     assert (Path(super_ds.path) / ".studyminimeta.yaml").exists()
     # Create catalog
     cat_path = Path(cat_path)
-    cat = WebCatalog(
-        location=cat_path, catalog_action="create", config_file=test_config_file
-    )
-    cat.create(force=True)
+    cat = WebCatalog(location=cat_path)
+    cat.create(config_file=test_data.workflow_config_file, force=True)
     assert cat_path.exists()
     assert cat_path.is_dir()
     for p in catalog_paths:
@@ -454,148 +448,148 @@ def test_workflow_new(super_path=None, cat_path=None):
     )
 
 
-def get_node_path(root_path, dataset_id, dataset_version, node_path=None):
-    _split_dir_length = Node._split_dir_length
-    md5_hash = md5sum_from_id_version_path(
-        dataset_id,
-        dataset_version,
-        node_path,
-    )
-    path_left = md5_hash[:_split_dir_length]
-    path_right = md5_hash[_split_dir_length:]
-    node_fn = root_path / dataset_id / dataset_version / path_left / path_right
-    return node_fn.with_suffix(".json")
+# def get_node_path(root_path, dataset_id, dataset_version, node_path=None):
+#     _split_dir_length = Node._split_dir_length
+#     md5_hash = md5sum_from_id_version_path(
+#         dataset_id,
+#         dataset_version,
+#         node_path,
+#     )
+#     path_left = md5_hash[:_split_dir_length]
+#     path_right = md5_hash[_split_dir_length:]
+#     node_fn = root_path / dataset_id / dataset_version / path_left / path_right
+#     return node_fn.with_suffix(".json")
 
 
-def get_id_and_version(dataset: Dataset, var_to_string=False):
-    """Helper to get a DataLad dataset's id and version"""
-    id = dataset.id
-    # sync possible adjusted branch and account for
-    # possibility of being on adjusted branch
-    dataset.repo.localsync()
-    version = dataset.repo.get_hexsha(dataset.repo.get_corresponding_branch())
-    if var_to_string:
-        return str(id), str(version)
-    return id, version
+# def get_id_and_version(dataset: Dataset, var_to_string=False):
+#     """Helper to get a DataLad dataset's id and version"""
+#     id = dataset.id
+#     # sync possible adjusted branch and account for
+#     # possibility of being on adjusted branch
+#     dataset.repo.localsync()
+#     version = dataset.repo.get_hexsha(dataset.repo.get_corresponding_branch())
+#     if var_to_string:
+#         return str(id), str(version)
+#     return id, version
 
 
-def assert_dict_values_equal(
-    dict_to_test: dict,
-    dict_correct: dict,
-    keys_to_test: list,
-):
-    """"""
+# def assert_dict_values_equal(
+#     dict_to_test: dict,
+#     dict_correct: dict,
+#     keys_to_test: list,
+# ):
+#     """"""
 
-    for key in keys_to_test:
-        assert_equal(dict_to_test[key], dict_correct[key])
-
-
-def assert_dict_values_in_list_equal(
-    dict_to_test: dict,
-    dict_correct: dict,
-    keys_to_test: list,
-):
-    """"""
-
-    for key in keys_to_test:
-        print("---")
-        print(key)
-        print("---")
-        assert_equal(len(dict_to_test[key]), len(dict_correct[key]))
-        for val in dict_to_test[key]:
-            first_key = list(val.keys())[0]
-            print(f"dict_correct[key]: {dict_correct[key]}")
-            print(f"dict_to_test[key]: {dict_to_test[key]}")
-            print(f"val: {val}")
-            print(f"first_key: {first_key}")
-            print(f"val[first_key]: {val[first_key]}")
-            # print(f"x[first_key]: {x[first_key]}")
-
-            found_obj = [
-                x for x in dict_correct[key] if val[first_key] == x[first_key]
-            ]
-            assert_equal(len(found_obj), 1)
+#     for key in keys_to_test:
+#         assert_equal(dict_to_test[key], dict_correct[key])
 
 
-def assert_super_variable_values_equal(
-    dict_to_test: dict,
-    keys_to_test: list,
-    dataset_details: dict,
-):
-    """"""
-    for key in keys_to_test:
-        assert key in dict_to_test
-    # id and version
-    assert_equal(dict_to_test["dataset_id"], dataset_details["super_ds"][0])
-    assert_equal(
-        dict_to_test["dataset_version"], dataset_details["super_ds"][1]
-    )
-    # subdatasets
-    correct_subds = [
-        {
-            "dataset_id": f"{dataset_details['sub_ds'][0]}",
-            "dataset_path": "some_dir/subdataset",
-            "dataset_version": f"{dataset_details['sub_ds'][1]}",
-            "dirs_from_path": ["some_dir", "subdataset"],
-        }
-    ]
-    assert_equal(dict_to_test["subdatasets"], correct_subds)
-    # extractors_used
-    assert_equal(len(dict_to_test["metadata_sources"]["sources"]), 2)
-    assert_equal(
-        dict_to_test["metadata_sources"]["sources"][0]["source_name"],
-        "metalad_core",
-    )
-    assert_equal(
-        dict_to_test["metadata_sources"]["sources"][1]["source_name"],
-        "metalad_studyminimeta",
-    )
+# def assert_dict_values_in_list_equal(
+#     dict_to_test: dict,
+#     dict_correct: dict,
+#     keys_to_test: list,
+# ):
+#     """"""
+
+#     for key in keys_to_test:
+#         print("---")
+#         print(key)
+#         print("---")
+#         assert_equal(len(dict_to_test[key]), len(dict_correct[key]))
+#         for val in dict_to_test[key]:
+#             first_key = list(val.keys())[0]
+#             print(f"dict_correct[key]: {dict_correct[key]}")
+#             print(f"dict_to_test[key]: {dict_to_test[key]}")
+#             print(f"val: {val}")
+#             print(f"first_key: {first_key}")
+#             print(f"val[first_key]: {val[first_key]}")
+#             # print(f"x[first_key]: {x[first_key]}")
+
+#             found_obj = [
+#                 x for x in dict_correct[key] if val[first_key] == x[first_key]
+#             ]
+#             assert_equal(len(found_obj), 1)
 
 
-def assert_dir_variable_values_equal(
-    dict_to_test: dict,
-    keys_to_test: list,
-    dataset_details: dict,
-):
-    """"""
-    for key in keys_to_test:
-        assert key in dict_to_test
-    # id and version
-    assert_equal(dict_to_test["dataset_id"], dataset_details["super_ds"][0])
-    assert_equal(
-        dict_to_test["dataset_version"], dataset_details["super_ds"][1]
-    )
-    # children
-    correct_children = [
-        {
-            "dataset_id": f"{dataset_details['sub_ds'][0]}",
-            "dataset_version": f"{dataset_details['sub_ds'][1]}",
-            "name": "subdataset",
-            "path": "some_dir/subdataset",
-            "type": "dataset",
-        }
-    ]
-    assert_equal(dict_to_test["children"], correct_children)
+# def assert_super_variable_values_equal(
+#     dict_to_test: dict,
+#     keys_to_test: list,
+#     dataset_details: dict,
+# ):
+#     """"""
+#     for key in keys_to_test:
+#         assert key in dict_to_test
+#     # id and version
+#     assert_equal(dict_to_test["dataset_id"], dataset_details["super_ds"][0])
+#     assert_equal(
+#         dict_to_test["dataset_version"], dataset_details["super_ds"][1]
+#     )
+#     # subdatasets
+#     correct_subds = [
+#         {
+#             "dataset_id": f"{dataset_details['sub_ds'][0]}",
+#             "dataset_path": "some_dir/subdataset",
+#             "dataset_version": f"{dataset_details['sub_ds'][1]}",
+#             "dirs_from_path": ["some_dir", "subdataset"],
+#         }
+#     ]
+#     assert_equal(dict_to_test["subdatasets"], correct_subds)
+#     # extractors_used
+#     assert_equal(len(dict_to_test["metadata_sources"]["sources"]), 2)
+#     assert_equal(
+#         dict_to_test["metadata_sources"]["sources"][0]["source_name"],
+#         "metalad_core",
+#     )
+#     assert_equal(
+#         dict_to_test["metadata_sources"]["sources"][1]["source_name"],
+#         "metalad_studyminimeta",
+#     )
 
 
-def assert_sub_variable_values_equal(
-    dict_to_test: dict,
-    keys_to_test: list,
-    dataset_details: dict,
-):
-    """"""
-    for key in keys_to_test:
-        assert key in dict_to_test
-    # id and version
-    assert_equal(dict_to_test["dataset_id"], dataset_details["sub_ds"][0])
-    assert_equal(dict_to_test["dataset_version"], dataset_details["sub_ds"][1])
-    # extractors_used
-    assert_equal(len(dict_to_test["metadata_sources"]["sources"]), 2)
-    assert_equal(
-        dict_to_test["metadata_sources"]["sources"][0]["source_name"],
-        "metalad_core",
-    )
-    assert_equal(
-        dict_to_test["metadata_sources"]["sources"][1]["source_name"],
-        "datacite_gin",
-    )
+# def assert_dir_variable_values_equal(
+#     dict_to_test: dict,
+#     keys_to_test: list,
+#     dataset_details: dict,
+# ):
+#     """"""
+#     for key in keys_to_test:
+#         assert key in dict_to_test
+#     # id and version
+#     assert_equal(dict_to_test["dataset_id"], dataset_details["super_ds"][0])
+#     assert_equal(
+#         dict_to_test["dataset_version"], dataset_details["super_ds"][1]
+#     )
+#     # children
+#     correct_children = [
+#         {
+#             "dataset_id": f"{dataset_details['sub_ds'][0]}",
+#             "dataset_version": f"{dataset_details['sub_ds'][1]}",
+#             "name": "subdataset",
+#             "path": "some_dir/subdataset",
+#             "type": "dataset",
+#         }
+#     ]
+#     assert_equal(dict_to_test["children"], correct_children)
+
+
+# def assert_sub_variable_values_equal(
+#     dict_to_test: dict,
+#     keys_to_test: list,
+#     dataset_details: dict,
+# ):
+#     """"""
+#     for key in keys_to_test:
+#         assert key in dict_to_test
+#     # id and version
+#     assert_equal(dict_to_test["dataset_id"], dataset_details["sub_ds"][0])
+#     assert_equal(dict_to_test["dataset_version"], dataset_details["sub_ds"][1])
+#     # extractors_used
+#     assert_equal(len(dict_to_test["metadata_sources"]["sources"]), 2)
+#     assert_equal(
+#         dict_to_test["metadata_sources"]["sources"][0]["source_name"],
+#         "metalad_core",
+#     )
+#     assert_equal(
+#         dict_to_test["metadata_sources"]["sources"][1]["source_name"],
+#         "datacite_gin",
+#     )

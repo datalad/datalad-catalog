@@ -34,6 +34,11 @@ class TestPaths(object):
         data_path / "metadata_translate_wrongversion.jsonl"
     )
     demo_metafile_nonsense = data_path / "metadata_translate_nonsense.jsonl"
+    workflow_metalad_core = data_path / "metadata_core.json"
+    workflow_datacite_gin = data_path / "metadata_datacite_gin.json"
+    workflow_metalad_studyminimeta = data_path / "metadata_studyminimeta.json"
+    workflow_bids_dataset = data_path / "metadata_bids_dataset.json"
+    workflow_config_file = data_path / "test_config_file_workflow.json"
 
 
 @pytest.fixture

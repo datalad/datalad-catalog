@@ -62,6 +62,12 @@ command_suite = (
             "catalog-translate",
             "catalog_translate",
         ),
+        (
+            "datalad_catalog.workflow",
+            "Workflow",
+            "catalog-workflow",
+            "catalog_workflow",
+        ),
     ],
 )
 

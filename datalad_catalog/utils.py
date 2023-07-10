@@ -3,7 +3,10 @@ import json
 from pathlib import Path
 import sys
 import shutil
+from uuid import UUID
 import yaml
+
+from datalad.support.exceptions import InsufficientArgumentsError
 
 """A module with miscellaneous utility functions that are used across other modules
 """
@@ -167,6 +170,41 @@ def get_entry_points(group: str) -> dict:
     return entry_points
 
 
+def get_available_entrypoints(group,
+                               include_load_error: bool = False) -> dict:
+    """Return all entrypoints of a specific group known to the current
+    installation
+
+    Parameters
+    ----------
+    include_load_error: bool
+        Set to True if entry points with load errors should be included
+        in the returned dictionary (default is False)
+
+    Returns
+    -------
+    dict
+        A dictionary of entry points with key being the name
+    """
+    ep_dict = get_entry_points(f"datalad.metadata.{group}")
+    entrypoints = ep_dict
+    # Include all entrypoints vs only those without load errors
+    if include_load_error:
+        entrypoints = {
+            name: ep_dict[name]
+            for name in ep_dict.keys()
+            if ep_dict[name].get("load_error",None) is None
+        }
+    # Raise error if no translators found
+    if not bool(entrypoints):
+        raise EntryPointsNotFoundError(f"No {group} entrypoints were found")
+    return entrypoints
+
+
+class EntryPointsNotFoundError(InsufficientArgumentsError):
+    pass
+
+
 def dir_exists(location) -> bool:
     """
     Check if a directory exists at location
@@ -176,3 +214,19 @@ def dir_exists(location) -> bool:
     if location.exists() and location.is_dir():
         return True
     return False
+
+
+class jsEncoder(json.JSONEncoder):
+    """Class to return objects as strings for correct JSON encoding"""
+    def default(self, obj):
+        if isinstance(obj, UUID) or isinstance(obj, Path):
+            # if the obj is uuid, we simply return the value of uuid
+            return str(obj)
+        return json.JSONEncoder.default(self, obj)
+
+
+def write_jsonline_to_file(filename, line):
+    """Write a single JSON line to file"""
+    with open(filename, "a") as f:
+        json.dump(line, f, cls=jsEncoder)
+        f.write("\n")
