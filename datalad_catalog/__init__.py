@@ -57,6 +57,12 @@ command_suite = (
             "catalog_set",
         ),
         (
+            "datalad_catalog.remove",
+            "Remove",
+            "catalog-remove",
+            "catalog_remove",
+        ),
+        (
             "datalad_catalog.translate",
             "MetaTranslate",
             "catalog-translate",
