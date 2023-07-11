@@ -163,6 +163,11 @@ class WebCatalog(object):
         Such a config file will also be saved in a dedicated
         dataset-specific location
         """
+        # First see if related dataset record already exists
+        existing_record = self.get_record(
+            dataset_id=metadata_record[cnst.DATASET_ID],
+            dataset_version=metadata_record[cnst.DATASET_VERSION],
+        )
         # First translate the record into a MetaItem instance
         # that has multiple Node instances
         meta_item = MetaItem(
@@ -170,9 +175,12 @@ class WebCatalog(object):
         )
         # Then create/update their respective metadata files
         meta_item.write_nodes_to_files()
-        # TODO: return a value specifying whether the record
+        # Return a value specifying whether the record
         # was created or updated, for reporting
-        return
+        return dict(
+            action="update" if existing_record else "add",
+            type=metadata_record.get(cnst.TYPE),
+        )
 
     def get_main_dataset(self):
         super_path = Path(self.metadata_path) / "super.json"

@@ -13,6 +13,7 @@ from datalad_catalog.constraints import (
     EnsureWebCatalog,
     metadata_constraint,
 )
+import datalad_catalog.constants as cnst
 from datalad_catalog.webcatalog import WebCatalog
 from datalad_next.commands import (
     EnsureCommandParameterization,
@@ -176,11 +177,29 @@ class Add(ValidatedInterface):
             # This involves translating the record into Node instances
             # and creating/updating their respective metadata files
             try:
-                ctlg.add_record(meta_dict, config_file)
+                record_props = ctlg.add_record(meta_dict, config_file)
+                if record_props.get("action") == "add":
+                    success_msg_part1 = (
+                        "Metadata record successfully added to catalog"
+                    )
+                else:
+                    success_msg_part1 = (
+                        "Metadata record successfully updated in catalog"
+                    )
+                if record_props.get("type") == "dataset":
+                    success_msg_part2 = "dataset:"
+                else:
+                    success_msg_part2 = "filetree of dataset:"
+
                 yield get_status_dict(
                     **res_kwargs,
                     status="ok",
-                    message=("Metadata item successfully added to catalog"),
+                    message=(
+                        f"{success_msg_part1} "
+                        f"({success_msg_part2} dataset_id={meta_dict[cnst.DATASET_ID]}, "
+                        f"dataset_version={meta_dict[cnst.DATASET_VERSION]})"
+                    ),
+                    metadata=meta_dict,
                 )
             except Exception as e:
                 err_msg = f"Catalog add operation failed in LINE {i}: \n\n{e}"
