@@ -3,6 +3,7 @@ from datalad_next.commands import (
     Interface,
     build_doc,
 )
+
 # Create named logger
 lgr = logging.getLogger("datalad.catalog.catalog")
 
@@ -93,11 +94,11 @@ class Catalog(Interface):
                 "it to the catalog"
             ),
             code_py=(
-                "catalog_validate(catalog='/tmp/my-cat/'," 
+                "catalog_validate(catalog='/tmp/my-cat/',"
                 "metadata='path/to/metadata.jsonl')"
             ),
             code_cmd=(
-                "datalad catalog-validate -c /tmp/my-cat/" 
+                "datalad catalog-validate -c /tmp/my-cat/"
                 "-m path/to/metadata.jsonl'"
             ),
         ),
@@ -106,24 +107,16 @@ class Catalog(Interface):
                 "GET a property of an existing catalog, "
                 "such as the catalog configuration"
             ),
-            code_py=(
-                "catalog_get(property='config', catalog='/tmp/my-cat/')"
-            ),
-            code_cmd=(
-                "datalad catalog-get -c /tmp/my-cat/ config"
-            ),
+            code_py=("catalog_get(property='config', catalog='/tmp/my-cat/')"),
+            code_cmd=("datalad catalog-get -c /tmp/my-cat/ config"),
         ),
         dict(
-            text=(
-                "REMOVE a specific metadata record from an existing catalog"
-            ),
+            text=("REMOVE a specific metadata record from an existing catalog"),
             code_py=(
                 "catalog_remove(catalog='/tmp/my-cat', "
                 "dataset_id='efgh', dataset_version='5678')"
             ),
-            code_cmd=(
-                "datalad catalog-remove -c /tmp/my-cat -i efgh -v 5678"
-            ),
+            code_cmd=("datalad catalog-remove -c /tmp/my-cat -i efgh -v 5678"),
         ),
         dict(
             text=(
@@ -176,13 +169,9 @@ class Catalog(Interface):
     ]
 
     # parameters of the command, must be exhaustive
-    _params_ = dict(
-    )
+    _params_ = dict()
 
     @staticmethod
-    def __call__(
-    ):
-        """
-        """
+    def __call__():
+        """ """
         print(Catalog.__doc__)
-        
