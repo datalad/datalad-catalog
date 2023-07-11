@@ -43,9 +43,10 @@ catalog_paths = [
 ]
 
 
-@pytest.mark.xfail(
+@pytest.mark.skipif(
     sys.platform == "win32", reason="jq does not build on windows"
 )
+@skip_if_adjusted_branch
 def test_workflow_new(test_data, workflow_catalog_path, workflow_dataset_path):
     cat_path = workflow_catalog_path
     super_path = workflow_dataset_path
