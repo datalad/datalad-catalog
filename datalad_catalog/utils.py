@@ -216,6 +216,7 @@ def dir_exists(location) -> bool:
 
 class jsEncoder(json.JSONEncoder):
     """Class to return objects as strings for correct JSON encoding"""
+
     def default(self, obj):
         if isinstance(obj, object):
             return str(obj)
