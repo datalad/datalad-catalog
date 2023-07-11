@@ -15,8 +15,9 @@ from datalad_catalog.constraints import (
     metadata_constraint,
 )
 from datalad_catalog.utils import (
-    get_available_entrypoints,
     EntryPointsNotFoundError,
+    get_available_entrypoints,
+    jsEncoder,
 )
 from datalad_catalog.validate import get_schema_store
 from datalad_catalog.webcatalog import (
@@ -31,6 +32,7 @@ from datalad_next.commands import (
     get_status_dict,
 )
 from datalad_next.exceptions import CapturedException
+from datalad_next.uis import ui_switcher
 from datalad.support.exceptions import InsufficientArgumentsError
 
 import abc
@@ -195,6 +197,8 @@ class MetaTranslate(ValidatedInterface):
                     message=("Metadata successfully translated"),
                     translated_metadata=translated_meta,
                 )
+                ui = ui_switcher.ui
+                ui.message(json.dumps(translated_meta, cls=jsEncoder))
             except Exception as e:
                 yield get_status_dict(
                     **res_kwargs,

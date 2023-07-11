@@ -12,6 +12,7 @@ from datalad_catalog.constraints import (
     CatalogRequired,
     EnsureWebCatalog,
 )
+from datalad_catalog.utils import jsEncoder
 from datalad_catalog.webcatalog import (
     WebCatalog,
 )
@@ -28,7 +29,9 @@ from datalad_next.constraints import (
     EnsureChoice,
     EnsureStr,
 )
+from datalad_next.uis import ui_switcher
 import logging
+import json
 from pathlib import Path
 from typing import Union
 
@@ -219,13 +222,12 @@ class Get(ValidatedInterface):
             path=catalog.location,
         )
 
+        ui = ui_switcher.ui
         # TODO: add property schema, schema:store, schema:version, schema:catalog, schema:dataset, etc
-
         # Yield error for get-operations that haven't been implemented yet
         if property in ("tree"):
             msg = f"catalog-get for property={property} is not yet implemented"
             yield get_status_dict(**res_kwargs, status="error", message=msg)
-
         # Get catalog home page
         if property == "home":
             try:
@@ -246,7 +248,6 @@ class Get(ValidatedInterface):
                     exception=e,
                     home=None,
                 )
-
         # Get catalog metadata for dataset/directory/file
         if property == "metadata":
             # set default record_type
@@ -270,7 +271,8 @@ class Get(ValidatedInterface):
             yield get_status_dict(
                 **res_kwargs, status=sts, message=msg, metadata=record
             )
-
+            if record:
+                ui.message(json.dumps(record, cls=jsEncoder))
         # Get catalog-level or dataset-level config
         if property == "config":
             if dataset_id and dataset_version:
@@ -297,6 +299,7 @@ class Get(ValidatedInterface):
                     message=msg,
                     config=dataset_node["config"],
                 )
+                ui.message(json.dumps(dataset_node["config"], cls=jsEncoder))
             else:
                 try:
                     cfg = catalog.get_config()
@@ -304,6 +307,7 @@ class Get(ValidatedInterface):
                     yield get_status_dict(
                         **res_kwargs, status="ok", message=msg, config=cfg
                     )
+                    ui.message(json.dumps(cfg, cls=jsEncoder))
                 except Exception as e:
                     msg = "Catalog-level configuration has not been set"
                     yield get_status_dict(

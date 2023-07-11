@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 import sys
 import shutil
-from uuid import UUID
 import yaml
 
 from datalad.support.exceptions import InsufficientArgumentsError
@@ -217,10 +216,8 @@ def dir_exists(location) -> bool:
 
 class jsEncoder(json.JSONEncoder):
     """Class to return objects as strings for correct JSON encoding"""
-
     def default(self, obj):
-        if isinstance(obj, UUID) or isinstance(obj, Path):
-            # if the obj is uuid, we simply return the value of uuid
+        if isinstance(obj, object):
             return str(obj)
         return json.JSONEncoder.default(self, obj)
 
