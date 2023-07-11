@@ -21,7 +21,6 @@ from datalad_catalog.webcatalog import (
 from datalad_catalog.add import Add
 from datalad_catalog.translate import MetaTranslate
 from datalad_catalog.utils import (
-    read_json_file,
     get_available_entrypoints,
     write_jsonline_to_file,
 )
@@ -30,26 +29,19 @@ from datalad_next.commands import (
     ValidatedInterface,
     Parameter,
     build_doc,
-    datasetmethod,
     eval_results,
-    generic_result_renderer,
     get_status_dict,
-    ParameterConstraintContext,
 )
 from datalad_next.constraints import (
     EnsureBool,
     EnsureChoice,
-    EnsureGeneratorFromFileLike,
     EnsureInt,
-    EnsureJSON,
     EnsureListOf,
-    EnsureNone,
     EnsurePath,
     EnsureStr,
 )
 from datalad_next.constraints.dataset import EnsureDataset
 import logging
-import json
 from pathlib import Path
 from typing import Union
 

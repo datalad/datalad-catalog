@@ -31,7 +31,6 @@ from datalad_next.commands import (
 from datalad_next.exceptions import CapturedException
 import json
 import logging
-from pathlib import Path
 
 
 __docformat__ = "restructuredtext"

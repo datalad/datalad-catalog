@@ -1,18 +1,11 @@
-from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.tests.utils_pytest import (
     assert_in_results,
     assert_result_count,
 )
 from datalad_catalog.validate import Validate
-from datalad_catalog.utils import read_json_file
-
-from jsonschema import (
-    ValidationError,
-)
-import pytest
-
-
 from datalad_next.constraints.exceptions import CommandParametrizationError
+
+import pytest
 
 catalog_validate = Validate()
 

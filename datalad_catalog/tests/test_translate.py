@@ -1,12 +1,8 @@
-from pathlib import Path
-from datalad_catalog.catalog import Catalog
 from datalad_catalog.translate import (
     MetaTranslate,
 )
-from datalad_catalog.utils import read_json_file
 from datalad.tests.utils_pytest import (
     assert_in_results,
-    assert_raises,
     assert_result_count,
 )
 from datalad_next.constraints.exceptions import CommandParametrizationError

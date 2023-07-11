@@ -2,7 +2,6 @@ import pytest
 from datalad_catalog.create import Create
 from datalad.tests.utils_pytest import (
     assert_in_results,
-    assert_result_count,
 )
 from datalad_next.constraints.exceptions import CommandParametrizationError
 

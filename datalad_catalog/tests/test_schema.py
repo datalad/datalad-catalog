@@ -1,11 +1,9 @@
 import pytest
 from pathlib import Path
-from datalad.support.exceptions import InsufficientArgumentsError
 from jsonschema import (
     Draft202012Validator,
     RefResolver,
     ValidationError,
-    validate,
 )
 from datalad_catalog.utils import read_json_file
 

@@ -4,10 +4,7 @@ from pathlib import Path
 from datalad_catalog import constants as cnst
 from datalad_catalog.webcatalog import (
     Node,
-    WebCatalog,
 )
-
-from pprint import pprint
 
 tests_path = Path(__file__).resolve().parent
 package_path = Path(__file__).resolve().parent.parent

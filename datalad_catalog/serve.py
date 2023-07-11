@@ -25,7 +25,6 @@ from datalad_next.commands import (
 )
 from datalad_next.constraints import (
     EnsureRange,
-    EnsureStr,
     EnsureInt,
 )
 import logging

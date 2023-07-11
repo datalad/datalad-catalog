@@ -1,10 +1,8 @@
-from datalad.support.exceptions import InsufficientArgumentsError
 from datalad.tests.utils_pytest import (
     assert_in_results,
     assert_result_count,
 )
 from datalad_catalog.add import Add
-from datalad_catalog.utils import read_json_file
 
 import io
 import json

@@ -5,14 +5,6 @@ from datalad_catalog.constants import (
     tests_path,
 )
 from datalad_catalog.webcatalog import WebCatalog
-from datalad.tests.utils_pytest import (
-    with_tree,
-    with_tempfile,
-    assert_equal,
-    assert_repo_status,
-    skip_if_adjusted_branch,
-    skip_if_on_windows,
-)
 
 
 class TestPaths(object):
