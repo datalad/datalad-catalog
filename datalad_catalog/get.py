@@ -205,15 +205,17 @@ class Get(ValidatedInterface):
 
     @staticmethod
     def custom_result_renderer(res, **kwargs):
-        """This result renderer dumps the value of the 'output' key 
+        """This result renderer dumps the value of the 'output' key
         in the result record in JSON-line format -- only if status==ok"""
         ui = ui_switcher.ui
-        ui.message(json.dumps(
-            res.get('output'),
-            separators=(',', ':'),
-            indent=None,
-            cls=jsEncoder,
-        ))
+        ui.message(
+            json.dumps(
+                res.get("output"),
+                separators=(",", ":"),
+                indent=None,
+                cls=jsEncoder,
+            )
+        )
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)

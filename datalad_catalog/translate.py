@@ -100,6 +100,20 @@ class MetaTranslate(ValidatedInterface):
     _examples_ = []
 
     @staticmethod
+    def custom_result_renderer(res, **kwargs):
+        """This result renderer dumps the value of the 'output' key
+        in the result record in JSON-line format -- only if status==ok"""
+        ui = ui_switcher.ui
+        ui.message(
+            json.dumps(
+                res.get("translated_metadata"),
+                separators=(",", ":"),
+                indent=None,
+                cls=jsEncoder,
+            )
+        )
+
+    @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)
     @eval_results
     # signature must match parameter list above
@@ -197,8 +211,6 @@ class MetaTranslate(ValidatedInterface):
                     message=("Metadata successfully translated"),
                     translated_metadata=translated_meta,
                 )
-                ui = ui_switcher.ui
-                ui.message(json.dumps(translated_meta, cls=jsEncoder))
             except Exception as e:
                 yield get_status_dict(
                     **res_kwargs,

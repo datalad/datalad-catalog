@@ -176,8 +176,7 @@ def test_get_metadata(demo_catalog, test_data):
     assert res[0]["output"] is not None
     assert res[0]["output"][cnst.DATASET_ID] == ds_meta[cnst.DATASET_ID]
     assert (
-        res[0]["output"][cnst.DATASET_VERSION]
-        == ds_meta[cnst.DATASET_VERSION]
+        res[0]["output"][cnst.DATASET_VERSION] == ds_meta[cnst.DATASET_VERSION]
     )
     # add file-level metadata
     catalog_add(
