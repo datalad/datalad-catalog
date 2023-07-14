@@ -123,10 +123,10 @@ def test_get_home(demo_catalog, test_data):
         status="ok",
         path=demo_catalog.location,
     )
-    assert "home" in res[0]
-    assert res[0]["home"] is not None
-    assert res[0]["home"][cnst.DATASET_ID] == home_id
-    assert res[0]["home"][cnst.DATASET_VERSION] == home_version
+    assert "output" in res[0]
+    assert res[0]["output"] is not None
+    assert res[0]["output"][cnst.DATASET_ID] == home_id
+    assert res[0]["output"][cnst.DATASET_VERSION] == home_version
 
 
 def test_get_metadata(demo_catalog, test_data):
@@ -147,7 +147,7 @@ def test_get_metadata(demo_catalog, test_data):
         status="impossible",
         path=demo_catalog.location,
     )
-    assert res[0]["metadata"] is None
+    assert res[0]["output"] is None
     # add dataset-level metadata
     catalog_add(
         catalog=demo_catalog,
@@ -172,11 +172,11 @@ def test_get_metadata(demo_catalog, test_data):
         status="ok",
         path=demo_catalog.location,
     )
-    assert "metadata" in res[0]
-    assert res[0]["metadata"] is not None
-    assert res[0]["metadata"][cnst.DATASET_ID] == ds_meta[cnst.DATASET_ID]
+    assert "output" in res[0]
+    assert res[0]["output"] is not None
+    assert res[0]["output"][cnst.DATASET_ID] == ds_meta[cnst.DATASET_ID]
     assert (
-        res[0]["metadata"][cnst.DATASET_VERSION]
+        res[0]["output"][cnst.DATASET_VERSION]
         == ds_meta[cnst.DATASET_VERSION]
     )
     # add file-level metadata
@@ -207,11 +207,11 @@ def test_get_metadata(demo_catalog, test_data):
         status="ok",
         path=demo_catalog.location,
     )
-    assert "metadata" in res[0]
-    assert res[0]["metadata"] is not None
-    assert res[0]["metadata"][cnst.DATASET_ID] == file_meta[cnst.DATASET_ID]
+    assert "output" in res[0]
+    assert res[0]["output"] is not None
+    assert res[0]["output"][cnst.DATASET_ID] == file_meta[cnst.DATASET_ID]
     assert (
-        res[0]["metadata"][cnst.DATASET_VERSION]
+        res[0]["output"][cnst.DATASET_VERSION]
         == file_meta[cnst.DATASET_VERSION]
     )
     res = catalog_get(
@@ -231,11 +231,11 @@ def test_get_metadata(demo_catalog, test_data):
         status="ok",
         path=demo_catalog.location,
     )
-    assert "metadata" in res[0]
-    assert res[0]["metadata"] is not None
-    assert res[0]["metadata"][cnst.DATASET_ID] == file_meta[cnst.DATASET_ID]
+    assert "output" in res[0]
+    assert res[0]["output"] is not None
+    assert res[0]["output"][cnst.DATASET_ID] == file_meta[cnst.DATASET_ID]
     assert (
-        res[0]["metadata"][cnst.DATASET_VERSION]
+        res[0]["output"][cnst.DATASET_VERSION]
         == file_meta[cnst.DATASET_VERSION]
     )
     # and lastly test a nonexisting dir
@@ -256,7 +256,7 @@ def test_get_metadata(demo_catalog, test_data):
         status="impossible",
         path=demo_catalog.location,
     )
-    assert res[0]["metadata"] is None
+    assert res[0]["output"] is None
 
 
 def test_get_config(demo_catalog_default_config, demo_catalog, test_data):
@@ -276,8 +276,8 @@ def test_get_config(demo_catalog_default_config, demo_catalog, test_data):
         status="ok",
         path=demo_catalog_default_config.location,
     )
-    assert "config" in res[0]
-    assert default_config == res[0]["config"]
+    assert "output" in res[0]
+    assert default_config == res[0]["output"]
     # test dataset-level config after adding to same catalog with default config
     dataset_config = read_json_file(test_data.demo_config_path_dataset)
     ds_meta = read_json_file(test_data.catalog_metadata_dataset1)
@@ -326,4 +326,4 @@ def test_get_config(demo_catalog_default_config, demo_catalog, test_data):
         status="ok",
         path=demo_catalog_default_config.location,
     )
-    assert "config" in res[0]
+    assert "output" in res[0]

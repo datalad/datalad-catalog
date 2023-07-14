@@ -204,6 +204,18 @@ class Get(ValidatedInterface):
     _examples_ = []
 
     @staticmethod
+    def custom_result_renderer(res, **kwargs):
+        """This result renderer dumps the value of the 'output' key 
+        in the result record in JSON-line format -- only if status==ok"""
+        ui = ui_switcher.ui
+        ui.message(json.dumps(
+            res.get('output'),
+            separators=(',', ':'),
+            indent=None,
+            cls=jsEncoder,
+        ))
+
+    @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)
     @eval_results
     # signature must match parameter list above
@@ -221,8 +233,8 @@ class Get(ValidatedInterface):
             action_property=property,
             path=catalog.location,
         )
+        # ui = ui_switcher.ui
 
-        ui = ui_switcher.ui
         # TODO: add property schema, schema:store, schema:version, schema:catalog, schema:dataset, etc
         # Yield error for get-operations that haven't been implemented yet
         if property in ("tree"):
@@ -237,7 +249,7 @@ class Get(ValidatedInterface):
                     f"dataset_version={home_spec['dataset_version']}"
                 )
                 yield get_status_dict(
-                    **res_kwargs, status="ok", message=msg, home=home_spec
+                    **res_kwargs, status="ok", message=msg, output=home_spec
                 )
             except Exception as e:
                 msg = "No home page has been set for the catalog"
@@ -246,7 +258,7 @@ class Get(ValidatedInterface):
                     status="impossible",
                     message=msg,
                     exception=e,
-                    home=None,
+                    output=None,
                 )
         # Get catalog metadata for dataset/directory/file
         if property == "metadata":
@@ -269,10 +281,10 @@ class Get(ValidatedInterface):
                 msg = "Metadata record retrieved"
                 sts = "ok"
             yield get_status_dict(
-                **res_kwargs, status=sts, message=msg, metadata=record
+                **res_kwargs, status=sts, message=msg, output=record
             )
-            if record:
-                ui.message(json.dumps(record, cls=jsEncoder))
+            # if record:
+            #     ui.message(json.dumps(record, cls=jsEncoder))
         # Get catalog-level or dataset-level config
         if property == "config":
             if dataset_id and dataset_version:
@@ -297,17 +309,17 @@ class Get(ValidatedInterface):
                     **res_kwargs,
                     status=sts,
                     message=msg,
-                    config=dataset_node["config"],
+                    output=dataset_node["config"],
                 )
-                ui.message(json.dumps(dataset_node["config"], cls=jsEncoder))
+                # ui.message(json.dumps(dataset_node["config"], cls=jsEncoder))
             else:
                 try:
                     cfg = catalog.get_config()
                     msg = f"Catalog-level configuration retrieved"
                     yield get_status_dict(
-                        **res_kwargs, status="ok", message=msg, config=cfg
+                        **res_kwargs, status="ok", message=msg, output=cfg
                     )
-                    ui.message(json.dumps(cfg, cls=jsEncoder))
+                    # ui.message(json.dumps(cfg, cls=jsEncoder))
                 except Exception as e:
                     msg = "Catalog-level configuration has not been set"
                     yield get_status_dict(
@@ -315,5 +327,5 @@ class Get(ValidatedInterface):
                         status="impossible",
                         message=msg,
                         exception=e,
-                        config=None,
+                        output=None,
                     )
