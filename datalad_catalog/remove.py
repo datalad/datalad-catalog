@@ -108,7 +108,7 @@ class RemoveParameterValidator(EnsureCommandParameterization):
 class Remove(ValidatedInterface):
     """Remove metadata from an existing catalog
 
-    This will remove metadata corresponding to a specified 
+    This will remove metadata corresponding to a specified
     dataset_id and dataset_version from an existing catalog.
 
     This command has to be called with the reckless flag to
@@ -151,7 +151,9 @@ class Remove(ValidatedInterface):
                 "catalog_remove(catalog='/tmp/my-cat', "
                 "dataset_id='efgh', dataset_version='5678', reckless=True)"
             ),
-            code_cmd=("datalad catalog-remove -c /tmp/my-cat -i efgh -v 5678 --reckless"),
+            code_cmd=(
+                "datalad catalog-remove -c /tmp/my-cat -i efgh -v 5678 --reckless"
+            ),
         ),
     ]
 

@@ -130,9 +130,7 @@ class Set(ValidatedInterface):
 
     _examples_ = [
         dict(
-            text=(
-                "Set the home page of an existing catalog"
-            ),
+            text=("Set the home page of an existing catalog"),
             code_py=(
                 "catalog_set(property='home', catalog='/tmp/my-cat', "
                 "dataset_id='abcd', dataset_version='1234')"

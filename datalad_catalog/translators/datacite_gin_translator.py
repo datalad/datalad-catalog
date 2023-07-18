@@ -146,7 +146,7 @@ class DataciteTranslator:
             '{"type":"", '
             '"title":$pubin["citation"], '
             '"doi":'
-            '($pubin["id"] | sub("DOI:"; "https://www.doi.org/")), '
+            '($pubin["id"] | sub("(?i)DOI:"; "https://doi.org/")), '
             '"datePublished":"", '
             '"publicationOutlet":"", '
             '"authors": []}]'

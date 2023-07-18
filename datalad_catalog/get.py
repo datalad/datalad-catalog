@@ -204,16 +204,12 @@ class Get(ValidatedInterface):
 
     _examples_ = [
         dict(
-            text=(
-                "Get the configuration of an existing catalog"
-            ),
+            text=("Get the configuration of an existing catalog"),
             code_py=("catalog_get(property='config', catalog='/tmp/my-cat/')"),
             code_cmd=("datalad catalog-get -c /tmp/my-cat/ config"),
         ),
         dict(
-            text=(
-                "Get the home page details of an existing catalog"
-            ),
+            text=("Get the home page details of an existing catalog"),
             code_py=("catalog_get(property='home', catalog='/tmp/my-cat/')"),
             code_cmd=("datalad catalog-get -c /tmp/my-cat/ home"),
         ),

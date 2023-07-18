@@ -79,9 +79,7 @@ class Serve(ValidatedInterface):
 
     _examples_ = [
         dict(
-            text=(
-                "SERVE the content of the catalog via a local HTTP server"
-            ),
+            text=("SERVE the content of the catalog via a local HTTP server"),
             code_py="catalog_serve(catalog='/tmp/my-cat/')",
             code_cmd="datalad catalog-serve -c /tmp/my-cat",
         ),

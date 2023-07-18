@@ -111,8 +111,7 @@ class Add(ValidatedInterface):
                 "metadata=json.dumps({'my':'metadata'}))"
             ),
             code_cmd=(
-                "datalad catalog-add "
-                "-c /tmp/my-cat -m '{\"my\":\"metadata\"}'"
+                "datalad catalog-add " '-c /tmp/my-cat -m \'{"my":"metadata"}\''
             ),
         ),
         dict(

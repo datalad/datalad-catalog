@@ -100,7 +100,7 @@ class Workflow(ValidatedInterface):
     This functionality requires the installation of datalad-metalad as well
     as any datalad extensions providing relevant translators for the extracted
     metadata items.
-    
+
     It will run a workflow of metadata extraction, translation, and catalog (entry)
     generation, given a DataLad dataset hierarchy and a specified workflow type:
     new/update.
