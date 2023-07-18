@@ -81,7 +81,22 @@ class Validate(ValidatedInterface):
         ),
     )
 
-    _examples_ = []
+    _examples_ = [
+        dict(
+            text=(
+                "Validate metadata against a catalog schema without adding "
+                "it to the catalog"
+            ),
+            code_py=(
+                "catalog_validate(catalog='/tmp/my-cat/',"
+                "metadata='path/to/metadata.jsonl')"
+            ),
+            code_cmd=(
+                "datalad catalog-validate -c /tmp/my-cat/"
+                "-m path/to/metadata.jsonl'"
+            ),
+        ),
+    ]
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)

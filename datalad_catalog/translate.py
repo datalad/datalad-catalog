@@ -67,8 +67,13 @@ class MetaTranslate(ValidatedInterface):
 
     The to-be-translated-to schema version is determined from the catalog,
     if provided, otherwise from the latest supported version of the package installation.
-    Available translators (registered as entrypoints) will be filtered based on own
-    criteria (extractor) to find the appropriate one.
+
+    Tranlators should be provided and exposed as a datalad entry point using the group:
+    'datalad.metadata.translators'.
+
+    Available translators will be filtered based on own matching criteria (such as
+    extractor name, version, etc) to find the appropriate translator, after which
+    the translator's translation code will be executed on the metadata item.
     """
 
     _validator_ = MetaTranslateParameterValidator()
@@ -97,7 +102,22 @@ class MetaTranslate(ValidatedInterface):
         ),
     )
 
-    _examples_ = []
+    _examples_ = [
+        dict(
+            text=(
+                "Translate a metalad-extracted metadata item from a particular "
+                "source structure into the catalog schema, assuming a dedicated "
+                "translator is locally available via the entry point mechanism"
+            ),
+            code_py=(
+                "catalog_translate(catalog='/tmp/my-cat', "
+                "metadata='path/to/metadata.jsonl')"
+            ),
+            code_cmd=(
+                "datalad catalog-translate -c /tmp/my-cat -m path/to/metadata.jsonl"
+            ),
+        ),
+    ]
 
     @staticmethod
     def custom_result_renderer(res, **kwargs):

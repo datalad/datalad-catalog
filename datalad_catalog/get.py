@@ -157,10 +157,11 @@ class GetParameterValidator(EnsureCommandParameterization):
 @build_doc
 # All extension commands must be derived from Interface
 class Get(ValidatedInterface):
-    """Utility for getting various properties of a catalog, based on the specified property
+    """Utility for getting various properties of a catalog, based on the specified
+    property ('home', 'config', 'metadata', 'tree')
 
     Used to get the catalog home page, get config at catalog- or dataset-level,
-    get the metadata for a specific dataset/version
+    or get the metadata for a specific dataset/version.
     """
 
     _validator_ = GetParameterValidator()
@@ -201,7 +202,50 @@ class Get(ValidatedInterface):
         ),
     )
 
-    _examples_ = []
+    _examples_ = [
+        dict(
+            text=(
+                "Get the configuration of an existing catalog"
+            ),
+            code_py=("catalog_get(property='config', catalog='/tmp/my-cat/')"),
+            code_cmd=("datalad catalog-get -c /tmp/my-cat/ config"),
+        ),
+        dict(
+            text=(
+                "Get the home page details of an existing catalog"
+            ),
+            code_py=("catalog_get(property='home', catalog='/tmp/my-cat/')"),
+            code_cmd=("datalad catalog-get -c /tmp/my-cat/ home"),
+        ),
+        dict(
+            text=(
+                "Get metadata of a specific dataset from an existing catalog"
+            ),
+            code_py=(
+                "catalog_get(property='metadata', catalog='/tmp/my-cat', "
+                "dataset_id='abcd', dataset_version='1234')"
+            ),
+            code_cmd=(
+                "datalad catalog-get -c /tmp/my-cat -i abcd -v 1234 metadata"
+            ),
+        ),
+        dict(
+            text=(
+                "Get metadata of a specific directory node in a dataset from "
+                "an existing catalog"
+            ),
+            code_py=(
+                "catalog_get(property='metadata', catalog='/tmp/my-cat', "
+                "dataset_id='abcd', dataset_version='1234', "
+                "record_type='directory', record_path='relative/path/to/directory')"
+            ),
+            code_cmd=(
+                "datalad catalog-get -c /tmp/my-cat -i abcd -v 1234 "
+                "--record_type directory --record_path relative/path/to/directory "
+                "metadata"
+            ),
+        ),
+    ]
 
     @staticmethod
     def custom_result_renderer(res, **kwargs):

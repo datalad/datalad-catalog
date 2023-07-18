@@ -108,7 +108,11 @@ class RemoveParameterValidator(EnsureCommandParameterization):
 class Remove(ValidatedInterface):
     """Remove metadata from an existing catalog
 
-    dataset_id and dataset_version need to specified
+    This will remove metadata corresponding to a specified 
+    dataset_id and dataset_version from an existing catalog.
+
+    This command has to be called with the reckless flag to
+    ignore a warning message.
     """
 
     _validator_ = RemoveParameterValidator()
@@ -140,7 +144,16 @@ class Remove(ValidatedInterface):
         ),
     )
 
-    _examples_ = []
+    _examples_ = [
+        dict(
+            text=("REMOVE a specific metadata record from an existing catalog"),
+            code_py=(
+                "catalog_remove(catalog='/tmp/my-cat', "
+                "dataset_id='efgh', dataset_version='5678', reckless=True)"
+            ),
+            code_cmd=("datalad catalog-remove -c /tmp/my-cat -i efgh -v 5678 --reckless"),
+        ),
+    ]
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)

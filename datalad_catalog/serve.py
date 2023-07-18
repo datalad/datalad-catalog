@@ -77,7 +77,23 @@ class Serve(ValidatedInterface):
         ),
     )
 
-    _examples_ = []
+    _examples_ = [
+        dict(
+            text=(
+                "SERVE the content of the catalog via a local HTTP server"
+            ),
+            code_py="catalog_serve(catalog='/tmp/my-cat/')",
+            code_cmd="datalad catalog-serve -c /tmp/my-cat",
+        ),
+        dict(
+            text=(
+                "SERVE the content of the catalog via a local HTTP server "
+                "at a custom port, e.g. http://localhost:8001"
+            ),
+            code_py="catalog_serve(catalog='/tmp/my-cat/', port=8001)",
+            code_cmd="datalad catalog-serve -c /tmp/my-cat -p 8001",
+        ),
+    ]
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)

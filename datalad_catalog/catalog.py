@@ -44,8 +44,8 @@ class Catalog(Interface):
     Note: in the catalog website, each dataset entry is displayed
     under ``<main page>/#/dataset/<dataset_id>/<dataset_version>``.
     By default, the main page of the catalog will display a 404 error,
-    unless the default dataset is configured with ``datalad catalog
-    set-super``.
+    unless the default dataset is configured with ``datalad catalog-set
+    home``.
     """
 
     # usage examples

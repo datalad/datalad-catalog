@@ -91,9 +91,11 @@ class SetParameterValidator(EnsureCommandParameterization):
 @build_doc
 # All extension commands must be derived from Interface
 class Set(ValidatedInterface):
-    """Utility for setting various properties of a catalog, based on the specified subcommand
+    """Utility for setting various properties of a catalog, based on the
+    specified property ('home' or 'config')
 
     Used to set the catalog home page, or to reset config at catalog- or dataset-level.
+    (Note: the latter is not fully supported yet and will yield an error result)
     """
 
     _validator_ = SetParameterValidator()
@@ -126,7 +128,34 @@ class Set(ValidatedInterface):
         ),
     )
 
-    _examples_ = []
+    _examples_ = [
+        dict(
+            text=(
+                "Set the home page of an existing catalog"
+            ),
+            code_py=(
+                "catalog_set(property='home', catalog='/tmp/my-cat', "
+                "dataset_id='abcd', dataset_version='1234')"
+            ),
+            code_cmd=(
+                "datalad catalog-set -c /tmp/my-cat -i abcd -v 1234 home"
+            ),
+        ),
+        dict(
+            text=(
+                "Set a new home page of an existing catalog, where the home page "
+                "has previously been set "
+            ),
+            code_py=(
+                "catalog_set(property='home', catalog='/tmp/my-cat', "
+                "dataset_id='efgh', dataset_version='5678', reckless='overwrite')"
+            ),
+            code_cmd=(
+                "datalad catalog-set -c /tmp/my-cat -i efgh -v 5678 --reckless "
+                "overwrite home"
+            ),
+        ),
+    ]
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)

@@ -97,8 +97,13 @@ class WorkflowParameterValidator(EnsureCommandParameterization):
 class Workflow(ValidatedInterface):
     """Run a workflow to create or update a catalog
 
-    Run a workflow of metadata extraction, translation, and catalog (entry) generation,
-    given a DataLad dataset hierarchy and a specified workflow type: new/update
+    This functionality requires the installation of datalad-metalad as well
+    as any datalad extensions providing relevant translators for the extracted
+    metadata items.
+    
+    It will run a workflow of metadata extraction, translation, and catalog (entry)
+    generation, given a DataLad dataset hierarchy and a specified workflow type:
+    new/update.
     """
 
     _validator_ = WorkflowParameterValidator()
@@ -176,7 +181,38 @@ class Workflow(ValidatedInterface):
             default=False,
         ),
     )
-    _examples_ = []
+    _examples_ = [
+        dict(
+            text=(
+                "Run a workflow for recursive metadata extraction (using "
+                "the 'metalad_core' extractor), translating metadata to the latest"
+                "catalog schema, and adding the translated metadata to a new catalog"
+            ),
+            code_py=(
+                "catalog_workflow(mode='new', catalog='/tmp/my-cat/', "
+                "dataset='path/to/superdataset', extractor='metalad_core')"
+            ),
+            code_cmd=(
+                "datalad catalog-workflow -t new -c /tmp/my-cat "
+                "-d path/to/superdataset -e metalad_core"
+            ),
+        ),
+        dict(
+            text=(
+                "Run a workflow for updating a catalog after registering a "
+                "subdataset to the superdataset which the catalog represents. "
+            ),
+            code_py=(
+                "catalog_workflow(mode='update', catalog='/tmp/my-cat/', "
+                "dataset='path/to/superdataset', subdataset='path/to/subdataset', "
+                "extractor='metalad_core')"
+            ),
+            code_cmd=(
+                "datalad catalog-workflow -t new -c /tmp/my-cat "
+                "-d path/to/superdataset -s path/to/subdataset -e metalad_core"
+            ),
+        ),
+    ]
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)

@@ -134,8 +134,27 @@ class Create(ValidatedInterface):
     _examples_ = [
         dict(
             text="Create a new catalog from scratch",
-            code_py="catalog('create', catalog='/tmp/my-cat')",
+            code_py="catalog_create(catalog='/tmp/my-cat')",
             code_cmd="datalad catalog-create -c /tmp/my-cat",
+        ),
+        dict(
+            text=("Create a new catalog at a location where a directory "
+                  "already exists. This will overwrite all catalog content "
+                  "except for metadata."),
+            code_py="catalog_create(catalog='/tmp/my-cat', force=True)",
+            code_cmd="datalad catalog-create -c /tmp/my-cat --force",
+        ),
+        dict(
+            text=("Create a new catalog and add metadata"),
+            code_py=("catalog_create(catalog='/tmp/my-cat', "
+                     "metadata='path/to/metadata.jsonl')"),
+            code_cmd="datalad catalog-create -c /tmp/my-cat -m path/to/metadata.jsonl",
+        ),
+        dict(
+            text=("Create a new catalog with a custom configuration"),
+            code_py=("catalog_create(catalog='/tmp/my-cat', "
+                     "config_file='path/to/custom_config_file.json')"),
+            code_cmd="datalad catalog-create -c /tmp/my-cat -F path/to/custom_config_file.json",
         ),
     ]
 

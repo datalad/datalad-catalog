@@ -92,7 +92,41 @@ class Add(ValidatedInterface):
         ),
     )
 
-    _examples_ = []
+    _examples_ = [
+        dict(
+            text="Add metadata from file to an existing catalog",
+            code_py=(
+                "catalog_add(catalog='/tmp/my-cat', "
+                "metadata='path/to/metadata.jsonl')"
+            ),
+            code_cmd=(
+                "datalad catalog-add "
+                "-c /tmp/my-cat -m path/to/metadata.jsonl"
+            ),
+        ),
+        dict(
+            text="Add metadata as JSON string to an existing catalog",
+            code_py=(
+                "catalog_add(catalog='/tmp/my-cat', "
+                "metadata=json.dumps({'my':'metadata'}))"
+            ),
+            code_cmd=(
+                "datalad catalog-add "
+                "-c /tmp/my-cat -m '{\"my\":\"metadata\"}'"
+            ),
+        ),
+        dict(
+            text="Add metadata as subject to a dataset-level configuration",
+            code_py=(
+                "catalog_add(catalog='/tmp/my-cat', "
+                "config_file='path/to/dataset_config_file.json')"
+            ),
+            code_cmd=(
+                "datalad catalog-add "
+                "-c /tmp/my-cat -F path/to/dataset_config_file.json"
+            ),
+        ),
+    ]
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)
