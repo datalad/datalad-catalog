@@ -7,12 +7,10 @@ DataLad Catalog
 
 Welcome to the user and technical documentation of DataLad Catalog,
 a DataLad extension that allows you to create a user-friendly data
-browser from structured DataLad-generated metadata.
+browser from structured metadata.
 
-.. image:: /_static/datalad_catalog_logo_1_dark.svg
-   :height: 100px
-   :width: 200 px
-   :alt: alternate text
+.. image:: /_static/datacat0_hero_wo_subtitle.svg
+   :alt: datacat logo
    :align: center
 
 |

@@ -24,7 +24,7 @@ With `miniconda`_:
 
 .. code-block:: bash
    
-    conda create -n my_catalog_env python=3.9
+    conda create -n my_catalog_env python=3.11
     conda activate my_catalog_env
 
 
@@ -58,7 +58,8 @@ Dependencies
 Because this is an extension to ``datalad`` and builds on metadata handling
 functionality, the installation process also installed `datalad`_ and
 `datalad-metalad`_ as dependencies, although these do not have to be used as the
-only sources of metadata for a catalog.
+only sources of metadata for a catalog. In addition `datalad-next`_ is installed
+in order to use the latest improvements and patches to the ``datalad`` core package.
 
 While the catalog generation process does not expect data to be structured as
 DataLad datasets, it can still be very useful to do so when building a full
@@ -79,6 +80,7 @@ dependent on `jq`_.
 .. _datalad: https://github.com/datalad/datalad
 .. _GitHub: https://github.com/datalad/datalad-catalog
 .. _datalad-metalad: https://github.com/datalad/datalad-metalad
+.. _datalad-next: https://github.com/datalad/datalad-next
 .. _DataLad Handbook: https://handbook.datalad.org/en/latest/intro/installation.html
 .. _jq: https://stedolan.github.io/jq/
 .. _miniconda: https://docs.conda.io/en/latest/miniconda.html

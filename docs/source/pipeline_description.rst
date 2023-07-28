@@ -241,9 +241,9 @@ Step 5 - Run DataLad Catalog
 
 The important subcommands for generating a catalog are:
 
-- ``create`` creates a new catalog with the required assets, taking metadata
+- ``catalog-create`` creates a new catalog with the required assets, taking metadata
   as an optional input argument
-- ``add`` adds dataset and/or file level metadata to an existing catalog
+- ``catalog-add`` adds dataset and/or file level metadata to an existing catalog
 
 To create a catalog from the metadata we generated above, we can run the following:
 
@@ -253,8 +253,8 @@ To create a catalog from the metadata we generated above, we can run the followi
     TRANSLATED_DATASET_METADATA_OUT_PATH="path/to/translated_dataset_metadata.json"
     TRANSLATED_FILE_METADATA_OUT_PATH="path/to/translated_file_metadata.json"
     CATALOG_PATH="path/to/new/catalog"
-    datalad catalog create -c "$CATALOG_PATH" -m "$TRANSLATED_DATASET_METADATA_OUT_PATH"
-    datalad catalog add -c "$CATALOG_PATH" -m "$TRANSLATED_FILE_METADATA_OUT_PATH"
+    datalad catalog-create -c "$CATALOG_PATH" -m "$TRANSLATED_DATASET_METADATA_OUT_PATH"
+    datalad catalog-add -c "$CATALOG_PATH" -m "$TRANSLATED_FILE_METADATA_OUT_PATH"
 
 
 Step 6 - Next steps
@@ -262,10 +262,10 @@ Step 6 - Next steps
 
 Congratulations! You now have a catalog with multiple entries!
 
-This catalog can be served locally (``datalad catalog serve``) to view/test it, deployed
+This catalog can be served locally (``datalad catalog-serve``) to view/test it, deployed
 to an open or/restricted cloud server in order to make it available to the public or 
 colleagues/collaborators (e.g. via GitHub Pages in the case of publicly available catalogs),
-and updated with new entries in future (with a ``datalad catalog add``).
+and updated with new entries in future (with a ``datalad catalog-add``).
 
 Happy cataloging!
 

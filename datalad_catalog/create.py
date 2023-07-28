@@ -105,10 +105,11 @@ class Create(ValidatedInterface):
             # cmdline argument definitions, incl aliases
             args=("-m", "--metadata"),
             # documentation
-            doc="""Path to input metadata. Multiple input types are possible:
-            - A '.json' file containing an array of JSON objects related to a
-             single datalad dataset.
-            - A stream of JSON objects/lines""",
+            doc="""The metadata records to be added to the catalog.
+            Multiple input types are possible:
+            - a path to a file containing JSON lines
+            - JSON lines from STDIN
+            - a JSON serialized string""",
         ),
         config_file=Parameter(
             # cmdline argument definitions, incl aliases
