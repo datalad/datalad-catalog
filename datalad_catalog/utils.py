@@ -1,8 +1,58 @@
+import hashlib
 import json
+from pathlib import Path
 import sys
+import shutil
+import yaml
+
+from datalad.support.exceptions import InsufficientArgumentsError
 
 """A module with miscellaneous utility functions that are used across other modules
 """
+
+
+def copy_overwrite_path(src: Path, dest: Path, overwrite: bool = False):
+    """
+    Copy or overwrite a directory or file
+    """
+    isFile = src.is_file()
+    if dest.exists() and not overwrite:
+        pass
+    else:
+        if isFile:
+            try:
+                shutil.copy2(src, dest)
+            except shutil.SameFileError:
+                pass
+        else:
+            if dest.exists():
+                shutil.rmtree(dest)
+            shutil.copytree(src, dest)
+
+
+def md5sum_from_id_version_path(dataset_id, dataset_version, path=None):
+    """Helper to get md5 hash of concatenated input variables"""
+    long_name = dataset_id + "-" + dataset_version
+    if path:
+        long_name = long_name + "-" + str(path)
+    return md5hash(long_name)
+
+
+def md5hash(txt):
+    """
+    Create md5 hash of the input string
+    """
+    txt_hash = hashlib.md5(txt.encode("utf-8")).hexdigest()
+    return txt_hash
+
+
+def load_config_file(file: Path):
+    """Helper to load content from JSON or YAML file"""
+    with open(file) as f:
+        if file.suffix == ".json":
+            return json.load(f)
+        if file.suffix in [".yml", ".yaml"]:
+            return yaml.safe_load(f)
 
 
 def read_json_file(file_path):
@@ -117,3 +167,64 @@ def get_entry_points(group: str) -> dict:
             continue
 
     return entry_points
+
+
+def get_available_entrypoints(group, include_load_error: bool = False) -> dict:
+    """Return all entrypoints of a specific group known to the current
+    installation
+
+    Parameters
+    ----------
+    include_load_error: bool
+        Set to True if entry points with load errors should be included
+        in the returned dictionary (default is False)
+
+    Returns
+    -------
+    dict
+        A dictionary of entry points with key being the name
+    """
+    ep_dict = get_entry_points(f"datalad.metadata.{group}")
+    entrypoints = ep_dict
+    # Include all entrypoints vs only those without load errors
+    if include_load_error:
+        entrypoints = {
+            name: ep_dict[name]
+            for name in ep_dict.keys()
+            if ep_dict[name].get("load_error", None) is None
+        }
+    # Raise error if no translators found
+    if not bool(entrypoints):
+        raise EntryPointsNotFoundError(f"No {group} entrypoints were found")
+    return entrypoints
+
+
+class EntryPointsNotFoundError(InsufficientArgumentsError):
+    pass
+
+
+def dir_exists(location) -> bool:
+    """
+    Check if a directory exists at location
+    """
+    if not isinstance(location, Path):
+        location = Path(location)
+    if location.exists() and location.is_dir():
+        return True
+    return False
+
+
+class jsEncoder(json.JSONEncoder):
+    """Class to return objects as strings for correct JSON encoding"""
+
+    def default(self, obj):
+        if isinstance(obj, object):
+            return str(obj)
+        return json.JSONEncoder.default(self, obj)
+
+
+def write_jsonline_to_file(filename, line):
+    """Write a single JSON line to file"""
+    with open(filename, "a") as f:
+        json.dump(line, f, cls=jsEncoder)
+        f.write("\n")

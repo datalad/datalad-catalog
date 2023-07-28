@@ -1,0 +1,45 @@
+[{
+    "contentbytesize": 22937600,
+    "dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609",
+    "dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758",
+    "metadata_sources": {
+        "key_source_map": {},
+        "sources": [
+            {
+                "agent_email": "s.heunis@fz-juelich.de",
+                "agent_name": "Stephan Heunis",
+                "source_name": "metalad_core",
+                "source_parameter": {},
+                "source_time": 1680125378.1434848,
+                "source_version": "1"
+            }
+        ]
+    },
+    "path": "MRI_raw_data/Control/Baseline/GV_T3_14_1_1_2_20190809_134721/8/pdata/1/2dseq",
+    "type": "file"
+},
+{
+    "contentbytesize": 30935082,
+    "dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609",
+    "dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758",
+    "metadata_sources": {
+        "key_source_map": {},
+        "sources": [
+            {
+                "agent_email": "s.heunis@fz-juelich.de",
+                "agent_name": "Stephan Heunis",
+                "source_name": "metalad_core",
+                "source_parameter": {},
+                "source_time": 1680125753.3527339,
+                "source_version": "1"
+            }
+        ]
+    },
+    "path": "derivatives/fmriprep/sub-CSI1/anat/sub-CSI1_T1w_preproc.nii.gz",
+    "type": "file",
+    "url": [
+        "https://s3.amazonaws.com/openneuro.org/ds001499/derivatives/fmriprep/sub-CSI1/anat/sub-CSI1_T1w_preproc.nii.gz?versionId=.9EqWOGtwyKH4Cm93VKRt4Ijo.xahbV_",
+        "https://s3.amazonaws.com/openneuro.org/ds001499/derivatives/fmriprep/sub-CSI1/anat/sub-CSI1_T1w_preproc.nii.gz?versionId=Vu3BLYvh6ZRgy4fKOlfdKJg0EBKST1p7",
+        "https://s3.amazonaws.com/openneuro.org/ds001499/derivatives/fmriprep/sub-CSI1/anat/sub-CSI1_T1w_preproc.nii.gz?versionId=YphXx57IDxXzNF_SBMsz3cYdCxYt6Exr"
+    ]
+}]

@@ -1,71 +1,110 @@
-from pathlib import Path
-from datalad_catalog.catalog import Catalog
 from datalad_catalog.translate import (
-    Translate,
-    TranslatorNotFoundError,
-    get_translators,
+    MetaTranslate,
 )
-from datalad_catalog.utils import read_json_file
 from datalad.tests.utils_pytest import (
     assert_in_results,
-    assert_raises,
     assert_result_count,
 )
+from datalad_next.constraints.exceptions import CommandParametrizationError
+import pytest
+import os
+
+catalog_translate = MetaTranslate()
 
 
-tests_path = Path(__file__).resolve().parent
-data_path = tests_path / "data"
-demo_metafile_datacite = data_path / "metadata_datacite_gin.jsonl"
-demo_metafile_datacite_2items = data_path / "metadata_datacite_gin2.jsonl"
-demo_metafile_wrongname = data_path / "metadata_translate_wrongname.jsonl"
-demo_metafile_wrongversion = data_path / "metadata_translate_wrongversion.jsonl"
-demo_metafile_nonsense = data_path / "metadata_translate_nonsense.jsonl"
+def test_arg_combinations(demo_catalog):
+    """Test various incorrect combinations of arguments"""
+    # no arguments
+    with pytest.raises(CommandParametrizationError):
+        catalog_translate()
+    # only catalog (no further positional/optional args)
+    with pytest.raises(CommandParametrizationError):
+        catalog_translate(catalog=demo_catalog)
+    # fake metadata argument
+    with pytest.raises(CommandParametrizationError):
+        catalog_translate("huh?", catalog=demo_catalog)
 
 
-def test_correct_translation():
-    """"""
-    ctlg = Catalog()
+def test_correct_translation(demo_catalog, test_data):
+    """With and without the catalog argument"""
+    res = catalog_translate(
+        catalog=demo_catalog,
+        metadata=test_data.demo_metafile_datacite,
+        on_failure="ignore",
+        return_type="list",
+    )
     assert_in_results(
-        ctlg("translate", metadata=demo_metafile_datacite),
+        res,
         action="catalog_translate",
         status="ok",
+        path=demo_catalog.location,
+    )
+    res = catalog_translate(
+        metadata=test_data.demo_metafile_datacite,
+        on_failure="ignore",
+        return_type="list",
+    )
+    assert_in_results(
+        res,
+        action="catalog_translate",
+        status="ok",
+        path=os.getcwd(),
     )
 
 
-def test_correct_translation_with_class():
-    meta_dict = read_json_file(demo_metafile_datacite)
-    Translate(meta_dict, get_translators()).run_translator()
-
-
-def test_translator_not_found():
-    ctlg = Catalog()
+def test_translator_not_found(demo_catalog, test_data):
     # Wrong name
-    assert_raises(
-        TranslatorNotFoundError,
-        ctlg,
-        "translate",
-        metadata=demo_metafile_wrongname,
+    res = catalog_translate(
+        catalog=demo_catalog,
+        metadata=test_data.demo_metafile_wrongname,
+        on_failure="ignore",
+        return_type="list",
+    )
+    assert_in_results(
+        res,
+        action="catalog_translate",
+        status="error",
+        path=demo_catalog.location,
     )
     # Wrong version
-    assert_raises(
-        TranslatorNotFoundError,
-        ctlg,
-        "translate",
-        metadata=demo_metafile_wrongversion,
+    res = catalog_translate(
+        catalog=demo_catalog,
+        metadata=test_data.demo_metafile_wrongversion,
+        on_failure="ignore",
+        return_type="list",
+    )
+    assert_in_results(
+        res,
+        action="catalog_translate",
+        status="error",
+        path=demo_catalog.location,
     )
     # Nonsense metadata
-    assert_raises(
-        TranslatorNotFoundError,
-        ctlg,
-        "translate",
-        metadata=demo_metafile_nonsense,
+    res = catalog_translate(
+        catalog=demo_catalog,
+        metadata=test_data.demo_metafile_nonsense,
+        on_failure="ignore",
+        return_type="list",
+    )
+    assert_in_results(
+        res,
+        action="catalog_translate",
+        status="error",
+        path=demo_catalog.location,
     )
 
 
-def test_multiline_translation():
-    ctlg = Catalog()
+def test_multiline_translation(demo_catalog, test_data):
+    """This runs on two lines of metadata requiring the same translator,
+    which should be instantiated only once"""
+    res = catalog_translate(
+        catalog=demo_catalog,
+        metadata=test_data.demo_metafile_datacite_2items,
+        on_failure="ignore",
+        return_type="list",
+    )
     assert_result_count(
-        ctlg("translate", metadata=demo_metafile_datacite_2items),
+        res,
         2,
         action="catalog_translate",
         status="ok",

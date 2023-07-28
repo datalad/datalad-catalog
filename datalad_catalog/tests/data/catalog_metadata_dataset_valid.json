@@ -42,21 +42,6 @@
   "name": "StudyForrest",
   "short_name": "",
   "description": "",
-  "descriptions": [
-      {
-          "type": "studyminimeta",
-          "name": "StudyMiniMeta",
-          "content": "The StudyForrest project centers around the use of the movie Forrest Gump, which provides complex sensory input that is both reproducible and is also richly laden with real-life-like content and contexts. Since its initial release, the StudyForrest dataset has grown and been extended substantially, and now encompasses many hours of fMRI scans, structural brain scans, eye-tracking data, and extensive annotations of the movie. It is a one-of-a-kind resource for studying high-level cognition in the human brain under complex, natural stimulation. The versatility of the provided data (some individuals have nearly ten hours of fMRI data) enables studies far beyond this main focus. This covers a vast range from studies of low-level signal properties and brain structure, to sensory integration and attentional processes, to computational modeling of representational spaces and brain area interactions.",
-          "path": "",
-          "priority": 1
-      },
-      {
-          "type": "file",
-          "name": "README.md",
-          "content": "",
-          "path": "README.md"
-      }
-  ],
   "doi": "",
   "url": [
       "https://github.com/psychoinformatics-de/studyforrest-data"

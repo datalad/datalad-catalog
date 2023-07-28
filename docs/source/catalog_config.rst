@@ -3,7 +3,7 @@ Catalog Configuration
 
 A useful feature of the catalog process is to be able to configure certain
 properties according to your preferences. This is done with help of a config
-file (in either ``JSON`` or ``YAML`` format) and the ``-y/--config-file`` flag.
+file (in either ``JSON`` or ``YAML`` format) and the ``-F/--config-file`` flag.
 A config file can be passed during catalog creation in order to set the config
 on the catalog level, or when adding metadata in order to set the config
 on the dataset-level.

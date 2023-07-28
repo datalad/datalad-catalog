@@ -1,11 +1,10 @@
-from pathlib import Path
-
-import pytest
-
-from datalad_catalog.catalog import Catalog
-from datalad_catalog.meta_item import MetaItem
+from datalad_catalog.add import Add
 from datalad_catalog.utils import read_json_file
-from datalad_catalog.webcatalog import WebCatalog, Node
+from datalad_catalog.webcatalog import WebCatalog
+from datalad_catalog.node import Node
+
+from pathlib import Path
+import pytest
 
 
 CATALOG_NAME = "catalog_name"
@@ -24,79 +23,72 @@ default_config_path = package_path / "config" / "config.json"
 @pytest.fixture
 def demo_catalog_with_config_yml(tmp_path):
     catalog_path = tmp_path / "demo_catalog_with_config_yml"
-    return WebCatalog(
+    ctlg = WebCatalog(
         location=catalog_path,
-        config_file=str(demo_config_path_yml),
-        catalog_action="create",
     )
+    ctlg.create(config_file=str(demo_config_path_yml))
+    return ctlg
 
 
 @pytest.fixture
 def demo_catalog_with_config_json(tmp_path):
     catalog_path = tmp_path / "demo_catalog_with_config_json"
-    return WebCatalog(
+    ctlg = WebCatalog(
         location=catalog_path,
-        config_file=str(demo_config_path_json),
-        catalog_action="create",
     )
+    ctlg.create(config_file=str(demo_config_path_json))
+    return ctlg
 
 
 @pytest.fixture
 def demo_catalog_without_config(tmp_path):
     catalog_path = tmp_path / "demo_catalog_without_config"
-    return WebCatalog(
-        location=catalog_path, config_file=None, catalog_action="create"
+    ctlg = WebCatalog(
+        location=catalog_path,
     )
+    ctlg.create(config_file=None)
+    return ctlg
 
 
 def test_config_with_file_yml(demo_catalog_with_config_yml):
+    assert demo_catalog_with_config_yml.config_path == demo_config_path_yml
+    assert hasattr(demo_catalog_with_config_yml, "config")
+    assert demo_catalog_with_config_yml.config is not None
     assert (
-        demo_catalog_with_config_yml.catalog_config_path == demo_config_path_yml
-    )
-    assert hasattr(demo_catalog_with_config_yml, "catalog_config")
-    assert demo_catalog_with_config_yml.catalog_config is not None
-    assert (
-        demo_catalog_with_config_yml.catalog_config[CATALOG_NAME]
+        demo_catalog_with_config_yml.config[CATALOG_NAME]
         == "DataLad Catalog Config Test"
     )
 
 
 def test_config_with_file_json(demo_catalog_with_config_json):
+    assert demo_catalog_with_config_json.config_path == demo_config_path_json
+    assert hasattr(demo_catalog_with_config_json, "config")
+    assert demo_catalog_with_config_json.config is not None
     assert (
-        demo_catalog_with_config_json.catalog_config_path
-        == demo_config_path_json
-    )
-    assert hasattr(demo_catalog_with_config_json, "catalog_config")
-    assert demo_catalog_with_config_json.catalog_config is not None
-    assert (
-        demo_catalog_with_config_json.catalog_config[CATALOG_NAME]
+        demo_catalog_with_config_json.config[CATALOG_NAME]
         == "DataLad Catalog Config Test"
     )
 
 
 def test_config_without_file(demo_catalog_without_config):
-    assert (
-        demo_catalog_without_config.catalog_config_path == default_config_path
-    )
-    assert hasattr(demo_catalog_without_config, "catalog_config")
-    assert demo_catalog_without_config.catalog_config is not None
-    assert demo_catalog_without_config.catalog_config[CATALOG_NAME] == "DataCat"
+    assert demo_catalog_without_config.config_path == default_config_path
+    assert hasattr(demo_catalog_without_config, "config")
+    assert demo_catalog_without_config.config is not None
+    assert demo_catalog_without_config.config[CATALOG_NAME] == "DataCat"
 
 
 def test_dataset_config(tmp_path):
     """"""
+    catalog_add = Add()
     # 0. Create catalog with custom config file
     catalog_path = tmp_path / "new_catalog"
-    catalog = Catalog()
-    catalog(
-        catalog_action="create",
-        catalog_dir=catalog_path,
-        config_file=demo_config_path_json,
+    ctlg = WebCatalog(
+        location=catalog_path,
     )
+    ctlg.create(config_file=str(demo_config_path_json))
     # 1. Test dataset add with dataset-specific config file
-    catalog(
-        catalog_action="add",
-        catalog_dir=catalog_path,
+    catalog_add(
+        catalog=ctlg,
         metadata=str(metadata_path1),
         config_file=demo_config_path_dataset,
     )
@@ -105,28 +97,26 @@ def test_dataset_config(tmp_path):
     d_v = _get_value_from_file(metadata_path1, "dataset_version")
     config_file_path = catalog_path / "metadata" / d_id / d_v / "config.json"
     assert config_file_path.exists()
-    # - Grab webcatalog instance
-    ctlg = WebCatalog(
-        catalog_path,
-        None,
-        None,
-        demo_config_path_dataset,
-        "add",
+    # - Grab Node instance
+    node_instance = Node(
+        catalog=ctlg,
+        type="dataset",
+        dataset_id=d_id,
+        dataset_version=d_v,
+        node_path=None,
     )
-    # - Dataset config attribute should exist
-    assert hasattr(ctlg, "dataset_config")
-    # - Dataset config attribute should have correct dataset-specific content
-    assert ctlg.dataset_config is not None
+    cfg = node_instance.get_config()
+    # - config attribute should have correct dataset-specific content
+    assert cfg is not None
+    assert cfg.get("source") == "dataset"
     assert (
-        ctlg.dataset_config[CATALOG_NAME]
+        cfg.get("config").get(CATALOG_NAME)
         == "DataLad Catalog Config Test Dataset"
     )
     # 2. Next, test dataset add with NO CONFIG
-    catalog(
-        catalog_action="add",
-        catalog_dir=catalog_path,
-        metadata=metadata_path2,
-        config_file=None,
+    catalog_add(
+        catalog=ctlg,
+        metadata=str(metadata_path2),
     )
     # - Dataset config file should NOT be created
     d_id = _get_value_from_file(metadata_path2, "dataset_id")
@@ -134,22 +124,19 @@ def test_dataset_config(tmp_path):
     config_file_path = catalog_path / "metadata" / d_id / d_v / "config.json"
     assert not config_file_path.exists()
     # - Grab webcatalog instance
-    ctlg = WebCatalog(
-        catalog_path,
-        None,
-        None,
-        None,
-        "add",
-    )
     # - Grab Node instance
-    node = Node(
-        catalog=ctlg, type="dataset", dataset_id=d_id, dataset_version=d_v
+    node_instance = Node(
+        catalog=ctlg,
+        type="dataset",
+        dataset_id=d_id,
+        dataset_version=d_v,
+        node_path=None,
     )
-    # config attribute should exist on node instance
-    assert hasattr(node, "config")
-    # Config attribute should be set from catalog level (here, from specific file)
-    assert node.config is not None
-    assert node.config[CATALOG_NAME] == "DataLad Catalog Config Test"
+    cfg = node_instance.get_config()
+    # config attribute should exist and be correct and from correct source
+    assert cfg is not None
+    assert cfg.get("source") == "catalog"
+    assert cfg.get("config").get(CATALOG_NAME) == "DataLad Catalog Config Test"
 
 
 def _get_value_from_file(metadata_path, key):

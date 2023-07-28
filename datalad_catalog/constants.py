@@ -1,4 +1,14 @@
 # A module to store all constants
+from pathlib import Path
+
+# Paths
+package_path = Path(__file__).resolve().parent
+catalog_path = package_path / "catalog"
+schema_dir = catalog_path / "schema"
+tests_path = package_path / "tests"
+default_config_dir = package_path / "config"
+
+# Keys
 ATGRAPH = "@graph"
 ATID = "@id"
 ATLIST = "@list"
@@ -6,12 +16,14 @@ ATTYPE = "@type"
 AUTHOR = "author"
 AUTHORS = "authors"
 CATALOG = "catalog"
+CATALOG_NAME = "catalog_name"
 CHILDREN = "children"
 CONTENT = "content"
 CONTENTBYTESIZE = "contentbytesize"
 CREATIVEWORK = "CreativeWork"
 DESCRIPTION = "description"
 DOI = "doi"
+DOLLARID = "$id"
 DIRECTORY = "directory"
 DATASET_ID = "dataset_id"
 DATASET_PATH = "dataset_path"
@@ -59,3 +71,12 @@ TYPE_DIRECTORY = "directory"
 TYPE_FILE = "file"
 URL = "url"
 VERSION = "version"
+
+# Schema
+CATALOG_SCHEMA_IDS = {
+    CATALOG: "https://datalad.org/catalog.schema.json",
+    TYPE_DATASET: "https://datalad.org/catalog.dataset.schema.json",
+    TYPE_FILE: "https://datalad.org/catalog.file.schema.json",
+    AUTHORS: "https://datalad.org/catalog.authors.schema.json",
+    METADATA_SOURCES: "https://datalad.org/catalog.metadata_sources.schema.json",
+}
