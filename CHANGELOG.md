@@ -1,3 +1,22 @@
+# 0.2.1 (Tue Mar 7, 2023) -- fix extension tests
+
+### 🏠 Internal
+
+- Start using a `maint` branch for releases
+
+### 🛡 Tests
+
+- Don't install `jq` dependency on Windows, don't collect and run workflow tests on windows. Issue [#256](https://github.com/datalad/datalad-catalog/issues/256), Commit [25dd1e7](https://github.com/datalad/datalad-catalog/commit/25dd1e7a8076579b025c55aeebe3c9f33083c5a2) (by [@jsheunis](https://github.com/jsheunis))
+
+### 🪓 Deprecations and removals
+
+- fix ModuleNotFoundError because of upstream metadata updates. Commit [649e941](https://github.com/datalad/datalad-catalog/commit/649e9415e297608f8a9d5adafea16c887eb9cc08) (by [@jsheunis](https://github.com/jsheunis))
+
+### Authors: 1
+
+- Stephan Heunis (@jsheunis)
+
+
 # 0.2.0 (Thu Nov 24, 2022) -- jsonschema rendering + metadata forms + cleanup
 
 
