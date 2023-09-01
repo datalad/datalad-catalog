@@ -1,6 +1,6 @@
 import pytest
 from datalad.support.exceptions import InsufficientArgumentsError
-from datalad.tests.utils import (
+from datalad.tests.utils_pytest import (
     assert_in_results,
     assert_raises,
 )
