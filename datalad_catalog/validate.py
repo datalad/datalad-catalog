@@ -31,6 +31,7 @@ from datalad_next.commands import (
 from datalad_next.exceptions import CapturedException
 import json
 import logging
+from pathlib import Path
 
 
 __docformat__ = "restructuredtext"
@@ -109,7 +110,7 @@ class Validate(ValidatedInterface):
     ):
         res_kwargs = dict(
             action="catalog_validate",
-            path=catalog.location,
+            path=catalog.location if bool(catalog) else Path.cwd(),
         )
         # turn non-iterable into a list for uniform processing below
         if isinstance(metadata, (str, dict)):

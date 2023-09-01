@@ -5,6 +5,7 @@ from datalad.tests.utils_pytest import (
 from datalad_catalog.validate import Validate
 from datalad_next.constraints.exceptions import CommandParametrizationError
 
+from pathlib import Path
 import pytest
 
 catalog_validate = Validate()
@@ -64,4 +65,27 @@ def test_validate_from_file_faulty(demo_catalog, test_data):
         action="catalog_validate",
         status="error",
         path=demo_catalog.location,
+    )
+
+
+def test_validate_without_catalog(demo_catalog, test_data):
+    """Validate  metadata from a file with json lines,
+    and no catalog argument"""
+    res = catalog_validate(
+        metadata=test_data.catalog_metadata_valid_invalid,
+        on_failure="ignore",
+        return_type="list",
+    )
+    assert_result_count(
+        res,
+        2,
+        action="catalog_validate",
+        status="ok",
+        path=Path.cwd(),
+    )
+    assert_in_results(
+        res,
+        action="catalog_validate",
+        status="error",
+        path=Path.cwd(),
     )
