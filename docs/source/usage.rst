@@ -91,7 +91,7 @@ the schema version contained in the installed ``datalad-catalog`` package.
 
 .. note::
    
-   The validator runs internally whenever ``datalad catalog add`` is called,
+   The validator runs internally whenever ``datalad catalog-add`` is called,
    so there is no need to run validation explicitly unless desired.
 
 Set catalog properties
@@ -122,7 +122,7 @@ testing, run ``datalad catalog-serve``.
 
 .. code-block:: bash
 
-   datalad catalog serve --catalog /tmp/my-cat
+   datalad catalog-serve --catalog /tmp/my-cat
 
 Once the content is served, the catalog can be viewed by visiting the localhost URL.
 
@@ -168,10 +168,10 @@ on the dataset-level:
 
 .. code-block:: bash
 
-   datalad catalog add --catalog /tmp/my-custom-cat --metadata path/to/metadata.jsonl --config-file path/to/custom_dataset_config.json
+   datalad catalog-add --catalog /tmp/my-custom-cat --metadata path/to/metadata.jsonl --config-file path/to/custom_dataset_config.json
 
 In the latter case, the config will be set for all new dataset entries corresponding
-to metadata source objects in the metadata provided to the ``add`` operation.
+to metadata source objects in the metadata provided to the ``catalog-add`` operation.
 
 If no config file is specified on the catalog level, a default config file is used.
 The catalog-level config also serves as the default config on the dataset level,

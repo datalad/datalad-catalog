@@ -13,7 +13,7 @@ As an example, ``datalad-catalog``'s default config file can be viewed `here`_.
 Catalog-level configuration
 ===========================
 
-Via the catalog-level config (provided during ``catalog create``) you can specify
+Via the catalog-level config (provided during ``catalog-create``) you can specify
 the following properties:
 
 - the catalog name
@@ -27,13 +27,13 @@ The catalog-level configuration file will be located at: ``path-to-catalog/confi
 Dataset-level configuration
 ===========================
 
-The dataset-level config (provided during ``catalog add``) can specify the exact same content,
+The dataset-level config (provided during ``catalog-add``) can specify the exact same content,
 although then the catalog-level properties mentioned above will be ignored.
 
 This configuration file will be located at: ``path-to-catalog/metadata/<dataset_id>/<dataset_version>/config.json``.
 
 This configuration file will be created for all dataset-level metadata items in the metadata
-provided to the ``add`` operation. For each dataset, this file will override the default
+provided to the ``catalog-add`` operation. For each dataset, this file will override the default
 config specified on the catalog level.
 
 Inheritance rules

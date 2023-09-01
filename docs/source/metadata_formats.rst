@@ -88,7 +88,7 @@ metadata will typically be structured according to whatever schema was specified
 extractor, and information in such a schema will first have to be translated to the catalog
 schema before catalog entry generation can continue.
 
-``datalad-catalog`` provides a ``translate`` mechanism through which custom translators
+``datalad-catalog`` provides a ``catalog-translate`` command through which custom translators
 can be created and used to translate MetaLad-extracted metadata into the catalog schema.
 The catalog ships with several translators (including ones for ``metalad_core`` and 
 ``metalad_studyminimeta``) and provides a base class that makes it straightforward to 

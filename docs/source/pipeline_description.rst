@@ -221,16 +221,16 @@ Before the extracted metadata can be provided to ``datalad-catalog``, it needs t
 in a format/structure that will validate successfully against the catalog schema.
 Extracted metadata will typically be structured according to whatever schema was
 specified by the extractor, and information in such a schema will have to be translated
-to the catalog schema. For this purpose, ``datalad-catalog`` provides a ``translate``
-mechanism together with dedicated translators for specific metadata extractors.
+to the catalog schema. For this purpose, ``datalad-catalog`` provides a ``catalog-translate``
+command together with dedicated translators for specific metadata extractors.
 See :doc:`metadata_formats` and the :doc:`usage` instructions for more information.
 
 To translate the extracted metadata, we do the following:
 
 .. code-block:: bash
    
-    datalad catalog translate -m [path/to/dataset_metadata.json] > [path/to/translated_dataset_metadata.json]
-    datalad catalog translate -m [path/to/file_metadata.json] > [path/to/translated_file_metadata.json]
+    datalad catalog-translate -m [path/to/dataset_metadata.json] > [path/to/translated_dataset_metadata.json]
+    datalad catalog-translate -m [path/to/file_metadata.json] > [path/to/translated_file_metadata.json]
 
 
 Step 5 - Run DataLad Catalog
