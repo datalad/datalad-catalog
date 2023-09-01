@@ -1,5 +1,6 @@
 from datalad.tests.utils_pytest import (
     assert_in_results,
+    assert_result_count,
 )
 import datalad_catalog.constants as cnst
 from datalad_catalog.add import Add
@@ -128,6 +129,12 @@ def test_set_home(demo_catalog, test_data):
             cnst.DATASET_VERSION: ds_meta2[cnst.DATASET_VERSION],
         },
     )
+    assert_result_count(
+        res,
+        1,
+        action="catalog_set",
+        action_property="home",
+    )
 
 
 def test_set_home_outofcatalog(demo_catalog, test_data):
@@ -170,6 +177,12 @@ def test_set_home_outofcatalog(demo_catalog, test_data):
             cnst.DATASET_VERSION: "version_not_in_ctalog",
         },
     )
+    assert_result_count(
+        res,
+        1,
+        action="catalog_set",
+        action_property="home",
+    )
     # 2. Test when home page already set, dataset NOT in catalog
     # test WITH reckless=overwrite
     res = catalog_set(
@@ -188,4 +201,10 @@ def test_set_home_outofcatalog(demo_catalog, test_data):
         status="ok",
         path=demo_catalog.location,
         home={cnst.DATASET_ID: "bla", cnst.DATASET_VERSION: "bla"},
+    )
+    assert_result_count(
+        res,
+        1,
+        action="catalog_set",
+        action_property="home",
     )

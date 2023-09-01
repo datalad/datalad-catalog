@@ -219,18 +219,19 @@ class Set(ValidatedInterface):
                         message=success_msg,
                         home=success_home_spec,
                     )
-                # if home already set and no reckless mode, yield impossible
-                msg = (
-                    f"Home page already set: dataset_id={home_spec[cnst.DATASET_ID]}, "
-                    f"dataset_version={home_spec[cnst.DATASET_VERSION]}."
-                    "To overwrite this property, use '--reckless overwrite'"
-                )
-                yield get_status_dict(
-                    **res_kwargs,
-                    status="impossible",
-                    message=msg,
-                    home=home_spec,
-                )
+                else:
+                    # if home already set and no reckless mode, yield impossible
+                    msg = (
+                        f"Home page already set: dataset_id={home_spec[cnst.DATASET_ID]}, "
+                        f"dataset_version={home_spec[cnst.DATASET_VERSION]}."
+                        "To overwrite this property, use '--reckless overwrite'"
+                    )
+                    yield get_status_dict(
+                        **res_kwargs,
+                        status="impossible",
+                        message=msg,
+                        home=home_spec,
+                    )
             except FileNotFoundError:
                 # if home not set, set it
                 catalog.set_main_dataset(dataset_id, dataset_version)
