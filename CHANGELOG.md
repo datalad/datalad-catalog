@@ -1,4 +1,4 @@
-# 1.0.0 (Fri Sept 1 2023) -- Brand new CLI!
+# 1.0.1 (Fri Sept 1 2023) -- Brand new CLI!
 
 ### Summary
 
@@ -36,7 +36,7 @@ Some of the important changes to take note of:
 - NF: Adds metadata translation functionality in dedicated class. PR [#246](https://github.com/datalad/datalad-catalog/pull/246) (by [@jsheunis](https://github.com/jsheunis))
 - ENH: don't install jq dependency on windows. PR [#248](https://github.com/datalad/datalad-catalog/pull/248) (by [@jsheunis](https://github.com/jsheunis))
 - ENH: refactoring config, extractors_used. PR [#237](https://github.com/datalad/datalad-catalog/pull/237) (by [@jsheunis](https://github.com/jsheunis))
-- ENH+BUG: Improving translators and catalog generation.. PR [#269](https://github.com/datalad/datalad-catalog/pull/269) (by [@jsheunis](https://github.com/jsheunis))
+- ENH+BUG: Improving translators and catalog generation. PR [#269](https://github.com/datalad/datalad-catalog/pull/269) (by [@jsheunis](https://github.com/jsheunis))
 - Frontend maintenance. PR [#272](https://github.com/datalad/datalad-catalog/pull/272) (by [@jsheunis](https://github.com/jsheunis))
 - ENH+NF: add javascript customization options via config. PR [#283](https://github.com/datalad/datalad-catalog/pull/283) (by [@jsheunis](https://github.com/jsheunis))
 - ENH: Translator edits. PR [#277](https://github.com/datalad/datalad-catalog/pull/277) (by [@jsheunis](https://github.com/jsheunis))
@@ -65,6 +65,8 @@ Some of the important changes to take note of:
 
 - Switch MacOS Appveyor builds to Monterey. PR [#242](https://github.com/datalad/datalad-catalog/pull/242) (by [@mslw](https://github.com/mslw))
 - codespell: typo fixes, config, workflow. PR [#257](https://github.com/datalad/datalad-catalog/pull/257) (by [@yarikoptic](https://github.com/yarikoptic))
+- Add a readthedocs configuration file. PR [#336](https://github.com/datalad/datalad-catalog/pull/336) (by [@jsheunis](https://github.com/jsheunis))
+- depend on `datalad-next 1.0.0b3` . PR [#336](https://github.com/datalad/datalad-catalog/pull/336) (by [@jsheunis](https://github.com/jsheunis))
 
 ### 🛡 Tests
 
