@@ -1,4 +1,4 @@
-# 1.0.0 (Fri Sept 1 2023) -- Brand new CLI!
+# 1.0.1 (Fri Sept 1 2023) -- Brand new CLI!
 
 ### Summary
 
