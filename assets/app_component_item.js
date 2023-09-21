@@ -120,8 +120,12 @@ Vue.component('tree-item', function (resolve, reject) {
                 return JSON.parse(text);
               },
               getDownloadURL(url_array) {
-                if (url_array && url_array[0]) {
-                  return url_array[0];
+                if (url_array) {
+                  if (Array.isArray(url_array)) {
+                    return url_array[0];
+                  } else {
+                    return url_array;
+                  }
                 } else {
                   return "";
                 }

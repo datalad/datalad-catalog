@@ -1,0 +1,293 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datalad.org/catalog.dataset.schema.json",
+  "title": "dataset",
+  "description": "A dataset in a DataLad Catalog",
+  "type": "object",
+  "properties": {
+    "type": {
+      "description": "The type of node",
+      "title": "Type",
+      "type": "string",
+      "pattern": "dataset"
+    },
+    "dataset_id": {
+      "description": "The dataset ID",
+      "title": "Dataset ID",
+      "type": "string"
+    },
+    "dataset_version": {
+      "description": "The dataset VERSION",
+      "title": "Dataset version",
+      "type": "string"
+    },
+    "name":  {
+      "description": "The long name of the dataset",
+      "title": "Name",
+      "type": "string"
+    },
+    "short_name":  {
+      "description": "The short name of the dataset",
+      "title": "Short name",
+      "type": "string"
+    },
+    "description": {
+      "description": "A 1-2 paragraph description of the dataset",
+      "title": "Description",
+      "type": ["array", "string"]
+    },
+    "doi": {
+      "description": "The dataset's digital object identifier",
+      "title": "DOI",
+      "type": "string"
+    },
+    "url": {
+      "description": "The location of the datalad dataset's annex",
+      "title": "URL",
+      "type": ["array", "string"],
+      "items": {
+        "type": "string"
+      }
+    },
+    "license": {
+      "description": "The license under which the dataset is made available",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The license name",
+          "title": "Name",
+          "type": "string"
+        },
+        "url": {
+          "description": "A URL where a description of the license can be viewed",
+          "title": "URL",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "dependentSchemas": {
+        "name": {
+          "required": ["name"]
+        },
+        "url": {
+          "required": ["name"]
+        }
+      }
+    },
+    "authors": { "$ref": "https://datalad.org/catalog.authors.schema.json"},
+    "access_request_contact" : {
+      "description": "The contact details of the person/office from which to request access to the dataset content",
+      "title": "Access Request Contact",
+      "type": "object",
+      "properties": {
+        "givenName": {
+          "description": "The author's given name, such as 'John'",
+          "title": "Given name",
+          "type": "string"
+        },
+        "familyName": {
+          "description": "The author's last/family name, such as 'Doe'",
+          "title": "Family name",
+          "type": "string"
+        },
+        "name": {
+          "description": "A concatenation of the honorificSuffix, givenName and familyName properties, such as 'Dr. John Doe'",
+          "title": "Name",
+          "type": "string"
+        },
+        "email": {
+          "description": "Email address of the author, such as johndoe@example.com",
+          "title": "Email",
+          "type": "string",
+          "format": "email"
+        },
+        "honorificSuffix": {
+          "description": "Title of the author, such as 'Dr.'",
+          "title": "Honorific suffix",
+          "type": "string"
+        },
+        "identifiers": {
+          "description": "Identifiers for the person",
+          "title": "Identifiers",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "description": "Type of identifier, such as 'ORCID'",
+                "title": "Type",
+                "type": "string"
+              },
+              "identifier": {
+                "description": "The actual identifier, such as the ORCID ID '0000-1212-5566'",
+                "title": "Identifier",
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "required": ["givenName", "familyName", "email"]
+    },
+    "access_request_url": { 
+      "type": "string",
+      "description": "The url of the online location from which to request access to the dataset content",
+      "title": "Access Request URL",
+      "format": "uri"
+    },
+    "keywords": {
+      "description": "Tags or keywords describing the dataset",
+      "title": "Keywords",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "funding": {
+      "description": "Sources of funding for the dataset",
+      "title": "Funding",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the funding source, such as a funder or grant scheme",
+            "title": "Name",
+            "type": "string"
+          },
+          "identifier": {
+            "description": "Identifier of the fund, such as a grant number",
+            "title": "Identifier",
+            "type": "string"
+          },
+          "description": {
+            "description": "Free form description of grant or funding",
+            "title": "Description",
+            "type": "string"
+          }
+        },
+        "required": []
+      },
+      "uniqueItems": true
+    },
+    "publications": {
+      "description": "Publications related to the dataset",
+      "title": "Publications",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "description": "Type of publication, such as a scholarly article, book, blog post",
+            "title": "Type",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title of the publication",
+            "title": "Title",
+            "type": "string"
+          },
+          "doi": {
+            "description": "The publication's digital object identifier",
+            "title": "DOI",
+            "type": "string"
+          },
+          "datePublished": {
+            "description": "The publication date year",
+            "title": "Date published",
+            "type": ["number", "string"]
+          },
+          "publicationOutlet": {
+            "description": "The publication outlet / venue, such as the journal, publisher name, or news outlet",
+            "title": "Publication outlet",
+            "type": "string"
+          },
+          "authors": { "$ref": "https://datalad.org/catalog.authors.schema.json"}
+        },
+        "required": ["title", "doi", "authors"]
+      },
+      "uniqueItems": true
+    },
+    "subdatasets": {
+      "description": "Subdatasets of the current dataset",
+      "title": "Subdatasets",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "dataset_id": {
+            "description": "The subdataset ID",
+            "title": "Dataset ID",
+            "type": "string"
+          },
+          "dataset_version": {
+            "description": "The subdataset VERSION",
+            "title": "Dataset version",
+            "type": "string"
+          },
+          "dataset_path": {
+            "description": "The subdataset PATH relative to its parent",
+            "title": "Dataset path",
+            "type": "string"
+          }
+        },
+        "required": ["dataset_id", "dataset_version", "dataset_path"]
+      },
+      "uniqueItems": true
+    },
+    "metadata_sources": {"$ref": "https://datalad.org/catalog.metadata_sources.schema.json"},
+    "additional_display": {
+      "description": "Additional items to display in tabs on dataset page",
+      "title": "Additional display",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the section that will appear as the tab name",
+            "title": "Name",
+            "type": "string"
+          },
+          "content": {
+            "description": "The content that will appear in the tab when opened, specified as key-value pairs",
+            "title": "Content",
+            "type": "object"
+          },
+          "icon": {
+            "description": "An icon from the Font Awesome Free collection (v6.1.1), e.g. 'fas fa-database', that will be displayed in the tab heading",
+            "title": "icon",
+            "type": "string"
+          }
+        },
+        "required": ["name", "content"]
+      },
+      "uniqueItems": true
+    },
+    "top_display": {
+      "description": "Additional items to display at the top of the dataset page (along with keywords, description, etc)",
+      "title": "Top display",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the item that will appear as part of the top display",
+            "title": "Name",
+            "type": "string"
+          },
+          "value": {
+            "description": "Value of the item that will appear as part of the top display",
+            "title": "Value",
+            "type": ["number", "string"]
+          }
+        },
+        "required": ["name", "value"]
+      },
+      "uniqueItems": true,
+      "maxItems": 5
+    }
+  },
+  "required": [ "type", "dataset_id", "dataset_version", "name"]
+}
+

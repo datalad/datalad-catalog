@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datalad.org/catalog.schema.json",
+  "title": "catalog",
+  "description": "The main catalog schema",
+  "version": "1.0.0",
+  "type": "object",
+  "allOf": [
+    {
+      "if": {
+        "properties": { "type": { "const": "dataset" } }
+      },
+      "then": {
+        "$ref": "https://datalad.org/catalog.dataset.schema.json"
+      }
+    },
+    {
+      "if": {
+        "properties": { "type": { "const": "file" } }
+      },
+      "then": {
+        "$ref": "https://datalad.org/catalog.file.schema.json"
+      }
+    }
+  ]
+}

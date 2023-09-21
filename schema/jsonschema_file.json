@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datalad.org/catalog.file.schema.json",
+  "title": "file",
+  "description": "A file in a DataLad Catalog",
+  "type": "object",
+  "properties": {
+    "type": {
+      "description": "The type of item",
+      "title": "Type",
+      "type": "string",
+      "pattern": "file"
+    },
+    "dataset_id": {
+      "description": "The parent dataset ID",
+      "title": "Dataset ID",
+      "type": "string"
+    },
+    "dataset_version": {
+      "description": "The parent dataset VERSION",
+      "title": "Dataset version",
+      "type": "string"
+    },
+    "path": {
+      "description": "The path of the file relative to its parent dataset",
+      "title": "Path",
+      "type": "string"
+    },
+    "contentbytesize": {
+      "description": "The size of the file in bytes",
+      "title": "Content byte size",
+      "type": "number"
+    },
+    "url": {
+      "description": "The location of the annexed file",
+      "title": "URL",
+      "type": ["array", "string"],
+      "items": {
+        "type": "string"
+      }
+    },
+    "metadata_sources": {"$ref": "https://datalad.org/catalog.metadata_sources.schema.json"},
+    "additional_display": {
+      "description": "Additional items to display on the file level",
+      "title": "Additional display",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name of the section that will appear as the tab name",
+            "title": "Name",
+            "type": "string"
+          },
+          "content": {
+            "description": "The content that will appear when selecting the file, specified as key-value pairs",
+            "title": "Content",
+            "type": "object"
+          }
+        },
+        "required": ["name", "content"]
+      },
+      "uniqueItems": true
+    }
+  },
+  "required": [ "type", "dataset_id", "dataset_version", "path"]
+}
+

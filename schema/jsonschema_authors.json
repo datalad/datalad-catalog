@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://datalad.org/catalog.authors.schema.json",
+  "title": "authors",
+  "description": "Authors, creators, or maintainers of the entity",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "givenName": {
+        "description": "The author's given name, such as 'John'",
+        "title": "Given name",
+        "type": "string"
+      },
+      "familyName": {
+        "description": "The author's last/family name, such as 'Doe'",
+        "title": "Family name",
+        "type": "string"
+      },
+      "name": {
+        "description": "A concatenation of the honorificSuffix, givenName and familyName properties, such as 'Dr. John Doe'",
+        "title": "Name",
+        "type": "string"
+      },
+      "email": {
+        "description": "Email address of the author, such as johndoe@example.com",
+        "title": "Email",
+        "type": "string",
+        "format": "email"
+      },
+      "honorificSuffix": {
+        "description": "Title of the author, such as 'Dr.'",
+        "title": "Honorific suffix",
+        "type": "string"
+      },
+      "identifiers": {
+        "description": "Identifiers for the person",
+        "title": "Identifiers",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "description": "Type of identifier, such as 'ORCID'",
+              "title": "Type",
+              "type": "string"
+            },
+            "identifier": {
+              "description": "The actual identifier, such as the ORCID ID '0000-1212-5566'",
+              "title": "Identifier",
+              "type": "string"
+            }
+          }
+        }
+      }
+
+    },
+    "required": []
+  },
+  "uniqueItems": true
+}
+
