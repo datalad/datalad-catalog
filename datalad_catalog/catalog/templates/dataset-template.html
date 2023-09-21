@@ -465,7 +465,18 @@
                     <tbody>
                       <tr v-for="content_key in Object.keys(new_tab.content)">
                          <td><strong>{{ content_key.charAt(0).toUpperCase() + content_key.slice(1) }}</strong></td> 
-                         <td>{{ new_tab.content[content_key] }}</td>  
+                         <td>
+                          <span v-if="!new_tab.content[content_key]"><em>not specified</em></span>
+                          <span v-else-if="Array.isArray(new_tab.content[content_key])">
+                            <span v-for="val in new_tab.content[content_key]">{{val}}<br></span>
+                          </span>
+                          <span v-else-if="typeof new_tab.content[content_key] === 'object'">
+                            <span v-for="k in Object.keys(new_tab.content[content_key])">
+                              <em>{{k}}:</em> {{new_tab.content[content_key][k]}} <br>
+                            </span>
+                          </span>
+                          <span v-else>{{ new_tab.content[content_key] }}</span>
+                         </td>
                       </tr>
                      </tbody>
                   </table>
