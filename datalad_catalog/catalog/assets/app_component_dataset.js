@@ -629,11 +629,11 @@ const datasetView = () =>
           else {
             this.$root.selectedDataset.has_files = false;
           }
-          // now set the correct tab:
-          this.setCorrectTab(
-            this.$root.selectedDataset.has_subdatasets,
-            this.$root.selectedDataset.has_files
-          )
+          // // now set the correct tab:
+          // this.setCorrectTab(
+          //   this.$root.selectedDataset.has_subdatasets,
+          //   this.$root.selectedDataset.has_files
+          // )
           next();
         },
         async created() {
@@ -717,14 +717,15 @@ const datasetView = () =>
           else {
             this.$root.selectedDataset.has_files = false;
           }
-          this.setCorrectTab(
-            this.$root.selectedDataset.has_subdatasets,
-            this.$root.selectedDataset.has_files
-          )
+          // this.setCorrectTab(
+          //   this.$root.selectedDataset.has_subdatasets,
+          //   this.$root.selectedDataset.has_files
+          // )
         },
         mounted() {
           this.tag_options_filtered = this.tag_options;
           this.tag_options_available = this.tag_options;
+          this.tabIndex = 0;
         }
       }
     })
