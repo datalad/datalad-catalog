@@ -10,7 +10,7 @@
 import jq
 import logging
 from pathlib import Path
-from datalad_catalog.translate import TranslatorBase
+from datalad_catalog.translate import TranslatorBase, TranslatorImplementationBase
 
 lgr = logging.getLogger("datalad.metadata.translators.bids_dataset_translator")
 
@@ -94,7 +94,7 @@ class BIDSDatasetTranslator(TranslatorBase):
         return BIDSTranslator(metadata).translate()
 
 
-class BIDSTranslator:
+class BIDSTranslator(TranslatorImplementationBase):
     """Translator for bids_dataset
     Uses jq programs written by jsheunis for datalad-catalog workflow
     to translate some fields. Will not include empty values in its output.
@@ -167,19 +167,6 @@ class BIDSTranslator:
             '"authors": []}]'
         )
         result = jq.first(program, self.extracted_metadata)
-        return result if len(result) > 0 else None
-
-    def get_metadata_source(self):
-        program = (
-            '{"key_source_map": {},"sources": [{'
-            '"source_name": .extractor_name, '
-            '"source_version": .extractor_version, '
-            '"source_parameter": .extraction_parameter, '
-            '"source_time": .extraction_time, '
-            '"agent_email": .agent_email, '
-            '"agent_name": .agent_name}]}'
-        )
-        result = jq.first(program, self.metadata_record)
         return result if len(result) > 0 else None
 
     def get_additional_display(self):

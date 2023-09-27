@@ -8,6 +8,7 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Translate metalad-extracted metadata items into the catalog schema
 """
+import jq
 
 import datalad_catalog.constants as cnst
 from datalad_catalog.constraints import (
@@ -393,3 +394,29 @@ class TranslatorBase(metaclass=abc.ABCMeta):
         Reports the version of the extractor supported by the translator
         """
         raise NotImplementedError
+
+
+class TranslatorImplementationBase:
+    """Common functionality across all translator implementations
+    """
+
+    def get_metadata_source(self):
+        program = (
+            '{"key_source_map": {},"sources": [{'
+            '"source_name": .extractor_name, '
+            '"source_version": .extractor_version, '
+            '"source_parameter": .extraction_parameter, '
+            '"source_time": .extraction_time, '
+            '"agent_email": .agent_email, '
+            '"agent_name": .agent_name}]}'
+        )
+        result = jq.first(program, self.metadata_record)
+        # filter out "sources" fields for only non None values
+        if result:
+            result['sources'] = [
+                {k: v for k, v in source.items() if v is not None}
+                for source in result['sources']
+            ]
+            return result
+        else:
+            return None
