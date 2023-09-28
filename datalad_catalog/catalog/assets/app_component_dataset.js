@@ -735,7 +735,7 @@ const datasetView = () =>
           // finally set the root data and then set the correct tab
           this.$root.selectedDataset.available_tabs = available_tabs
           this.setCorrectTab(
-            to.params.tab_name,
+            this.$route.params.tab_name,
           )
         },
         mounted() {
