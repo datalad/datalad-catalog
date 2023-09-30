@@ -24,7 +24,8 @@
         <!-- DATASET VERSION ETC -->
         <b-card-text>
           <strong>Version:</strong> {{selectedDataset.dataset_version.substring(0,7)}}&nbsp;
-          <strong>Last updated:</strong> {{displayData.last_updated}}&nbsp;
+          <strong>Last updated:</strong> <span v-if="displayData.last_updated">{{displayData.last_updated}}&nbsp;</span>
+          <span v-else><em>unknown</em></span>&nbsp;
           <strong>DOI:</strong> <span v-if="selectedDataset.doi"><a :href="selectedDataset.doi" target="_blank"> {{selectedDataset.doi.replace("https://doi.org/", "")}}</a></span>
           <span v-else><em>unknown</em></span>&nbsp;
           <strong>License:</strong> <span v-if="selectedDataset.license && selectedDataset.license.name"><a :href="selectedDataset.license.url" target="_blank"> {{selectedDataset.license.name}}</a></span>
