@@ -17,7 +17,8 @@ const default_config = {
     about: null,
     documentation: null,
     github: null,
-    twitter: null,
+    mastodon: null,
+    x: null
   },
   dataset_options: {
     include_metadata_export: true,
