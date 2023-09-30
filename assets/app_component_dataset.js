@@ -380,7 +380,7 @@ const datasetView = () =>
           },
           openWithBinder(dataset_url) {
             const environment_url =
-              "https://mybinder.org/v2/gh/datalad/datalad-binder/parameter-test";
+              "https://mybinder.org/v2/gh/datalad/datalad-binder/main";
             const content_url = "https://github.com/jsheunis/datalad-notebooks";
             const content_repo_name = "datalad-notebooks";
             const notebook_name = "download_data_with_datalad_python.ipynb";
