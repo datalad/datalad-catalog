@@ -494,7 +494,8 @@ var form_app = new Vue({
         github:
           "https://github.com/datalad/datalad-catalog",
         docs: "https://docs.datalad.org/projects/catalog/en/latest/",
-        twitter: "https://twitter.com/datalad",
+        mastodon: "https://fosstodon.org/@datalad",
+        x: "https://x.com/datalad"
       };
       if (dest in destinations) {
         window.open(destinations[dest]);
