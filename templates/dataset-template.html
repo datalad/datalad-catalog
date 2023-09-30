@@ -4,7 +4,18 @@
       <b-card-body>
         <!-- DATASET TITLE -->
         <b-card-title>
-          <span><a @click="gotoHome" class="newlink"><i class="fas fa-home"></i></a>{{displayData.display_name}}</span>
+          <span class="dataset-nav">
+            <span>
+              <a @click="gotoHome" class="newlink"><small><i class="fas fa-home"></i></small></a>
+            </span>
+            <span class="dataset-nav-item" v-if="selectedDataset.show_backbutton">
+              <a @click="history.back()" class="newlink"><small><i class="fas fa-backward"></i></small></a>
+            </span>
+            <span class="dataset-nav-item">
+              {{displayData.display_name}}
+            </span>
+          </span>
+          
         </b-card-title>
         <!-- DATASET AUTHORS -->
         <b-card-sub-title class="mb-2">
