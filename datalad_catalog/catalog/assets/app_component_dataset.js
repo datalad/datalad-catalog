@@ -38,6 +38,7 @@ const datasetView = () =>
             citation_busy: false,
             citation_text: "",
             invalid_doi: false,
+            show_backbutton: false,
           };
         },
         watch: {
@@ -91,7 +92,7 @@ const datasetView = () =>
                   disp_dataset["short_name"] = dataset["short_name"];
                 }
               }
-              disp_dataset["display_name"] = " - " + disp_dataset["short_name"];
+              disp_dataset["display_name"] = disp_dataset["short_name"];
               // DOI
               if (!dataset.hasOwnProperty("doi") || !dataset["doi"]) {
                 disp_dataset["doi"] = "not available";
@@ -632,9 +633,28 @@ const datasetView = () =>
           this.setCorrectTab(
             to.params.tab_name,
           )
+          // if navigated to using vue router (i.e. internal to the app), show the back button
+          if ((this.$root.home_dataset_id == this.$root.selectedDataset.dataset_id) && 
+          (this.$root.home_dataset_version == this.$root.selectedDataset.dataset_version)) {
+            this.$root.selectedDataset.show_backbutton = false
+          } else {
+            this.$root.selectedDataset.show_backbutton = true
+          }
           next();
         },
         async created() {
+          // fetch superfile in order to set id and version on $root
+          homefile = metadata_dir + "/super.json";
+          homeresponse = await fetch(homefile);
+          if (homeresponse.status == 404) {
+            this.$root.home_dataset_id = null;
+            this.$root.home_dataset_version = null;
+          } else {
+            hometext = await homeresponse.text();
+            homedataset = JSON.parse(hometext);
+            this.$root.home_dataset_id = homedataset.dataset_id;
+            this.$root.home_dataset_version = homedataset.dataset_version;
+          }
           file = getFilePath(
             this.$route.params.dataset_id,
             this.$route.params.dataset_version,
