@@ -218,10 +218,17 @@ const datasetView = () =>
                 c.dirs_from_path[c.dirs_from_path.length - 1]
                   .toLowerCase()
                   .indexOf(this.search_text.toLowerCase()) >= 0 ||
-                // || (c.authors.some(e => e.givenName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0))
                 c.authors.some(
                   (f) =>
-                    f.name.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0
+                  f.givenName && f.givenName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0 
+                ) ||
+                c.authors.some(
+                  (f) =>
+                  f.familyName && f.familyName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0 
+                ) ||
+                c.authors.some(
+                  (f) =>
+                  f.name && f.name.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0
                 )
               );
             });
