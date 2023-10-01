@@ -333,6 +333,9 @@ const datasetView = () =>
                   dataset_version: objVersion,
                 },
               }
+              // before navigation, clear filtering options
+              this.clearFilters()
+              // now navigate
               if (newBrowserTab) {
                 const routeData = router.resolve(route_info);
                 window.open(routeData.href, '_blank');
@@ -344,6 +347,11 @@ const datasetView = () =>
               console.log(this.$root.subNotAvailable);
               this.$root.$emit("bv::show::modal", "modal-3", "#btnShow");
             }
+          },
+          clearFilters() {
+            this.search_text = ""
+            this.search_tags = []
+            this.clearSearchTagText()
           },
           selectDescription(desc) {
             if (desc.content.startsWith("path:")) {

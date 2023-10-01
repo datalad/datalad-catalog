@@ -270,7 +270,7 @@
               <span v-else>
                 <b-card no-body class="p-2">
                   <ul>
-                    <tree-item class="item" v-for="item in selectedDataset.tree" :item="item"></tree-item>
+                    <tree-item class="item" v-for="item in selectedDataset.tree" :item="item" @clear-filters="clearFilters"></tree-item>
                   </ul>
                 </b-card>
               </span>
