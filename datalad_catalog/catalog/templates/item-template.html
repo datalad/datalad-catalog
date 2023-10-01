@@ -8,7 +8,7 @@
         <span v-else-if="isDataset"><span v-if="item.state == 'disabled'" class="subdataset-disabled"> <i class="fas fa-database"></i> {{ displayText }}</span><span v-else> <i class="fas fa-database"></i> <a class="subdataset" @click="selectDataset($event, item, item.id)">{{ displayText }}</a></span></span>
         <!-- File -->
         <span v-else> <i class="far fa-file-alt"></i>
-            <span v-if="downloadURL">
+            <span v-if="downloadURL.includes('http')">
                 <a :href="downloadURL" :download="displayText">{{ displayText }}</a>
             </span>
             <span v-else>{{ displayText }}</span>
