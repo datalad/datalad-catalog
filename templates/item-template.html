@@ -17,6 +17,6 @@
     </div>
     <!-- Children of an open folder -->
     <ul v-show="isOpen" v-if="isFolder">
-        <tree-item class="item" v-for="(child, index) in item.children" :key="index" :index="index" :item="child"></tree-item>
+        <tree-item class="item" v-for="(child, index) in item.children" :key="index" :index="index" :item="child" v-on="$listeners"></tree-item>
     </ul>
 </li>
