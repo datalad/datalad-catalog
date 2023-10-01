@@ -170,7 +170,7 @@
             <span v-else>
               <span v-if="!subdatasets || !subdatasets.length"><em>There are no subdatasets listed for the current dataset</em></span>
               <span v-else>
-                <b-form>
+                <b-form v-if="subdatasets.length > 3">
                   <b-row>
                     <b-col md="7">
                       <b-input-group>
@@ -246,7 +246,12 @@
                       </b-col>
                       <b-col md="4">
                         <b-card-text>
-                          <span v-for="keyword in ds.keywords"><b-button pill size="sm" class="p-1" variant="outline-dark" @click="addSearchTag(keyword)">{{keyword}}</b-button>&nbsp;</span>
+                          <span v-if="subdatasets.length > 3">
+                            <span v-for="keyword in ds.keywords"><b-button pill size="sm" class="p-1" variant="outline-dark" @click="addSearchTag(keyword)">{{keyword}}</b-button>&nbsp;</span>
+                          </span>
+                          <span v-else>
+                            <span v-for="keyword in ds.keywords"><b-button pill size="sm" class="p-1" variant="outline-secondary">{{keyword}}</b-button>&nbsp;</span>
+                          </span>
                         </b-card-text>
                       </b-col>
                     </b-row>
