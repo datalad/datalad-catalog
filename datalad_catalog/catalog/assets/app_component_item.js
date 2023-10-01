@@ -31,7 +31,11 @@ Vue.component('tree-item', function (resolve, reject) {
                 return this.item["name"];
               },
               byteText: function () {
-                return this.formatBytes(this.item["contentbytesize"]);
+                if (this.item["contentbytesize"]) {
+                  return this.formatBytes(this.item["contentbytesize"]);
+                } else {
+                  return ""
+                }
               },
               downloadURL: function () {
                 return this.getDownloadURL(this.item["url"]);

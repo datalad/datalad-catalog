@@ -51,8 +51,11 @@ a:hover {
 }
 
 .item {
-  cursor: pointer;
   font-family: Menlo, Consolas, monospace;
+}
+
+.showpointer {
+  cursor: pointer;
 }
 
 .bold {
