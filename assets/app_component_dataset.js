@@ -109,9 +109,12 @@ const datasetView = () =>
               sorted_metadata_sources = dataset.metadata_sources.sources.sort(
                 (a, b) => b.source_time - a.source_time
               );
-              disp_dataset.last_updated = this.getDateFromUTCseconds(
-                sorted_metadata_sources[0].source_time
-              );
+              disp_dataset.last_updated = sorted_metadata_sources[0].source_time
+              if (disp_dataset.last_updated) {
+                disp_dataset.last_updated = this.getDateFromUTCseconds(
+                  disp_dataset.last_updated
+                );
+              }
               // ID, version and location
               disp_dataset.file_path =
                 "metadata/" +
