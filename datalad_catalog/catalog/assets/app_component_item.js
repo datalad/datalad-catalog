@@ -89,6 +89,9 @@ Vue.component('tree-item', function (resolve, reject) {
                       dataset_version: objVersion,
                     },
                   }
+                  // before navigation, clear filter options
+                  this.$emit('clear-filters')
+                  // now navigate
                   if (newBrowserTab) {
                     const routeData = router.resolve(route_info);
                     window.open(routeData.href, '_blank');

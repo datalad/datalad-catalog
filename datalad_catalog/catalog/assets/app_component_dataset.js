@@ -218,10 +218,17 @@ const datasetView = () =>
                 c.dirs_from_path[c.dirs_from_path.length - 1]
                   .toLowerCase()
                   .indexOf(this.search_text.toLowerCase()) >= 0 ||
-                // || (c.authors.some(e => e.givenName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0))
                 c.authors.some(
                   (f) =>
-                    f.name.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0
+                  f.givenName && f.givenName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0 
+                ) ||
+                c.authors.some(
+                  (f) =>
+                  f.familyName && f.familyName.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0 
+                ) ||
+                c.authors.some(
+                  (f) =>
+                  f.name && f.name.toLowerCase().indexOf(this.search_text.toLowerCase()) >= 0
                 )
               );
             });
@@ -326,6 +333,9 @@ const datasetView = () =>
                   dataset_version: objVersion,
                 },
               }
+              // before navigation, clear filtering options
+              this.clearFilters()
+              // now navigate
               if (newBrowserTab) {
                 const routeData = router.resolve(route_info);
                 window.open(routeData.href, '_blank');
@@ -337,6 +347,11 @@ const datasetView = () =>
               console.log(this.$root.subNotAvailable);
               this.$root.$emit("bv::show::modal", "modal-3", "#btnShow");
             }
+          },
+          clearFilters() {
+            this.search_text = ""
+            this.search_tags = []
+            this.clearSearchTagText()
           },
           selectDescription(desc) {
             if (desc.content.startsWith("path:")) {
