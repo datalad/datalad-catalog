@@ -80,8 +80,8 @@ def test_add_from_file_faulty(demo_catalog, test_data):
 
 def test_add_from_stdin(monkeypatch, demo_catalog):
     """Add catalog metadata from stdin"""
-    mdata1 = '{"dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609", "dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758", "type": "dataset", "name": "test_name"}'
-    mdata2 = '{"dataset_id": "3344ffv5-7a37-4062-a1e0-8fcef7909609", "dataset_version": "8888dbde969d2f5d6b533e35b5c5c51ac0b15758", "type": "dataset", "name": "test_name"}'
+    mdata1 = '{"dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609", "dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758", "type": "dataset", "metadata_sources": {"key_source_map": {}, "sources": [{"source_name": "", "source_version": ""}]}}'
+    mdata2 = '{"dataset_id": "3344ffv5-7a37-4062-a1e0-8fcef7909609", "dataset_version": "8888dbde969d2f5d6b533e35b5c5c51ac0b15758", "type": "dataset", "metadata_sources": {"key_source_map": {}, "sources": [{"source_name": "", "source_version": ""}]}}'
     content = io.StringIO(json.dumps(mdata1) + "\n" + json.dumps(mdata2))
     monkeypatch.setattr("sys.stdin", content)
     res = catalog_add(
@@ -101,7 +101,7 @@ def test_add_from_stdin(monkeypatch, demo_catalog):
 
 def test_add_from_json_str(demo_catalog, test_data):
     """Add catalog metadata from a json serialized string"""
-    mdata = '{"dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609", "dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758", "type": "dataset", "name": "test_name"}'
+    mdata = '{"dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609", "dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758", "type": "dataset", "metadata_sources": {"key_source_map": {}, "sources": [{"source_name": "", "source_version": ""}]}}'
     res = catalog_add(
         catalog=demo_catalog,
         metadata=mdata,
