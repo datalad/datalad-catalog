@@ -63,6 +63,6 @@
       "uniqueItems": true
     }
   },
-  "required": [ "type", "dataset_id", "dataset_version", "path"]
+  "required": [ "type", "dataset_id", "dataset_version", "path", "metadata_sources"]
 }
 

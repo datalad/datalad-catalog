@@ -68,7 +68,7 @@ class MetaTranslate(ValidatedInterface):
     The to-be-translated-to schema version is determined from the catalog,
     if provided, otherwise from the latest supported version of the package installation.
 
-    Tranlators should be provided and exposed as a datalad entry point using the group:
+    Translators should be provided and exposed as a datalad entry point using the group:
     'datalad.metadata.translators'.
 
     Available translators will be filtered based on own matching criteria (such as
