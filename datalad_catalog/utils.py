@@ -1,8 +1,9 @@
 import hashlib
 import json
 from pathlib import Path
-import sys
 import shutil
+import subprocess
+import sys
 import yaml
 
 from datalad.support.exceptions import InsufficientArgumentsError
@@ -228,3 +229,13 @@ def write_jsonline_to_file(filename, line):
     with open(filename, "a") as f:
         json.dump(line, f, cls=jsEncoder)
         f.write("\n")
+
+
+def get_gitconfig(conf_name):
+    """Return the config of local git installation"""
+    result = (
+        subprocess.run(["git", "config", conf_name], capture_output=True)
+        .stdout.decode()
+        .rstrip()
+    )
+    return result
