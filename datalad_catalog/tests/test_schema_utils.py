@@ -125,3 +125,14 @@ def test_get_meta_items():
         path=None,
         required_only=True,
     )
+
+
+def test_exclude_keys():
+    item = get_metadata_item(
+        item_type="file",
+        dataset_id="my_ds_id",
+        dataset_version="my_ds_version",
+        source_name="wackystuff",
+        source_version="wack.point.zero",
+        exclude_keys=["path"],
+    )
