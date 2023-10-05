@@ -117,9 +117,10 @@ def get_metadata_item(
     source_version: str,
     path=None,
     required_only: bool = True,
+    exclude_keys: list = [],
 ):
     assert item_type in ("dataset", "file")
-    if item_type == "file" and not path:
+    if item_type == "file" and not path and "path" not in exclude_keys:
         raise ValueError("Path is a required field for item type 'file'")
     meta_item = get_schema_item(
         item_type=item_type,
@@ -129,6 +130,9 @@ def get_metadata_item(
     meta_item[cnst.DATASET_VERSION] = dataset_version
     if item_type == "file":
         meta_item[cnst.PATH] = path
+    for k in exclude_keys:
+        if k in meta_item:
+            del meta_item[k]
     meta_item[cnst.METADATA_SOURCES] = get_metadata_sources(
         source_name,
         source_version,
