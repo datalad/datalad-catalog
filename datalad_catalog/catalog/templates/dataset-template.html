@@ -11,11 +11,10 @@
             <span class="dataset-nav-item" v-if="selectedDataset.show_backbutton">
               <a @click="history.back()" class="newlink"><small><i class="fas fa-backward"></i></small></a>
             </span>
-            <span class="dataset-nav-item">
-              {{displayData.display_name}}
-            </span>
           </span>
-          
+          <div class="dataset-title">
+            {{displayData.display_name}}
+          </div>
         </b-card-title>
         <!-- DATASET AUTHORS -->
         <b-card-sub-title class="mb-2">
