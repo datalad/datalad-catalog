@@ -511,7 +511,7 @@ const datasetView = () =>
             // If a tab parameter is supplied via the router, navigate to that tab if
             // part of available tabs, otherwise first tab
             else {
-              selectTab = tabs.indexOf(tab_param)
+              selectTab = tabs.indexOf(tab_param.toLowerCase())
               if (selectTab >= 0) {
                 this.tabIndex = selectTab;
               } else {
