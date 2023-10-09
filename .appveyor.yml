@@ -3,7 +3,7 @@
 # to create a "native" platform experience, using as few cross-platform
 # helper tools as possible.
 #
-# On Linux/Mac a virtualenv is used for testing. The effective virtual env
+# On Linux/Mac a venv is used for testing. The effective virtual env
 # is available under ~/VENV.
 #
 # All workers support remote login. Login details are shown at the top of each
@@ -64,15 +64,15 @@ environment:
     - ID: Ubu20
       DTS: datalad_catalog
       APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
-      INSTALL_SYSPKGS: python3-virtualenv
+      INSTALL_SYSPKGS: python3-venv
       # system git-annex is way too old, use better one
-      INSTALL_GITANNEX: git-annex -m deb-url --url http://snapshot.debian.org/archive/debian/20210906T204127Z/pool/main/g/git-annex/git-annex_8.20210903-1_amd64.deb
+      INSTALL_GITANNEX: git-annex -m snapshot
       CODECOV_BINARY: https://uploader.codecov.io/latest/linux/codecov
     # Windows core tests
     - ID: WinP39core
       # ~35 min
       DTS: datalad_catalog
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
       # Python version specification is non-standard on windows
       PY: 39-x64
       INSTALL_GITANNEX: git-annex -m datalad/packages
@@ -145,13 +145,13 @@ init:
 install:
   # place a debug setup helper at a convenient location
   - cmd: copy tools\ci\appveyor_env_setup.bat C:\\datalad_debug.bat
+  # Missing system software
+  - sh: "[ -n \"$INSTALL_SYSPKGS\" ] && ( [ \"x${APPVEYOR_BUILD_WORKER_IMAGE}\" = \"xmacOS\" ] && brew install -q ${INSTALL_SYSPKGS} || { sudo apt-get update -y && sudo apt-get install --no-install-recommends -y ${INSTALL_SYSPKGS}; } ) || true"
   # If a particular Python version is requested, use env setup (using the
-  # appveyor provided environments/installation). Note, these are broken
-  # on the ubuntu images
-  # https://help.appveyor.com/discussions/problems/28217-appveyor-ubunu-image-with-python3-lzma-module
-  # Otherwise create a virtualenv using the default Python 3, to enable uniform
+  # appveyor provided environments/installation).
+  # Otherwise create a venv using the default Python 3, to enable uniform
   # use of python/pip executables below
-  - sh: "[ \"x$PY\" != x ] && . ${HOME}/venv${PY}/bin/activate || virtualenv -p 3 ${HOME}/dlvenv && . ${HOME}/dlvenv/bin/activate; ln -s \"$VIRTUAL_ENV\" \"${HOME}/VENV\""
+  - sh: "[ \"x$PY\" != x ] && . ${HOME}/venv${PY}/bin/activate || python3 -m venv ${HOME}/dlvenv && . ${HOME}/dlvenv/bin/activate; ln -s \"$VIRTUAL_ENV\" \"${HOME}/VENV\""
   - cmd: "set PATH=C:\\Python%PY%;C:\\Python%PY%\\Scripts;%PATH%"
   # deploy the datalad installer, override version via DATALAD_INSTALLER_VERSION
   - cmd:
@@ -161,13 +161,11 @@ install:
       python -m pip install datalad-installer
       )
   - sh: python -m pip install datalad-installer${DATALAD_INSTALLER_VERSION:-}
-  # Missing system software
-  - sh: "[ -n \"$INSTALL_SYSPKGS\" ] && ( [ \"x${APPVEYOR_BUILD_WORKER_IMAGE}\" = \"xmacOS\" ] && brew install -q ${INSTALL_SYSPKGS} || { sudo apt-get update -y && sudo apt-get install --no-install-recommends -y ${INSTALL_SYSPKGS}; } ) || true"
   # Install git-annex on windows, otherwise INSTALL_SYSPKGS can be used
   # deploy git-annex, if desired
   - cmd: IF DEFINED INSTALL_GITANNEX datalad-installer --sudo ok %INSTALL_GITANNEX%
   - sh: "[ -n \"${INSTALL_GITANNEX}\" ] && datalad-installer --sudo ok ${INSTALL_GITANNEX}"
-# in case of a snapshot installation, use the following approach to adjust
+  # in case of a snapshot installation, use the following approach to adjust
   # the PATH as necessary
   #- sh: "[ -n \"${INSTALL_GITANNEX}\" ] && datalad-installer -E ${HOME}/dlinstaller_env.sh --sudo ok ${INSTALL_GITANNEX}"
   # add location of datalad installer results to PATH

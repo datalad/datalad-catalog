@@ -1,4 +1,4 @@
 [codespell]
-skip = .git,*.pdf,*.svg,venvs,versioneer.py,*.min.js
-# Claus - name
-ignore-words-list = claus
+skip = .venv,venvs,.git,build,*.egg-info,*.lock,.asv,.mypy_cache,.tox,fixtures,_version.py,*.pem,versioneer.py
+# ignore-words-list = 
+# exclude-file = 

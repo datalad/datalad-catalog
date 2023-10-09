@@ -1,0 +1,45 @@
+fragment-directory: changelog.d
+
+categories:
+  - name: 💥 Breaking Changes
+    bump: major
+    label: semver-major
+    label-color: C5000B
+    label-description: Increment the major version when merged
+  - name: 🚀 Enhancements and New Features
+    bump: minor
+    label: semver-minor
+    label-color: F1A60E
+    label-description: Increment the minor version when merged
+  - name: 🐛 Bug Fixes
+    label: semver-patch
+    label-color: "870048"
+    label-description: Increment the patch version when merged
+  - name: 🔩 Dependencies
+    label: semver-dependencies
+    label-color: 8732bc
+    label-description: Update one or more dependencies' versions
+  - name: 📝 Documentation
+    label: semver-documentation
+    label-color: cfd3d7
+    label-description: Changes only affect the documentation
+  - name: 🏠 Internal
+    label: semver-internal
+    label-color: "696969"
+    label-description: Changes only affect the internal API
+  - name: 🏎 Performance
+    label: semver-performance
+    label-color: f4b2d8
+    label-description: Improve performance of an existing feature
+  - name: 🧪 Tests
+    label: semver-tests
+    label-color: ffd3cc
+    label-description: Add or improve existing tests
+
+extra-labels:
+  - name: release
+    color: 007f70
+    description: Create a release when this pr is merged
+  - name: CHANGELOG-missing
+    color: 5B0406
+    description: When a PR does not contain add a changelog item, yet
