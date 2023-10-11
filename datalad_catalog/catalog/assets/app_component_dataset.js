@@ -201,6 +201,14 @@ const datasetView = () =>
               else {
                 disp_dataset.show_export = false
               }
+              // Additional display and definitions
+              disp_dataset.additional_tabs = dataset.additional_display
+              disp_dataset.display_tabs = []
+              disp_dataset.additional_tab_defs = dataset.additional_display_definitions
+              for (var t=0; t<disp_dataset.additional_tabs.length; t++) {
+                n = disp_dataset.additional_tabs[t].name
+              }
+              disp_dataset.additional_tab_render = {}
               // Write main derived variable and set to ready
               this.displayData = disp_dataset;
               this.display_ready = true;
@@ -501,7 +509,7 @@ const datasetView = () =>
             }
           },
           setCorrectTab(tab_param) {
-            // the set of available tabs have been updated in component
+            // the set of available tabs has been updated in component
             // data in either created() or beforeRouteUpdate()
             var tabs = this.$root.selectedDataset.available_tabs.map(v => v.toLowerCase());
             // If no tab parameter is supplied via the router, set to first tab
@@ -518,7 +526,19 @@ const datasetView = () =>
                 this.tabIndex = 0;
               }
             }
-          }
+          },
+          getDefinitionURL(tab, key, nested_key = null, type = 'keys') {
+            if (nested_key != null) {
+              return this.displayData.additional_tab_defs[tab][type][key][nested_key]
+            } else {
+              var value = this.displayData.additional_tab_defs[tab][type][key]
+              if (typeof value === 'object') {
+                return type == 'keys' ? value.self : value
+              } else {
+                return value
+              }
+            }
+          },
         },
         async beforeRouteUpdate(to, from, next) {
           this.tabIndex = 0;

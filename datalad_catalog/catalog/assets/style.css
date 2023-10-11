@@ -250,3 +250,8 @@ li[class="item"]:last-child {
   padding-left: 5px;
   border-left: 2px solid #a9afb440;
 }
+
+.def-tooltip .tooltip-inner{
+  max-width: 500px !important;
+  width: 300px !important;
+}

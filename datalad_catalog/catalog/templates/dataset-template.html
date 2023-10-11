@@ -465,8 +465,8 @@
             </b-tab>
           </span>
           <!-- EXTRA TABS -->
-          <span v-if="selectedDataset.additional_display && selectedDataset.additional_display.length">
-            <span v-for="new_tab in selectedDataset.additional_display">
+          <span v-show="displayData.additional_tabs && displayData.additional_tabs.length">
+            <span v-for="new_tab in displayData.additional_tabs">
               <b-tab :key="new_tab.name" ref="tabelement">
                 <template v-slot:title>
                   <span v-if="new_tab.icon"><i :class="new_tab.icon"></i></span><span v-else><i class="fas fa-bars"></i></span> {{new_tab.name}}
@@ -480,7 +480,92 @@
                         <th>Value(s)</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="displayData.additional_tab_defs">
+                      <!-- A row per key-value pair -->
+                      <tr v-for="content_key in Object.keys(new_tab.content)">
+                         <!-- PROPERTY NAME-->
+                         <td width="20%">
+                          <strong>
+                            <span :id="new_tab.name + '_' + content_key">{{ toUpperString(content_key) }}</span>
+                            <span v-if="getDefinitionURL(new_tab.name, content_key)">
+                              &nbsp;<sup><i :id="new_tab.name + '_' + content_key + '_info'" class="fas fa-circle-info"></i></sup>
+                              <b-tooltip custom-class="def-tooltip" :target="new_tab.name + '_' + content_key + '_info'" placement="topleft">
+                                <a :href="getDefinitionURL(new_tab.name, content_key)">{{ getDefinitionURL(new_tab.name, content_key) }}</a>
+                              </b-tooltip>
+                            </span>
+                          </strong>
+                         </td>
+                         <!-- PROPERTY VALUE -->
+                         <!-- Value: could be a string, array, or object, or not specified-->
+                         <!-- Value: an object would in turn have more key-value pairs-->
+                         <td>
+                          <!-- not specified -->
+                          <span v-if="!new_tab.content[content_key]"><em>not specified</em></span>
+                          <!-- array -->
+                          <span v-else-if="Array.isArray(new_tab.content[content_key])">
+                            <span v-for="(val, idx) in new_tab.content[content_key]">
+                              <span v-if="getDefinitionURL(new_tab.name, content_key, idx, 'values') == 'https://schema.org/email'">
+                                <a :href="'mailto:' + new_tab.content[content_key][idx]">{{new_tab.content[content_key][idx]}}</a>
+                              </span>
+                              <span v-else-if="getDefinitionURL(new_tab.name, content_key, idx, 'values') == 'https://schema.org/URL'">
+                                <a :href="new_tab.content[content_key][idx]" target="_blank">{{new_tab.content[content_key][idx]}}</a>
+                              </span>
+                              <span v-else-if="getDefinitionURL(new_tab.name, content_key, idx, 'values') == 'https://schema.org/Text'">
+                                {{new_tab.content[content_key][idx]}}
+                              </span>
+                              <span v-else>
+                                <a :href="getDefinitionURL(new_tab.name, content_key, idx, 'values')" target="_blank">{{new_tab.content[content_key][idx]}}</a>
+                              </span>
+                              <br>
+                            </span>
+                          </span>
+                          <!-- object -->
+                          <span v-else-if="typeof new_tab.content[content_key] === 'object'">
+                            <span v-for="k in Object.keys(new_tab.content[content_key])">
+                              <span><em>{{k}}</em>
+                                <span v-if="getDefinitionURL(new_tab.name, content_key, k)">
+                                  &nbsp;<sup><i :id="new_tab.name + '_' + content_key + '_' + k + '_info'" class="fas fa-circle-info"></i></sup>:
+                                  <b-tooltip custom-class="def-tooltip" :target="new_tab.name + '_' + content_key + '_' + k + '_info'" placement="topleft">
+                                    <a :href="getDefinitionURL(new_tab.name, content_key, k)" target="_blank">{{ getDefinitionURL(new_tab.name, content_key, k) }}</a>
+                                  </b-tooltip>
+                                </span>
+                              </span>
+                              <span>&nbsp;
+                                <span v-if="getDefinitionURL(new_tab.name, content_key, k, 'keys') == 'https://schema.org/email'">
+                                  <a :href="'mailto:' + new_tab.content[content_key][k]">{{new_tab.content[content_key][k]}}</a>
+                                </span>
+                                <span v-else-if="getDefinitionURL(new_tab.name, content_key, k, 'values') == 'https://schema.org/URL'">
+                                  <a :href="new_tab.content[content_key][k]">{{new_tab.content[content_key][k]}}</a>
+                                </span>
+                                <span v-else-if="getDefinitionURL(new_tab.name, content_key, k, 'values') == 'https://schema.org/Text'">
+                                  {{new_tab.content[content_key][k]}}
+                                </span>
+                                <span v-else>
+                                  <a :href="new_tab.content[content_key][k]">{{new_tab.content[content_key][k]}}</a>
+                                </span>
+                                <br>
+                              </span>
+                            </span>
+                          </span>
+                          <!-- string -->
+                          <span v-else>
+                            <span v-if="getDefinitionURL(new_tab.name, content_key, null, 'keys') == 'https://schema.org/email'">
+                              <a :href="'mailto:' + new_tab.content[content_key]">{{new_tab.content[content_key]}}</a>
+                            </span>
+                            <span v-else-if="getDefinitionURL(new_tab.name, content_key, null, 'values') == 'https://schema.org/URL'">
+                              <a :href="new_tab.content[content_key]" target="_blank">{{new_tab.content[content_key]}}</a>
+                            </span>
+                            <span v-else-if="getDefinitionURL(new_tab.name, content_key, null, 'values') == 'https://schema.org/Text'">
+                              {{new_tab.content[content_key]}}
+                            </span>
+                            <span v-else>
+                              <a :href="getDefinitionURL(new_tab.name, content_key, null, 'values')" target="_blank">{{new_tab.content[content_key]}}</a>
+                            </span>
+                          </span>
+                         </td>  
+                      </tr>
+                     </tbody>
+                     <tbody v-else>
                       <tr v-for="content_key in Object.keys(new_tab.content)">
                          <td><strong>{{ content_key.charAt(0).toUpperCase() + content_key.slice(1) }}</strong></td> 
                          <td>
@@ -494,7 +579,7 @@
                             </span>
                           </span>
                           <span v-else>{{ new_tab.content[content_key] }}</span>
-                         </td>
+                         </td>  
                       </tr>
                      </tbody>
                   </table>
