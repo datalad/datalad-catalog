@@ -377,7 +377,52 @@ const datasetView = () =>
             }
           },
           gotoHome() {
-            router.push({ name: "home" });
+            // if there is NO home page set:
+            // - if there is a tab name in the URL, navigate to current
+            // - else: don't navigate, only "reset"
+            // if there IS a home page set:
+            // - if the current page IS the home page:
+            //   - if there is a tab name in the URL, navigate to current
+            //   - else: don't navigate, only "reset"
+            // - if the current page is NOT the home page, navigate to home
+            // reset: clear filters and set tab index = 0
+            const current_route_info = {
+              name: "dataset",
+              params: {
+                dataset_id: this.selectedDataset.dataset_id,
+                dataset_version: this.selectedDataset.dataset_version,
+              },
+            }
+            if (!this.catalogHasHome()) {
+              if (this.$route.params.tab_name) {
+                router.push(current_route_info)
+              } else {
+                this.clearFilters();
+                this.tabIndex = 0;
+              }
+            } else {
+              if (this.currentIsHome()) {
+                if (this.$route.params.tab_name) {
+                  router.push(current_route_info)
+                } else {
+                  this.clearFilters();
+                  this.tabIndex = 0;
+                }
+              } else {
+                router.push({ name: "home" });
+              }
+            }            
+          },
+          catalogHasHome() {
+            if (this.$root.home_dataset_id && this.$root.home_dataset_version) {
+              return true
+            } else {
+              return false
+            }
+          },
+          currentIsHome() {
+            return ((this.$root.home_dataset_id == this.$root.selectedDataset.dataset_id) &&
+            (this.$root.home_dataset_version == this.$root.selectedDataset.dataset_version))
           },
           getDateFromUTCseconds(utcSeconds) {
             // TODO: consider moving this functionality to generator tool
@@ -652,8 +697,7 @@ const datasetView = () =>
             to.params.tab_name,
           )
           // if navigated to using vue router (i.e. internal to the app), show the back button
-          if ((this.$root.home_dataset_id == this.$root.selectedDataset.dataset_id) && 
-          (this.$root.home_dataset_version == this.$root.selectedDataset.dataset_version)) {
+          if (this.currentIsHome()) {
             this.$root.selectedDataset.show_backbutton = false
           } else {
             this.$root.selectedDataset.show_backbutton = true
