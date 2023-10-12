@@ -274,6 +274,40 @@ const datasetView = () =>
         },
         methods: {
           newTabActivated(newTabIndex, prevTabIndex, bvEvent) {
+            // // first cancel tab navigation
+            // bvEvent.preventDefault()
+
+            // get correct tab name
+            var tabs = this.selectedDataset.available_tabs.map(v => v.toLowerCase())
+            new_tab_parameter = tabs[newTabIndex]
+
+            // // build route
+            // const route_info = {
+            //   name: "dataset",
+            //   params: {
+            //     dataset_id: this.selectDataset.dataset_id,
+            //     dataset_version: this.selectDataset.dataset_version,
+            //   },
+            // }
+            // router.replace(route_info)
+            // https://stackoverflow.com/a/56691294
+            console.log("Current history state")
+            console.log(history.state)
+            console.log("Current route path")
+            console.log(this.$route.path)
+            console.log("New route path")
+            console.log(this.$route.path)
+            var new_path = '#' + this.$route.path + '/' + new_tab_parameter
+            console.log("Now replacing history state")
+            history.pushState(
+              {},
+              null,
+              new_path
+            )
+            console.log("History state after replace")
+            console.log(history.state)
+            console.log("Route path after replace")
+            console.log(this.$route.path)
             if (newTabIndex == 1) {
               this.getFiles()
             }
@@ -521,6 +555,7 @@ const datasetView = () =>
           }
         },
         async beforeRouteUpdate(to, from, next) {
+          console.log("ROUTER - DATASET - beforeRouteUpdate")
           this.tabIndex = 0;
           this.subdatasets_ready = false;
           this.dataset_ready = false;
@@ -661,6 +696,7 @@ const datasetView = () =>
           next();
         },
         async created() {
+          console.log("LIFE CYCLE - DATASET - CREATED")
           // fetch superfile in order to set id and version on $root
           homefile = metadata_dir + "/super.json";
           homeresponse = await fetch(homefile);
@@ -777,6 +813,7 @@ const datasetView = () =>
           )
         },
         mounted() {
+          console.log("LIFE CYCLE - DATASET - MOUNTED")
           this.tag_options_filtered = this.tag_options;
           this.tag_options_available = this.tag_options;
         }

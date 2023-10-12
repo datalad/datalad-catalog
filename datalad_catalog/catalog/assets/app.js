@@ -41,6 +41,7 @@ var datacat = new Vue({
     }
   },
   beforeCreate() {
+    console.log("LIFE CYCLE - APP - BEFORECREATE")
     fetch(config_file)
       .then((response) => {
         if (response.ok) {
@@ -84,6 +85,9 @@ var datacat = new Vue({
         console.log(error);
         this.logo_path = default_config.logo_path;
       });
+  },
+  created(){
+    console.log("LIFE CYCLE - APP - CREATED")
   },
   router,
 });
