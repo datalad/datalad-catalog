@@ -205,7 +205,9 @@ const datasetView = () =>
               disp_dataset.additional_tabs = dataset.additional_display
               disp_dataset.display_tabs = []
               disp_dataset.additional_tab_defs = dataset.additional_display_definitions
-              for (var t=0; t<disp_dataset.additional_tabs.length; t++) {
+              disp_dataset.additional_tab_count =
+                Array.isArray(disp_dataset.additional_tabs) ? disp_dataset.additional_tabs.length : 0
+              for (var t=0; t<disp_dataset.additional_tab_count; t++) {
                 n = disp_dataset.additional_tabs[t].name
               }
               disp_dataset.additional_tab_render = {}
