@@ -1,5 +1,6 @@
 from pathlib import Path
-
+import pytest
+import sys
 import yaml
 from datalad.api import meta_extract
 from datalad.distribution.dataset import Dataset
@@ -93,6 +94,9 @@ templateversion: 1.2
 """
 
 
+@pytest.mark.skipif(
+    sys.platform == "win32", reason="exclude from CI tests on windows"
+)
 @with_tempfile(mkdir=True)
 def test_datacite_extractor(temp_dir_name: str = ""):
     dataset_dir = Path(temp_dir_name) / "dataset"
