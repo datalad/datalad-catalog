@@ -1,0 +1,47 @@
+{
+    "catalog_name": "DataCat",
+    "link_color": "#fba304",
+    "link_hover_color": "#af7714",
+    "social_links": {
+        "about": null,
+        "documentation": "https://docs.datalad.org/projects/catalog/en/latest/",
+        "github": "https://github.com/datalad/datalad-catalog",
+        "mastodon": "https://fosstodon.org/@datalad",
+        "x": "https://x.com/datalad"
+    },
+    "dataset_options": {
+        "include_metadata_export": true,
+        "default_tab": "subdatasets"
+    },
+    "property_sources": {
+        "dataset": {
+            "authors": {
+                "rule": "merge",
+                "source": [
+                    "metalad_studyminimeta"
+                ]
+            },
+            "description": {
+                "rule": "priority",
+                "source": [
+                    "metalad_studyminimeta",
+                    "bids_dataset"
+                ]
+            },
+            "keywords": {
+                "rule": "merge",
+                "source": "any"
+            },
+            "additional_display": {
+                "rule": "merge",
+                "source": []
+            },
+            "top_display": {
+                "rule": "merge",
+                "source": []
+            }
+        },
+        "file": {
+        }
+    }   
+}
