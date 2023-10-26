@@ -156,6 +156,41 @@
       <!-- BOTTOM SECTION WITH TABS-->
       <b-card-body>
         <b-tabs card content-class="mt-3" fill active-nav-item-class="font-weight-bold" v-model="tabIndex" @activate-tab="newTabActivated" ref="alltabs">
+          <!-- FILE TREE -->
+          <b-tab @click="getFiles" key="content" ref="tabelement">
+            <template v-slot:title>
+              <i class="far fa-folder"></i> Content
+            </template>
+            <span v-if="files_ready">
+              <span v-if="!selectedDataset.tree || !selectedDataset.tree.length"><em>There is no content available for the current dataset</em></span>
+              <span v-else>
+                <b-card no-body class="p-2">
+                  <ul>
+                    <tree-item class="item" v-for="item in selectedDataset.tree" :item="item" @clear-filters="clearFilters"></tree-item>
+                  </ul>
+                </b-card>
+              </span>
+              <b-modal id="modal-3" size="md"
+              header-bg-variant="light"
+              footer-bg-variant="light"
+              body-bg-variant="light"
+              body-text-variant="dark"
+              ok-only
+              >
+                <template #modal-header="{ close }">
+                  <div class="d-block text-center">
+                    <h3>Dataset not found</h3>
+                    <p class="my-4">The selected dataset is currently not available in the catalog.</p>
+                  </div>
+                </template>
+              </b-modal>
+            </span>
+            <span v-else>
+              <div class="d-flex justify-content-center mb-3">
+                <b-spinner label="Loading..."></b-spinner>
+              </div>
+            </span>
+          </b-tab>
           <!-- SUBDATASETS -->
           <b-tab key="subdatasets" ref="tabelement">
             <template v-slot:title>
@@ -257,41 +292,6 @@
                   </template>
                 </b-card>
               </span>
-            </span>
-          </b-tab>
-          <!-- FILE TREE -->
-          <b-tab @click="getFiles" key="content" ref="tabelement">
-            <template v-slot:title>
-              <i class="far fa-folder"></i> Content
-            </template>
-            <span v-if="files_ready">
-              <span v-if="!selectedDataset.tree || !selectedDataset.tree.length"><em>There is no content available for the current dataset</em></span>
-              <span v-else>
-                <b-card no-body class="p-2">
-                  <ul>
-                    <tree-item class="item" v-for="item in selectedDataset.tree" :item="item" @clear-filters="clearFilters"></tree-item>
-                  </ul>
-                </b-card>
-              </span>
-              <b-modal id="modal-3" size="md"
-              header-bg-variant="light"
-              footer-bg-variant="light"
-              body-bg-variant="light"
-              body-text-variant="dark"
-              ok-only
-              >
-                <template #modal-header="{ close }">
-                  <div class="d-block text-center">
-                    <h3>Dataset not found</h3>
-                    <p class="my-4">The selected dataset is currently not available in the catalog.</p>
-                  </div>
-                </template>
-              </b-modal>
-            </span>
-            <span v-else>
-              <div class="d-flex justify-content-center mb-3">
-                <b-spinner label="Loading..."></b-spinner>
-              </div>
             </span>
           </b-tab>
           <!-- PUBLICATIONS -->
