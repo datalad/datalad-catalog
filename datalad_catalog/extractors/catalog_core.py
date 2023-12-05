@@ -275,46 +275,53 @@ def translate(metadata_record, graph):
     return {k: v for k, v in translated_record.items() if v is not None}
 
 
+def get_catalog_metadata(source_dataset):
+    """"""
+    source_dataset_version = source_dataset.repo.get_hexsha()
+    status = source_dataset.subdatasets(result_renderer="disabled")
+    agent_name = source_dataset.config.get("user.name")
+    agent_email = source_dataset.config.get("user.email")
+
+    metadata = get_dataset_metadata(source_dataset, source_dataset_version, status)
+    default_context = {
+        # schema.org definitions by default
+        "@vocab": "http://schema.org/",
+        # DataLad ID prefix, pointing to our own resolver
+        "datalad": "http://dx.datalad.org/",
+    }
+    # meta_out structures the metadata in exactly the same
+    # way as datalad meta-extract outputs it
+    meta_out = dict(
+        dataset_id=source_dataset.id,
+        dataset_version=source_dataset_version,
+        extractor_name="catalog_core",
+        extractor_version="1",
+        extraction_parameter={},
+        extraction_time=time.time(),
+        agent_name=agent_name,
+        agent_email=agent_email,
+        extracted_metadata={
+            "@context": default_context,
+            "@graph": metadata,
+        },
+        type="dataset",
+    )
+    # translate() does more or less the same as
+    # datalad_catalog.translators.metalad_core_translator
+    return translate(meta_out, metadata)
+
+
 # SCRIPT EXECUTION STARTS HERE
 
-parser = ArgumentParser()
-parser.add_argument(
-    "dataset_path", type=Path, help="Path to the datalad dataset"
-)
-args = parser.parse_args()
-source_dataset = EnsureDataset(
-    installed=True, purpose="extract core metadata", require_id=True
-)(args.dataset_path).ds
-source_dataset_id = (source_dataset.id,)
-source_dataset_version = source_dataset.repo.get_hexsha()
-agent_name = source_dataset.config.get("user.name")
-agent_email = source_dataset.config.get("user.email")
-status = source_dataset.subdatasets(result_renderer="disabled")
-metadata = get_dataset_metadata(source_dataset, source_dataset_version, status)
-default_context = {
-    # schema.org definitions by default
-    "@vocab": "http://schema.org/",
-    # DataLad ID prefix, pointing to our own resolver
-    "datalad": "http://dx.datalad.org/",
-}
-# meta_out structures the metadata in exactly the same
-# way as datalad meta-extract outputs it
-meta_out = dict(
-    dataset_id=source_dataset.id,
-    dataset_version=source_dataset_version,
-    extractor_name="catalog_core",
-    extractor_version="1",
-    extraction_parameter={},
-    extraction_time=time.time(),
-    agent_name=agent_name,
-    agent_email=agent_email,
-    extracted_metadata={
-        "@context": default_context,
-        "@graph": metadata,
-    },
-    type="dataset",
-)
-# translate() does more or less the same as
-# datalad_catalog.translators.metalad_core_translator
-meta_translated = translate(meta_out, metadata)
-print(json.dumps(meta_translated))
+if __name__ == "__main__":
+
+    parser = ArgumentParser()
+    parser.add_argument(
+        "dataset_path", type=Path, help="Path to the datalad dataset"
+    )
+    args = parser.parse_args()
+    source_dataset = EnsureDataset(
+        installed=True, purpose="extract core metadata", require_id=True
+    )(args.dataset_path).ds
+    metadata = get_catalog_metadata(source_dataset)
+    print(json.dumps(metadata))
