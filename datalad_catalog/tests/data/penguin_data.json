@@ -1,0 +1,228 @@
+[
+    {
+        "type": "dataset",
+        "dataset_id": "c475969b-2919-57b1-a3e6-71770acaa222",
+        "dataset_version": "0.1.0",
+        "metadata_sources": {
+            "key_source_map": {},
+            "sources": [
+                {
+                    "source_name": "tabby",
+                    "source_version": "0.1.0",
+                    "source_parameter": {},
+                    "source_time": 1702323824.737152,
+                    "agent_name": "Stephan Heunis",
+                    "agent_email": "s.heunis@fz-juelich.de"
+                }
+            ]
+        },
+        "name": "Palmer Penguins",
+        "license": {
+            "name": "https://creativecommons.org/publicdomain/zero/1.0/",
+            "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+        },
+        "description": "The goal of palmerpenguins is to provide a great dataset for data exploration and visualization, as an alternative to iris. Data were collected and made available by Dr. Kristen Gorman and the Palmer Station, Antarctica LTER, a member of the Long Term Ecological Research Network.",
+        "doi": "https://doi.org/10.5281/zenodo.3960218",
+        "authors": [
+            {
+                "email": "a@example.com",
+                "name": "Allison Horst",
+                "identifiers": [
+                    {
+                        "name": "ORCID",
+                        "identifier": "0000-0002-6047-5564"
+                    }
+                ]
+            },
+            {
+                "email": "b@example.com",
+                "name": "Alison Hill",
+                "identifiers": [
+                    {
+                        "name": "ORCID",
+                        "identifier": "0000-0002-8082-1890"
+                    }
+                ]
+            },
+            {
+                "email": "c@example.com",
+                "name": "Kristen Gorman",
+                "identifiers": [
+                    {
+                        "name": "ORCID",
+                        "identifier": "0000-0002-0258-9264"
+                    }
+                ]
+            }
+        ],
+        "keywords": [
+            "penguins",
+            "sea ice",
+            "foraging",
+            "ecological niches",
+            "islands",
+            "antarctica",
+            "animal sexual behavior",
+            "isotopes"
+        ],
+        "funding": [
+            {
+                "@type": "schema:Grant",
+                "name": "DFG",
+                "identifier": "431549029-INF",
+                "schema:url": "https://gepris.dfg.de/gepris/projekt/431549029?context=projekt&task=showDetail&id=431549029&"
+            },
+            {
+                "@type": "schema:Grant",
+                "name": "NSF-OPP",
+                "identifier": "#0217282",
+                "schema:url": "https://www.nsf.gov/awardsearch/showAward?AWD_ID=0217282&HistoricalAwards=false"
+            },
+            {
+                "@type": "schema:Grant",
+                "name": "NSF-OPP",
+                "identifier": "#0823101",
+                "schema:url": "https://www.nsf.gov/awardsearch/showAward?AWD_ID=0823101&HistoricalAwards=false"
+            },
+            {
+                "@type": "schema:Grant",
+                "name": "NSF-OPP",
+                "identifier": "#0741351",
+                "schema:url": "https://www.nsf.gov/awardsearch/showAward?AWD_ID=0741351&HistoricalAwards=false"
+            }
+        ],
+        "publications": [
+            {
+                "@type": "schema:CreativeWork",
+                "datePublished": "2014",
+                "doi": "https://doi.org/10.1371/journal.pone.0090081",
+                "title": "Gorman KB, Williams TD, Fraser WR (2014) Ecological Sexual Dimorphism and Environmental Variability within a Community of Antarctic Penguins (Genus Pygoscelis). PLoS ONE 9(3): e90081.",
+                "authors": []
+            }
+        ],
+        "access_request_contact": {
+            "givenName": "Allison",
+            "familyName": "Horst",
+            "email": "ahorst@ucsb.edu"
+        },
+        "subdatasets": [],
+        "additional_display": [
+            {
+                "name": "ABCD-J",
+                "icon": "fa-solid fa-graduation-cap",
+                "content": {
+                    "@context": {
+                        "homepage": "https://schema.org/mainEntityOfPage",
+                        "data controller": "https://w3id.org/dpv#hasDataController",
+                        "sample (organism)": "https://openminds.ebrains.eu/controlledTerms/Species",
+                        "sample (organism part)": "https://openminds.ebrains.eu/controlledTerms/UBERONParcellation",
+                        "used for": "http://www.w3.org/ns/prov#hadUsage"
+                    },
+                    "sample (organism)": [
+                        {
+                            "@type": "https://openminds.ebrains.eu/controlledTerms/Species",
+                            "name": "Pygoscelis adeliae",
+                            "preferredOntologyIdentifier": "http://purl.obolibrary.org/obo/NCBITaxon_9238",
+                            "synonym": "Adelie penguin"
+                        },
+                        {
+                            "@type": "https://openminds.ebrains.eu/controlledTerms/Species",
+                            "name": "Pygoscelis papua",
+                            "preferredOntologyIdentifier": "http://purl.obolibrary.org/obo/NCBITaxon_30457",
+                            "synonym": "Gentoo penguin"
+                        },
+                        {
+                            "@type": "https://openminds.ebrains.eu/controlledTerms/Species",
+                            "name": "Pygoscelis antarcticus",
+                            "preferredOntologyIdentifier": "http://purl.obolibrary.org/obo/NCBITaxon_79643",
+                            "synonym": "chinstrap penguin"
+                        }
+                    ],
+                    "sample (organism part)": {
+                        "@type": "https://openminds.ebrains.eu/controlledTerms/UBERONParcellation",
+                        "name": "body proper",
+                        "preferredOntologyIdentifier": "http://purl.obolibrary.org/obo/UBERON_0013702"
+                    },
+                    "homepage": {
+                        "@type": "https://schema.org/URL",
+                        "@value": "https://github.com/allisonhorst/palmerpenguins"
+                    },
+                    "data controller": {
+                        "@type": "https://schema.org/Person",
+                        "email": "ahorst@ucsb.edu",
+                        "name": "Allison Horst"
+                    },
+                    "used for": {
+                        "@type": "https://schema.org/Thing",
+                        "name": "Testing effort for DBI backends",
+                        "url": "https://dbitest.r-dbi.org/",
+                        "description": "The dataset is used as example data for testing data base backend features in automated tests"
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "type": "file",
+        "dataset_id": "c475969b-2919-57b1-a3e6-71770acaa222",
+        "dataset_version": "0.1.0",
+        "metadata_sources": {
+            "key_source_map": {},
+            "sources": [
+                {
+                    "source_name": "tabby",
+                    "source_version": "0.1.0",
+                    "source_parameter": {},
+                    "source_time": 1702323824.80198,
+                    "agent_name": "Stephan Heunis",
+                    "agent_email": "s.heunis@fz-juelich.de"
+                }
+            ]
+        },
+        "path": "raw/adelie.csv",
+        "contentbytesize": 23755,
+        "url": "https://portal.edirepository.org/nis/dataviewer?packageid=knb-lter-pal.219.3&entityid=002f3893385f710df69eeebe893144ff"
+    },
+    {
+        "type": "file",
+        "dataset_id": "c475969b-2919-57b1-a3e6-71770acaa222",
+        "dataset_version": "0.1.0",
+        "metadata_sources": {
+            "key_source_map": {},
+            "sources": [
+                {
+                    "source_name": "tabby",
+                    "source_version": "0.1.0",
+                    "source_parameter": {},
+                    "source_time": 1702323824.80198,
+                    "agent_name": "Stephan Heunis",
+                    "agent_email": "s.heunis@fz-juelich.de"
+                }
+            ]
+        },
+        "path": "raw/gentoo.csv",
+        "contentbytesize": 11263,
+        "url": "https://portal.edirepository.org/nis/dataviewer?packageid=knb-lter-pal.220.3&entityid=e03b43c924f226486f2f0ab6709d2381"
+    },
+    {
+        "type": "file",
+        "dataset_id": "c475969b-2919-57b1-a3e6-71770acaa222",
+        "dataset_version": "0.1.0",
+        "metadata_sources": {
+            "key_source_map": {},
+            "sources": [
+                {
+                    "source_name": "tabby",
+                    "source_version": "0.1.0",
+                    "source_parameter": {},
+                    "source_time": 1702323824.80198,
+                    "agent_name": "Stephan Heunis",
+                    "agent_email": "s.heunis@fz-juelich.de"
+                }
+            ]
+        },
+        "path": "raw/chinstrap.csv",
+        "contentbytesize": 18872,
+        "url": "https://portal.edirepository.org/nis/dataviewer?packageid=knb-lter-pal.221.2&entityid=fe853aa8f7a59aa84cdd3197619ef462"
+    }
+]
