@@ -89,3 +89,27 @@ def test_validate_without_catalog(demo_catalog, test_data):
         status="error",
         path=Path.cwd(),
     )
+
+
+def test_validate_metadata_dict(demo_catalog):
+    mdata = {
+        "dataset_id": "deabeb9b-7a37-4062-a1e0-8fcef7909609",
+        "dataset_version": "0321dbde969d2f5d6b533e35b5c5c51ac0b15758",
+        "type": "dataset",
+        "metadata_sources": {
+            "key_source_map": {},
+            "sources": [{"source_name": "", "source_version": ""}],
+        },
+    }
+    res = catalog_validate(
+        catalog=demo_catalog,
+        metadata=mdata,
+        on_failure="ignore",
+        return_type="list",
+    )
+    assert_in_results(
+        res,
+        action="catalog_validate",
+        status="ok",
+        path=demo_catalog.location,
+    )

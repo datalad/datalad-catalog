@@ -10,7 +10,10 @@
 import jq
 import logging
 from pathlib import Path
-from datalad_catalog.translate import TranslatorBase
+from datalad_catalog.translate import (
+    TranslatorBase,
+    TranslatorImplementationBase,
+)
 
 lgr = logging.getLogger(
     "datalad.metadata.translators.metalad_studyminimeta_translator"
@@ -96,7 +99,7 @@ class MetaladStudyminimetaTranslator(TranslatorBase):
         return MinimetaTranslator(metadata).translate()
 
 
-class MinimetaTranslator:
+class MinimetaTranslator(TranslatorImplementationBase):
     """Translator for metalad_studyminimeta
     Uses jq programs written by jsheunis for datalad-catalog workflow
     to translate some fields, but introduces additional condition checks.
@@ -191,19 +194,6 @@ class MinimetaTranslator:
             '"dataset_path": .name, "dirs_from_path": []}]'
         )
         result = jq.first(program, self.graph)  #  [] if nothing found
-        return result if len(result) > 0 else None
-
-    def get_metadata_source(self):
-        program = (
-            '{"key_source_map": {},"sources": [{'
-            '"source_name": .extractor_name, '
-            '"source_version": .extractor_version, '
-            '"source_parameter": .extraction_parameter, '
-            '"source_time": .extraction_time, '
-            '"agent_email": .agent_email, '
-            '"agent_name": .agent_name}]}'
-        )
-        result = jq.first(program, self.metadata_record)
         return result if len(result) > 0 else None
 
     def translate(self):
