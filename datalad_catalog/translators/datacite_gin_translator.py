@@ -10,7 +10,10 @@
 import jq
 import logging
 from pathlib import Path
-from datalad_catalog.translate import TranslatorBase, TranslatorImplementationBase
+from datalad_catalog.translate import (
+    TranslatorBase,
+    TranslatorImplementationBase,
+)
 
 lgr = logging.getLogger("datalad.metadata.translators.datacite_gin_translator")
 

@@ -396,8 +396,7 @@ class TranslatorBase(metaclass=abc.ABCMeta):
 
 
 class TranslatorImplementationBase:
-    """Common functionality across all translator implementations
-    """
+    """Common functionality across all translator implementations"""
 
     def get_metadata_source(self):
         program = (
@@ -412,9 +411,9 @@ class TranslatorImplementationBase:
         result = jq.first(program, self.metadata_record)
         # filter out "sources" fields for only non None values
         if result:
-            result['sources'] = [
+            result["sources"] = [
                 {k: v for k, v in source.items() if v is not None}
-                for source in result['sources']
+                for source in result["sources"]
             ]
             return result
         else:
