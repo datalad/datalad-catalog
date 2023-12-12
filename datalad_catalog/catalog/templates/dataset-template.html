@@ -466,7 +466,7 @@
           </span>
           <!-- EXTRA TABS -->
           <span v-if="selectedDataset.additional_display && selectedDataset.additional_display.length">
-            <span v-for="new_tab in selectedDataset.additional_display">
+            <span v-for="(new_tab, index) in selectedDataset.additional_display">
               <b-tab :key="new_tab.name" ref="tabelement">
                 <template v-slot:title>
                   <span v-if="new_tab.icon"><i :class="new_tab.icon"></i></span><span v-else><i class="fas fa-bars"></i></span> {{new_tab.name}}
@@ -480,7 +480,10 @@
                         <th>Value(s)</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <!-- If the tab has @context, treat it as a semantic tab and try to look up each object's @type for custom rendering -->
+                    <context-tab-body v-if="new_tab.content?.['@context']" :tabby="new_tab" ></context-tab-body>
+                    <!-- If the tab has NO @context: standard additional tab rendering with no customizations -->
+                    <tbody v-else>
                       <tr v-for="content_key in Object.keys(new_tab.content)">
                          <td><strong>{{ content_key.charAt(0).toUpperCase() + content_key.slice(1) }}</strong></td> 
                          <td>
@@ -494,9 +497,9 @@
                             </span>
                           </span>
                           <span v-else>{{ new_tab.content[content_key] }}</span>
-                         </td>
+                         </td>  
                       </tr>
-                     </tbody>
+                    </tbody>
                   </table>
                 </span>
               </b-tab>
