@@ -96,7 +96,7 @@ implement custom translators. Before translation from a specific source will wor
 the extractor-specific translator should be provided and exposed as an entry point
 (via a DataLad extension) as part of the ``datalad.metadata.translators`` group.
 
-Then ``datalad-catalog`` will be able to find the correct traslator automatically
+Then ``datalad-catalog`` will be able to find the correct translator automatically
 based on unique properties in a MetaLad-extracted metadata object. This is done by applying
 matching criteria that is specified by the translator, and running a ``translate()`` method
 if the match was successful.

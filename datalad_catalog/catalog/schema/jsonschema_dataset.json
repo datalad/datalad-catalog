@@ -288,6 +288,6 @@
       "maxItems": 5
     }
   },
-  "required": [ "type", "dataset_id", "dataset_version", "name"]
+  "required": [ "type", "dataset_id", "dataset_version", "metadata_sources"]
 }
 

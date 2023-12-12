@@ -31,7 +31,11 @@ Vue.component('tree-item', function (resolve, reject) {
                 return this.item["name"];
               },
               byteText: function () {
-                return this.formatBytes(this.item["contentbytesize"]);
+                if (this.item["contentbytesize"]) {
+                  return this.formatBytes(this.item["contentbytesize"]);
+                } else {
+                  return ""
+                }
               },
               downloadURL: function () {
                 return this.getDownloadURL(this.item["url"]);
@@ -85,6 +89,9 @@ Vue.component('tree-item', function (resolve, reject) {
                       dataset_version: objVersion,
                     },
                   }
+                  // before navigation, clear filter options
+                  this.$emit('clear-filters')
+                  // now navigate
                   if (newBrowserTab) {
                     const routeData = router.resolve(route_info);
                     window.open(routeData.href, '_blank');

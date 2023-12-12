@@ -10,7 +10,8 @@
         "x": "https://x.com/datalad"
     },
     "dataset_options": {
-        "include_metadata_export": true
+        "include_metadata_export": true,
+        "default_tab": "subdatasets"
     },
     "property_sources": {
         "dataset": {
