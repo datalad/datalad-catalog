@@ -8,8 +8,6 @@
 # ## ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 """Translate metalad-extracted metadata items into the catalog schema
 """
-import jq
-
 import datalad_catalog.constants as cnst
 from datalad_catalog.constraints import (
     EnsureWebCatalog,
@@ -38,6 +36,7 @@ from datalad.support.exceptions import InsufficientArgumentsError
 
 import abc
 import json
+import jq
 import logging
 import os
 
