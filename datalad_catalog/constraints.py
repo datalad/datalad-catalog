@@ -22,6 +22,10 @@ from datalad_next.constraints import (
     WithDescription,
 )
 
+from datalad_next.constraints.basic import (
+    EnsureDType,
+)
+
 __docformat__ = "restructuredtext"
 
 
@@ -31,6 +35,10 @@ __docformat__ = "restructuredtext"
 # - a JSON serialized string
 metadata_constraint = WithDescription(
     AnyOf(
+        WithDescription(
+            EnsureDType(dict),
+            error_message="not a valid Python dictionary",
+        ),
         WithDescription(
             EnsureJSON(),
             error_message="not valid JSON content",
