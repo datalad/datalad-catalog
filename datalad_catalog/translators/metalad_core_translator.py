@@ -10,7 +10,10 @@
 import jq
 import logging
 from pathlib import Path
-from datalad_catalog.translate import TranslatorBase
+from datalad_catalog.translate import (
+    TranslatorBase,
+    TranslatorImplementationBase,
+)
 
 lgr = logging.getLogger("datalad.metadata.translators.metalad_core_translator")
 
@@ -94,7 +97,7 @@ class MetaladCoreTranslator(TranslatorBase):
         return CoreTranslator(metadata).translate()
 
 
-class CoreTranslator:
+class CoreTranslator(TranslatorImplementationBase):
     """Translator for metalad_core
     Uses jq programs written by jsheunis for datalad-catalog workflow
     to translate some fields. Will not include empty values in its output.
@@ -137,19 +140,6 @@ class CoreTranslator:
             '"dirs_from_path": []}]'
         )
         result = jq.first(program, self.graph)
-        return result if len(result) > 0 else None
-
-    def get_metadata_source(self):
-        program = (
-            '{"key_source_map": {},"sources": [{'
-            '"source_name": .extractor_name, '
-            '"source_version": .extractor_version, '
-            '"source_parameter": .extraction_parameter, '
-            '"source_time": .extraction_time, '
-            '"agent_email": .agent_email, '
-            '"agent_name": .agent_name}]}'
-        )
-        result = jq.first(program, self.metadata_record)
         return result if len(result) > 0 else None
 
     def get_file_url(self):
