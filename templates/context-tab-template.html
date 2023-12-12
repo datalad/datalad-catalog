@@ -1,0 +1,70 @@
+<tbody v-if="context_tab_ready">
+<tr v-for="content_key in Object.keys(tabby.content).filter((k) => !k.startsWith('@'))">
+    <!-- PROPERTY NAME -->
+    <td width="30%">
+      <strong>
+        <!-- name -->
+        <span :id="tabby.name + '_' + content_key">{{ toUpperString(content_key) }}</span>
+        <!-- popover -->
+        <span v-if="tabby.content?.['@context']?.[content_key]">
+          &nbsp;<sup><i :id="tabby.name + '_' + content_key + '_info'" class="fas fa-circle-info"></i></sup>
+          <b-popover triggers="hover" :target="tabby.name + '_' + content_key + '_info'" placement="topleft">
+            <a :href="tabby.content?.['@context']?.[content_key]">{{ tabby.content?.['@context']?.[content_key] }}</a>
+          </b-popover>
+        </span>
+      </strong>
+    </td>
+    <!-- PROPERTY VALUE -->
+    <td>
+      <!-- Always work with an array; if single value given create a one-element array out of it -->
+      <span v-for="(val, idx) in Array.isArray(tabby.content[content_key]) ? tabby.content[content_key] : Array.of(tabby.content[content_key])">
+        <template v-if="typeof val === 'object'">
+          <!-- URL -->
+          <template v-if="val?.['@type'] == 'https://schema.org/URL'">
+            <a :href="val['@value']"> {{val['@value']}}</a><br>
+          </template>
+          <!-- Person -->
+          <template v-else-if="val?.['@type'] == 'https://schema.org/Person'">
+            <template v-if="Object.hasOwn(val, 'email')">
+              <!-- with e-mail -->
+              <a :href="'mailto:' + val.email"> {{val.name}}</a><br>
+            </template>
+            <template v-else>
+              <!-- without e-mail -->
+              {{val.name}}
+            </template>
+          </template>
+          <!-- Thing (name, url, description) -->
+          <template v-else-if="val?.['@type'] == 'https://schema.org/Thing'">
+            <template v-if="Object.hasOwn(val, 'name') && Object.hasOwn(val, 'url')">
+              <!-- with url -->
+              <a :href="val.url">{{val.name}}</a> {{val?.description}}
+            </template>
+            <template v-else>
+              <!-- without url -->
+              {{val?.name}} {{val?.description}}
+            </template>
+          </template>
+          <!-- OpenMINDS Species -->
+          <template v-else-if="val?.['@type'] == 'https://openminds.ebrains.eu/controlledTerms/Species'">
+            <a :href="val.preferredOntologyIdentifier">{{val.name}} ({{val?.synonym}})</a><br>
+          </template>
+          <!-- OpenMINDS UBERONParcellation -->
+          <template v-else-if="val?.['@type'] == 'https://openminds.ebrains.eu/controlledTerms/UBERONParcellation'">
+            <a :href="val.preferredOntologyIdentifier">{{val.name}}</a><br>
+          </template>
+          <!-- Anything else - type unknown or not declared -->
+          <template v-else>
+            {{val}}
+          </template>
+        </template>
+
+        <template v-else>
+          <!-- Primitive value, presumably text or number but we take any -->
+          {{val}}
+        </template>
+
+      </span>
+    </td>
+  </tr>
+</tbody>
