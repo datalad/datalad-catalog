@@ -1,3 +1,84 @@
+# 1.1.0 (Tue Jan 9 2024) -- UX improvements and internals
+
+### Summary
+
+- This release mostly contains improvements to the UI/UX side of the catalog, such as optimized rendering of components and the addition of new buttons/displays.
+- A notable addition is the ability to render rich semantic information in a dedicated tab, including (links to) term definitions.
+- Several internal functions were refactored to remove redundant code or allow 
+- datalad-catalog api calls can now also receive a Python dictionary as metadata input (e.g. `add` and `validate`)
+
+**Full Changelog**: https://github.com/datalad/datalad-catalog/compare/v1.0.1...v.1.1.0
+
+### 💫 Enhancements and new features
+
+- ENH: adds a "request access" button for a dataset. PR [#235](https://github.com/datalad/datalad-catalog/pull/235) (by [@jsheunis](https://github.com/jsheunis))
+- ENH: Fine tuning of HTML rendering. PR [#347](https://github.com/datalad/datalad-catalog/pull/347) (by [@jsheunis](https://github.com/jsheunis)):
+   - hides fields, including properties, journal, and grant description, if they are not populated, to prevent empty properties from making the rendered page ugly
+   - improves parsing of objects and arrays in the additional display tab so that they can be rendered in a more visually pleasing way.
+- ENH: Changes approach for setting the required tabs from URL parameters. PR [#358](https://github.com/datalad/datalad-catalog/pull/358) (by [@jsheunis](https://github.com/jsheunis)):
+   - discards the use of `$refs` for finding available tabs because of an issue with asynchronous loading of `$root`, the dataset component and its subcomponents, and `$refs`. It can happen that `$refs` might or might not be defined at the time when `created()` or `mounted()` is called in the vue app life cycle. For a more useful description, see https://stackoverflow.com/questions/54355375/vue-js-refs-are-undefined-even-though-this-refs-shows-theyre-there.
+   - instead determines the available tabs from the root component data, and accesses this list both on `created()` and on `beforeRouteUpdate()` in order to check the provided URL parameter against this list.
+- ENH: Update icons and social media links by using font-awesome 6.4.2, replacing twitter with X, and adding mastodon. PR [#366](https://github.com/datalad/datalad-catalog/pull/366) (by [@jsheunis](https://github.com/jsheunis))
+- ENH: Let the binder button display for all datasets and not only for datasets with a github URL; also update the binder link to point to the main branch of the relevant repo. PR [#367](https://github.com/datalad/datalad-catalog/pull/367) (by [@jsheunis](https://github.com/jsheunis))
+- NF: Introduce a dataset back button. The additions introduce changes to html (to show and hide the back button), to css (for the back button styling together with home button and dataset title), and to JS. The latter handles logic for when to show and hide the back button. Upon `create()` the superdataset file is fetched in order to store the `id` and `version` on the component, and the back button is hidden. Upon internal navigation (using `beforeRouteUpdate()`), the JS checks if the route that is navigated to is the same as the home page by comparing the new `id` and `version` to the stored super id and version. If they are different, show the back button; if they are the same, hide the back button. PR [#368](https://github.com/datalad/datalad-catalog/pull/368) (by [@jsheunis](https://github.com/jsheunis))
+- ENH: Display "last updated" as 'unknown' if the corresponding field is empty (previously an empty value was displayed as an ugly 'NaN'). PR [#369](https://github.com/datalad/datalad-catalog/pull/369) (by [@jsheunis](https://github.com/jsheunis))
+- ENH: Content tab UI tweaks. PR [#369](https://github.com/datalad/datalad-catalog/pull/369) (by [@jsheunis](https://github.com/jsheunis)):
+   - The cloud icon as a means to download a file is removed
+   - Filename is turned into a link, if the file has an associated URL and only if the URL string contains http
+   - the file size is updated to display correctly (empty string, and not NaN, if the value is empty)
+   - the cursor will only turn into a pointer if the item is a folder or a file with a link.. PR [#369](https://github.com/datalad/datalad-catalog/pull/369) (by [@jsheunis](https://github.com/jsheunis))
+- ENH: Update functionality wrt subdataset display / behaviour / filtering. PR [#373](https://github.com/datalad/datalad-catalog/pull/373) (by [@jsheunis](https://github.com/jsheunis)):
+   - Fixes subdataset filtering to filter on `name`, `givenName`, and `familyName` provided that the property value in each case is not `null`.
+   - Update subdataset filtering behaviour to only show filtering options when the number of `subdatasets > 3`. This will hide the filtering options otherwise. Additionally, if the filtering options are hidden, the tags on each subdataset will be deactivated (still visible, but not clickable)
+   - Clears filtering options (filtering text, selected filter tags) when navigating to a subdataset, both from the subdataset view and the content aka file tree view. This prevents the filtering options from remaining and subsequently filtering the subdatasets of the recently selected dataset (after filtering).
+- ENH: Linked data rendering in `additional_display` tab. PR [#405](https://github.com/datalad/datalad-catalog/pull/405) (by [@jsheunis](https://github.com/jsheunis)):
+   - A new async component is introduced to encapsulate any rendering of `additional_tab_display`s that have an `@context` key in their `content` field. The component was created to remove specific implementation details related to semantics from the overall dataset page rendering (i.e. from the dataset-template component). This allows for future changes to the semantic tab rendering without affecting how the component is invoked.
+   - see previous work by [@mslw](https://github.com/mslw) at https://github.com/psychoinformatics-de/sfb1451-projects-catalog/pull/62/files: 
+- ENH: Adds improved logic to the function called when user selects the catalog home button (when the current location is any tab on any dataset page in a catalog). PR [#394](https://github.com/datalad/datalad-catalog/pull/394) (by [@jsheunis](https://github.com/jsheunis)):
+   - If there is NO home page set:
+      - if there is a tab name in the URL, navigate to current
+      - else: don't navigate, only reset
+   - If there IS a home page set:
+      - if the current page IS the home page:
+         - if there is a tab name in the URL, navigate to current
+         - else: don't navigate, only reset
+      - if the current page is NOT the home page, navigate to home (reset = clear filters and set tab index = 0)
+- ENH: adds ability to specify default tab display via dataset-level config file (e.g. `"dataset_options"["default_tab"] = "subdatasets"`). PR [#397](https://github.com/datalad/datalad-catalog/pull/397) (by [@jsheunis](https://github.com/jsheunis)):
+   - the content tab is displayed in position 0
+   - the subdatasets tab is displayed in position 1
+   - other standard / non-standard tabs follow in their original order
+   - if no default tab is specified via the dataset-level config, the content tab is shown
+   - if a different default tab is provided via dataset-level config, that tab will be shown
+- ENH: Allow python dictionaries to be passed as `metadata` argument, (e.g. for `add` and `validate`). PR [#403](https://github.com/datalad/datalad-catalog/pull/403) (by [@jsheunis](https://github.com/jsheunis))
+
+### 🪓 Deprecations and removals
+
+- Removed unused contributors file in repo root. PR [#340](https://github.com/datalad/datalad-catalog/pull/340) (by [@tmheunis](https://github.com/tmheunis))
+
+### 🐛 Bug Fixes
+
+- BF: Fix double underscore typo in `display_schema` javascript. PR [#402](https://github.com/datalad/datalad-catalog/pull/402) (by [@jsheunis](https://github.com/jsheunis))
+- BF: Fix file download url rendering, where the previous state resulted in the download url for a file only containing the first letter of a string (i.e. `url_string[0]`) because it tested for the existence of an array incorrectly. PR [#343](https://github.com/datalad/datalad-catalog/pull/343) (by [@jsheunis](https://github.com/jsheunis))
+- BF: Tabs and buttons. PR [#350](https://github.com/datalad/datalad-catalog/pull/350) (by [@jsheunis](https://github.com/jsheunis)):
+   - reverts automatic tab switching to its original functionality: displaying the first tab whether it has content or not
+   - fixes the faulty positioning of the "request access" button in the case where no other dataset buttons are displayed
+
+### 🏠 Internal
+
+- Add schema utility functions that can be used in a more streamlined way by Python applications. PR [#378](https://github.com/datalad/datalad-catalog/pull/378) (by [@jsheunis](https://github.com/jsheunis)):
+   - Adds the ability get the base structure of a valid metadata item (with minimum required fields or all expanded fields), based on the current schema (either in the package data or from an argument-provided catalog). This functionality is contained in the new `schema_utils` module.
+   - Updates required fields in schemas, specifically removing `name` from the list of required fields of the dataset schema and adding `metadata_sources` to the list of required fields of both the dataset and file schemas
+- Adds ability for `schema_utils` to return a base metadata item with specific keys excluded. PR [#379](https://github.com/datalad/datalad-catalog/pull/379) (by [@jsheunis](https://github.com/jsheunis))
+- Have a single implementation of assigning sources by @yarikoptic. PR [#356](https://github.com/datalad/datalad-catalog/pull/356)
+
+
+### Authors: 3
+
+- Stephan Heunis (@jsheunis)
+- Tosca Heunis (@tmheunis)
+- Yaroslav Halchenko (@yarikoptic)
+
+
 # 1.0.1 (Fri Sept 1 2023) -- Brand new CLI!
 
 ### Summary
