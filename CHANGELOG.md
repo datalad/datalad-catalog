@@ -70,6 +70,7 @@
    - Updates required fields in schemas, specifically removing `name` from the list of required fields of the dataset schema and adding `metadata_sources` to the list of required fields of both the dataset and file schemas
 - Adds ability for `schema_utils` to return a base metadata item with specific keys excluded. PR [#379](https://github.com/datalad/datalad-catalog/pull/379) (by [@jsheunis](https://github.com/jsheunis))
 - Have a single implementation of assigning sources by @yarikoptic. PR [#356](https://github.com/datalad/datalad-catalog/pull/356)
+- Update `versioneer` from old 0.18 to 0.23, to fix the build error `AttributeError: module 'configparser' has no attribute 'SafeConfigParser'` resulting from incompatibility of older version with python 3.12. PR [#408](https://github.com/datalad/datalad-catalog/pull/408) (by [@jsheunis](https://github.com/jsheunis))
 
 
 ### Authors: 3
