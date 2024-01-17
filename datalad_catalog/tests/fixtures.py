@@ -2,6 +2,7 @@ from pathlib import Path
 import pytest
 from datalad_catalog.constants import (
     package_path,
+    default_config_dir,
     tests_path,
 )
 from datalad_catalog.webcatalog import WebCatalog
@@ -11,7 +12,7 @@ class TestPaths(object):
     """Class to store paths to test data"""
 
     data_path = tests_path / "data"
-    default_config_path = package_path / "config" / "config.json"
+    default_config_path = default_config_dir / "config.json"
     demo_config_path_catalog = data_path / "test_config_file_catalog.json"
     demo_config_path_dataset = data_path / "test_config_file_dataset.json"
     catalog_metadata_dataset1 = (
