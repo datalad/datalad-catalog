@@ -1,5 +1,6 @@
 import pytest
 from datalad_catalog.create import Create
+from datalad_catalog.utils import read_json_file
 from datalad.tests.utils_pytest import (
     assert_in_results,
 )
@@ -53,9 +54,10 @@ def test_create_with_metadata(tmp_path, test_data):
     does not yet exist and some metadata as the input args
     """
     catalog_path = tmp_path / "test_catalog"
+    mdata_path = test_data.catalog_metadata_dataset1
     res = catalog_create(
         catalog=catalog_path,
-        metadata=test_data.catalog_metadata_dataset1,
+        metadata=mdata_path,
     )
     assert_in_results(
         res,
@@ -68,12 +70,15 @@ def test_create_with_metadata(tmp_path, test_data):
     for p in catalog_paths:
         pth = catalog_path / p
         assert pth.exists()
-    assert_in_results(
-        res,
-        action="catalog_add",
-        status="ok",
-        path=catalog_path,
+    mdata = read_json_file(mdata_path)
+    ds_mdata_dir = (
+        catalog_path
+        / "metadata"
+        / mdata.get("dataset_id")
+        / mdata.get("dataset_version")
     )
+    assert ds_mdata_dir.exists()
+    assert ds_mdata_dir.is_dir()
 
 
 def test_create_at_existing_noncatalog(tmp_path):
