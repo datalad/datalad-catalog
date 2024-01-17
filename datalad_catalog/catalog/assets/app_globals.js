@@ -15,10 +15,10 @@ const default_config = {
   logo_path: "artwork/catalog_logo.svg",
   social_links: {
     about: null,
-    documentation: null,
-    github: null,
-    mastodon: null,
-    x: null
+    documentation: "https://docs.datalad.org/projects/catalog/en/latest/",
+    github: "https://github.com/datalad/datalad-catalog",
+    mastodon: "https://fosstodon.org/@datalad",
+    x: "https://x.com/datalad"
   },
   dataset_options: {
     include_metadata_export: true,
