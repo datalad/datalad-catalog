@@ -224,7 +224,7 @@ class WebCatalog(object):
     def get_config(self):
         """"""
         # Read config from file
-        config_path = cnst.default_config_dir / "config.json"
+        config_path = self.location / "config.json"
         if not config_path.exists():
             return None
         return load_config_file(config_path)

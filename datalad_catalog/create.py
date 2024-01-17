@@ -211,7 +211,7 @@ class Create(ValidatedInterface):
         # Dataset-level will inherit from catalog config in any case.
         if metadata is not None:
             catalog_add = Add()
-            yield from catalog_add(
+            yield catalog_add(
                 catalog=catalog,
                 metadata=metadata,
                 config_file=None,
