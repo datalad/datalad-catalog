@@ -1,3 +1,22 @@
+# 1.1.1 (Mon Jan 22 2024) -- Buggy configgy
+
+**Full Changelog**: https://github.com/datalad/datalad-catalog/compare/v1.1.0...v1.1.1
+
+### 🐛 Bug Fixes
+
+- Fix config-related issues picked up in handbook tutorial. PR [413](https://github.com/datalad/datalad-catalog/pull/413) (by [@jsheunis](https://github.com/jsheunis)):
+   - removes unused `config/config.yml` file
+   - makes the metadata source rules in the default config file (`config/config.json`) more permissive by removing custom sources such as `metalad_studyminimeta` from the rules; ssentially, all fields are "first come first served" or "merge any".
+   - fix the bug where `WebCatalog.get_config()` fetched the incorrect file (default package config instead of the catalog's actual config); the method now fetches the config file of the catalog.
+   - Ensure that the JS-loaded config (from catalog or from dataset) has the minimum required fields as defined by the default in JS, which prevents related browser-based errors
+   - not a bug fix but part of the same PR: remove double yielding of `add` commands when creating a catalog and adding metadata at the same time.
+- Define default social links in javascript default config instead of making them null. PR [414](https://github.com/datalad/datalad-catalog/pull/414) (by [@jsheunis](https://github.com/jsheunis)):
+
+### Authors: 1
+
+- Stephan Heunis (@jsheunis)
+
+
 # 1.1.0 (Tue Jan 9 2024) -- UX improvements and internals
 
 ### Summary
