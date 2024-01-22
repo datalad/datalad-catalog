@@ -84,7 +84,10 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/136479?v=4",
       "profile": "http://psychoinformatics.de",
       "contributions": [
-        "ideas"
+        "ideas",
+        "bug",
+        "mentoring",
+        "userTesting"
       ]
     },
     {
