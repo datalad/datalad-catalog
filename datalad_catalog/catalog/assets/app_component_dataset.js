@@ -38,7 +38,6 @@ const datasetView = () =>
             citation_busy: false,
             citation_text: "",
             invalid_doi: false,
-            show_backbutton: false,
           };
         },
         watch: {
@@ -204,6 +203,22 @@ const datasetView = () =>
               // Write main derived variable and set to ready
               this.displayData = disp_dataset;
               this.display_ready = true;
+
+              // Add json-ld data to head
+              var scripttag = document.getElementById("structured-data")
+              if (!scripttag) {
+                scripttag = document.createElement("script");
+                scripttag.setAttribute("type", "application/ld+json");
+                scripttag.setAttribute("id", "structured-data");
+                document.head.appendChild(scripttag);
+              }
+              obj = {
+                  "@context": "https://schema.org/",
+                  "@type": "Dataset",
+                  "name": this.displayData.display_name ? this.displayData.display_name : "",
+                  "description": this.selectedDataset.description ? this.selectedDataset.description : ""
+              }
+              scripttag.textContent = JSON.stringify(obj);
             }
           },
         },
@@ -271,6 +286,13 @@ const datasetView = () =>
             }
             return sorted;
           },
+          showBackButtonComp() {
+            if (this.currentIsHome()) {
+              return false
+            } else {
+              return true
+            }
+          },
         },
         methods: {
           newTabActivated(newTabIndex, prevTabIndex, bvEvent) {
@@ -284,9 +306,7 @@ const datasetView = () =>
             // https://www.sitepoint.com/clipboard-api/
             selectText = document.getElementById("clone_code").textContent;
             selectText = '\n      ' + selectText + '  \n\n  '
-            console.log(selectText)
             selectText = selectText.replace(/^\s+|\s+$/g, '');
-            console.log(selectText)
             navigator.clipboard
               .writeText(selectText)
               .then(() => {})
@@ -318,6 +338,7 @@ const datasetView = () =>
             }, 1000);
           },
           async selectDataset(event, obj, objId, objVersion, objPath) {
+            event.preventDefault()
             var newBrowserTab = event.ctrlKey || event.metaKey || (event.button == 1)
             if (obj != null) {
               objId = obj.dataset_id;
@@ -720,12 +741,6 @@ const datasetView = () =>
             available_tabs_lower,
             this.$root.selectedDataset.config?.dataset_options?.default_tab
           )
-          // if navigated to using vue router (i.e. internal to the app), show the back button
-          if (this.currentIsHome()) {
-            this.$root.selectedDataset.show_backbutton = false
-          } else {
-            this.$root.selectedDataset.show_backbutton = true
-          }
           next();
         },
         async created() {
