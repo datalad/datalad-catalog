@@ -5,8 +5,7 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/github/datalad/datalad-catalog?branch=main&svg=true)](https://ci.appveyor.com/project/mih/datalad-catalog/branch/main)
 [![codecov.io](https://codecov.io/github/datalad/datalad-catalog/coverage.svg?branch=main)](https://codecov.io/github/datalad/datalad-catalog?branch=main)
 [![crippled-filesystems](https://github.com/datalad/datalad-catalog/actions/workflows/test_crippledfs.yml/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/test_crippledfs.yml)
-[![pages-build-deployment](https://github.com/datalad/datalad-catalog/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/pages/pages-build-deployment)
-[![push_catalog_to_gh_pages](https://github.com/datalad/datalad-catalog/actions/workflows/deploy_demo.yml/badge.svg)](https://github.com/datalad/datalad-catalog/actions/workflows/deploy_demo.yml)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/e59c7ed4-e353-474f-912d-fb6cdc7f269f/deploy-status)](https://app.netlify.com/sites/datalad-catalog/deploys)
 [![DOI](https://zenodo.org/badge/371040885.svg)](https://zenodo.org/badge/latestdoi/371040885)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
@@ -33,9 +32,9 @@ INF project).
 
 ## 1. Online demo
 
-Navigate to [https://datalad.github.io/datalad-catalog/](https://datalad.github.io/datalad-catalog/) to view a live demo of a catalog generated with DataLad Catalog.
+Navigate to [https://datalad-catalog.netlify.app/](https://datalad-catalog.netlify.app/) to view a live demo of a catalog generated with DataLad Catalog.
 
-This demo site is hosted via GitHub Pages and it builds from the `gh-pages` branch of this repository.
+This demo site is hosted via Netlify and it builds from the `datalad_catalog/catalog` directory of the `main` branch of this repository.
 
 <div style="text-align:center;">
     <img src="docs/source/_static/datalad_catalog_demo.svg" width="75%"></img>
