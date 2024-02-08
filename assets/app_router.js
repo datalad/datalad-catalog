@@ -41,11 +41,17 @@ const routes = [
     name: "dataset",
   },
   { path: "/about", component: aboutPage, name: "about" },
-  { path: "*", component: notFound, name: "404" },
+  { 
+    path: '/:catchAll(.*)', 
+    component: notFound,
+    name: '404'
+  },
 ];
 
 // Create router
 const router = new VueRouter({
+  mode: 'history',
+  base: '/',
   routes: routes,
   scrollBehavior(to, from, savedPosition) {
     return { x: 0, y: 0, behavior: "auto" };
