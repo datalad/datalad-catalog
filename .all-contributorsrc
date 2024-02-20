@@ -84,7 +84,10 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/136479?v=4",
       "profile": "http://psychoinformatics.de",
       "contributions": [
-        "ideas"
+        "ideas",
+        "bug",
+        "mentoring",
+        "userTesting"
       ]
     },
     {
@@ -143,6 +146,18 @@
         "userTesting",
         "review"
       ]
+    },
+    {
+      "login": "tmheunis",
+      "name": "tmheunis",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11378509?v=4",
+      "profile": "https://github.com/tmheunis",
+      "contributions": [
+        "bug",
+        "code",
+        "ideas",
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -150,5 +165,7 @@
   "projectOwner": "datalad",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitType": "docs",
+  "commitConvention": "angular"
 }

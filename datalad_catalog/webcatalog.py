@@ -224,7 +224,7 @@ class WebCatalog(object):
     def get_config(self):
         """"""
         # Read config from file
-        config_path = cnst.default_config_dir / "config.json"
+        config_path = self.location / "config.json"
         if not config_path.exists():
             return None
         return load_config_file(config_path)
@@ -287,14 +287,21 @@ class WebCatalog(object):
         """Serve a catalog via a local http server"""
         os.chdir(self.location)
 
-        import http.server
+        from http.server import SimpleHTTPRequestHandler
         import socketserver
         from datalad.ui import ui
         import datalad.support.ansi_colors as ac
 
-        Handler = http.server.SimpleHTTPRequestHandler
+        class CustomHandler(SimpleHTTPRequestHandler):
+            # Redirect all '/dataset' URLs to '/index.html'
+            def do_GET(self):
+                if self.path.startswith("/dataset"):
+                    self.path = "/index.html"
+                # Continue with the default behavior
+                return SimpleHTTPRequestHandler.do_GET(self)
+
         try:
-            with socketserver.TCPServer((host, port), Handler) as httpd:
+            with socketserver.TCPServer((host, port), CustomHandler) as httpd:
                 ui.message(
                     "\nServing catalog at: http://{h}:{p}/ - navigate to this "
                     "address in your browser to test the catalog locally - press "

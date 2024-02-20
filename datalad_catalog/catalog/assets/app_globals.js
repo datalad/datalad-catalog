@@ -2,29 +2,28 @@
 // Data //
 /********/
 
-const config_file = "./config.json";
-const metadata_dir = "./metadata";
-const superdatasets_file = metadata_dir + "./super.json";
-const json_file = metadata_dir + "./datasets.json";
+const template_dir = "/templates";
+const config_file = "/config.json";
+const metadata_dir = "/metadata";
+const superdatasets_file = metadata_dir + "/super.json";
 const SPLIT_INDEX = 3;
 const SHORT_NAME_LENGTH = 0; // number of characters in name to display, zero if all
 const default_config = {
   catalog_name: "DataCat",
   link_color: "#fba304",
   link_hover_color: "#af7714",
-  logo_path: "artwork/catalog_logo.svg",
+  logo_path: "/artwork/catalog_logo.svg",
   social_links: {
     about: null,
-    documentation: null,
-    github: null,
-    mastodon: null,
-    x: null
+    documentation: "https://docs.datalad.org/projects/catalog/en/latest/",
+    github: "https://github.com/datalad/datalad-catalog",
+    mastodon: "https://fosstodon.org/@datalad",
+    x: "https://x.com/datalad"
   },
   dataset_options: {
     include_metadata_export: true,
   }
 };
-const template_dir = "./templates";
 
 /*************/
 // Functions //
@@ -48,7 +47,6 @@ async function grabSubDatasets(app) {
           console.error(er);
           subds_json[index] = "unavailable";
         }
-        console.log(subds_json[index]);
       }
     })
   );

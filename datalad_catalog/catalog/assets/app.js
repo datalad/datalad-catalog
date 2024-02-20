@@ -54,6 +54,13 @@ var datacat = new Vue({
       })
       .then((responseJson) => {
         obj = responseJson;
+        // first ensure that the config has all required fields;
+        // if some are missing, fill them in from default_config
+        for (const [key, value] of Object.entries(default_config)) {
+          if (!obj.hasOwnProperty(key) ) {
+            obj[key] = value;
+          }
+        }
         // set social links
         this.social_links = obj.social_links
         // set dataset options
