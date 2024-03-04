@@ -63,10 +63,19 @@
                 "source_time": 1652857264.862466,
                 "agent_name": "Stephan Heunis",
                 "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "manual_entry",
+                "source_version": "1",
+                "source_parameter": {},
+                "source_time": 1709565468.450221,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
             }
         ]
     },
     "name": "studyforrest_phase2",
+    "alias": "studyforrest_phase2",
     "license": {
         "name": "PDDL",
         "url": ""

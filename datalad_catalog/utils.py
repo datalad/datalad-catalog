@@ -47,6 +47,16 @@ def md5hash(txt):
     return txt_hash
 
 
+def split_string(input_string, split_length):
+    """
+    Split a string into two parts using a specified
+    length for the first part
+    """
+    path_left = input_string[:split_length]
+    path_right = input_string[split_length:]
+    return path_left, path_right
+
+
 def load_config_file(file: Path):
     """Helper to load content from JSON or YAML file"""
     with open(file) as f:

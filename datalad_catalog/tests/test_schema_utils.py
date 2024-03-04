@@ -9,6 +9,7 @@ ds = {
     "dataset_id": "",
     "dataset_version": "",
     "name": "",
+    "alias": "",
     "short_name": "",
     "description": "",
     "doi": "",

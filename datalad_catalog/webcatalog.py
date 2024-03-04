@@ -14,7 +14,10 @@ from datalad_catalog.utils import (
     copy_overwrite_path,
     dir_exists,
     load_config_file,
+    md5hash,
+    md5sum_from_id_version_path,
     read_json_file,
+    split_string,
 )
 
 lgr = logging.getLogger("datalad.catalog.webcatalog")
@@ -316,3 +319,81 @@ class WebCatalog(object):
                 msg="Unable to serve at the desired host and port", exc_info=e
             )
             raise (e)
+
+    def get_dataset_versions(self):
+        """Function to get all dataset-versions from a catalog,
+        including several data points from each specific dataset-version
+        metadata file. This means that each dataset-level metadata file
+        in the catalog is read, which might take some time.
+        """
+        dataset_versions = []
+
+        for dv in self.metadata_path.glob("*/*"):
+            """"""
+            if not dv.is_dir():
+                continue
+            ds_id_path = dv.parent.relative_to(self.metadata_path)
+            ds_id = str(ds_id_path)
+            ds_version_path = dv.relative_to(self.metadata_path)
+            ds_version = dv.name
+            n = Node(
+                catalog=self,
+                type="dataset",
+                dataset_id=ds_id,
+                dataset_version=ds_version,
+                node_path=None,
+            )
+            name = alias_path = alias = None
+            if hasattr(n, "name"):
+                name = n.name
+            if hasattr(n, "alias"):
+                alias = n.alias
+                alias_path = str(
+                    (Path(alias) / md5hash(alias)).with_suffix(".json")
+                )
+            dataset_versions.append(
+                {
+                    "dataset_name": name,
+                    "dataset_id": ds_id,
+                    "dataset_version": ds_version,
+                    "concept_path": str(
+                        (ds_id_path / md5hash(ds_id)).with_suffix(".json")
+                    ),
+                    "metadata_path": str(
+                        n.get_location().relative_to(self.metadata_path)
+                    ),
+                    "alias": alias,
+                    "alias_path": alias_path,
+                    "updated_at": n.get_last_updated(),
+                }
+            )
+        return dataset_versions
+
+    def get_catalog_report(self):
+        """Summarize output from self.get_dataset_versions and
+        some more additional stats
+        """
+        files = list(self.metadata_path.rglob("*.json"))
+        ds_versions = self.get_dataset_versions()
+        ds_ids = list(set([dsv["dataset_id"] for dsv in ds_versions]))
+        homepage = self.get_main_dataset()
+        homepage_node = Node(
+            catalog=self,
+            type="dataset",
+            dataset_id=homepage.get("dataset_id"),
+            dataset_version=homepage.get("dataset_version"),
+            node_path=None,
+        )
+        return {
+            "catalog_location": str(self.location.resolve()),
+            "homepage_id": homepage.get("dataset_id"),
+            "homepage_version": homepage.get("dataset_version"),
+            "homepage_path": str(
+                homepage_node.get_location().relative_to(self.location)
+            ),
+            "dataset_count": len(ds_ids),
+            "version_count": len(ds_versions),
+            "metadata_file_count": len(files),
+            "datasets": ds_ids,
+            "versions": ds_versions,
+        }
