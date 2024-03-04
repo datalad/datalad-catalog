@@ -2,6 +2,8 @@
     "dataset_id": "45b9ab26-07fc-11e8-8c71-f0d5bf7b5561",
     "dataset_version": "29dcce2b9477537b433996ebc342c531139e1d87",
     "type": "dataset",
+    "name": "curated-annotations",
+    "alias": "curated-annotations",
     "children": [],
     "url": [
         "https://datapub.fz-juelich.de/studyforrest/studyforrest.ria/45b/9ab26-07fc-11e8-8c71-f0d5bf7b5561"
@@ -32,6 +34,14 @@
                 "source_version": "1",
                 "source_parameter": {},
                 "source_time": 1652857269.6786208,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "manual_entry",
+                "source_version": "1",
+                "source_parameter": {},
+                "source_time": 1709548638972.9111,
                 "agent_name": "Stephan Heunis",
                 "agent_email": "s.heunis@fz-juelich.de"
             }

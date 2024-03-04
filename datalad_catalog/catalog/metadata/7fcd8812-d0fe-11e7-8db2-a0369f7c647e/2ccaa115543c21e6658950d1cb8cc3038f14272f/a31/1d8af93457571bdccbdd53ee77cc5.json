@@ -2,6 +2,8 @@
     "dataset_id": "7fcd8812-d0fe-11e7-8db2-a0369f7c647e",
     "dataset_version": "2ccaa115543c21e6658950d1cb8cc3038f14272f",
     "type": "dataset",
+    "name": "aggregate",
+    "alias": "aggregate",
     "children": [],
     "url": [
         "http://psydata.ovgu.de/studyforrest/aggregate/.git",
@@ -29,6 +31,14 @@
                 "source_version": "1",
                 "source_parameter": {},
                 "source_time": 1652857130.159643,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "manual_entry",
+                "source_version": "1",
+                "source_parameter": {},
+                "source_time": 1709548638972.9111,
                 "agent_name": "Stephan Heunis",
                 "agent_email": "s.heunis@fz-juelich.de"
             }

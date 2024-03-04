@@ -2,6 +2,8 @@
     "dataset_id": "3304e775-5f5f-435a-b68e-d98c9f5fb72a",
     "dataset_version": "aaac44e047d375cd8f791b1b6fe2b739f02c83b2",
     "type": "dataset",
+    "name": "cortical-surfaces-freesurfer",
+    "alias": "cortical-surfaces-freesurfer",
     "children": [],
     "url": [
         "http://psydata.ovgu.de/studyforrest/visualrois/.git",
@@ -30,6 +32,14 @@
                 "source_version": "1",
                 "source_parameter": {},
                 "source_time": 1652857136.363641,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "manual_entry",
+                "source_version": "1",
+                "source_parameter": {},
+                "source_time": 1709548638972.9111,
                 "agent_name": "Stephan Heunis",
                 "agent_email": "s.heunis@fz-juelich.de"
             }

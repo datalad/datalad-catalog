@@ -2,6 +2,8 @@
     "dataset_id": "2d05f277-94b0-470b-8e11-4e56691d5b89",
     "dataset_version": "78e04a00fedbe3e055f86c2f9127aa48e1133d55",
     "type": "dataset",
+    "name": "retinotopic-maps",
+    "alias": "retinotopic-maps",
     "children": [],
     "url": [
         "http://psydata.ovgu.de/studyforrest/retinotopy/.git",
@@ -37,6 +39,14 @@
                 "source_version": "1",
                 "source_parameter": {},
                 "source_time": 1652857142.5423129,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "manual_entry",
+                "source_version": "1",
+                "source_parameter": {},
+                "source_time": 1709548638972.9111,
                 "agent_name": "Stephan Heunis",
                 "agent_email": "s.heunis@fz-juelich.de"
             }

@@ -43,10 +43,19 @@
                 "source_time": 1652857178.8397892,
                 "agent_name": "Stephan Heunis",
                 "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "manual_entry",
+                "source_version": "1",
+                "source_parameter": {},
+                "source_time": 1709548638972.9111,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
             }
         ]
     },
     "name": "Studyforrest Structural MRI scans",
+    "alias": "3T_structural_mri",
     "description": [
         {
             "source": "datacite_gin",
