@@ -771,6 +771,23 @@ const datasetView = () =>
             return;
           }
           text = await response.text();
+          response_obj = JSON.parse(text);
+          // if the object.type is alias (i.e. the url parameter is an alias for the dataset)
+          // replace the current route with one containing the actual id and version
+          // TODO: should this be an actual route replace? or should the route with
+          // alias be kept as is and the correct dataset info just fetched from the file
+          // associated with the id and version?
+          if (response_obj["type"] == "redirect") {
+            const replace_route_info = {
+              name: "dataset",
+              params: {
+                dataset_id: response_obj.dataset_id,
+                dataset_version: response_obj.dataset_version,
+              },
+            }
+            router.replace(replace_route_info)
+            return;
+          }
           app.selectedDataset = JSON.parse(text);
           this.dataset_ready = true;
           if (
