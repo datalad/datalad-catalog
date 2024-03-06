@@ -282,7 +282,9 @@ def get_catalog_metadata(source_dataset):
     agent_name = source_dataset.config.get("user.name")
     agent_email = source_dataset.config.get("user.email")
 
-    metadata = get_dataset_metadata(source_dataset, source_dataset_version, status)
+    metadata = get_dataset_metadata(
+        source_dataset, source_dataset_version, status
+    )
     default_context = {
         # schema.org definitions by default
         "@vocab": "http://schema.org/",
@@ -314,7 +316,6 @@ def get_catalog_metadata(source_dataset):
 # SCRIPT EXECUTION STARTS HERE
 
 if __name__ == "__main__":
-
     parser = ArgumentParser()
     parser.add_argument(
         "dataset_path", type=Path, help="Path to the datalad dataset"
