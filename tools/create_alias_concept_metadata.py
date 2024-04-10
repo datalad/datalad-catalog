@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 import csv
 import json
 from pathlib import Path
-from datalad.api import  (
+from datalad.api import (
     catalog_add,
 )
 from datalad_catalog.constraints import EnsureWebCatalog
@@ -16,10 +16,9 @@ from datalad_catalog.schema_utils import get_metadata_item
 
 
 def add_aliases(alias_path, catalog):
-
     alias_path = Path(alias_path)
-    with alias_path.open(newline='') as tsvfile:
-        reader = csv.DictReader(tsvfile, delimiter='\t')
+    with alias_path.open(newline="") as tsvfile:
+        reader = csv.DictReader(tsvfile, delimiter="\t")
         for i, row in enumerate(reader):
             meta_item = get_metadata_item(
                 item_type="dataset",
@@ -35,6 +34,7 @@ def add_aliases(alias_path, catalog):
                 catalog=catalog,
                 metadata=json.dumps(meta_item),
             )
+
 
 def create_metadata_files(catalog):
     # Get report
@@ -76,7 +76,6 @@ def create_metadata_files(catalog):
             json.dump(redirect_dict, f)
 
 
-
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument(
@@ -94,7 +93,7 @@ if __name__ == "__main__":
     catalog = EnsureWebCatalog()(args.catalog)
 
     # If aliases are provided, first set them in metadata
-    if (args.aliases):
+    if args.aliases:
         add_aliases(args.aliases, catalog)
 
     create_metadata_files(catalog)
