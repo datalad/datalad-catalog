@@ -57,11 +57,30 @@ const datasetView = () =>
                     );
                   }
                 });
-              }
+              }           
               this.tag_options = tags;
               this.tag_options_filtered = this.tag_options;
               this.tag_options_available = this.tag_options;
               this.tags_ready = true;
+              
+              // if keyword(s) included in query parameters
+              if (this.$route.query.hasOwnProperty("keyword")) {
+                query_keywords = this.$route.query.keyword
+                // if included keywords(s) not null or empty string/array/object
+                if (query_keywords) {
+                  // if included keywords(s) = array
+                  if ((query_keywords instanceof Array || Array.isArray(query_keywords))
+                    && query_keywords.length > 0) {
+                      // add all search tags
+                      for (const el of query_keywords) {
+                        console.log(`adding to search tags: ${el}`)
+                        this.addSearchTag(el)
+                      }
+                  } else {
+                    this.addSearchTag(query_keywords)
+                  }
+                }
+              }
             }
           },
           dataset_ready: function (newVal, oldVal) {
@@ -300,6 +319,28 @@ const datasetView = () =>
             if (tabs[newTabIndex] == 'content') {
               this.getFiles()
             }
+            // Update URL query string whenever a new tab is selected
+            this.updateURLQueryString(this.$route, newTabIndex)
+          },
+          updateURLQueryString(current_route, tab_index) {
+            if (tab_index) {
+              query_tab = this.selectedDataset.available_tabs[tab_index];
+            } else {
+              const query = Object.assign({}, current_route.query);
+              default_tab = this.$root.selectedDataset.config?.dataset_options?.default_tab
+              query_tab = query.tab ? query.tab : (default_tab ? default_tab : "content")
+            }
+            query_string = '?tab=' + query_tab
+            if (this.search_tags.length > 0) {
+              for (const element of this.search_tags) {
+                query_string = query_string + '&keyword=' + element
+              }
+            }
+            history.replaceState(
+              {},
+              null,
+              current_route.path + query_string
+            )
           },
           copyCloneCommand(index) {
             // https://stackoverflow.com/questions/60581285/execcommand-is-now-obsolete-whats-the-alternative
@@ -354,15 +395,23 @@ const datasetView = () =>
                   dataset_id: objId,
                   dataset_version: objVersion,
                 },
+                query: {},
               }
               // before navigation, clear filtering options
               this.clearFilters()
               // now navigate
               if (newBrowserTab) {
                 const routeData = router.resolve(route_info);
+                console.log(routeData)
                 window.open(routeData.href, '_blank');
               }
               else {
+                this.search_tags = []
+                history.replaceState(
+                  {},
+                  null,
+                  this.$route.path
+                )
                 router.push(route_info);
               }
             } else {
@@ -416,20 +465,14 @@ const datasetView = () =>
               },
             }
             if (!this.catalogHasHome()) {
-              if (this.$route.params.tab_name) {
-                router.push(current_route_info)
-              } else {
                 this.clearFilters();
                 this.tabIndex = this.getDefaultTabIdx();
-              }
+                this.updateURLQueryString(this.$route, this.tabIndex)
             } else {
               if (this.currentIsHome()) {
-                if (this.$route.params.tab_name) {
-                  router.push(current_route_info)
-                } else {
-                  this.clearFilters();
-                  this.tabIndex = this.getDefaultTabIdx();
-                }
+                this.clearFilters();
+                this.tabIndex = this.getDefaultTabIdx();
+                this.updateURLQueryString(this.$route, this.tabIndex)
               } else {
                 router.push({ name: "home" });
               }
@@ -501,6 +544,7 @@ const datasetView = () =>
             this.search_tags.push(option);
             this.clearSearchTagText();
             this.filterTags();
+            this.updateURLQueryString(this.$route)
           },
           removeSearchTag(tag) {
             idx = this.search_tags.indexOf(tag);
@@ -508,6 +552,7 @@ const datasetView = () =>
               this.search_tags.splice(idx, 1);
             }
             this.filterTags();
+            this.updateURLQueryString(this.$route)
           },
           clearSearchTagText() {
             this.tag_text = "";
@@ -582,7 +627,8 @@ const datasetView = () =>
             // If a tab parameter is supplied via the router, navigate to that tab if
             // part of available tabs, otherwise default tab
             else {
-              selectTab = tabs.indexOf(tab_param.toLowerCase())
+              tab_param = Array.isArray(tab_param) ? tab_param[0] : tab_param
+              selectTab = available_tabs.indexOf(tab_param.toLowerCase())
               if (selectTab >= 0) {
                 this.tabIndex = selectTab;
               } else {
@@ -736,8 +782,9 @@ const datasetView = () =>
             this.$root.selectedDataset.config = config;
           }
           // Set the correct tab to be rendered
+          correct_tab = to.query.hasOwnProperty("tab") ? to.query.tab : null
           this.setCorrectTab(
-            to.params.tab_name,
+            correct_tab,
             available_tabs_lower,
             this.$root.selectedDataset.config?.dataset_options?.default_tab
           )
@@ -784,6 +831,7 @@ const datasetView = () =>
                 dataset_id: response_obj.dataset_id,
                 dataset_version: response_obj.dataset_version,
               },
+              query: this.$route.query,
             }
             router.replace(replace_route_info)
             return;
@@ -883,9 +931,9 @@ const datasetView = () =>
             config = JSON.parse(configtext);
             this.$root.selectedDataset.config = config;
           }
-          // Set the correct tab to be rendered
+          correct_tab = this.$route.query.hasOwnProperty("tab") ? this.$route.query.tab : null
           this.setCorrectTab(
-            this.$route.params.tab_name,
+            correct_tab,
             available_tabs_lower,
             this.$root.selectedDataset.config?.dataset_options?.default_tab
           )
