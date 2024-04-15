@@ -323,7 +323,7 @@ const datasetView = () =>
             this.updateURLQueryString(this.$route, newTabIndex)
           },
           updateURLQueryString(current_route, tab_index) {
-            if (tab_index) {
+            if (tab_index >= 0) {
               query_tab = this.selectedDataset.available_tabs[tab_index];
             } else {
               const query = Object.assign({}, current_route.query);
@@ -688,8 +688,6 @@ const datasetView = () =>
           this.$root.selectedDataset.keywords = this.$root.selectedDataset.keywords
             ? this.$root.selectedDataset.keywords
             : [];
-          this.dataset_ready = true;
-
           if (
             this.$root.selectedDataset.hasOwnProperty("subdatasets") &&
             this.$root.selectedDataset.subdatasets instanceof Array &&
@@ -806,9 +804,12 @@ const datasetView = () =>
             available_tabs_lower,
             this.$root.selectedDataset.config?.dataset_options?.default_tab
           )
+          this.dataset_ready = true;
           next();
         },
         async created() {
+          this.dataset_ready = false;
+          this.subdatasets_ready = false;
           // fetch superfile in order to set id and version on $root
           homefile = metadata_dir + "/super.json";
           homeresponse = await fetch(homefile);
@@ -856,7 +857,6 @@ const datasetView = () =>
             return;
           }
           app.selectedDataset = JSON.parse(text);
-          this.dataset_ready = true;
           if (
             this.$root.selectedDataset.hasOwnProperty("subdatasets") &&
             this.$root.selectedDataset.subdatasets instanceof Array &&
@@ -956,6 +956,7 @@ const datasetView = () =>
             available_tabs_lower,
             this.$root.selectedDataset.config?.dataset_options?.default_tab
           )
+          this.dataset_ready = true;
         },
         mounted() {
           this.tag_options_filtered = this.tag_options;
