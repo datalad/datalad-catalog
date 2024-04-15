@@ -646,10 +646,28 @@ const datasetView = () =>
         async beforeRouteUpdate(to, from, next) {
           this.subdatasets_ready = false;
           this.dataset_ready = false;
-
           file = getFilePath(to.params.dataset_id, to.params.dataset_version, null);
           response = await fetch(file);
           text = await response.text();
+          response_obj = JSON.parse(text);
+          // if the object.type is redirect (i.e. the url parameter is an alias for or ID
+          // of the dataset) replace the current route with one containing the actual id
+          // and optionally version
+          if (response_obj["type"] == "redirect") {
+            route_params = {
+              dataset_id: response_obj.dataset_id,
+            }
+            if (response_obj.dataset_version) {
+              route_params.dataset_version = response_obj.dataset_version
+            }
+            const replace_route_info = {
+              name: "dataset",
+              params: route_params,
+              query: to.query,
+            }
+            router.replace(replace_route_info)
+            return;
+          }
           this.$root.selectedDataset = JSON.parse(text);
           this.$root.selectedDataset.name = this.$root.selectedDataset.name
             ? this.$root.selectedDataset.name
@@ -819,18 +837,19 @@ const datasetView = () =>
           }
           text = await response.text();
           response_obj = JSON.parse(text);
-          // if the object.type is alias (i.e. the url parameter is an alias for the dataset)
-          // replace the current route with one containing the actual id and version
-          // TODO: should this be an actual route replace? or should the route with
-          // alias be kept as is and the correct dataset info just fetched from the file
-          // associated with the id and version?
+          // if the object.type is redirect (i.e. the url parameter is an alias for or ID
+          // of the dataset) replace the current route with one containing the actual id
+          // and optionally version
           if (response_obj["type"] == "redirect") {
+            route_params = {
+              dataset_id: response_obj.dataset_id,
+            }
+            if (response_obj.dataset_version) {
+              route_params.dataset_version = response_obj.dataset_version
+            }
             const replace_route_info = {
               name: "dataset",
-              params: {
-                dataset_id: response_obj.dataset_id,
-                dataset_version: response_obj.dataset_version,
-              },
+              params: route_params,
               query: this.$route.query,
             }
             router.replace(replace_route_info)
