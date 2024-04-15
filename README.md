@@ -112,34 +112,42 @@ The overall catalog generation process actually starts several steps before the 
 The first four steps in this list can follow any arbitrarily specified procedures and can use any arbitrarily specified tools to get the job done. If these steps are completed, correctly formatted data can be input, together with some configuration details, to `datalad-catalog`. This tool then provides several basic commands for catalog generation and customization. *For example:*
 
 ```bash
+# CREATE a new catalog from scratch:
+datalad catalog-create -c /tmp/my-cat
 
-datalad catalog validate -m <path/to/input/data>
-# Validate input data located at <path/to/input/data> according to the catalog's schema.
+#ADD metadata to an existing catalog:
+datalad catalog-add -c /tmp/my-cat -m path/to/metadata.jsonl
 
-datalad catalog create -c <path/to/catalog/directory> -m <path/to/input/data>
-# Create a catalog at location <path/to/catalog/directory>, using input data located at <path/to/input/data>.
+# SET a property of an existing catalog, such as the home page of an existing catalog - i.e. the first dataset displayed when navigating to the root URL of the catalog:
+datalad catalog-set -c /tmp/my-cat -i abcd -v 1234 home
 
-datalad catalog add -c <path/to/catalog/directory> -m <path/to/input/data>
-# Add metadata to an existing catalog at location <path/to/catalog/directory>, using input data located at <path/to/input/data>.
+# SERVE the content of the catalog via a local HTTP server at http://localhost:8001:
+datalad catalog-serve -c /tmp/my-cat -p 8001
 
-datalad catalog set-super -c <path/to/catalog/directory> -i <dataset_id> -v <dataset_version>
-# Set the superdataset of an existing catalog at location <path/to/catalog/directory>, where the superdataset id and version are provided as arguments. The superdataset will be the first dataset displayed when navigating to the root URL of a catalog.
+# VALIDATE metadata against a catalog schema without adding it to the catalog::
+datalad catalog-validate -c /tmp/my-cat/-m path/to/metadata.jsonl
 
-datalad catalog serve -c <path/to/catalog/directory>
-# Serve the content of the catalog at location <path/to/catalog/directory> via a local HTTP server.
+# GET a property of an existing catalog, such as the catalog configuration:
+datalad catalog-get -c /tmp/my-cat/ config
 
-datalad catalog workflow-new -c <path/to/catalog/directory> -d <path/to/superdataset>
-# Run a workflow for recursive metadata extraction (using datalad-metalad), translating metadata to the catalog schema (using JQ bindings), and adding the translated metadata to a new catalog.
+# REMOVE a specific metadata record from an existing catalog:
+datalad catalog-remove -c /tmp/my-cat -i efgh -v 5678
 
-datalad catalog workflow-update -c <path/to/catalog/directory> -d <path/to/superdataset> -s <path/to/subdataset>
-# Run a workflow for updating a catalog after registering a subdataset to the superdataset which the catalog represents. This workflow includes extraction (using datalad-metalad), translating metadata to the catalog schema (using JQ bindings), and adding the translated metadata to the existing catalog.
+# TRANSLATE a metalad-extracted metadata item from a particular source structure into the catalog schema. A dedicated translator should be provided and exposed as an entry point (e.g. via a DataLad extension) as part of the 'datalad.metadata.translators' group:
+datalad catalog-translate -c /tmp/my-cat -m path/to/metadata.jsonl
+
+# RUN A WORKFLOW for recursive metadata extraction (using datalad-metalad), translating metadata to the catalog schema, and adding the translated metadata to a new catalog:
+datalad catalog-workflow -t new -c /tmp/my-cat -d path/to/superdataset -e metalad_core
+
+# RUN A WORKFLOW for updating a catalog after registering a subdataset to the superdataset which the catalog represents. This workflow includes extraction (using datalad-metalad), translating metadata to the catalog schema, and adding the translated metadata to the existing catalog:
+datalad catalog-workflow -t new -c /tmp/my-cat -d path/to/superdataset -s path/to/subdataset -e metalad_core
 ```
 
 <div id="tutorial"><div>
 
 ## 5. Tutorial
 
-To explore the basic functionality of `datalad-catalog`, please refer to [these tutorials](https://github.com/datalad/tutorials/tree/master/notebooks/catalog_tutorials#readme).
+To explore the basic functionality of `datalad-catalog`, please refer to [the tutorial in the DataLad Handbook](https://handbook.datalad.org/en/latest/beyond_basics/101-182-catalog.html).
 
 
 ## 6. An example workflow

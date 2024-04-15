@@ -29,7 +29,7 @@ Foundation) under grant SFB 1451 (`431549029`_, INF project).
 Demo
 ====
 
-See our `demo catalog`_, hosted via GitHub Pages. This catalog was generated
+See our `demo catalog`_, hosted via Netlify. This catalog was generated
 from the `studyforrest dataset`_.
 
 .. image:: /_static/datalad_catalog_demo.svg
@@ -67,6 +67,6 @@ Indices and tables
 
 .. |---| unicode:: U+02014 .. em dash
 
-.. _demo catalog: https://datalad.github.io/datalad-catalog/
+.. _demo catalog: https://datalad-catalog.netlify.app/
 .. _studyforrest dataset: https://www.studyforrest.org/
 
