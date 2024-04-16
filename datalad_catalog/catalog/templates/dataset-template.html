@@ -144,7 +144,7 @@
 
             <b-card-text v-if="selectedDataset.subdatasets_available_count || selectedDataset.top_display">
               <strong>Properties:</strong> <br>
-              <span v-if="selectedDataset.subdatasets_available_count"><b-button disabled size="sm" variant="outline-dark">Subdatasets: {{selectedDataset.subdatasets_available_count}}</b-button>&nbsp;</span>
+              <span v-if="selectedDataset.subdatasets_available_count"><b-button disabled size="sm" variant="outline-dark">Datasets: {{selectedDataset.subdatasets_available_count}}</b-button>&nbsp;</span>
               <span v-if="selectedDataset.top_display && selectedDataset.top_display.length">
                 <span v-for="display_property in selectedDataset.top_display" v-if="display_property.value"><b-button disabled size="sm" variant="outline-dark">{{display_property.name}}: {{display_property.value}}</b-button>&nbsp;</span>
               </span>
@@ -193,7 +193,7 @@
           <!-- SUBDATASETS -->
           <b-tab key="subdatasets" ref="tabelement">
             <template v-slot:title>
-              <i class="fas fa-list-ol"></i> Subdatasets <span v-if="subdatasets_ready">({{selectedDataset.subdatasets_available_count}})</span>
+              <i class="fas fa-list-ol"></i> Datasets <span v-if="subdatasets_ready">({{selectedDataset.subdatasets_available_count}})</span>
             </template>
             <span v-if="!subdatasets_ready">
               <div class="d-flex justify-content-center mb-3">
@@ -201,7 +201,7 @@
               </div>
             </span>
             <span v-else>
-              <span v-if="!subdatasets || !subdatasets.length"><em>There are no subdatasets listed for the current dataset</em></span>
+              <span v-if="!subdatasets || !subdatasets.length"><em>There are no datasets listed for the current dataset</em></span>
               <span v-else>
                 <b-form v-if="subdatasets.length > 3">
                   <b-row>
