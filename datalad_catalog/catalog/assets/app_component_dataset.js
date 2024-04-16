@@ -207,6 +207,14 @@ const datasetView = () =>
               else {
                 disp_dataset.show_export = false
               }
+              // Determine show/hide confirg for "Request access" button
+              if (dataset.config?.hasOwnProperty("dataset_options") && dataset.config.dataset_options.hasOwnProperty("include_access_request")) {
+                disp_dataset.show_access_request = dataset.config.dataset_options.include_access_request
+              }
+              else {
+                // default should be to display the access request button, if access request contact/url are included
+                disp_dataset.show_access_request = true
+              }
               // Write main derived variable and set to ready
               this.displayData = disp_dataset;
               this.display_ready = true;
@@ -619,7 +627,6 @@ const datasetView = () =>
           this.$root.selectedDataset.keywords = this.$root.selectedDataset.keywords
             ? this.$root.selectedDataset.keywords
             : [];
-          this.dataset_ready = true;
 
           if (
             this.$root.selectedDataset.hasOwnProperty("subdatasets") &&
@@ -736,6 +743,7 @@ const datasetView = () =>
             available_tabs_lower,
             this.$root.selectedDataset.config?.dataset_options?.default_tab
           )
+          this.dataset_ready = true;
           next();
         },
         async created() {
@@ -768,7 +776,6 @@ const datasetView = () =>
           }
           text = await response.text();
           app.selectedDataset = JSON.parse(text);
-          this.dataset_ready = true;
           if (
             this.$root.selectedDataset.hasOwnProperty("subdatasets") &&
             this.$root.selectedDataset.subdatasets instanceof Array &&
@@ -868,6 +875,7 @@ const datasetView = () =>
             available_tabs_lower,
             this.$root.selectedDataset.config?.dataset_options?.default_tab
           )
+          this.dataset_ready = true;
         },
         mounted() {
           console.debug("Executing lifecycle hook: mounted")

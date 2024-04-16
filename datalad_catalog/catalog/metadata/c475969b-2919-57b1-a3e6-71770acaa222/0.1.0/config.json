@@ -1,0 +1,17 @@
+{
+    "catalog_name": "ABCDJ Catalog",
+    "logo_path": "abcdj_catalog_logo.svg",
+    "link_color": "#151868",
+    "link_hover_color": "#3d43d7",
+    "social_links": {
+        "about": "https://datalad.org/",
+        "documentation": "https://datalad.org/",
+        "github": "https://github.com/datalad/",
+        "x": "https://twitter.com/datalad"
+    },
+    "dataset_options": {
+        "default_tab": "content",
+        "include_metadata_export": true,
+        "include_access_request": false
+    }
+}
