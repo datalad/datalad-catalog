@@ -215,6 +215,11 @@ const datasetView = () =>
                 // default should be to display the access request button, if access request contact/url are included
                 disp_dataset.show_access_request = true
               }
+              // Show / hide binder button: if disp_dataset.url exists OR if dataset has a notebook specified in metadata
+              disp_dataset.show_binder_button = false
+              if ( disp_dataset.url || dataset.hasOwnProperty("notebooks") && current_dataset.notebooks.length > 0 ) {
+                disp_dataset.show_binder_button = true
+              }
               // Write main derived variable and set to ready
               this.displayData = disp_dataset;
               this.display_ready = true;
