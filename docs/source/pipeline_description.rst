@@ -264,7 +264,7 @@ Congratulations! You now have a catalog with multiple entries!
 
 This catalog can be served locally (``datalad catalog-serve``) to view/test it, deployed
 to an open or/restricted cloud server in order to make it available to the public or 
-colleagues/collaborators (e.g. via GitHub Pages in the case of publicly available catalogs),
+colleagues/collaborators (e.g. via Netlify in the case of publicly available catalogs),
 and updated with new entries in future (with a ``datalad catalog-add``).
 
 Happy cataloging!
