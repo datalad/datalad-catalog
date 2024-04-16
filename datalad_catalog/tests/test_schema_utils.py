@@ -77,7 +77,7 @@ ds = {
             "git_repo_url": "",
             "notebook_path": "",
         },
-    ]
+    ],
 }
 
 fl = {
