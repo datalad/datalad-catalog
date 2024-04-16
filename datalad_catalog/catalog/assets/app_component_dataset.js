@@ -551,8 +551,9 @@ const datasetView = () =>
                 fetch(doi, { headers })
                   .then((response) => response.text())
                   .then((data) => {
-                    this.selectedDataset.citation_text = data;
-                    console.log(data);
+                    // strip html tags from response text
+                    let doc = new DOMParser().parseFromString(data, 'text/html');
+                    this.selectedDataset.citation_text = doc.body.textContent || "";
                     this.citation_busy = false;
                   });
               } else {
