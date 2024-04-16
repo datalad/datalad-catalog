@@ -156,6 +156,13 @@ const datasetView = () =>
                 }
               } else {
                 disp_dataset.url = dataset.url;
+                if (disp_dataset.url && dataset.url.toLowerCase().indexOf("gin.g-node") >= 0) {
+                  disp_dataset.is_gin = true;
+                  disp_dataset.url = disp_dataset.url.replace('ssh://', '');
+                  disp_dataset.url = disp_dataset.url.replace('git@gin.g-node.org:', 'https://gin.g-node.org');
+                  disp_dataset.url = disp_dataset.url.replace('git@gin.g-node.org', 'https://gin.g-node.org');
+                  disp_dataset.url = disp_dataset.url.replace('.git', '');
+                }
               }
               // Description
               if (
