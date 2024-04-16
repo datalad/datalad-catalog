@@ -49,12 +49,12 @@
             }
         ]
     },
-    "name": null,
+    "name": "Palmer Penguins",
     "license": {
         "name": "https://creativecommons.org/publicdomain/zero/1.0/",
         "url": "https://creativecommons.org/publicdomain/zero/1.0/"
     },
-    "description": null,
+    "description": "The goal of palmerpenguins is to provide a great dataset for data exploration & visualization, as an alternative to iris.",
     "doi": "https://doi.org/10.5281/zenodo.3960218",
     "authors": [
         {
@@ -100,28 +100,28 @@
     ],
     "funding": [
         {
-            "@type": "schema:Grant",
-            "name": "DFG",
+            "@type": "https://schema.org/Grant",
+            "funder": "DFG",
             "identifier": "431549029-INF",
-            "schema:url": "https://gepris.dfg.de/gepris/projekt/431549029?context=projekt&task=showDetail&id=431549029&"
+            "url": "https://gepris.dfg.de/gepris/projekt/431549029?context=projekt&task=showDetail&id=431549029&"
         },
         {
-            "@type": "schema:Grant",
-            "name": "NSF-OPP",
+            "@type": "https://schema.org/Grant",
+            "funder": "NSF-OPP",
             "identifier": "#0217282",
-            "schema:url": "https://www.nsf.gov/awardsearch/showAward?AWD_ID=0217282&HistoricalAwards=false"
+            "url": "https://www.nsf.gov/awardsearch/showAward?AWD_ID=0217282&HistoricalAwards=false"
         },
         {
-            "@type": "schema:Grant",
-            "name": "NSF-OPP",
+            "@type": "https://schema.org/Grant",
+            "funder": "NSF-OPP",
             "identifier": "#0823101",
-            "schema:url": "https://www.nsf.gov/awardsearch/showAward?AWD_ID=0823101&HistoricalAwards=false"
+            "url": "https://www.nsf.gov/awardsearch/showAward?AWD_ID=0823101&HistoricalAwards=false"
         },
         {
-            "@type": "schema:Grant",
-            "name": "NSF-OPP",
+            "@type": "https://schema.org/Grant",
+            "funder": "NSF-OPP",
             "identifier": "#0741351",
-            "schema:url": "https://www.nsf.gov/awardsearch/showAward?AWD_ID=0741351&HistoricalAwards=false"
+            "url": "https://www.nsf.gov/awardsearch/showAward?AWD_ID=0741351&HistoricalAwards=false"
         }
     ],
     "publications": [
@@ -140,7 +140,7 @@
     },
     "additional_display": [
         {
-            "name": "ABCD-J",
+            "name": "Semantic Metadata",
             "icon": "fa-solid fa-graduation-cap",
             "content": {
                 "@context": {
