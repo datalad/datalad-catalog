@@ -165,12 +165,7 @@
             "value": 11
         }
     ],
-    "description": [
-        {
-            "source": "datacite_gin",
-            "content": "\"Extension of the dataset published in Hanke et al. (2014; doi:10.1038/sdata.2014.3) with\n additional acquisitions for 6 of the original 20 participants (and one additional participant).\n Participants performed a central fixation task while being stimulated with oriented gratings.\n The experiment was repeated in four different sessions with 7T BOLD fMRI acquisition, each\n with a different scan resolution (0.8, 1.4, 2.0, and 3.0 mm).\n \n This research was supported by a grant from the German Research Foundation (DFG) awarded to\n S. Pollmann and O. Speck (DFG PO 548/15-1). This research was, in part, also supported by the\n German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration\n in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science\n Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this\n research was supported by US-German CRCNS project, co-funded by the BMBF and the US National\n Science Foundation (BMBF 01GQ1411; NSF 1429999).\""
-        }
-    ],
+    "description": "\"Extension of the dataset published in Hanke et al. (2014; doi:10.1038/sdata.2014.3) with\n additional acquisitions for 6 of the original 20 participants (and one additional participant).\n Participants performed a central fixation task while being stimulated with oriented gratings.\n The experiment was repeated in four different sessions with 7T BOLD fMRI acquisition, each\n with a different scan resolution (0.8, 1.4, 2.0, and 3.0 mm).\n \n This research was supported by a grant from the German Research Foundation (DFG) awarded to\n S. Pollmann and O. Speck (DFG PO 548/15-1). This research was, in part, also supported by the\n German Federal Ministry of Education and Research (BMBF) as part of a US-German collaboration\n in computational neuroscience (CRCNS), co-funded by the BMBF and the US National Science\n Foundation (BMBF 01GQ1112; NSF 1129855). Work on the data-sharing technology employed for this\n research was supported by US-German CRCNS project, co-funded by the BMBF and the US National\n Science Foundation (BMBF 01GQ1411; NSF 1429999).\"",
     "publications": [
         {
             "type": "",

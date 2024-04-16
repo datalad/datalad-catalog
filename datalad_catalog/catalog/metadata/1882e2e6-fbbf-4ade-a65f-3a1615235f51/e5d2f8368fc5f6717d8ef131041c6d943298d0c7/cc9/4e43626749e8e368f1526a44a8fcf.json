@@ -47,12 +47,7 @@
         ]
     },
     "name": "Studyforrest Structural MRI scans",
-    "description": [
-        {
-            "source": "datacite_gin",
-            "content": "\"This dataset contains T1 and T2 weighted MRI scans, susceptibility weighted\n images, and diffusion imaging scans. These data are suitable for analyses\n of brain structure.\n\n For more information about the project visit: http://studyforrest.org\""
-        }
-    ],
+    "description": "\"This dataset contains T1 and T2 weighted MRI scans, susceptibility weighted\n images, and diffusion imaging scans. These data are suitable for analyses\n of brain structure.\n\n For more information about the project visit: http://studyforrest.org\"",
     "license": {
         "name": "Open Data Commons Public Domain Dedication and License (PDDL)",
         "url": "https://opendatacommons.org/licenses/pddl/"
