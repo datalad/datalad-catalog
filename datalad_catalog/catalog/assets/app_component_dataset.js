@@ -34,7 +34,6 @@ const datasetView = () =>
             files_ready: false,
             tags_ready: false,
             description_ready: false,
-            description_display: "",
             citation_busy: false,
             citation_text: "",
             invalid_doi: false,
@@ -43,14 +42,13 @@ const datasetView = () =>
         watch: {
           subdatasets_ready: function (newVal, oldVal) {
             if (newVal) {
-              console.log("subdatasets fetched!");
+              console.debug("Watched property: subdatasets_ready = true")
+              console.debug("Subdatasets have been fetched:");
               this.subdatasets = this.selectedDataset.subdatasets;
-              console.log("from watcher");
-              console.log(this.subdatasets);
+              console.debug(this.subdatasets);
               tags = this.tag_options;
               if (this.subdatasets) {
                 this.subdatasets.forEach((subds, index) => {
-                  console.log(index + "; " + subds);
                   if (subds.available == "true" && subds.keywords) {
                     tags = tags.concat(
                       subds.keywords.filter((item) => tags.indexOf(item) < 0)
@@ -67,8 +65,10 @@ const datasetView = () =>
           dataset_ready: function (newVal, oldVal) {
             // TODO: some of these methods/steps should be moved to the generatpr tool. e.g. shortname
             if (newVal) {
+              console.debug("Watched property: dataset_ready = true")
+              console.debug("Active dataset:");
               dataset = this.selectedDataset;
-              console.log(this.selectedDataset);
+              console.debug(this.selectedDataset);
               disp_dataset = {};
               // Set name to unknown if not available
               if (!dataset.hasOwnProperty("name") || !dataset["name"]) {
@@ -338,6 +338,8 @@ const datasetView = () =>
             }, 1000);
           },
           async selectDataset(event, obj, objId, objVersion, objPath) {
+            console.debug("Inside selectDataset")
+            console.debug(event)
             event.preventDefault()
             var newBrowserTab = event.ctrlKey || event.metaKey || (event.button == 1)
             if (obj != null) {
@@ -374,29 +376,6 @@ const datasetView = () =>
             this.search_text = ""
             this.search_tags = []
             this.clearSearchTagText()
-          },
-          selectDescription(desc) {
-            if (desc.content.startsWith("path:")) {
-              this.description_ready = false;
-              filepath = desc.content.split(":")[1];
-              extension = "." + filepath.split(".")[1];
-              desc_file = getFilePath(
-                this.selectedDataset.dataset_id,
-                this.selectedDataset.dataset_version,
-                desc.path,
-                extension
-              );
-              fetch(desc_file)
-                .then((response) => response.blob())
-                .then((blob) => blob.text())
-                .then((markdown) => {
-                  this.description_display = marked.parse(markdown);
-                  this.description_ready = true;
-                });
-            } else {
-              this.description_display = desc.content;
-              this.description_ready = true;
-            }
           },
           gotoHome() {
             // if there is NO home page set:
@@ -464,12 +443,19 @@ const datasetView = () =>
           gotoURL(url) {
             window.open(url);
           },
-          openWithBinder(dataset_url) {
+          openWithBinder(dataset_url, current_dataset) {
             const environment_url =
               "https://mybinder.org/v2/gh/datalad/datalad-binder/main";
             const content_url = "https://github.com/jsheunis/datalad-notebooks";
             const content_repo_name = "datalad-notebooks";
             const notebook_name = "download_data_with_datalad_python.ipynb";
+            if (current_dataset.hasOwnProperty("notebooks") && current_dataset.notebooks.length > 0) {
+              // until including the functionality to select from multiple notebooks in a dropdown, just select the first one
+              notebook = current_dataset.notebooks[0]
+              content_url = notebook.git_repo_url.replace(".git", "")
+              content_repo_name = content_url.substring(content_url.lastIndexOf('/') + 1)
+              notebook_name = notebook.notebook_path
+            }
             binder_url =
               environment_url +
               "?urlpath=git-pull%3Frepo%3D" +
@@ -582,7 +568,7 @@ const datasetView = () =>
             // If a tab parameter is supplied via the router, navigate to that tab if
             // part of available tabs, otherwise default tab
             else {
-              selectTab = tabs.indexOf(tab_param.toLowerCase())
+              selectTab = available_tabs.indexOf(tab_param.toLowerCase())
               if (selectTab >= 0) {
                 this.tabIndex = selectTab;
               } else {
@@ -598,6 +584,7 @@ const datasetView = () =>
           },
         },
         async beforeRouteUpdate(to, from, next) {
+          console.debug("Executing navigation guard: beforeRouteUpdate")
           this.subdatasets_ready = false;
           this.dataset_ready = false;
 
@@ -706,7 +693,7 @@ const datasetView = () =>
             this.$root.selectedDataset.has_files = false;
           }
           // Now list all tabs and set the correct one
-          // order in DOM: subdatasets, content, publications, funding, provenance,
+          // order in DOM: content, subdatasets, publications, funding, provenance,
           sDs = this.$root.selectedDataset
           available_tabs = ['content', 'subdatasets']
           standard_tabs = ['publications', 'funding', 'provenance']
@@ -744,6 +731,7 @@ const datasetView = () =>
           next();
         },
         async created() {
+          console.debug("Executing lifecycle hook: created")
           // fetch superfile in order to set id and version on $root
           homefile = metadata_dir + "/super.json";
           homeresponse = await fetch(homefile);
@@ -874,6 +862,7 @@ const datasetView = () =>
           )
         },
         mounted() {
+          console.debug("Executing lifecycle hook: mounted")
           this.tag_options_filtered = this.tag_options;
           this.tag_options_available = this.tag_options;
         }
