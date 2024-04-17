@@ -41,11 +41,11 @@
             <span v-show="displayData.is_gin"><b-button variant="outline-dark" size="sm" @click="gotoURL(displayData.url)"><img src="/artwork/ginfavicon.png" style="height: 1em;"></img> View on GIN</b-button>&nbsp;</span>
             <span v-show="selectedDataset.doi"><b-button variant="outline-dark" size="sm" v-b-modal.modal-2 @click="getCitationText(selectedDataset.doi)"><i class="fas fa-quote-right"></i> Cite</b-button>&nbsp;</span>
             <span v-if="displayData.show_export"><b-button variant="outline-dark" size="sm" :href="displayData.file_path" :download="displayData.download_filename"><i class="fas fa-share"></i> Export metadata</b-button>&nbsp;</span>
-            <span><b-button variant="outline-dark" size="sm" @click="openWithBinder(displayData.url)"><img src="data:image/png;base64,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"
+            <span v-show="displayData.show_binder_button"><b-button variant="outline-dark" size="sm" @click="openWithBinder(displayData.url, selectedDataset)"><img src="data:image/png;base64,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"
               alt="binder_logo" height="14em" class="mb-1">Explore with Binder</b-button></span>
             <span style="margin-left: auto;">
-              <span v-show="selectedDataset.access_request_contact"><b-button variant="outline-dark" size="sm" :href="displayData.access_request_mailto"><i class="far fa-envelope"></i> Request access</b-button>&nbsp;</span>
-              <span v-show="selectedDataset.access_request_url"><b-button variant="outline-dark" size="sm" @click="gotoURL(selectedDataset.access_request_url)"><i class="fas fa-share"></i> Request access</b-button></span>
+              <span v-if="displayData.show_access_request && selectedDataset.access_request_contact"><b-button variant="outline-dark" size="sm" :href="displayData.access_request_mailto"><i class="far fa-envelope"></i> Request access</b-button>&nbsp;</span>
+              <span v-if="displayData.show_access_request && selectedDataset.access_request_url"><b-button variant="outline-dark" size="sm" @click="gotoURL(selectedDataset.access_request_url)"><i class="fas fa-share"></i> Request access</b-button></span>
             </span>
           </div>
           
@@ -131,8 +131,7 @@
             <b-card-text>
               <strong>Description:</strong>
               <span v-if="displayData.description && Array.isArray(displayData.description) && displayData.description.length>0 ">
-                <b-button-group><span v-for="desc in displayData.description"><b-button id="xsm-button" size="sm" variant="outline-dark" @click="selectDescription(desc)">{{desc.source}}</b-button>&nbsp;</span></b-button-group><br>
-                <span v-html="description_display"></span>
+                <span v-for="desc in displayData.description">{{desc}}<br></span>
               </span>
               <span v-else>{{selectedDataset.description}}</span>
             </b-card-text>
@@ -145,7 +144,7 @@
 
             <b-card-text v-if="selectedDataset.subdatasets_available_count || selectedDataset.top_display">
               <strong>Properties:</strong> <br>
-              <span v-if="selectedDataset.subdatasets_available_count"><b-button disabled size="sm" variant="outline-dark">Subdatasets: {{selectedDataset.subdatasets_available_count}}</b-button>&nbsp;</span>
+              <span v-if="selectedDataset.subdatasets_available_count"><b-button disabled size="sm" variant="outline-dark">Datasets: {{selectedDataset.subdatasets_available_count}}</b-button>&nbsp;</span>
               <span v-if="selectedDataset.top_display && selectedDataset.top_display.length">
                 <span v-for="display_property in selectedDataset.top_display" v-if="display_property.value"><b-button disabled size="sm" variant="outline-dark">{{display_property.name}}: {{display_property.value}}</b-button>&nbsp;</span>
               </span>
@@ -159,10 +158,10 @@
           <!-- FILE TREE -->
           <b-tab @click="getFiles" key="content" ref="tabelement">
             <template v-slot:title>
-              <i class="far fa-folder"></i> Content
+              <i class="far fa-folder"></i> Content <span v-if="!selectedDataset.has_files">(no record)</span>
             </template>
             <span v-if="files_ready">
-              <span v-if="!selectedDataset.tree || !selectedDataset.tree.length"><em>There is no content available for the current dataset</em></span>
+              <span v-if="!selectedDataset.tree || !selectedDataset.tree.length"><em>This catalog record contains no information on dataset content</em></span>
               <span v-else>
                 <b-card no-body class="p-2">
                   <ul>
@@ -194,7 +193,7 @@
           <!-- SUBDATASETS -->
           <b-tab key="subdatasets" ref="tabelement">
             <template v-slot:title>
-              <i class="fas fa-list-ol"></i> Subdatasets <span v-if="subdatasets_ready">({{selectedDataset.subdatasets_available_count}})</span>
+              <i class="fas fa-list-ol"></i> Datasets <span v-if="subdatasets_ready">({{selectedDataset.subdatasets_available_count}})</span>
             </template>
             <span v-if="!subdatasets_ready">
               <div class="d-flex justify-content-center mb-3">
@@ -202,7 +201,7 @@
               </div>
             </span>
             <span v-else>
-              <span v-if="!subdatasets || !subdatasets.length"><em>There are no subdatasets listed for the current dataset</em></span>
+              <span v-if="!subdatasets || !subdatasets.length"><em>There are no datasets listed for the current dataset</em></span>
               <span v-else>
                 <b-form v-if="subdatasets.length > 3">
                   <b-row>
@@ -335,7 +334,44 @@
               </template>
               <span v-if="!selectedDataset.funding || !selectedDataset.funding.length"><em>There are no funding sources listed for the current dataset</em></span>
               <span v-else v-for="fund in selectedDataset.funding">
-                <b-card border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
+                <!-- If the fund has @type, treat it as a fund item with semantic info -->
+                <b-card v-if="fund?.['@type']=='https://schema.org/Grant'" border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
+                  <template v-slot:header>
+                    <b-row no-gutters>
+                      <b-col align-h="center" align-v="center" md="1">
+                        <span class="xxlfont"><i class="fas fa-dollar-sign "></i></span>
+                      </b-col>
+                      <b-col class="text-muted" md="11">
+                        <h5><span v-if="fund.funder">{{fund.funder}}</span><span v-else><em>(funder not specified)</em></span></h5>
+                        <span v-if="fund.name">
+                          <small><strong>Grant name:</strong> {{fund.name}}</small><br>
+                        </span>
+                        <template v-if="fund.alternateName">
+                          <span><small><strong>Alternate name: </strong>{{fund.alternateName}}</small></span><br>
+                        </template>
+                        <span v-if="fund.description">
+                          <small><strong>Description:</strong> {{fund.description}}</small><br>
+                        </span>
+                        <span v-if="fund.identifier">
+                          <template v-if="fund.identifier.startsWith('http')">
+                            <small><strong>Grant identifier:</strong> <a :href="fund.identifier">{{fund.identifier}}</a></small><br>
+                          </template>
+                          <template v-else>
+                            <small><strong>Grant identifier:</strong> {{fund.identifier}}</small><br>
+                          </template>
+                        </span>
+                        <span v-if="fund.url">
+                          <small><strong>URL:</strong> <a :href="fund.url">{{fund.url}}</a></small><br>
+                        </span>
+                        <span v-if="fund.sameAs">
+                          <small><strong>Same as:</strong> <a :href="fund.sameAs">{{fund.sameAs}}</a></small><br>
+                        </span>
+                      </b-col>
+                    </b-row>
+                  </template>
+                </b-card>
+                <!-- If the tab has NO @type: standard fund rendering with no customizations -->
+                <b-card v-else border-variant="dark" header-bg-variant="transparent" no-body class="mb-2">
                   <template v-slot:header>
                     <b-row no-gutters>
                       <b-col align-h="center" align-v="center" md="1">
@@ -345,6 +381,7 @@
                         <h5><span v-if="fund.name">{{fund.name}}</span><span v-else><em>(fund name not specified)</em></span></h5>
                         <span v-if="fund['identifier']"><small><strong>Grant identifier:</strong> {{fund["identifier"]}}</small><br></span>
                         <span v-if="fund['description']"><small><strong>Description:</strong> {{fund["description"]}}</small><br></span>
+                        <span v-if="fund['url']"><small><strong>URL:</strong> <a :href="fund['url']">{{fund["url"]}}</a></small><br></span>
                       </b-col>
                       </b-col>
                     </b-row>

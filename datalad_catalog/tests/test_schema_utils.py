@@ -73,6 +73,12 @@ ds = {
     },
     "additional_display": [{"name": "", "content": {}, "icon": ""}],
     "top_display": [{"name": "", "value": ""}],
+    "notebooks": [
+        {
+            "git_repo_url": "",
+            "notebook_path": "",
+        },
+    ],
 }
 
 fl = {

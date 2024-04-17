@@ -34,7 +34,6 @@ const datasetView = () =>
             files_ready: false,
             tags_ready: false,
             description_ready: false,
-            description_display: "",
             citation_busy: false,
             citation_text: "",
             invalid_doi: false,
@@ -43,14 +42,13 @@ const datasetView = () =>
         watch: {
           subdatasets_ready: function (newVal, oldVal) {
             if (newVal) {
-              console.log("subdatasets fetched!");
+              console.debug("Watched property: subdatasets_ready = true")
+              console.debug("Subdatasets have been fetched:");
               this.subdatasets = this.selectedDataset.subdatasets;
-              console.log("from watcher");
-              console.log(this.subdatasets);
+              console.debug(this.subdatasets);
               tags = this.tag_options;
               if (this.subdatasets) {
                 this.subdatasets.forEach((subds, index) => {
-                  console.log(index + "; " + subds);
                   if (subds.available == "true" && subds.keywords) {
                     tags = tags.concat(
                       subds.keywords.filter((item) => tags.indexOf(item) < 0)
@@ -86,8 +84,10 @@ const datasetView = () =>
           dataset_ready: function (newVal, oldVal) {
             // TODO: some of these methods/steps should be moved to the generatpr tool. e.g. shortname
             if (newVal) {
+              console.debug("Watched property: dataset_ready = true")
+              console.debug("Active dataset:");
               dataset = this.selectedDataset;
-              console.log(this.selectedDataset);
+              console.debug(this.selectedDataset);
               disp_dataset = {};
               // Set name to unknown if not available
               if (!dataset.hasOwnProperty("name") || !dataset["name"]) {
@@ -175,6 +175,13 @@ const datasetView = () =>
                 }
               } else {
                 disp_dataset.url = dataset.url;
+                if (disp_dataset.url && dataset.url.toLowerCase().indexOf("gin.g-node") >= 0) {
+                  disp_dataset.is_gin = true;
+                  disp_dataset.url = disp_dataset.url.replace('ssh://', '');
+                  disp_dataset.url = disp_dataset.url.replace('git@gin.g-node.org:', 'https://gin.g-node.org');
+                  disp_dataset.url = disp_dataset.url.replace('git@gin.g-node.org', 'https://gin.g-node.org');
+                  disp_dataset.url = disp_dataset.url.replace('.git', '');
+                }
               }
               // Description
               if (
@@ -218,6 +225,19 @@ const datasetView = () =>
               }
               else {
                 disp_dataset.show_export = false
+              }
+              // Determine show/hide confirg for "Request access" button
+              if (dataset.config?.hasOwnProperty("dataset_options") && dataset.config.dataset_options.hasOwnProperty("include_access_request")) {
+                disp_dataset.show_access_request = dataset.config.dataset_options.include_access_request
+              }
+              else {
+                // default should be to display the access request button, if access request contact/url are included
+                disp_dataset.show_access_request = true
+              }
+              // Show / hide binder button: if disp_dataset.url exists OR if dataset has a notebook specified in metadata
+              disp_dataset.show_binder_button = false
+              if ( disp_dataset.url || dataset.hasOwnProperty("notebooks") && current_dataset.notebooks.length > 0 ) {
+                disp_dataset.show_binder_button = true
               }
               // Write main derived variable and set to ready
               this.displayData = disp_dataset;
@@ -381,6 +401,8 @@ const datasetView = () =>
             }, 1000);
           },
           async selectDataset(event, obj, objId, objVersion, objPath) {
+            console.debug("Inside selectDataset")
+            console.debug(event)
             event.preventDefault()
             var newBrowserTab = event.ctrlKey || event.metaKey || (event.button == 1)
             if (obj != null) {
@@ -430,29 +452,6 @@ const datasetView = () =>
             this.search_text = ""
             this.search_tags = []
             this.clearSearchTagText()
-          },
-          selectDescription(desc) {
-            if (desc.content.startsWith("path:")) {
-              this.description_ready = false;
-              filepath = desc.content.split(":")[1];
-              extension = "." + filepath.split(".")[1];
-              desc_file = getFilePath(
-                this.selectedDataset.dataset_id,
-                this.selectedDataset.dataset_version,
-                desc.path,
-                extension
-              );
-              fetch(desc_file)
-                .then((response) => response.blob())
-                .then((blob) => blob.text())
-                .then((markdown) => {
-                  this.description_display = marked.parse(markdown);
-                  this.description_ready = true;
-                });
-            } else {
-              this.description_display = desc.content;
-              this.description_ready = true;
-            }
           },
           gotoHome() {
             // if there is NO home page set:
@@ -514,12 +513,19 @@ const datasetView = () =>
           gotoURL(url) {
             window.open(url);
           },
-          openWithBinder(dataset_url) {
+          openWithBinder(dataset_url, current_dataset) {
             const environment_url =
               "https://mybinder.org/v2/gh/datalad/datalad-binder/main";
             const content_url = "https://github.com/jsheunis/datalad-notebooks";
             const content_repo_name = "datalad-notebooks";
             const notebook_name = "download_data_with_datalad_python.ipynb";
+            if (current_dataset.hasOwnProperty("notebooks") && current_dataset.notebooks.length > 0) {
+              // until including the functionality to select from multiple notebooks in a dropdown, just select the first one
+              notebook = current_dataset.notebooks[0]
+              content_url = notebook.git_repo_url.replace(".git", "")
+              content_repo_name = content_url.substring(content_url.lastIndexOf('/') + 1)
+              notebook_name = notebook.notebook_path
+            }
             binder_url =
               environment_url +
               "?urlpath=git-pull%3Frepo%3D" +
@@ -610,8 +616,9 @@ const datasetView = () =>
                 fetch(doi, { headers })
                   .then((response) => response.text())
                   .then((data) => {
-                    this.selectedDataset.citation_text = data;
-                    console.log(data);
+                    // strip html tags from response text
+                    let doc = new DOMParser().parseFromString(data, 'text/html');
+                    this.selectedDataset.citation_text = doc.body.textContent || "";
                     this.citation_busy = false;
                   });
               } else {
@@ -651,6 +658,7 @@ const datasetView = () =>
           },
         },
         async beforeRouteUpdate(to, from, next) {
+          console.debug("Executing navigation guard: beforeRouteUpdate")
           this.subdatasets_ready = false;
           this.dataset_ready = false;
           file = getFilePath(to.params.dataset_id, to.params.dataset_version, null);
@@ -775,7 +783,7 @@ const datasetView = () =>
             this.$root.selectedDataset.has_files = false;
           }
           // Now list all tabs and set the correct one
-          // order in DOM: subdatasets, content, publications, funding, provenance,
+          // order in DOM: content, subdatasets, publications, funding, provenance,
           sDs = this.$root.selectedDataset
           available_tabs = ['content', 'subdatasets']
           standard_tabs = ['publications', 'funding', 'provenance']
@@ -817,6 +825,7 @@ const datasetView = () =>
         async created() {
           this.dataset_ready = false;
           this.subdatasets_ready = false;
+          console.debug("Executing lifecycle hook: created")
           // fetch superfile in order to set id and version on $root
           homefile = metadata_dir + "/super.json";
           homeresponse = await fetch(homefile);
@@ -966,6 +975,7 @@ const datasetView = () =>
           this.dataset_ready = true;
         },
         mounted() {
+          console.debug("Executing lifecycle hook: mounted")
           this.tag_options_filtered = this.tag_options;
           this.tag_options_available = this.tag_options;
         }

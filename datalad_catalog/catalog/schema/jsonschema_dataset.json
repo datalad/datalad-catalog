@@ -291,6 +291,28 @@
       },
       "uniqueItems": true,
       "maxItems": 5
+    },
+    "notebooks": {
+      "description": "Jupyter notebooks that will be linked to from the 'Explore with Binder' button and will typically be used to demonstrate the use of the dataset",
+      "title": "Jupyter notebooks",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "git_repo_url": {
+            "description": "The URL to a publicly accessible git repository containing the notebook",
+            "title": "Repo URL",
+            "type": "string"
+          },
+          "notebook_path": {
+            "description": "The path to the notebook, relative to the repository root, including the filename and extension",
+            "title": "Notebook path",
+            "type": "string"
+          }
+        },
+        "required": ["git_repo_url", "notebook_path"]
+      },
+      "uniqueItems": true
     }
   },
   "required": [ "type", "dataset_id", "dataset_version", "metadata_sources"]
