@@ -323,6 +323,8 @@ const datasetView = () =>
             this.updateURLQueryString(this.$route, newTabIndex)
           },
           updateURLQueryString(current_route, tab_index) {
+            console.log("updateURLQueryString - current route:")
+            console.log(current_route)
             if (tab_index >= 0) {
               query_tab = this.selectedDataset.available_tabs[tab_index];
             } else {
@@ -407,11 +409,16 @@ const datasetView = () =>
               }
               else {
                 this.search_tags = []
-                history.replaceState(
-                  {},
-                  null,
-                  this.$route.path
-                )
+                // The following commented out code is an attempt to fix remaining
+                // bugs with query strings that remain in the url when navigating to
+                // a subdataset. This code tries to set the query string to null first,
+                // by replacing the state, before pushing the next route via vue router.
+                // It didn't seem to solve the issue, but should be investigated more.
+                // history.replaceState(
+                //   {},
+                //   null,
+                //   this.$route.path
+                // )
                 router.push(route_info);
               }
             } else {
