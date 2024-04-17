@@ -9,7 +9,7 @@
               <a @click="gotoHome" class="newlink"><small><i class="fas fa-home"></i></small></a>
             </span>
             <span class="dataset-nav-item" v-if="showBackButtonComp">
-              <a @click="history.back()" class="newlink"><small><i class="fas fa-backward"></i></small></a>
+              <a @click="clickBackButton()" class="newlink"><small><i class="fas fa-backward"></i></small></a>
             </span>
           </span>
           <div class="dataset-title">
@@ -191,7 +191,7 @@
             </span>
           </b-tab>
           <!-- SUBDATASETS -->
-          <b-tab key="subdatasets" ref="tabelement">
+          <b-tab key="datasets" ref="tabelement">
             <template v-slot:title>
               <i class="fas fa-list-ol"></i> Datasets <span v-if="subdatasets_ready">({{selectedDataset.subdatasets_available_count}})</span>
             </template>

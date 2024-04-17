@@ -22,25 +22,9 @@ var datacat = new Vue({
     gotoExternal(dest) {
       window.open(dest);
     },
-    async load() {
-      // Load templates
-      await Promise.all(
-        Object.keys(template_paths).map(async (key, index) => {
-          url = template_dir + "/" + template_paths[key]
-          fetch(url).
-          then(response => {
-              return response.text();
-          }).
-          then(text => {
-              console.log('template loaded: '+key)
-              console.log(text)
-              document.getElementById(key).innerHTML = text;
-          });
-        })
-      )
-    }
   },
   beforeCreate() {
+    console.debug("Executing lifecycle hook: beforeCreate")
     fetch(config_file)
       .then((response) => {
         if (response.ok) {

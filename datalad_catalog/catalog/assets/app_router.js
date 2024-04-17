@@ -8,6 +8,7 @@ const routes = [
     path: "/",
     name: "home",
     beforeEnter: (to, from, next) => {
+      console.debug("Executing navigation guard: beforeEnter - route '/')")
       const superfile = metadata_dir + "/super.json";
       // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
       var rawFile = new XMLHttpRequest();
