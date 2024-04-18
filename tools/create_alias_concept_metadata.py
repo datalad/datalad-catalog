@@ -51,7 +51,7 @@ def create_metadata_files(catalog):
             key=lambda d: d.get("updated_at"),
             reverse=True,
         )
-        # Dict for metadata
+        # Dict for id concept metadata
         redirect_dict = {
             "type": "redirect",
             "dataset_id": d,
@@ -64,7 +64,11 @@ def create_metadata_files(catalog):
         dataset_concept_path.parent.mkdir(parents=True, exist_ok=True)
         with open(dataset_concept_path, "w") as f:
             json.dump(redirect_dict, f)
-
+        # Dict for alias metadata
+        redirect_dict = {
+            "type": "redirect",
+            "dataset_id": d,
+        }
         # Create alias metadata
         dataset_alias_path = (
             catalog.metadata_path
