@@ -11,6 +11,7 @@ var datacat = new Vue({
     links: {},
     dataset_options: {},
     config_ready: false,
+    catalog_config: {},
   },
   methods: {
     gotoHome() {
@@ -45,6 +46,7 @@ var datacat = new Vue({
             obj[key] = value;
           }
         }
+        this.catalog_config = obj
         // set social links
         this.social_links = obj.social_links
         // set dataset options

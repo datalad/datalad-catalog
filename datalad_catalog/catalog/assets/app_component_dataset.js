@@ -255,13 +255,39 @@ const datasetView = () =>
                 scripttag.setAttribute("id", "structured-data");
                 document.head.appendChild(scripttag);
               }
+              keys_to_populate = [
+                  "name", // Text
+                  "description", // Text
+                  "alternateName", // Text
+                  "creator", //	Person or Organization
+                  "citation", // Text or CreativeWork
+                  "funder", // Person or Organization
+                  "hasPart", // URL or Dataset
+                  // "isPartOf", // URL or Dataset
+                  "identifier", // URL, Text, or PropertyValue
+                  // "isAccessibleForFree", // Boolean
+                  "keywords", // Text
+                  "license", // URL or CreativeWork
+                  // "measurementTechnique", // Text or URL
+                  "sameAs", // URL
+                  // "spatialCoverage", // Text or Place
+                  // "temporalCoverage", // Text
+                  // "variableMeasured", // Text or PropertyValue
+                  "version", // Text or Number
+                  // "url", // URL
+                  "includedInDataCatalog", // DataCatalog
+                  // "distribution", // DataDownload
+              ]
               obj = {
                   "@context": "https://schema.org/",
                   "@type": "Dataset",
-                  "name": this.displayData.display_name ? this.displayData.display_name : "",
-                  "description": this.selectedDataset.description ? this.selectedDataset.description : ""
               }
-              scripttag.textContent = JSON.stringify(obj);
+              for (var k=0; k<keys_to_populate.length; k++) {
+                key = keys_to_populate[k]
+                obj[key] = this.getRichData(key, dataset, disp_dataset)
+              }
+
+              scripttag.textContent = JSON.stringify(pruneObject(obj));
 
               // Write main derived variable and set to ready
               this.displayData = disp_dataset;
@@ -388,6 +414,142 @@ const datasetView = () =>
             console.debug("- After: Vue Route query params: %s", JSON.stringify(Object.assign({}, this.$route.query)))
             let url_qp2 = new URL(document.location.toString()).searchParams
             console.debug("- After: URL query string: %s", url_qp2.toString())
+          },
+          getRichData(key, selectedDS, displayDS) {
+            switch (key) {
+              case "name":
+                return displayDS.display_name ? displayDS.display_name : ""
+              case "description":
+                return selectedDS.description ? selectedDS.description : ""
+              case "alternateName":
+                // use alias if present
+                return [selectedDS.alias ? selectedDS.alias : ""]
+              case "creator":
+                // authors
+                return selectedDS.authors?.map( (auth) => {
+                  return {
+                    "@type": "Person",
+                    "givenName": auth.givenName ? auth.givenName : null,
+                    "familyName": auth.familyName ? auth.familyName : null,
+                    "name": auth.name ? auth.name : null,
+                    "sameAs": this.getAuthorORCID(auth),
+                  }
+                })
+              case "citation":
+                // from publications
+                return selectedDS.publications?.map( (pub) => {
+                  return pub.doi
+                })
+              case "funder":
+                // from funding
+                return selectedDS.funding?.map( (fund) => {
+                  var fund_obj = {
+                    "@type": "Organization",
+                    "name": fund.funder ? fund.funder : (fund.name ? fund.name : (fund.description ? fund.description : null)),
+                  }
+                  var sameas = this.getFunderSameAs(fund)
+                  if (sameas) {
+                    fund_obj["sameAs"] = sameas
+                  }
+                  return fund_obj
+                })
+              case "hasPart":
+                // from subdatasets
+                var parts = selectedDS.subdatasets?.map( (ds) => {
+                  return {
+                      "@type": "Dataset",
+                      "name": ds.dirs_from_path[ds.dirs_from_path.length - 1]
+                  }
+                })
+                return parts.length ? parts : null
+              // case "isPartOf":
+              case "identifier":
+                // use DOI
+                return selectedDS.doi ? selectedDS.doi : null
+              // "isAccessibleForFree", // Boolean
+              case "keywords":
+                return selectedDS.keywords?.length ? selectedDS.keywords : null
+              case "license":
+                return selectedDS.license?.url ? selectedDS.license.url : null
+              // "measurementTechnique", // Text or URL
+              case "sameAs":
+                // homepage
+                if (selectedDS.additional_display && selectedDS.additional_display.length) {
+                  for (var t=0; t<selectedDS.additional_display.length; t++) {
+                    var current_display = selectedDS.additional_display[t]
+                    var homepage = current_display.content?.homepage?.["@value"]
+                    if (homepage) {
+                      return homepage
+                    }
+                  }
+                } else {
+                  return null
+                }
+                selectedDS.additional_display[0]["content"]["homepage"]["@value"]
+                return 
+              // "spatialCoverage", // Text or Place
+              // "temporalCoverage", // Text
+              // "variableMeasured", // Text or PropertyValue
+              case "version":
+                return selectedDS.dataset_version
+              // "url", // URL
+              case "includedInDataCatalog":
+                var obj = {
+                  "@type":"DataCatalog",
+                  "name": this.$root.catalog_config?.catalog_name ? this.$root.catalog_config.catalog_name : null,
+                  "url": this.$root.catalog_config?.catalog_url ? this.$root.catalog_config.catalog_url : null,
+                }
+                if (obj.name == null && obj.url == null) {
+                  return null
+                } else {
+                  return obj
+                }
+              // "distribution", // DataDownload
+              default:
+                return null
+            }
+          },
+          getAuthorORCID(author) {
+            if (author.hasOwnProperty("identifiers") && author.identifiers.length > 0) {
+              orcid_element = author.identifiers.filter(
+                (x) => x.name === "ORCID"
+              );
+              if (orcid_element.length > 0) {
+                orcid_code = orcid_element[0].identifier
+                const prefix = "https://orcid.org/"
+                return orcid_code.indexOf(prefix) >= 0 ? orcid_code : prefix + orcid_code
+              } else {
+                return null
+              }
+            } else {
+              return null
+            }
+          },
+          getFunderSameAs(fund) {
+            const common_funders = [
+              {
+                "name": "Deutsche Forschungsgemeinschaft",
+                "alternate_name": "DFG",
+                "ror": "https://ror.org/018mejw64"
+              },
+              {
+                "name": "National Science Foundation",
+                "alternate_name": "NSF",
+                "ror": "https://ror.org/021nxhr62"
+              }
+            ]
+            for (var i=0; i<common_funders.length; i++) {
+              var cf = common_funders[i]
+              if (fund.funder?.indexOf(cf.name) >= 0 ||
+                  fund.name?.indexOf(cf.name) >= 0 ||
+                  fund.description?.indexOf(cf.name) >= 0 ||
+                  fund.funder?.indexOf(cf.alternate_name) >= 0 ||
+                  fund.name?.indexOf(cf.alternate_name) >= 0 ||
+                  fund.description?.indexOf(cf.alternate_name) >= 0 ) {
+                return cf.ror
+              }
+            }
+            return null
           },
           copyCloneCommand(index) {
             // https://stackoverflow.com/questions/60581285/execcommand-is-now-obsolete-whats-the-alternative
