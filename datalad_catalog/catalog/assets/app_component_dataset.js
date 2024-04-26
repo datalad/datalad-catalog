@@ -14,6 +14,9 @@ const datasetView = () =>
             dataPath: [],
             showCopyTooltip: false,
             showCopyCiteTooltip: false,
+            showCopyDatasetAliasTooltip: false,
+            showCopyDatasetIdTooltip: false,
+            showCopyDatasetFullTooltip: false,
             tabIndex: 0,
             sort_name: true,
             sort_modified: true,
@@ -406,6 +409,35 @@ const datasetView = () =>
           hideTooltipLater() {
             setTimeout(() => {
               this.showCopyTooltip = false;
+            }, 1000);
+          },
+          copyDatasetURL(url_type) {
+            // https://stackoverflow.com/questions/60581285/execcommand-is-now-obsolete-whats-the-alternative
+            // https://www.sitepoint.com/clipboard-api/
+            urlmap = {
+              'alias': "showCopyDatasetAliasTooltip",
+              'id': "showCopyDatasetIdTooltip",
+              'full': "showCopyDatasetFullTooltip",
+            }
+            selectText = document.getElementById(url_type + "_url").textContent;
+            selectText = '\n      ' + selectText + '  \n\n  '
+            selectText = selectText.replace(/^\s+|\s+$/g, '');
+            navigator.clipboard
+              .writeText(selectText)
+              .then(() => {})
+              .catch((error) => {
+                alert(`Copy failed! ${error}`);
+              });
+            this[urlmap[url_type]] = true;
+          },
+          hideURLTooltipLater(url_type) {
+            setTimeout(() => {
+              urlmap = {
+                'alias': "showCopyDatasetAliasTooltip",
+                'id': "showCopyDatasetIdTooltip",
+                'full': "showCopyDatasetFullTooltip",
+              }
+              this[urlmap[url_type]] = false;
             }, 1000);
           },
           copyCitationText(index) {
