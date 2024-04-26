@@ -74,7 +74,7 @@ def test_config_without_file(demo_catalog_without_config):
     assert demo_catalog_without_config.config_path == default_config_path
     assert hasattr(demo_catalog_without_config, "config")
     assert demo_catalog_without_config.config is not None
-    assert demo_catalog_without_config.config[CATALOG_NAME] == "DataCat"
+    assert demo_catalog_without_config.config[CATALOG_NAME] == "DataCat Demo"
 
 
 def test_dataset_config(tmp_path):
