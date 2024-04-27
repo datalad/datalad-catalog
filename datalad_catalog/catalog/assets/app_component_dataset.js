@@ -266,10 +266,21 @@ const datasetView = () =>
               }
               scripttag.textContent = JSON.stringify(obj);
 
+              dataset_id_path = getFilePath(this.selectedDataset.dataset_id)
+              fetch(dataset_id_path)
+                .then((response) => {
+                  if(response.status == 404) {
+                    this.selectedDataset.has_id_path = false
+                  } else {
+                    this.selectedDataset.has_id_path = true 
+                  }
+                })
+                .catch(error => {
+                  // do nothing
+                })
               // Write main derived variable and set to ready
               this.displayData = disp_dataset;
               this.display_ready = true;
-
               console.debug("Watched property function completed: dataset_ready = true")
             }
           },

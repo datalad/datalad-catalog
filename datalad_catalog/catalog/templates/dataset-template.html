@@ -151,21 +151,23 @@
                 </b-row>
               </div>
             </span>
-            <h6>ID URL</h5>
-            <div class="shadow-sm p-3 mb-3 bg-white rounded">
-              <b-row>
-                <b-col cols="11" style="overflow: auto; white-space: nowrap;">
-                  <code id="id_url" >
-                    {{window.location.origin + '/dataset/' + selectedDataset.dataset_id}}
-                  </code>
-                </b-col>
-                <b-col cols="1">
-                  <i id="copyBtnIdURL" class="far fa-clone" @click="copyDatasetURL('id')"></i>
-                  <b-tooltip target="copyBtnIdURL" :show.sync="showCopyDatasetIdTooltip" @shown="hideURLTooltipLater('id')" triggers left title="Copied!">
-                  </b-tooltip>
-                </b-col>
-              </b-row>
-            </div>
+            <span v-if="selectedDataset.has_id_path">
+              <h6>ID URL</h5>
+              <div class="shadow-sm p-3 mb-3 bg-white rounded">
+                <b-row>
+                  <b-col cols="11" style="overflow: auto; white-space: nowrap;">
+                    <code id="id_url" >
+                      {{window.location.origin + '/dataset/' + selectedDataset.dataset_id}}
+                    </code>
+                  </b-col>
+                  <b-col cols="1">
+                    <i id="copyBtnIdURL" class="far fa-clone" @click="copyDatasetURL('id')"></i>
+                    <b-tooltip target="copyBtnIdURL" :show.sync="showCopyDatasetIdTooltip" @shown="hideURLTooltipLater('id')" triggers left title="Copied!">
+                    </b-tooltip>
+                  </b-col>
+                </b-row>
+              </div>
+            </span>
             <h6>Full URL</h5>
             <div class="shadow-sm p-3 mb-3 bg-white rounded">
               <b-row>
