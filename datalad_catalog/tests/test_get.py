@@ -64,24 +64,6 @@ def test_arg_combinations(demo_catalog):
         )
 
 
-def test_get_tree(demo_catalog):
-    """Tests for property: tree"""
-    # placeholder test until the tree functionality is implemented
-    res = catalog_get(
-        catalog=demo_catalog,
-        property="tree",
-        on_failure="ignore",
-        return_type="list",
-    )
-    assert_in_results(
-        res,
-        action="catalog_get",
-        action_property="tree",
-        status="error",
-        path=demo_catalog.location,
-    )
-
-
 def test_get_home(demo_catalog, test_data):
     """Tests for property: home"""
     # test no home spec

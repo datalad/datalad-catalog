@@ -56,15 +56,24 @@ async function grabSubDatasets(app) {
 function getFilePath(dataset_id, dataset_version, path, ext = ".json") {
   // Get node file location from  dataset id, dataset version, and node path
   // using a file system structure similar to RIA stores
-  file = metadata_dir + "/" + dataset_id + "/" + dataset_version;
-  blob = dataset_id + "-" + dataset_version;
-  if (path) {
-    blob = blob + "-" + path;
+  // - dataset_id is required, all the other parameters are optional
+  // - dataset_id could either be an actual dataset ID or an alias
+  file = metadata_dir + "/" + dataset_id
+  blob = dataset_id
+  if (dataset_version) {
+    file = file + "/" + dataset_version;
+    blob = blob + "-" + dataset_version;
+    // path to file only makes sense with the context of a dataset id AND version
+    if (path) {
+      blob = blob + "-" + path;
+    }
+    blob = md5(blob);
+    blob_parts = [blob.substring(0, SPLIT_INDEX), blob.substring(SPLIT_INDEX)];
+    return file + "/" + blob_parts[0] + "/" + blob_parts[1] + ext;
+  } else {
+    blob = md5(blob);
+    return file + "/" + blob + ext;
   }
-  blob = md5(blob);
-  blob_parts = [blob.substring(0, SPLIT_INDEX), blob.substring(SPLIT_INDEX)];
-  file = file + "/" + blob_parts[0] + "/" + blob_parts[1] + ext;
-  return file;
 }
 
 function getRelativeFilePath(dataset_id, dataset_version, path) {

@@ -8,6 +8,7 @@ const routes = [
     path: "/",
     name: "home",
     beforeEnter: (to, from, next) => {
+      console.debug("Executing navigation guard: beforeEnter - route '/')")
       const superfile = metadata_dir + "/super.json";
       // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
       var rawFile = new XMLHttpRequest();
@@ -22,6 +23,7 @@ const routes = [
                 dataset_id: superds["dataset_id"],
                 dataset_version: superds["dataset_version"],
               },
+              query: to.query,
             });
             next();
           } else if (rawFile.status === 404) {
@@ -36,7 +38,7 @@ const routes = [
     },
   },
   {
-    path: "/dataset/:dataset_id/:dataset_version/:tab_name?",
+    path: "/dataset/:dataset_id/:dataset_version?",
     component: datasetView,
     name: "dataset",
   },

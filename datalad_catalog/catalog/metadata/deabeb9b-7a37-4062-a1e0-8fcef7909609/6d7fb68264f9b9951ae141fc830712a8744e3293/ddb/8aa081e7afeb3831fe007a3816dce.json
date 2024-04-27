@@ -246,10 +246,19 @@
                 "source_time": 1652857119.960284,
                 "agent_name": "Stephan Heunis",
                 "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "manual_entry",
+                "source_version": "1",
+                "source_parameter": {},
+                "source_time": 1709565468.450221,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
             }
         ]
     },
     "name": "StudyForrest",
+    "alias": "studyforrest",
     "description": "The StudyForrest project centers around the use of the movie Forrest Gump, which provides complex sensory input that is both reproducible and is also richly laden with real-life-like content and contexts. Since its initial release, the StudyForrest dataset has grown and been extended substantially, and now encompasses many hours of fMRI scans, structural brain scans, eye-tracking data, and extensive annotations of the movie. It is a one-of-a-kind resource for studying high-level cognition in the human brain under complex, natural stimulation. The versatility of the provided data (some individuals have nearly ten hours of fMRI data) enables studies far beyond this main focus. This covers a vast range from studies of low-level signal properties and brain structure, to sensory integration and attentional processes, to computational modeling of representational spaces and brain area interactions.",
     "access_request_contact": {
         "familyName": "Heunis",

@@ -14,6 +14,9 @@ const datasetView = () =>
             dataPath: [],
             showCopyTooltip: false,
             showCopyCiteTooltip: false,
+            showCopyDatasetAliasTooltip: false,
+            showCopyDatasetIdTooltip: false,
+            showCopyDatasetFullTooltip: false,
             tabIndex: 0,
             sort_name: true,
             sort_modified: true,
@@ -55,15 +58,20 @@ const datasetView = () =>
                     );
                   }
                 });
-              }
+              }           
               this.tag_options = tags;
               this.tag_options_filtered = this.tag_options;
               this.tag_options_available = this.tag_options;
               this.tags_ready = true;
+
             }
           },
           dataset_ready: function (newVal, oldVal) {
-            // TODO: some of these methods/steps should be moved to the generatpr tool. e.g. shortname
+            // The code in this function is executed once the properties,
+            // children, variables, and everything related to the currently
+            // selected dataset is deemed "ready". This means subdatasets
+            // have been fetched and some subdataset properties have been
+            // collected to assist dataset-level UX (including search tags)
             if (newVal) {
               console.debug("Watched property: dataset_ready = true")
               console.debug("Active dataset:");
@@ -220,9 +228,27 @@ const datasetView = () =>
               if ( disp_dataset.url || dataset.hasOwnProperty("notebooks") && current_dataset.notebooks.length > 0 ) {
                 disp_dataset.show_binder_button = true
               }
-              // Write main derived variable and set to ready
-              this.displayData = disp_dataset;
-              this.display_ready = true;
+
+              // Set correct URL query string to mirrorif keyword(s) included in query parameters
+              if (this.$route.query.hasOwnProperty("keyword")) {
+                query_keywords = this.$route.query.keyword
+                // if included keywords(s) not null or empty string/array/object
+                if (query_keywords) {
+                  console.debug("Keywords in query parameter taken from vue route:")
+                  console.debug(query_keywords)
+                  // if included keywords(s) = array
+                  if ((query_keywords instanceof Array || Array.isArray(query_keywords))
+                    && query_keywords.length > 0) {
+                      // add all search tags
+                      for (const el of query_keywords) {
+                        console.log(`adding to search tags: ${el}`)
+                        this.addSearchTag(el)
+                      }
+                  } else {
+                    this.addSearchTag(query_keywords)
+                  }
+                }
+              }
 
               // Add json-ld data to head
               var scripttag = document.getElementById("structured-data")
@@ -239,6 +265,23 @@ const datasetView = () =>
                   "description": this.selectedDataset.description ? this.selectedDataset.description : ""
               }
               scripttag.textContent = JSON.stringify(obj);
+
+              dataset_id_path = getFilePath(this.selectedDataset.dataset_id)
+              fetch(dataset_id_path)
+                .then((response) => {
+                  if(response.status == 404) {
+                    this.selectedDataset.has_id_path = false
+                  } else {
+                    this.selectedDataset.has_id_path = true 
+                  }
+                })
+                .catch(error => {
+                  // do nothing
+                })
+              // Write main derived variable and set to ready
+              this.displayData = disp_dataset;
+              this.display_ready = true;
+              console.debug("Watched property function completed: dataset_ready = true")
             }
           },
         },
@@ -317,9 +360,48 @@ const datasetView = () =>
         methods: {
           newTabActivated(newTabIndex, prevTabIndex, bvEvent) {
             var tabs = this.selectedDataset.available_tabs
+            console.debug(
+              "%c> USER INPUT: new tab selected (%s)",
+              "color: white; font-style: italic; background-color: blue",
+              tabs[newTabIndex]
+            );
             if (tabs[newTabIndex] == 'content') {
               this.getFiles()
             }
+            // Update URL query string whenever a new tab is selected
+            this.updateURLQueryString(this.$route, newTabIndex)
+          },
+          updateURLQueryString(current_route, tab_index = null) {
+            // This function is called from:
+            // - addSearchTag(): when adding a search tag (a.k.a. keyword) - WITHOUT tab_index param
+            // - removeSearchTag(): when removing a search tag (a.k.a. keyword) - WITHOUT tab_index param
+            // - newTabActivated(): when a new tab is selected or programmatically activated - WITH tab_index param
+            console.debug("---\nUpdating URL query string\n---")
+            console.debug("- Argument tab_index: %i", tab_index)
+            console.debug("- Before: Vue Route query params: %s", JSON.stringify(Object.assign({}, current_route.query)))
+            let url_qp = new URL(document.location.toString()).searchParams
+            console.debug("- Before: URL query string: %s", url_qp.toString())
+            var query_tab
+            if (Number.isInteger(tab_index)) {
+              query_tab = this.selectedDataset.available_tabs[tab_index];
+            } else {
+              default_tab = this.$root.selectedDataset.config?.dataset_options?.default_tab
+              query_tab = url_qp.get("tab") ? url_qp.get("tab") : (default_tab ? default_tab : "content")
+            }
+            query_string = '?tab=' + query_tab
+            if (this.search_tags.length > 0) {
+              for (const element of this.search_tags) {
+                query_string = query_string + '&keyword=' + element
+              }
+            }
+            history.replaceState(
+              {},
+              null,
+              current_route.path + query_string
+            )
+            console.debug("- After: Vue Route query params: %s", JSON.stringify(Object.assign({}, this.$route.query)))
+            let url_qp2 = new URL(document.location.toString()).searchParams
+            console.debug("- After: URL query string: %s", url_qp2.toString())
           },
           copyCloneCommand(index) {
             // https://stackoverflow.com/questions/60581285/execcommand-is-now-obsolete-whats-the-alternative
@@ -340,6 +422,35 @@ const datasetView = () =>
               this.showCopyTooltip = false;
             }, 1000);
           },
+          copyDatasetURL(url_type) {
+            // https://stackoverflow.com/questions/60581285/execcommand-is-now-obsolete-whats-the-alternative
+            // https://www.sitepoint.com/clipboard-api/
+            urlmap = {
+              'alias': "showCopyDatasetAliasTooltip",
+              'id': "showCopyDatasetIdTooltip",
+              'full': "showCopyDatasetFullTooltip",
+            }
+            selectText = document.getElementById(url_type + "_url").textContent;
+            selectText = '\n      ' + selectText + '  \n\n  '
+            selectText = selectText.replace(/^\s+|\s+$/g, '');
+            navigator.clipboard
+              .writeText(selectText)
+              .then(() => {})
+              .catch((error) => {
+                alert(`Copy failed! ${error}`);
+              });
+            this[urlmap[url_type]] = true;
+          },
+          hideURLTooltipLater(url_type) {
+            setTimeout(() => {
+              urlmap = {
+                'alias': "showCopyDatasetAliasTooltip",
+                'id': "showCopyDatasetIdTooltip",
+                'full': "showCopyDatasetFullTooltip",
+              }
+              this[urlmap[url_type]] = false;
+            }, 1000);
+          },
           copyCitationText(index) {
             // https://stackoverflow.com/questions/60581285/execcommand-is-now-obsolete-whats-the-alternative
             // https://www.sitepoint.com/clipboard-api/
@@ -358,6 +469,10 @@ const datasetView = () =>
             }, 1000);
           },
           async selectDataset(event, obj, objId, objVersion, objPath) {
+            console.debug(
+              "%c> USER INPUT: dataset selected",
+              "color: white; font-style: italic; background-color: blue",
+            );
             console.debug("Inside selectDataset")
             console.debug(event)
             event.preventDefault()
@@ -376,15 +491,28 @@ const datasetView = () =>
                   dataset_id: objId,
                   dataset_version: objVersion,
                 },
+                query: {},
               }
               // before navigation, clear filtering options
               this.clearFilters()
               // now navigate
               if (newBrowserTab) {
                 const routeData = router.resolve(route_info);
+                console.log(routeData)
                 window.open(routeData.href, '_blank');
               }
               else {
+                this.search_tags = []
+                // The following commented out code is an attempt to fix remaining
+                // bugs with query strings that remain in the url when navigating to
+                // a subdataset. This code tries to set the query string to null first,
+                // by replacing the state, before pushing the next route via vue router.
+                // It didn't seem to solve the issue, but should be investigated more.
+                // history.replaceState(
+                //   {},
+                //   null,
+                //   this.$route.path
+                // )
                 router.push(route_info);
               }
             } else {
@@ -398,6 +526,10 @@ const datasetView = () =>
             this.clearSearchTagText()
           },
           gotoHome() {
+            console.debug(
+              "%c> USER INPUT: home selected",
+              "color: white; font-style: italic; background-color: blue",
+            );
             // if there is NO home page set:
             // - if there is a tab name in the URL, navigate to current
             // - else: don't navigate, only "reset"
@@ -415,20 +547,18 @@ const datasetView = () =>
               },
             }
             if (!this.catalogHasHome()) {
-              if (this.$route.params.tab_name) {
-                router.push(current_route_info)
-              } else {
                 this.clearFilters();
                 this.tabIndex = this.getDefaultTabIdx();
-              }
+                // Note: no need to call updateURLQueryString() here because a change to
+                // this.tabIndex will automatically call newTabActivated() (because of
+                // v-model="tabIndex"), which in turn calls updateURLQueryString().
             } else {
               if (this.currentIsHome()) {
-                if (this.$route.params.tab_name) {
-                  router.push(current_route_info)
-                } else {
-                  this.clearFilters();
-                  this.tabIndex = this.getDefaultTabIdx();
-                }
+                this.clearFilters();
+                this.tabIndex = this.getDefaultTabIdx();
+                // Note: no need to call updateURLQueryString() here because a change to
+                // this.tabIndex will automatically call newTabActivated() (because of
+                // v-model="tabIndex"), which in turn calls updateURLQueryString().
               } else {
                 router.push({ name: "home" });
               }
@@ -507,6 +637,7 @@ const datasetView = () =>
             this.search_tags.push(option);
             this.clearSearchTagText();
             this.filterTags();
+            this.updateURLQueryString(this.$route)
           },
           removeSearchTag(tag) {
             idx = this.search_tags.indexOf(tag);
@@ -514,6 +645,7 @@ const datasetView = () =>
               this.search_tags.splice(idx, 1);
             }
             this.filterTags();
+            this.updateURLQueryString(this.$route)
           },
           clearSearchTagText() {
             this.tag_text = "";
@@ -589,6 +721,7 @@ const datasetView = () =>
             // If a tab parameter is supplied via the router, navigate to that tab if
             // part of available tabs, otherwise default tab
             else {
+              tab_param = Array.isArray(tab_param) ? tab_param[0] : tab_param
               selectTab = available_tabs.indexOf(tab_param.toLowerCase())
               if (selectTab >= 0) {
                 this.tabIndex = selectTab;
@@ -603,15 +736,40 @@ const datasetView = () =>
             var idx = this.selectedDataset.available_tabs.indexOf(default_tab.toLowerCase())
             return idx >= 0 ? idx : 0
           },
+          clickBackButton() {
+            console.debug(
+              "%c> USER INPUT: backbutton clicked",
+              "color: white; font-style: italic; background-color: blue",
+            );
+            history.back()
+          },
         },
         async beforeRouteUpdate(to, from, next) {
           console.debug("Executing navigation guard: beforeRouteUpdate")
           this.subdatasets_ready = false;
           this.dataset_ready = false;
-
           file = getFilePath(to.params.dataset_id, to.params.dataset_version, null);
           response = await fetch(file);
           text = await response.text();
+          response_obj = JSON.parse(text);
+          // if the object.type is redirect (i.e. the url parameter is an alias for or ID
+          // of the dataset) replace the current route with one containing the actual id
+          // and optionally version
+          if (response_obj["type"] == "redirect") {
+            route_params = {
+              dataset_id: response_obj.dataset_id,
+            }
+            if (response_obj.dataset_version) {
+              route_params.dataset_version = response_obj.dataset_version
+            }
+            const replace_route_info = {
+              name: "dataset",
+              params: route_params,
+              query: to.query,
+            }
+            await router.replace(replace_route_info)
+            return;
+          }
           this.$root.selectedDataset = JSON.parse(text);
           this.$root.selectedDataset.name = this.$root.selectedDataset.name
             ? this.$root.selectedDataset.name
@@ -632,7 +790,6 @@ const datasetView = () =>
           this.$root.selectedDataset.keywords = this.$root.selectedDataset.keywords
             ? this.$root.selectedDataset.keywords
             : [];
-
           if (
             this.$root.selectedDataset.hasOwnProperty("subdatasets") &&
             this.$root.selectedDataset.subdatasets instanceof Array &&
@@ -713,9 +870,9 @@ const datasetView = () =>
             this.$root.selectedDataset.has_files = false;
           }
           // Now list all tabs and set the correct one
-          // order in DOM: content, subdatasets, publications, funding, provenance,
+          // order in DOM: content, datasets, publications, funding, provenance,
           sDs = this.$root.selectedDataset
-          available_tabs = ['content', 'subdatasets']
+          available_tabs = ['content', 'datasets']
           standard_tabs = ['publications', 'funding', 'provenance']
           // add available standard tabs
           for (var t=0; t<standard_tabs.length; t++) {
@@ -743,15 +900,19 @@ const datasetView = () =>
             this.$root.selectedDataset.config = config;
           }
           // Set the correct tab to be rendered
+          correct_tab = to.query.hasOwnProperty("tab") ? to.query.tab : null
           this.setCorrectTab(
-            to.params.tab_name,
+            correct_tab,
             available_tabs_lower,
             this.$root.selectedDataset.config?.dataset_options?.default_tab
           )
           this.dataset_ready = true;
+          console.debug("Finished navigation guard: beforeRouteUpdate")
           next();
         },
         async created() {
+          this.dataset_ready = false;
+          this.subdatasets_ready = false;
           console.debug("Executing lifecycle hook: created")
           // fetch superfile in order to set id and version on $root
           homefile = metadata_dir + "/super.json";
@@ -780,6 +941,25 @@ const datasetView = () =>
             return;
           }
           text = await response.text();
+          response_obj = JSON.parse(text);
+          // if the object.type is redirect (i.e. the url parameter is an alias for or ID
+          // of the dataset) replace the current route with one containing the actual id
+          // and optionally version
+          if (response_obj["type"] == "redirect") {
+            route_params = {
+              dataset_id: response_obj.dataset_id,
+            }
+            if (response_obj.dataset_version) {
+              route_params.dataset_version = response_obj.dataset_version
+            }
+            const replace_route_info = {
+              name: "dataset",
+              params: route_params,
+              query: this.$route.query,
+            }
+            await router.replace(replace_route_info)
+            return;
+          }
           app.selectedDataset = JSON.parse(text);
           if (
             this.$root.selectedDataset.hasOwnProperty("subdatasets") &&
@@ -845,9 +1025,9 @@ const datasetView = () =>
             this.$root.selectedDataset.has_files = false;
           }
           // Now list all tabs and set the correct one
-          // order in DOM: content, subdatasets, publications, funding, provenance,
+          // order in DOM: content, datasets, publications, funding, provenance,
           sDs = this.$root.selectedDataset
-          available_tabs = ['content', 'subdatasets']
+          available_tabs = ['content', 'datasets']
           standard_tabs = ['publications', 'funding', 'provenance']
           // add available standard tabs
           for (var t=0; t<standard_tabs.length; t++) {
@@ -874,18 +1054,30 @@ const datasetView = () =>
             config = JSON.parse(configtext);
             this.$root.selectedDataset.config = config;
           }
-          // Set the correct tab to be rendered
+          // ---
+          // Note for future: Handle route query parameters (tab and keyword) here?
+          // ---
+          // This point in the code is reached from an explicit URL navigation to a dataset
+          // (via home and/or via alias and/or via dataset-id, or directly to a dataset-version.
+          // This means that explicit query parameters will be in the $route object.
+          // (Note: when the same point is reached in the beforeRouteUpdate function,
+          // it means that navigation happened from within the catalog (i.e. not explicitly / externally)
+          // This means a new dataset page will be opened from the content tab or from the datasets tab of
+          // the dataset that is being navigated away from. This means we do not want keyword or tab parameters to pass through.
+          correct_tab = this.$route.query.hasOwnProperty("tab") ? this.$route.query.tab : null
           this.setCorrectTab(
-            this.$route.params.tab_name,
+            correct_tab,
             available_tabs_lower,
             this.$root.selectedDataset.config?.dataset_options?.default_tab
           )
           this.dataset_ready = true;
+          console.debug("Finished lifecycle hook: created")
         },
         mounted() {
           console.debug("Executing lifecycle hook: mounted")
           this.tag_options_filtered = this.tag_options;
           this.tag_options_available = this.tag_options;
+          console.debug("Finished lifecycle hook: mounted")
         }
       }
     })
