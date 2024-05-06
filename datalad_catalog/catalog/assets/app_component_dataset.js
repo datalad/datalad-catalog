@@ -225,7 +225,7 @@ const datasetView = () =>
               }
               // Show / hide binder button: if disp_dataset.url exists OR if dataset has a notebook specified in metadata
               disp_dataset.show_binder_button = false
-              if ( disp_dataset.url || dataset.hasOwnProperty("notebooks") && current_dataset.notebooks.length > 0 ) {
+              if ( disp_dataset.url || disp_dataset.hasOwnProperty("notebooks") && disp_dataset.notebooks.length > 0 ) {
                 disp_dataset.show_binder_button = true
               }
 
