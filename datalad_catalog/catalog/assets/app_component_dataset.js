@@ -499,8 +499,6 @@ const datasetView = () =>
                 } else {
                   return null
                 }
-                selectedDS.additional_display[0]["content"]["homepage"]["@value"]
-                return 
               // "spatialCoverage", // Text or Place
               // "temporalCoverage", // Text
               // "variableMeasured", // Text or PropertyValue
