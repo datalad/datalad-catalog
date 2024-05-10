@@ -3,6 +3,7 @@ With this script you can do the following for an existing catalog:
 - create aliases for datasets from a tsv file
 - create alias and concept id metadata files for all datasets
 """
+
 from argparse import ArgumentParser
 import csv
 import json
