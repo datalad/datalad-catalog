@@ -293,7 +293,7 @@ const datasetView = () =>
               scripttag.textContent = JSON.stringify(pruneObject(obj));
 
               dataset_id_path = getFilePath(this.selectedDataset.dataset_id)
-              fetch(dataset_id_path)
+              fetch(dataset_id_path, {cache: "no-cache"})
                 .then((response) => {
                   if(response.status == 404) {
                     this.selectedDataset.has_id_path = false
@@ -839,7 +839,7 @@ const datasetView = () =>
             this.files_ready = false;
             file_hash = this.selectedDataset.children;
             file = metadata_dir + "/" + file_hash + ".json";
-            response = await fetch(file);
+            response = await fetch(file, {cache: "no-cache"});
             text = await response.text();
             obj = JSON.parse(text);
             this.$root.selectedDataset.tree = obj["children"];
@@ -909,7 +909,7 @@ const datasetView = () =>
           this.subdatasets_ready = false;
           this.dataset_ready = false;
           file = getFilePath(to.params.dataset_id, to.params.dataset_version, null);
-          response = await fetch(file);
+          response = await fetch(file, {cache: "no-cache"});
           text = await response.text();
           response_obj = JSON.parse(text);
           // if the object.type is redirect (i.e. the url parameter is an alias for or ID
@@ -1051,7 +1051,7 @@ const datasetView = () =>
           this.$root.selectedDataset.available_tabs = available_tabs_lower
           // Now get dataset config if it exists
           dataset_config_path = metadata_dir + "/" + sDs.dataset_id + "/" + sDs.dataset_version + "/config.json";
-          configresponse = await fetch(dataset_config_path);
+          configresponse = await fetch(dataset_config_path, {cache: "no-cache"});
           if (configresponse.status == 404) {
             this.$root.selectedDataset.config = {};
           } else {
@@ -1076,7 +1076,7 @@ const datasetView = () =>
           console.debug("Executing lifecycle hook: created")
           // fetch superfile in order to set id and version on $root
           homefile = metadata_dir + "/super.json";
-          homeresponse = await fetch(homefile);
+          homeresponse = await fetch(homefile, {cache: "no-cache"});
           if (homeresponse.status == 404) {
             this.$root.home_dataset_id = null;
             this.$root.home_dataset_version = null;
@@ -1092,7 +1092,7 @@ const datasetView = () =>
             null
           );
           var app = this.$root;
-          response = await fetch(file);
+          response = await fetch(file, {cache: "no-cache"});
           // Reroute to 404 if the dataset file is not found
           if (response.status == 404) {
             router.push({
@@ -1206,7 +1206,7 @@ const datasetView = () =>
           this.$root.selectedDataset.available_tabs = available_tabs_lower
           // Now get dataset config if it exists
           dataset_config_path = metadata_dir + "/" + sDs.dataset_id + "/" + sDs.dataset_version + "/config.json";
-          configresponse = await fetch(dataset_config_path);
+          configresponse = await fetch(dataset_config_path, {cache: "no-cache"});
           if (configresponse.status == 404) {
             this.$root.selectedDataset.config = {};
           } else {

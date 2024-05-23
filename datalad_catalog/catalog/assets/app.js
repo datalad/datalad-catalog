@@ -26,7 +26,7 @@ var datacat = new Vue({
   },
   beforeCreate() {
     console.debug("Executing lifecycle hook: beforeCreate")
-    fetch(config_file)
+    fetch(config_file, {cache: "no-cache"})
       .then((response) => {
         if (response.ok) {
           return response.json();
