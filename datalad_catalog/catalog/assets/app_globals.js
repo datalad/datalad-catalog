@@ -37,7 +37,7 @@ async function grabSubDatasets(app) {
       id_and_version = subds.dataset_id + "-" + subds.dataset_version;
       subds_file = getFilePath(subds.dataset_id, subds.dataset_version, null);
       try {
-        subds_response = await fetch(subds_file);
+        subds_response = await fetch(subds_file, {cache: "no-cache"});
         subds_text = await subds_response.text();
       } catch (e) {
         console.error(e);
