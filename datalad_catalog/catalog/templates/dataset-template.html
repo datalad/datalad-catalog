@@ -461,7 +461,7 @@
               <span v-else v-for="record in selectedDataset.provenance">
                 <b-container>
                   <b-row>
-                    <b-col>
+                    <b-col cols="3">
                       <b-card header-bg-variant="transparent" >
                         <template v-slot:header>
                           <b-row no-gutters>
@@ -486,8 +486,7 @@
                         </b-card-text>
                       </b-card>
                     </b-col>
-                    <b-col cols="1"></b-col>
-                    <b-col cols="5">
+                    <b-col cols="6">
                       <b-card border-variant="dark">
                         <template v-slot:header class="text-center">
                             <b-card-title class="text-center"><i class="fas fa-terminal"></i>&nbsp;&nbsp;run-record</strong></b-card-title>
@@ -497,8 +496,11 @@
                             <span class="text-muted"><i class="fas fa-code-commit"></i> {{record.dataset_version}}</span>
                           </small>
                         </b-card-text>
-                        <b-card-text class="border rounded p-2">
-                          {{record.description}}
+                        <small>
+                          <strong>&nbsp;Run command message: </strong><br>
+                        </small>
+                        <b-card-text class="shadow p-3 mb-3 bg-white rounded">
+                          <span style="white-space: pre-wrap;">{{record.description.replace('[DATALAD RUNCMD] ', '')}}</span>
                         </b-card-text>
                         <b-card-text >
                           <small>
@@ -523,14 +525,13 @@
                               <span class="lfont"><i class="fas fa-user-check"></i></span>&nbsp;&nbsp;{{record.author.name}}
                             </b-col>
                             <b-col align-h="right">
-                              <small>{{record.datetime}}</small>
+                              <small>{{record.datetime.replace('T', ' ')}}</small>
                             </b-col>
                           </b-row>
                         </template>
                       </b-card>
                     </b-col>
-                    <b-col cols="1"></b-col>
-                    <b-col>
+                    <b-col cols="3">
                       <b-card header-bg-variant="transparent" >
                         <template v-slot:header>
                           <b-row no-gutters>
