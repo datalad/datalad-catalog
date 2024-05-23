@@ -201,11 +201,15 @@ def ri2url(ri):
             f["hostname"],
             ":" if f["port"] else "",
             f["port"],
-            f["path"]
-            if op.isabs(f["path"])
-            else "/{}".format(f["path"])
-            if f["path"].startswith("~")
-            else "/~/{}".format(f["path"]),
+            (
+                f["path"]
+                if op.isabs(f["path"])
+                else (
+                    "/{}".format(f["path"])
+                    if f["path"].startswith("~")
+                    else "/~/{}".format(f["path"])
+                )
+            ),
         )
     elif isinstance(ri, dsn.PathRI):
         # this has no chance of being resolved outside this machine

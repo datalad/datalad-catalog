@@ -54,14 +54,20 @@ def get_file_id(rec):
         rec["key"]
         if "key" in rec
         else "SHA1-s{}--{}".format(
-            rec["bytesize"]
-            if "bytesize" in rec
-            else 0
-            if rec["type"] == "symlink"
-            else os.stat(rec["path"]).st_size,
-            rec["gitshasum"]
-            if "gitshasum" in rec
-            else Digester(digests=["sha1"])(rec["path"])["sha1"],
+            (
+                rec["bytesize"]
+                if "bytesize" in rec
+                else (
+                    0
+                    if rec["type"] == "symlink"
+                    else os.stat(rec["path"]).st_size
+                )
+            ),
+            (
+                rec["gitshasum"]
+                if "gitshasum" in rec
+                else Digester(digests=["sha1"])(rec["path"])["sha1"]
+            ),
         )
     )
     return "datalad:{}".format(id_)
