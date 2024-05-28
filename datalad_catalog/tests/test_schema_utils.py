@@ -75,6 +75,7 @@ ds = {
     "top_display": [{"name": "", "value": ""}],
     "notebooks": [
         {
+            "binder_env_url": "",
             "git_repo_url": "",
             "notebook_path": "",
         },
