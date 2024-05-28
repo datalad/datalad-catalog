@@ -197,8 +197,8 @@ test_script:
   - cmd: md __testhome__
   - sh: mkdir __testhome__
   - cd __testhome__
-  - cmd: python -m pytest -s -v -m "not (turtle)" --doctest-modules --cov=datalad_catalog --pyargs %DTS%
-  - sh:  python -m pytest -s -v -m "not (turtle)" --doctest-modules --cov=datalad_catalog --pyargs ${DTS}
+  - cmd: python -m pytest -s -v -m "not (turtle)" --cov=datalad_catalog --pyargs %DTS%
+  - sh:  python -m pytest -s -v -m "not (turtle)" --cov=datalad_catalog --pyargs ${DTS}
 
 
 after_test:
