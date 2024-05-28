@@ -51,10 +51,19 @@
                 "source_time": 1652857174.37293,
                 "agent_name": "Stephan Heunis",
                 "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "manual_entry",
+                "source_version": "1",
+                "source_parameter": {},
+                "source_time": 1709565468.450221,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
             }
         ]
     },
     "name": "studyforrest_multires3t",
+    "alias": "studyforrest_multires3t",
     "license": {
         "name": "PDDL (http://opendatacommons.org/licenses/pddl/)",
         "url": ""
@@ -172,12 +181,7 @@
             "value": 10
         }
     ],
-    "description": [
-        {
-            "source": "datacite_gin",
-            "content": "\"Extension of a matching fMRI dataset (Sengupta, et al., 2017; OpenFMRI ds000113c) on participants performing a\n central fixation task while being stimulated with oriented visual gratings. This dataset extends the previous one\n with acquisitions for 3 matching spatial resolutions (1.4, 2.0, and 3.0 mm) at 3T (complementing the previous 7T\n acquisitions at 0.8, 1.4, 2.0, and 3.0 mm). Five of the total of seven participants are identical in both datasets.\n All participants are part of the studyforrest.org project.\n\n- This research was enabled by a grant from the German Research Foundation (DFG) awarded to S. Pollmann and\n  O. Speck (DFG PO 548/15-1).\n\n- This research was, in part, also supported by the German Federal Ministry of Education and Research (BMBF) as\n  part of a US-German collaboration in computational neuroscience (CRCNS), co-funded by the BMBF and the US\n  National Science Foundation (BMBF 01GQ1112; NSF 1129855).\n\n- Data management technology (DataLad) employed for this research was supported by US-German CRCNS project,\n  co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1411; NSF 1429999).\""
-        }
-    ],
+    "description": "\"Extension of a matching fMRI dataset (Sengupta, et al., 2017; OpenFMRI ds000113c) on participants performing a\n central fixation task while being stimulated with oriented visual gratings. This dataset extends the previous one\n with acquisitions for 3 matching spatial resolutions (1.4, 2.0, and 3.0 mm) at 3T (complementing the previous 7T\n acquisitions at 0.8, 1.4, 2.0, and 3.0 mm). Five of the total of seven participants are identical in both datasets.\n All participants are part of the studyforrest.org project.\n\n- This research was enabled by a grant from the German Research Foundation (DFG) awarded to S. Pollmann and\n  O. Speck (DFG PO 548/15-1).\n\n- This research was, in part, also supported by the German Federal Ministry of Education and Research (BMBF) as\n  part of a US-German collaboration in computational neuroscience (CRCNS), co-funded by the BMBF and the US\n  National Science Foundation (BMBF 01GQ1112; NSF 1129855).\n\n- Data management technology (DataLad) employed for this research was supported by US-German CRCNS project,\n  co-funded by the BMBF and the US National Science Foundation (BMBF 01GQ1411; NSF 1429999).\"",
     "publications": [
         {
             "type": "",

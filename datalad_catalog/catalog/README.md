@@ -20,16 +20,16 @@ The `artwork` and `assets` directories contain images and web assets (such as Ja
 
 ## Serving the content
 
-Since this site is self-contained and static, no further build processes, server-side implementations, or access to content delivery networks (CDNs) are necessary in order to serve the content. All that is needed is a simple HTTP server.
+Since this site is self-contained and static, no further build processes or access to content delivery networks (CDNs) are necessary in order to serve the content. All that is needed is a simple HTTP server with one specific addition - a custom redirect. This is required because the application makes use of [Vue Router's history mode](https://v3.router.vuejs.org/guide/essentials/history-mode.html#html5-history-mode), which requires a server-side redirect configuration to deal with the fact that a VueJS application is actually a single-page app.
 
-This can be achieved locally, for example using Python:
+For serving the content locally, this is already taken care of in `datalad-catalog`, and you can simply run the following:
 
 ```bash
 cd path/to/catalog/directory
-python3 -m http.server
+datalad catalog-serve -c .
 ```
 
-The content can also be hosted and served online. A straightforward and free way to achieve this is via GitHub and [GitHub Pages](https://pages.github.com/). After publishing this content as a GitHub repository, you can activate GitHub Pages in the repository's settings. See detailed instructions [here](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site).
+The content can also be hosted and served online. A straightforward way to achieve this, and one which has a free tier, is via [Netlify](https://www.netlify.com/) (the common alternative, [GitHub Pages](https://pages.github.com/), does not currently support server-side redirects). After publishing this content, e.g. as a GitHub repository, you can link that repository to a site on Netlify. [See here](https://docs.netlify.com/routing/redirects/) how to set up redirects with Netlify. Of course, the site can also be served from your preferred server setup, as long as page redirects can be supported.
 
 ## Maintaining content
 

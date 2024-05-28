@@ -6,6 +6,7 @@ from datalad_catalog.utils import (
     load_config_file,
     md5hash,
     merge_lists,
+    split_string,
 )
 
 lgr = logging.getLogger("datalad.catalog.node")
@@ -169,7 +170,9 @@ class Node(object):
             self.long_name = self.get_long_name()
             self.md5_hash = md5hash(self.long_name)
 
-        hash_path_left, hash_path_right = self.split_dir_name(self.md5_hash)
+        hash_path_left, hash_path_right = split_string(
+            self.md5_hash, self._split_dir_length
+        )
         node_fn = (
             self.parent_catalog.metadata_path
             / self.dataset_id
@@ -214,20 +217,6 @@ class Node(object):
                 # If config file is not passed,
                 # only load from catalog-level config file
                 return dict(source="catalog", config=self.parent_catalog.config)
-
-    def split_dir_name(self, dir_name):
-        """
-        Split a string into two parts
-
-        Args:
-            dir_name ([type]): [description]
-
-        Returns:
-            [type]: [description]
-        """
-        path_left = dir_name[: self._split_dir_length]
-        path_right = dir_name[self._split_dir_length :]
-        return path_left, path_right
 
     def add_attributes(
         self, new_attributes: dict, config_file: str = None, overwrite=False
@@ -474,3 +463,18 @@ class Node(object):
             return None
         # Return none if no key, else key
         return self.metadata_sources[cnst.KEY_SOURCE_MAP].get(key, None)
+
+    def get_last_updated(self):
+        """Proxy to a dedicated 'last_updated' field (which does not
+        exist in the catalog's dataset schema) by looking at the time
+        of the last metadata source that was added to the node record
+        """
+
+        if hasattr(self, "metadata_sources"):
+            sorted_sources = sorted(
+                self.metadata_sources[cnst.SOURCES],
+                key=lambda d: d.get("source_time"),
+                reverse=True,
+            )
+            return sorted_sources[0].get("source_time")
+        return None

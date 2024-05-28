@@ -8,35 +8,34 @@ const routes = [
     path: "/",
     name: "home",
     beforeEnter: (to, from, next) => {
+      console.debug("Executing navigation guard: beforeEnter - route '/')")
       const superfile = metadata_dir + "/super.json";
-      // https://www.dummies.com/programming/php/using-xmlhttprequest-class-properties/
-      var rawFile = new XMLHttpRequest();
-      rawFile.onreadystatechange = function () {
-        if (rawFile.readyState === 4) {
-          if (rawFile.status === 200 || rawFile.status == 0) {
-            var allText = rawFile.responseText;
-            superds = JSON.parse(allText);
-            router.push({
-              name: "dataset",
-              params: {
-                dataset_id: superds["dataset_id"],
-                dataset_version: superds["dataset_version"],
-              },
-            });
-            next();
-          } else if (rawFile.status === 404) {
-            router.push({ name: "404" });
-          } else {
-            // TODO: figure out what to do here
-          }
+      fetch(superfile, {cache: "no-cache"})
+      .then((response) => {
+        if(response.status == 404) {
+          router.push({ name: "404" });
+          next();
         }
-      };
-      rawFile.open("GET", superfile, false);
-      rawFile.send();
+        return response.text()
+      }).then((text) => {
+        superds = JSON.parse(text);
+        router.push({
+          name: "dataset",
+          params: {
+            dataset_id: superds["dataset_id"],
+            dataset_version: superds["dataset_version"],
+          },
+          query: to.query,
+        });
+        next();
+      })
+      .catch(error => {
+        console.error(error)
+      })
     },
   },
   {
-    path: "/dataset/:dataset_id/:dataset_version/:tab_name?",
+    path: "/dataset/:dataset_id/:dataset_version?",
     component: datasetView,
     name: "dataset",
   },

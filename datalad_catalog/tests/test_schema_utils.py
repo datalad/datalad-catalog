@@ -9,6 +9,7 @@ ds = {
     "dataset_id": "",
     "dataset_version": "",
     "name": "",
+    "alias": "",
     "short_name": "",
     "description": "",
     "doi": "",
@@ -72,6 +73,12 @@ ds = {
     },
     "additional_display": [{"name": "", "content": {}, "icon": ""}],
     "top_display": [{"name": "", "value": ""}],
+    "notebooks": [
+        {
+            "git_repo_url": "",
+            "notebook_path": "",
+        },
+    ],
 }
 
 fl = {

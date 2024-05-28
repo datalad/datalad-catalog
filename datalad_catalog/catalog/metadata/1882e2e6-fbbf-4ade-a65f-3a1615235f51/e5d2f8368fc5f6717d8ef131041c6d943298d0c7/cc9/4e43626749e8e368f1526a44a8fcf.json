@@ -43,16 +43,20 @@
                 "source_time": 1652857178.8397892,
                 "agent_name": "Stephan Heunis",
                 "agent_email": "s.heunis@fz-juelich.de"
+            },
+            {
+                "source_name": "manual_entry",
+                "source_version": "1",
+                "source_parameter": {},
+                "source_time": 1709565468.450221,
+                "agent_name": "Stephan Heunis",
+                "agent_email": "s.heunis@fz-juelich.de"
             }
         ]
     },
     "name": "Studyforrest Structural MRI scans",
-    "description": [
-        {
-            "source": "datacite_gin",
-            "content": "\"This dataset contains T1 and T2 weighted MRI scans, susceptibility weighted\n images, and diffusion imaging scans. These data are suitable for analyses\n of brain structure.\n\n For more information about the project visit: http://studyforrest.org\""
-        }
-    ],
+    "alias": "3T_structural_mri",
+    "description": "\"This dataset contains T1 and T2 weighted MRI scans, susceptibility weighted\n images, and diffusion imaging scans. These data are suitable for analyses\n of brain structure.\n\n For more information about the project visit: http://studyforrest.org\"",
     "license": {
         "name": "Open Data Commons Public Domain Dedication and License (PDDL)",
         "url": "https://opendatacommons.org/licenses/pddl/"

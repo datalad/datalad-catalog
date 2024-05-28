@@ -11,6 +11,7 @@ var datacat = new Vue({
     links: {},
     dataset_options: {},
     config_ready: false,
+    catalog_config: {},
   },
   methods: {
     gotoHome() {
@@ -22,26 +23,10 @@ var datacat = new Vue({
     gotoExternal(dest) {
       window.open(dest);
     },
-    async load() {
-      // Load templates
-      await Promise.all(
-        Object.keys(template_paths).map(async (key, index) => {
-          url = template_dir + "/" + template_paths[key]
-          fetch(url).
-          then(response => {
-              return response.text();
-          }).
-          then(text => {
-              console.log('template loaded: '+key)
-              console.log(text)
-              document.getElementById(key).innerHTML = text;
-          });
-        })
-      )
-    }
   },
   beforeCreate() {
-    fetch(config_file)
+    console.debug("Executing lifecycle hook: beforeCreate")
+    fetch(config_file, {cache: "no-cache"})
       .then((response) => {
         if (response.ok) {
           return response.json();
@@ -61,6 +46,7 @@ var datacat = new Vue({
             obj[key] = value;
           }
         }
+        this.catalog_config = obj
         // set social links
         this.social_links = obj.social_links
         // set dataset options

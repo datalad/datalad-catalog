@@ -139,7 +139,7 @@ class GetParameterValidator(EnsureCommandParameterization):
         super().__init__(
             param_constraints=dict(
                 catalog=CatalogRequired() & EnsureWebCatalog(),
-                property=EnsureChoice("home", "config", "metadata", "tree"),
+                property=EnsureChoice("home", "config", "metadata", "report"),
                 dataset_id=EnsureStr(),
                 dataset_version=EnsureStr(),
                 record_type=EnsureChoice("dataset", "directory", "file"),
@@ -158,10 +158,11 @@ class GetParameterValidator(EnsureCommandParameterization):
 # All extension commands must be derived from Interface
 class Get(ValidatedInterface):
     """Utility for getting various properties of a catalog, based on the specified
-    property ('home', 'config', 'metadata', 'tree')
+    property ('home', 'config', 'metadata', 'report')
 
     Used to get the catalog home page, get config at catalog- or dataset-level,
-    or get the metadata for a specific dataset/version.
+    get the metadata for a specific dataset/version, or get a summary report of
+    the catalog.
     """
 
     _validator_ = GetParameterValidator()
@@ -176,7 +177,7 @@ class Get(ValidatedInterface):
         property=Parameter(
             args=("property",),
             doc="""The property to get in the catalog.
-            Should be one of 'home', 'config', 'metadata' or 'tree'.""",
+            Should be one of 'home', 'config', 'metadata' or 'report'.""",
         ),
         dataset_id=Parameter(
             args=("-i", "--dataset_id"),
@@ -241,6 +242,14 @@ class Get(ValidatedInterface):
                 "metadata"
             ),
         ),
+        dict(
+            text=(
+                "Get a report of the number of datasets, dataset-versions, and "
+                "metadata files contained in existing catalog"
+            ),
+            code_py=("catalog_get(property='report', catalog='/tmp/my-cat')"),
+            code_cmd=("datalad catalog-get -c /tmp/my-cat report"),
+        ),
     ]
 
     @staticmethod
@@ -248,14 +257,34 @@ class Get(ValidatedInterface):
         """This result renderer dumps the value of the 'output' key
         in the result record in JSON-line format -- only if status==ok"""
         ui = ui_switcher.ui
-        ui.message(
-            json.dumps(
-                res.get("output"),
-                separators=(",", ":"),
-                indent=None,
-                cls=jsEncoder,
+        if res.get("action_property") == "report":
+            ui.message(
+                f"Catalog location: {res.get('output').get('catalog_location')}"
             )
-        )
+            ui.message(
+                f"Homepage dataset: ID={res.get('output').get('homepage_id')}, VERSION={res.get('output').get('homepage_version')}"
+            )
+            ui.message(
+                f"Homepage metadata file: {res.get('output').get('homepage_path')}"
+            )
+            ui.message(
+                f"Number of datasets: {res.get('output').get('dataset_count')}"
+            )
+            ui.message(
+                f"Number of dataset-versions: {res.get('output').get('version_count')}"
+            )
+            ui.message(
+                f"Number of metadata files: {res.get('output').get('metadata_file_count')}"
+            )
+        else:
+            ui.message(
+                json.dumps(
+                    res.get("output"),
+                    separators=(",", ":"),
+                    indent=None,
+                    cls=jsEncoder,
+                )
+            )
 
     @staticmethod
     # generic handling of command results (logging, rendering, filtering, ...)
@@ -279,9 +308,7 @@ class Get(ValidatedInterface):
 
         # TODO: add property schema, schema:store, schema:version, schema:catalog, schema:dataset, etc
         # Yield error for get-operations that haven't been implemented yet
-        if property in ("tree"):
-            msg = f"catalog-get for property={property} is not yet implemented"
-            yield get_status_dict(**res_kwargs, status="error", message=msg)
+        # none
         # Get catalog home page
         if property == "home":
             try:
@@ -371,3 +398,10 @@ class Get(ValidatedInterface):
                         exception=e,
                         output=None,
                     )
+        # Get catalog-level summary
+        if property == "report":
+            report = catalog.get_catalog_report()
+            msg = f"Catalog report retrieved"
+            yield get_status_dict(
+                **res_kwargs, status="ok", message=msg, output=report
+            )

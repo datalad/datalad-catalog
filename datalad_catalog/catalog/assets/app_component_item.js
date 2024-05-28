@@ -119,7 +119,7 @@ Vue.component('tree-item', function (resolve, reject) {
                 obj.dataset_version = this.$root.selectedDataset.dataset_version;
                 file = getFilePath(obj.dataset_id, obj.dataset_version, obj.path);
                 try {
-                  response = await fetch(file);
+                  response = await fetch(file, {cache: "no-cache"});
                   text = await response.text();
                 } catch (error) {
                   console.error(error);
