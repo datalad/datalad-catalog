@@ -18,6 +18,7 @@ from datalad_catalog.schema_utils import get_metadata_item
 
 def add_aliases(alias_path, catalog):
     alias_path = Path(alias_path)
+    ids_processed = []
     with alias_path.open(newline="") as tsvfile:
         reader = csv.DictReader(tsvfile, delimiter="\t")
         for i, row in enumerate(reader):
@@ -35,14 +36,19 @@ def add_aliases(alias_path, catalog):
                 catalog=catalog,
                 metadata=json.dumps(meta_item),
             )
+            ids_processed.append(row["dataset_id"])
+    
+    return ids_processed
 
 
-def create_metadata_files(catalog):
+def create_metadata_files(catalog, ids_to_process):
     # Get report
     report = catalog.get_catalog_report()
     # Write metadata for all datasets
     # - assumes that datasets have aliases set
     for d in report.get("datasets", []):
+        if d not in ids_to_process:
+            continue
         # Get latest version
         current_ds_versions = [
             dsv for dsv in report.get("versions") if dsv["dataset_id"] == d
@@ -98,7 +104,8 @@ if __name__ == "__main__":
     catalog = EnsureWebCatalog()(args.catalog)
 
     # If aliases are provided, first set them in metadata
+    ids_processed = []
     if args.aliases:
-        add_aliases(args.aliases, catalog)
+        ids_processed = add_aliases(args.aliases, catalog)
 
-    create_metadata_files(catalog)
+    create_metadata_files(catalog, ids_processed)
