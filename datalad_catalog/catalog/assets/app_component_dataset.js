@@ -225,7 +225,7 @@ const datasetView = () =>
               }
               // Show / hide binder button: if disp_dataset.url exists OR if dataset has a notebook specified in metadata
               disp_dataset.show_binder_button = false
-              if ( disp_dataset.url || disp_dataset.hasOwnProperty("notebooks") && disp_dataset.notebooks.length > 0 ) {
+              if ( disp_dataset.url || dataset.hasOwnProperty("notebooks") && dataset.notebooks.length > 0 ) {
                 disp_dataset.show_binder_button = true
               }
 
@@ -754,18 +754,24 @@ const datasetView = () =>
             window.open(url);
           },
           openWithBinder(dataset_url, current_dataset) {
-            const environment_url =
+            var environment_url =
               "https://mybinder.org/v2/gh/datalad/datalad-binder/main";
             var content_url = "https://github.com/jsheunis/datalad-notebooks";
             var content_repo_name = "datalad-notebooks";
             var notebook_name = "download_data_with_datalad_python.ipynb";
+            var has_custom_notebook = false;
             if (current_dataset.hasOwnProperty("notebooks") && current_dataset.notebooks.length > 0) {
               // until including the functionality to select from multiple notebooks in a dropdown, just select the first one
+              has_custom_notebook = true
               notebook = current_dataset.notebooks[0]
               content_url = notebook.git_repo_url.replace(".git", "")
               content_repo_name = content_url.substring(content_url.lastIndexOf('/') + 1)
-              notebook_name = notebook.notebook_path
+              notebook_name = escapeHTML(notebook.notebook_path)
+              if (notebook.hasOwnProperty("binder_env_url") && notebook["binder_env_url"]) {
+                environment_url = notebook["binder_env_url"]
+              }
             }
+
             binder_url =
               environment_url +
               "?urlpath=git-pull%3Frepo%3D" +
@@ -773,10 +779,14 @@ const datasetView = () =>
               "%26urlpath%3Dnotebooks%252F" +
               content_repo_name +
               "%252F" +
-              notebook_name +
-              "%3Frepourl%3D%22" +
-              dataset_url +
-              "%22";
+              notebook_name;
+
+            if (!has_custom_notebook) {
+              binder_url = binder_url +
+                "%3Frepourl%3D%22" +
+                dataset_url +
+                "%22"
+            }
             window.open(binder_url);
           },
           sortByName() {
