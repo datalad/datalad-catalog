@@ -11,6 +11,13 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
+---
+
+### *:loudspeaker: A new catalog is coming...*
+
+We're working on a newer, leaner, more modular, and more interoperable solution to the same challenge that the current `datalad-catalog` aims to address. This new development is taking place within the broader context of making DataLad datasets interoperable with linked and semantic (meta)data. For more background, see [this issue](https://github.com/psychoinformatics-de/datalad-concepts/issues/115). To keep up to date, follow progress at [`psychoinformatics-de/datalad-concepts`](https://github.com/psychoinformatics-de/datalad-concepts) and [`psychoinformatics-de/shacl-vue`](https://github.com/psychoinformatics-de/shacl-vue). Because of this redirected focus, `datalad-catalog` itself will be downscaled by focusing on maintenance and assessing the priority of new features on a case-by-case basis.
+
+---
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/datacat0_hero.svg">
