@@ -26,6 +26,26 @@ Foundation) under grant SFB 1451 (`431549029`_, INF project).
 
 .. _431549029: https://gepris.dfg.de/gepris/projekt/431549029
 
+
+NOTE: Future development
+========================
+
+We're working on a newer, leaner, more modular, and more interoperable solution
+to the same challenge that the current ``datalad-catalog`` aims to address.
+This new development is taking place within the broader context of making
+DataLad datasets interoperable with linked and semantic (meta)data. For more
+background, see `this issue`_. To keep up to date, follow progress at
+`psychoinformatics-de/datalad-concepts`_, `psychoinformatics-de/shacl-vue`_, and
+in the `new development branch`_. Because of this redirected focus, ``datalad-catalog``
+itself will be downscaled by focusing on maintenance and assessing the priority
+of new features on a case-by-case basis.
+
+
+.. _this issue: https://github.com/psychoinformatics-de/datalad-concepts/issues/115
+.. _psychoinformatics-de/datalad-concepts: https://github.com/psychoinformatics-de/datalad-concepts
+.. _psychoinformatics-de/shacl-vue: https://github.com/psychoinformatics-de/shacl-vue
+.. _new development branch: https://github.com/datalad/datalad-catalog/tree/revolution
+
 Demo
 ====
 
