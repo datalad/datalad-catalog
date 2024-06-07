@@ -308,6 +308,11 @@
             "description": "The path to the notebook, relative to the repository root, including the filename and extension",
             "title": "Notebook path",
             "type": "string"
+          },
+          "binder_env_url": {
+            "description": "The URL to a myBinder base environment that is built up by specifying a git repository URL and branch/tag name, see https://mybinder.org. The public repository should contain the Binder environment configuration as specified by https://mybinder.readthedocs.io/en/latest/using/config_files.html#. An example: https://mybinder.org/v2/gh/datalad/datalad-binder/main",
+            "title": "Binder repo URL",
+            "type": "string"
           }
         },
         "required": ["git_repo_url", "notebook_path"]

@@ -201,5 +201,12 @@
                 }
             }
         }
+    ],
+    "notebooks": [
+        {
+            "git_repo_url": "https://github.com/mcnakhaee/palmerpenguins",
+            "notebook_path": "notebooks/example.ipynb",
+            "binder_env_url": "https://mybinder.org/v2/gh/datalad/datalad-binder/enhs"
+        }
     ]
 }
