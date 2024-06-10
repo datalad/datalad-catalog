@@ -144,7 +144,7 @@ class BIDSTranslator(TranslatorImplementationBase):
         )
         result = jq.first(program, self.extracted_metadata)
         return result if result is not None and len(result) > 0 else None
-    
+
     def get_keywords(self):
         program = ". as $parent | .entities.task + .variables.dataset"
         result = jq.first(program, self.extracted_metadata)
