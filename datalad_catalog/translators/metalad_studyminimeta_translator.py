@@ -168,7 +168,7 @@ class MinimetaTranslator(TranslatorImplementationBase):
             '{"name": .name, "identifier": "", "description": ""}]'
         )
         result = jq.first(program, self.graph)  #  [] if nothing found
-        return result if len(result) > 0 else None
+        return result if result is not None and len(result) > 0 else None
 
     def get_publications(self):
         if self.combinedpersonspubs is not None:
@@ -194,7 +194,7 @@ class MinimetaTranslator(TranslatorImplementationBase):
             '"dataset_path": .name, "dirs_from_path": []}]'
         )
         result = jq.first(program, self.graph)  #  [] if nothing found
-        return result if len(result) > 0 else None
+        return result if result is not None and len(result) > 0 else None
 
     def translate(self):
         translated_record = {
