@@ -77,6 +77,8 @@ const datasetView = () =>
               console.debug("Active dataset:");
               dataset = this.selectedDataset;
               console.debug(this.selectedDataset);
+              dataset_options = dataset.dataset_options
+
               disp_dataset = {};
               // Set name to unknown if not available
               if (!dataset.hasOwnProperty("name") || !dataset["name"]) {
@@ -134,44 +136,109 @@ const datasetView = () =>
                 dataset.dataset_id + "_" + dataset.dataset_version;
               disp_dataset.download_filename =
                 "dataset_" + disp_dataset.id_and_version + ".json";
-              // URL
-              disp_dataset.is_github = false; // Github / gitlab / url / binder
-              disp_dataset.is_gitlab = false; // Github / gitlab / url / binder
-              disp_dataset.is_gin = false; // GIN
-              disp_dataset.url = "";
-              if (
-                dataset.hasOwnProperty("url") &&
-                (dataset["url"] instanceof Array || Array.isArray(dataset["url"])) &&
-                dataset["url"].length > 0
-              ) {
-                for (var i = 0; i < dataset.url.length; i++) {
-                  if (dataset.url[i].toLowerCase().indexOf("github") >= 0) {
-                    disp_dataset.is_github = true;
-                    disp_dataset.url = dataset.url[i];
-                    disp_dataset.url = disp_dataset.url.replace('git@github.com:', 'https://github.com');
-                  }
-                  if (dataset.url[i].toLowerCase().indexOf("gin.g-node") >= 0) {
-                    disp_dataset.is_gin = true;
-                    disp_dataset.url = dataset.url[i];
-                    disp_dataset.url = disp_dataset.url.replace('ssh://', '');
-                    disp_dataset.url = disp_dataset.url.replace('git@gin.g-node.org:', 'https://gin.g-node.org');
-                    disp_dataset.url = disp_dataset.url.replace('git@gin.g-node.org', 'https://gin.g-node.org');
-                    disp_dataset.url = disp_dataset.url.replace('.git', '');
-                  }
-                }
-                if (!disp_dataset.url) {
+              
+              // -------
+              // BUTTONS
+              // -------
+              // show all buttons by default, unless logic dictates otherwise
+
+              // first get dataset options
+              dataset_options = dataset.config.dataset_options;
+
+              console.log("Dataset options (on dataset or inferred from catalog)")
+              console.log(dataset_options)
+              
+              // then initialise show/hide flags
+              disp_dataset.show_datalad = true; // Download with DataLad button
+              disp_dataset.show_github = true; // Github
+              disp_dataset.show_gitlab = true; // Gitlab
+              disp_dataset.show_gin = true; // GIN.g-node
+              disp_dataset.show_binder = true; // MyBinder
+              disp_dataset.show_cite = true; // 'Cite' button
+              disp_dataset.show_export = true; // 'Export metadata' button
+              disp_dataset.show_access_request = true; // 'Request access' button
+              
+              // URL (this is the field for the datalad dataset url to clone from)
+              // If URL does not exist, several buttons cannot be shown
+              // If URL is an array, first select first element
+              if (dataset.hasOwnProperty("url")) {
+                if (
+                  (dataset["url"] instanceof Array || Array.isArray(dataset["url"])) &&
+                  dataset["url"].length > 0
+                ) {
                   disp_dataset.url = dataset.url[0];
+                } else {
+                  disp_dataset.url = dataset.url;
                 }
-              } else {
-                disp_dataset.url = dataset.url;
-                if (disp_dataset.url && dataset.url.toLowerCase().indexOf("gin.g-node") >= 0) {
-                  disp_dataset.is_gin = true;
+                // show/hide datalad button
+                disp_dataset.show_datalad = dataset_options.include_datalad ?? true
+                // show/hide github button
+                if (disp_dataset.url.toLowerCase().indexOf("github") >= 0) {
+                  disp_dataset.url = disp_dataset.url.replace('git@github.com:', 'https://github.com');
+                  disp_dataset.show_github = dataset_options.include_github ?? true
+                } else {
+                  disp_dataset.show_github = false;
+                }
+                // show/hide GIN button
+                if (disp_dataset.url.toLowerCase().indexOf("gin.g-node") >= 0) {
                   disp_dataset.url = disp_dataset.url.replace('ssh://', '');
                   disp_dataset.url = disp_dataset.url.replace('git@gin.g-node.org:', 'https://gin.g-node.org');
-                  disp_dataset.url = disp_dataset.url.replace('git@gin.g-node.org', 'https://gin.g-node.org');
                   disp_dataset.url = disp_dataset.url.replace('.git', '');
+                  disp_dataset.show_gin = dataset_options.include_gin ?? true
+                } else {
+                  disp_dataset.show_gin = false;
                 }
+                // show/hide gitlab button
+                if (disp_dataset.url.toLowerCase().indexOf("gitlab") >= 0) {
+                  disp_dataset.show_gitlab = dataset_options.include_gitlab ?? true
+                } else {
+                  disp_dataset.show_gitlab = false;
+                }
+              } else{
+                // none of these buttons can be shown without a URL
+                disp_dataset.show_datalad = false;
+                disp_dataset.show_github = false;
+                disp_dataset.show_gitlab = false;
+                disp_dataset.show_gin = false;
               }
+              // Show binder button: (if disp_dataset.url exists OR if dataset has a notebook specified in metadata) AND config specifies (or is missing)
+              disp_dataset.show_binder_button = false
+              if ( disp_dataset.url || disp_dataset.hasOwnProperty("notebooks") && disp_dataset.notebooks.length > 0 ) {
+                disp_dataset.show_binder = dataset_options.include_binder ?? true
+              } else {
+                disp_dataset.show_binder = false;
+              }
+              // Show cite button: if the dataset.doi exists AND config specifies (or is missing)
+              disp_dataset.show_cite = dataset.doi ? (dataset_options.include_cite ?? true) : false
+              // Show export button: if config specifies (or is missing)
+              disp_dataset.show_export = dataset_options.include_metadata_export ?? true
+              // Show/hide config for "Request access" button:
+              // if the (access_request_contact exists OR access_request_url exists)
+              // AND config specifies (or is missing)
+              if ( dataset.hasOwnProperty("access_request_contact") && dataset["access_request_contact"] ||
+              dataset.hasOwnProperty("access_request_url") && dataset["access_request_url"] ) {
+                disp_dataset.show_access_request = dataset_options.include_access_request ?? true
+              } else {
+                disp_dataset.show_access_request = false;
+              }
+              // Create href mailto for request access contact
+              if (
+                dataset.hasOwnProperty("access_request_contact") &&
+                dataset["access_request_contact"]
+              ) {
+                var email_to = dataset.access_request_contact.email
+                var email_subject = "Access request: " + disp_dataset.short_name
+                disp_dataset.access_request_mailto =
+                  "mailto:" + 
+                  email_to +
+                  "?subject=" +
+                  email_subject +
+                  "&body=Dear%20" +
+                  dataset.access_request_contact.givenName +
+                  "%20" + 
+                  dataset.access_request_contact.familyName;
+              }
+
               // Description
               if (
                 dataset.hasOwnProperty("description") &&
@@ -189,44 +256,6 @@ const datasetView = () =>
                 typeof dataset["description"] === "string"
               ) {
                 this.description_ready = true;
-              }
-              // Create href mailto for request access contact
-              if (
-                dataset.hasOwnProperty("access_request_contact") &&
-                dataset["access_request_contact"]
-              ) {
-                var email_to = dataset.access_request_contact.email
-                var email_subject = "Access request: " + disp_dataset.short_name
-
-                disp_dataset.access_request_mailto =
-                  "mailto:" + 
-                  email_to +
-                  "?subject=" +
-                  email_subject +
-                  "&body=Dear%20" +
-                  dataset.access_request_contact.givenName +
-                  "%20" + 
-                  dataset.access_request_contact.familyName;
-              }
-              // Rendering options for dataset page
-              if (this.$root.hasOwnProperty("dataset_options") && this.$root.dataset_options.hasOwnProperty("include_metadata_export")) {
-                disp_dataset.show_export = this.$root.dataset_options.include_metadata_export
-              }
-              else {
-                disp_dataset.show_export = false
-              }
-              // Determine show/hide confirg for "Request access" button
-              if (dataset.config?.hasOwnProperty("dataset_options") && dataset.config.dataset_options.hasOwnProperty("include_access_request")) {
-                disp_dataset.show_access_request = dataset.config.dataset_options.include_access_request
-              }
-              else {
-                // default should be to display the access request button, if access request contact/url are included
-                disp_dataset.show_access_request = true
-              }
-              // Show / hide binder button: if disp_dataset.url exists OR if dataset has a notebook specified in metadata
-              disp_dataset.show_binder_button = false
-              if ( disp_dataset.url || disp_dataset.hasOwnProperty("notebooks") && disp_dataset.notebooks.length > 0 ) {
-                disp_dataset.show_binder_button = true
               }
 
               // Set correct URL query string to mirrorif keyword(s) included in query parameters
@@ -1049,15 +1078,20 @@ const datasetView = () =>
           // set the root data for available tabs
           available_tabs_lower = available_tabs
           this.$root.selectedDataset.available_tabs = available_tabs_lower
-          // Now get dataset config if it exists
+          // Now get dataset config if it exists, else set to catalog-level config
           dataset_config_path = metadata_dir + "/" + sDs.dataset_id + "/" + sDs.dataset_version + "/config.json";
           configresponse = await fetch(dataset_config_path, {cache: "no-cache"});
           if (configresponse.status == 404) {
-            this.$root.selectedDataset.config = {};
+            this.$root.selectedDataset.config = this.$root.catalog_config;
           } else {
             configtext = await configresponse.text();
             config = JSON.parse(configtext);
-            this.$root.selectedDataset.config = config;
+            this.$root.selectedDataset.config = {...this.$root.catalog_config, ...config};
+            if (config.dataset_options) {
+              // dataset options exist in catalog level config and dataset-level config
+              // they need to be merged, with dataset-level taking priority
+              this.$root.selectedDataset.config.dataset_options = {...this.$root.catalog_config.dataset_options, ...config.dataset_options};
+            }
           }
           // Set the correct tab to be rendered
           correct_tab = to.query.hasOwnProperty("tab") ? to.query.tab : null
@@ -1204,15 +1238,20 @@ const datasetView = () =>
           available_tabs_lower = available_tabs
           // set the root data for available tabs
           this.$root.selectedDataset.available_tabs = available_tabs_lower
-          // Now get dataset config if it exists
+          // Now get dataset config if it exists, else set to catalog-level config
           dataset_config_path = metadata_dir + "/" + sDs.dataset_id + "/" + sDs.dataset_version + "/config.json";
           configresponse = await fetch(dataset_config_path, {cache: "no-cache"});
           if (configresponse.status == 404) {
-            this.$root.selectedDataset.config = {};
+            this.$root.selectedDataset.config = this.$root.catalog_config;
           } else {
             configtext = await configresponse.text();
             config = JSON.parse(configtext);
-            this.$root.selectedDataset.config = config;
+            this.$root.selectedDataset.config = {...this.$root.catalog_config, ...config};
+            if (config.dataset_options) {
+              // dataset options exist in catalog level config and dataset-level config
+              // they need to be merged, with dataset-level taking priority
+              this.$root.selectedDataset.config.dataset_options = {...this.$root.catalog_config.dataset_options, ...config.dataset_options};
+            }
           }
           // ---
           // Note for future: Handle route query parameters (tab and keyword) here?
