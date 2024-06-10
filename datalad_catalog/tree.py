@@ -85,15 +85,23 @@ class Tree(ValidatedInterface):
                 ui.message(".")
             ds_prefix = "└──" if res["i"] + 1 == res["N_datasets"] else "├──"
             ui.message(
-                f"{ds_prefix} DS[{res['i']}]: {res['dataset_name']} (ID: {res['d']}; ALIAS: {res['dataset_alias']})"
+                f"{ds_prefix} DS[{res['i']}]: {res['dataset_name']}"
             )
+            indent = "    " if res["i"] + 1 == res["N_datasets"] else "│   "
+            ui.message(
+                f"{indent}ID: {res['d']}; ALIAS: {res['dataset_alias']}"
+            )
+            ui.message(f"{indent}Versions:")
         elif res["result_type"] == "version":
             indent = "    " if res["i"] + 1 == res["N_datasets"] else "│   "
             version_prefix = (
                 "└──" if res["j"] + 1 == res["N_ds_versions"] else "├──"
             )
+            postfix = ''
+            if res['d'] == res["homepage"]["id"] and res['dataset_version'] == res["homepage"]["version"]:
+                postfix = " (HOMEPAGE)"
             ui.message(
-                f"{indent}{version_prefix} {res['dataset_version']} (Updated: {strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime(res['updated_at']))})"
+                f"{indent}{version_prefix} {res['dataset_version']} (Updated: {strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime(res['updated_at']))}){postfix}"
             )
         else:
             ui.message("│")
@@ -112,6 +120,10 @@ class Tree(ValidatedInterface):
         )
         report = catalog.get_catalog_report()
         res_kwargs["catalog_name"] = catalog.location.name
+        res_kwargs["homepage"] = {
+            "id": report.get("homepage_id"),
+            "version": report.get("homepage_version"),
+        }
         all_datasets = report.get("datasets")
         N_datasets = len(all_datasets)
         res_kwargs["N_datasets"] = N_datasets
