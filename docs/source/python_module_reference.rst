@@ -16,3 +16,4 @@ Python Module Reference
    catalog_set
    catalog_translate
    catalog_workflow
+   catalog_tree
