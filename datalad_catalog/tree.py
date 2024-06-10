@@ -84,21 +84,20 @@ class Tree(ValidatedInterface):
                 ui.message(res["catalog_name"])
                 ui.message(".")
             ds_prefix = "└──" if res["i"] + 1 == res["N_datasets"] else "├──"
-            ui.message(
-                f"{ds_prefix} DS[{res['i']}]: {res['dataset_name']}"
-            )
+            ui.message(f"{ds_prefix} DS[{res['i']}]: {res['dataset_name']}")
             indent = "    " if res["i"] + 1 == res["N_datasets"] else "│   "
-            ui.message(
-                f"{indent}ID: {res['d']}; ALIAS: {res['dataset_alias']}"
-            )
+            ui.message(f"{indent}ID: {res['d']}; ALIAS: {res['dataset_alias']}")
             ui.message(f"{indent}Versions:")
         elif res["result_type"] == "version":
             indent = "    " if res["i"] + 1 == res["N_datasets"] else "│   "
             version_prefix = (
                 "└──" if res["j"] + 1 == res["N_ds_versions"] else "├──"
             )
-            postfix = ''
-            if res['d'] == res["homepage"]["id"] and res['dataset_version'] == res["homepage"]["version"]:
+            postfix = ""
+            if (
+                res["d"] == res["homepage"]["id"]
+                and res["dataset_version"] == res["homepage"]["version"]
+            ):
                 postfix = " (HOMEPAGE)"
             ui.message(
                 f"{indent}{version_prefix} {res['dataset_version']} (Updated: {strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime(res['updated_at']))}){postfix}"
