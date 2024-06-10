@@ -8,6 +8,7 @@ pyyaml
 pytest
 pytest-cov
 coverage
+black
 
 # requirements for a document building
 sphinx
