@@ -12,7 +12,14 @@
         "x": "https://x.com/datalad"
     },
     "dataset_options": {
-        "include_metadata_export": true
+        "include_datalad": true,
+        "include_github": true,
+        "include_gitlab": true,
+        "include_gin": true,
+        "include_binder": true,
+        "include_cite": true,
+        "include_metadata_export": true,
+        "include_access_request": true
     },
     "property_sources": {
         "dataset": {
