@@ -193,7 +193,8 @@ cd datalad-catalog
 pip install -r requirements-devel.txt
 ```
 
-This installs `sphinx` and related packages for documentation building, `coverage` for code coverage, and `pytest` for testing.
+This installs `sphinx` and related packages for documentation building, `coverage` for code coverage,
+`black` for linting, and `pytest` for testing.
 
 ### Contribution process
 
@@ -202,10 +203,12 @@ To make a contribution to the code or documentation, please:
 - create an issue describing the bug/feature
 - fork the project repository,
 - create a branch from `main`,
-- check that tests succeed: from the project root directory, run `pytest`
 - commit your changes,
-- push to your fork
+- check that linting tests succeed: from the project root directory, run `black .`
+- check that tests succeed: from the project root directory, run `python -m pytest`
+- push your commits to your fork
 - create a pull request with a clear description of the changes
+- check that all continuous integration tests succeed on the pull request
 
 ## Contributors ✨
 
