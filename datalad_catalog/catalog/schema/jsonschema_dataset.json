@@ -48,7 +48,23 @@
     },
     "url": {
       "description": "The location of the datalad dataset's annex",
-      "title": "URL",
+      "title": "DataLad URL",
+      "type": ["array", "string"],
+      "items": {
+        "type": "string"
+      }
+    },
+    "download_url": {
+      "description": "The URL at which the complete dataset can be downloaded directly, typically via HTTP protocol and without further access restrictions",
+      "title": "Download URL",
+      "type": ["array", "string"],
+      "items": {
+        "type": "string"
+      }
+    },
+    "homepage_url": {
+      "description": "A unique URL with content that describes the current dataset and which may provide further data access",
+      "title": "Homepage URL",
       "type": ["array", "string"],
       "items": {
         "type": "string"

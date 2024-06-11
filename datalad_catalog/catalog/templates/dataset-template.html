@@ -46,6 +46,8 @@
               alt="binder_logo" height="14em" class="mb-1">Explore with Binder</b-button>&nbsp;</span>
             <span><b-button variant="outline-dark" size="sm" v-b-modal.modal-4><i class="fas fa-share"></i> Share</b-button>&nbsp;</span>
             <span style="margin-left: auto;">
+              <span v-if="displayData.show_homepage"><b-button variant="outline-dark" size="sm" :href="displayData.homepage_url" target="_blank"><i class="fas fa-house"></i> Homepage</b-button>&nbsp;</span>
+              <span v-if="displayData.show_download"><b-button variant="outline-dark" size="sm" :href="displayData.download_url" target="_blank"><i class="fas fa-download"></i> Download</b-button>&nbsp;</span>
               <span v-if="displayData.show_access_request && selectedDataset.access_request_contact"><b-button variant="outline-dark" size="sm" :href="displayData.access_request_mailto"><i class="far fa-envelope"></i> Request access</b-button>&nbsp;</span>
               <span v-if="displayData.show_access_request && selectedDataset.access_request_url"><b-button variant="outline-dark" size="sm" @click="gotoURL(selectedDataset.access_request_url)"><i class="fas fa-share"></i> Request access</b-button></span>
             </span>
