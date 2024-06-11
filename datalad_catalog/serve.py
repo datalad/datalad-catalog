@@ -41,6 +41,7 @@ lgr = logging.getLogger("datalad.catalog.serve")
 
 class ServeParameterValidator(EnsureCommandParameterization):
     """"""
+
     def _validate_combinations(
         self,
         catalog,
@@ -149,7 +150,7 @@ class Serve(ValidatedInterface):
     def __call__(
         catalog: Union[Path, WebCatalog],
         port: int = 8000,
-        base = None,
+        base=None,
     ):
         res_kwargs = dict(
             action="catalog_serve",

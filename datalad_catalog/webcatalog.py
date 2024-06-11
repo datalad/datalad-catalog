@@ -287,11 +287,12 @@ class WebCatalog(object):
         host: str = "localhost",
         port: int = 8000,
         base: str = None,
-
     ):
         """Serve a catalog via a local http server"""
 
-        if base and not self.location.resolve().is_relative_to(Path(base).resolve()):
+        if base and not self.location.resolve().is_relative_to(
+            Path(base).resolve()
+        ):
             error_msg = "The catalog location should be relative to the supplied base path "
             raise ValueError(error_msg)
         if base:
@@ -299,7 +300,7 @@ class WebCatalog(object):
             relpath = str(self.location.resolve().relative_to(base_path))
             os.chdir(base_path)
         else:
-            relpath = ''
+            relpath = ""
             os.chdir(self.location)
 
         from http.server import SimpleHTTPRequestHandler
