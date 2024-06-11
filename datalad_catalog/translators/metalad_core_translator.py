@@ -140,7 +140,7 @@ class CoreTranslator(TranslatorImplementationBase):
             '"dirs_from_path": []}]'
         )
         result = jq.first(program, self.graph)
-        return result if len(result) > 0 else None
+        return result if result is not None and len(result) > 0 else None
 
     def get_file_url(self):
         program = ".distribution? | .url?"

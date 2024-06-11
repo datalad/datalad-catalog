@@ -117,7 +117,7 @@ class DataciteTranslator(TranslatorImplementationBase):
         program = '.license | { "name": .name, "url": .url}'
         result = jq.first(program, self.extracted_metadata)
         # todo check for license info missing
-        return result if len(result) > 0 else None
+        return result if result is not None and len(result) > 0 else None
 
     def get_authors(self):
         program = (
@@ -130,7 +130,7 @@ class DataciteTranslator(TranslatorImplementationBase):
             "else null end]"
         )
         result = jq.first(program, self.extracted_metadata)
-        return result if len(result) > 0 else None
+        return result if result is not None and len(result) > 0 else None
 
     def get_keywords(self):
         return self.extracted_metadata.get("keywords")
@@ -141,7 +141,7 @@ class DataciteTranslator(TranslatorImplementationBase):
             '{"name": $element, "identifier": "", "description": ""}]'
         )
         result = jq.first(program, self.extracted_metadata)
-        return result if len(result) > 0 else None
+        return result if result is not None and len(result) > 0 else None
 
     def get_publications(self):
         program = (
@@ -155,7 +155,7 @@ class DataciteTranslator(TranslatorImplementationBase):
             '"authors": []}]'
         )
         result = jq.first(program, self.extracted_metadata)
-        return result if len(result) > 0 else None
+        return result if result is not None and len(result) > 0 else None
 
     def translate(self):
         translated_record = {
