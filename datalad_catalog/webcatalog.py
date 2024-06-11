@@ -286,9 +286,21 @@ class WebCatalog(object):
         self,
         host: str = "localhost",
         port: int = 8000,
+        base: str = None,
+
     ):
         """Serve a catalog via a local http server"""
-        os.chdir(self.location)
+
+        if base and not self.location.resolve().is_relative_to(Path(base).resolve()):
+            error_msg = "The catalog location should be relative to the supplied base path "
+            raise ValueError(error_msg)
+        if base:
+            base_path = Path(base).resolve()
+            relpath = str(self.location.resolve().relative_to(base_path))
+            os.chdir(base_path)
+        else:
+            relpath = ''
+            os.chdir(self.location)
 
         from http.server import SimpleHTTPRequestHandler
         import socketserver
@@ -298,19 +310,20 @@ class WebCatalog(object):
         class CustomHandler(SimpleHTTPRequestHandler):
             # Redirect all '/dataset' URLs to '/index.html'
             def do_GET(self):
-                if self.path.startswith("/dataset"):
-                    self.path = "/index.html"
+                if self.path.startswith(f"/{relpath}/dataset"):
+                    self.path = f"/{relpath}/index.html"
                 # Continue with the default behavior
                 return SimpleHTTPRequestHandler.do_GET(self)
 
         try:
             with socketserver.TCPServer((host, port), CustomHandler) as httpd:
                 ui.message(
-                    "\nServing catalog at: http://{h}:{p}/ - navigate to this "
+                    "\nServing catalog at: http://{h}:{p}/{s} - navigate to this "
                     "address in your browser to test the catalog locally - press "
                     "CTRL+C to stop local testing\n".format(
                         h=ac.color_word(host, ac.BOLD),
                         p=ac.color_word(port, ac.BOLD),
+                        s=ac.color_word(relpath, ac.BOLD),
                     )
                 )
                 httpd.serve_forever()

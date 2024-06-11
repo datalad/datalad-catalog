@@ -16,16 +16,18 @@ from datalad_catalog.webcatalog import (
     WebCatalog,
 )
 from datalad_next.commands import (
-    EnsureCommandParameterization,
-    ValidatedInterface,
-    Parameter,
     build_doc,
+    EnsureCommandParameterization,
     eval_results,
     get_status_dict,
+    ValidatedInterface,
+    Parameter,
+    ParameterConstraintContext,
 )
 from datalad_next.constraints import (
-    EnsureRange,
     EnsureInt,
+    EnsurePath,
+    EnsureRange,
 )
 import logging
 from pathlib import Path
@@ -39,14 +41,42 @@ lgr = logging.getLogger("datalad.catalog.serve")
 
 class ServeParameterValidator(EnsureCommandParameterization):
     """"""
+    def _validate_combinations(
+        self,
+        catalog,
+        port,
+        base,
+    ):
+        """"""
+        # parameter combinations for catalog and base
+
+        if catalog and base:
+            if not catalog.location.resolve().is_relative_to(base.resolve()):
+                self.raise_for(
+                    dict(
+                        catalog=catalog,
+                        port=port,
+                        base=base,
+                    ),
+                    (
+                        f"the catalog location ({catalog.location.resolve()}) should be relative "
+                        "to the base path"
+                    ),
+                )
 
     def __init__(self):
+        all_params = ("catalog", "port", "base")
         super().__init__(
             param_constraints=dict(
                 catalog=CatalogRequired() & EnsureWebCatalog(),
                 port=EnsureInt() & EnsureRange(1025, 9999),
+                base=EnsurePath(),
             ),
-            joint_constraints=dict(),
+            joint_constraints={
+                ParameterConstraintContext(
+                    all_params, "validate-parameter-combinations"
+                ): self._validate_combinations,
+            },
         )
 
 
@@ -75,6 +105,16 @@ class Serve(ValidatedInterface):
             doc="""The port at which the content is served at
             'localhost' (default 8000)""",
         ),
+        base=Parameter(
+            # cmdline argument definitions, incl aliases
+            args=("--base",),
+            # documentation
+            doc="""The base path that should be served as the 'localhost'
+            root, implying that the catalog will be served from a
+            subdirectory relative to the base path. Must be a parent
+            path of the catalog location.           
+            """,
+        ),
     )
 
     _examples_ = [
@@ -91,6 +131,14 @@ class Serve(ValidatedInterface):
             code_py="catalog_serve(catalog='/tmp/my-cat/', port=8001)",
             code_cmd="datalad catalog-serve -c /tmp/my-cat -p 8001",
         ),
+        dict(
+            text=(
+                "SERVE the content of the catalog via a local HTTP server "
+                "at a custom subdirectory, e.g. http://localhost:8000/my-cat"
+            ),
+            code_py="catalog_serve(catalog='/tmp/my-cat/', base='/tmp')",
+            code_cmd="datalad catalog-serve -c /tmp/my-cat --base /tmp",
+        ),
     ]
 
     @staticmethod
@@ -101,13 +149,15 @@ class Serve(ValidatedInterface):
     def __call__(
         catalog: Union[Path, WebCatalog],
         port: int = 8000,
+        base = None,
     ):
         res_kwargs = dict(
             action="catalog_serve",
             path=catalog.location,
+            basepath=base,
         )
         try:
-            catalog.serve(port=port)
+            catalog.serve(port=port, base=base)
             yield get_status_dict(
                 **res_kwargs,
                 status="ok",
