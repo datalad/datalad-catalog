@@ -19,7 +19,9 @@
         "include_binder": true,
         "include_cite": true,
         "include_metadata_export": true,
-        "include_access_request": true
+        "include_access_request": true,
+        "include_homepage": true,
+        "include_download": true
     },
     "property_sources": {
         "dataset": {

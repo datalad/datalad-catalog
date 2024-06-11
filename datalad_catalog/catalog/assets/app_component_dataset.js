@@ -157,6 +157,8 @@ const datasetView = () =>
               disp_dataset.show_cite = true; // 'Cite' button
               disp_dataset.show_export = true; // 'Export metadata' button
               disp_dataset.show_access_request = true; // 'Request access' button
+              disp_dataset.show_homepage = true; // 'Homepage' button
+              disp_dataset.show_download = true; // 'Download' button
               
               // URL (this is the field for the datalad dataset url to clone from)
               // If URL does not exist, several buttons cannot be shown
@@ -210,6 +212,31 @@ const datasetView = () =>
               }
               // Show cite button: if the dataset.doi exists AND config specifies (or is missing)
               disp_dataset.show_cite = dataset.doi ? (dataset_options.include_cite ?? true) : false
+
+              // Show homepage button: if the dataset.homepage_url exists AND config specifies (or is missing)
+              if (dataset.hasOwnProperty("homepage_url")) {
+                if (
+                  (dataset["homepage_url"] instanceof Array || Array.isArray(dataset["homepage_url"])) &&
+                  dataset["homepage_url"].length > 0
+                ) {
+                  disp_dataset.homepage_url = dataset.homepage_url[0];
+                } else {
+                  disp_dataset.homepage_url = dataset.homepage_url;
+                }
+              }
+              disp_dataset.show_homepage = disp_dataset.homepage_url ? (dataset_options.include_homepage ?? true) : false
+              // Show download button: if the dataset.download_url exists AND config specifies (or is missing)
+              if (dataset.hasOwnProperty("download_url")) {
+                if (
+                  (dataset["download_url"] instanceof Array || Array.isArray(dataset["download_url"])) &&
+                  dataset["download_url"].length > 0
+                ) {
+                  disp_dataset.download_url = dataset.download_url[0];
+                } else {
+                  disp_dataset.download_url = dataset.download_url;
+                }
+              }
+              disp_dataset.show_download = disp_dataset.download_url ? (dataset_options.include_download ?? true) : false
               // Show export button: if config specifies (or is missing)
               disp_dataset.show_export = dataset_options.include_metadata_export ?? true
               // Show/hide config for "Request access" button:
