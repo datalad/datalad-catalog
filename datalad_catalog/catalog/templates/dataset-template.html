@@ -38,7 +38,7 @@
               alt="datalad_d" height="14em" class="mb-1"/>
               Download with DataLad</b-button>&nbsp;</span>
             <span v-show="displayData.show_github"><b-button variant="outline-dark" size="sm" @click="gotoURL(displayData.url)"><i class="fab fa-github"></i> View on GitHub</b-button>&nbsp;</span>
-            <span v-show="displayData.show_gin"><b-button variant="outline-dark" size="sm" @click="gotoURL(displayData.url)"><img src="/artwork/ginfavicon.png" style="height: 1em;"></img> View on GIN</b-button>&nbsp;</span>
+            <span v-show="displayData.show_gin"><b-button variant="outline-dark" size="sm" @click="gotoURL(displayData.url)"><img src="artwork/ginfavicon.png" style="height: 1em;"></img> View on GIN</b-button>&nbsp;</span>
             <span v-show="displayData.show_gitlab"><b-button variant="outline-dark" size="sm" @click="gotoURL(displayData.url)"><i class="fab fa-gitlab"></i> View on GitLab</b-button>&nbsp;</span>
             <span v-show="displayData.show_cite"><b-button variant="outline-dark" size="sm" v-b-modal.modal-2 @click="getCitationText(selectedDataset.doi)"><i class="fas fa-quote-right"></i> Cite</b-button>&nbsp;</span>
             <span v-if="displayData.show_export"><b-button variant="outline-dark" size="sm" :href="displayData.file_path" :download="displayData.download_filename"><i class="fas fa-file-arrow-down"></i> Export metadata</b-button>&nbsp;</span>
@@ -61,7 +61,7 @@
           ok-only>
             <template #modal-header="{ close }">
               <div class="d-block text-center">
-                <h3>Download with <img src="/artwork/datalad_logo_wide.svg" width="100em"></h3>
+                <h3>Download with <img src="artwork/datalad_logo_wide.svg" width="100em"></h3>
               </div>
             </template>
             <h5>Step 1: Install DataLad</h5>

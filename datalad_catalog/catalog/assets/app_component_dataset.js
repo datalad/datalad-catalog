@@ -479,7 +479,7 @@ const datasetView = () =>
             history.replaceState(
               {},
               null,
-              current_route.path + query_string
+              (router.options.base + current_route.path + query_string).replace("//", "/")
             )
             console.debug("- After: Vue Route query params: %s", JSON.stringify(Object.assign({}, this.$route.query)))
             let url_qp2 = new URL(document.location.toString()).searchParams
