@@ -143,12 +143,12 @@ class BIDSTranslator(TranslatorImplementationBase):
             '"email":"", "honorificSuffix":"", "identifiers":[]}]'
         )
         result = jq.first(program, self.extracted_metadata)
-        return result if len(result) > 0 else None
+        return result if result is not None and len(result) > 0 else None
 
     def get_keywords(self):
         program = ". as $parent | .entities.task + .variables.dataset"
         result = jq.first(program, self.extracted_metadata)
-        return result if len(result) > 0 else None
+        return result if result is not None and len(result) > 0 else None
 
     def get_funding(self):
         program = (
@@ -156,7 +156,7 @@ class BIDSTranslator(TranslatorImplementationBase):
             '{"name": "", "grant":"", "description":$fund}]'
         )
         result = jq.first(program, self.extracted_metadata)
-        return result if len(result) > 0 else None
+        return result if result is not None and len(result) > 0 else None
 
     def get_publications(self):
         program = (
@@ -170,12 +170,12 @@ class BIDSTranslator(TranslatorImplementationBase):
             '"authors": []}]'
         )
         result = jq.first(program, self.extracted_metadata)
-        return result if len(result) > 0 else None
+        return result if result is not None and len(result) > 0 else None
 
     def get_additional_display(self):
         program = '[{"name": "BIDS", "content": .entities}]'
         result = jq.first(program, self.extracted_metadata)
-        return result if len(result) > 0 else None
+        return result if result is not None and len(result) > 0 else None
 
     def get_top_display(self):
         program = (
@@ -185,7 +185,7 @@ class BIDSTranslator(TranslatorImplementationBase):
             '{"name": "Runs", "value": (.entities.run | length)}]'
         )
         result = jq.first(program, self.extracted_metadata)
-        return result if len(result) > 0 else None
+        return result if result is not None and len(result) > 0 else None
 
     def translate(self):
         translated_record = {

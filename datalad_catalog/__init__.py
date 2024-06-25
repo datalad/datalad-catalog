@@ -63,6 +63,12 @@ command_suite = (
             "catalog_remove",
         ),
         (
+            "datalad_catalog.tree",
+            "Tree",
+            "catalog-tree",
+            "catalog_tree",
+        ),
+        (
             "datalad_catalog.translate",
             "MetaTranslate",
             "catalog-translate",

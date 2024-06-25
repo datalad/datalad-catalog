@@ -32,6 +32,9 @@
     "url": [
         "https://github.com/psychoinformatics-de/studyforrest-data"
     ],
+    "homepage_url": [
+        "https://www.studyforrest.org/"
+    ],
     "authors": [
         {
             "name": "Adina Wagner",

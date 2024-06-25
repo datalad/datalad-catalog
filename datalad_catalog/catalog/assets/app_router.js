@@ -50,7 +50,7 @@ const routes = [
 // Create router
 const router = new VueRouter({
   mode: 'history',
-  base: '/',
+  base: window.location.pathname.split('dataset/')[0],
   routes: routes,
   scrollBehavior(to, from, savedPosition) {
     return { x: 0, y: 0, behavior: "auto" };

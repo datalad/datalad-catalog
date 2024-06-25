@@ -37,7 +37,7 @@ def add_aliases(alias_path, catalog):
                 metadata=json.dumps(meta_item),
             )
             ids_processed.append(row["dataset_id"])
-    
+
     return ids_processed
 
 

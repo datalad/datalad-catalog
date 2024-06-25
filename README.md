@@ -11,6 +11,13 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
+---
+
+### *:loudspeaker: A new catalog is coming...*
+
+We're working on a newer, leaner, more modular, and more interoperable solution to the same challenge that the current `datalad-catalog` aims to address. This new development is taking place within the broader context of making DataLad datasets interoperable with linked and semantic (meta)data. For more background, see [this issue](https://github.com/psychoinformatics-de/datalad-concepts/issues/115). To keep up to date, follow progress at [`psychoinformatics-de/datalad-concepts`](https://github.com/psychoinformatics-de/datalad-concepts), [`psychoinformatics-de/shacl-vue`](https://github.com/psychoinformatics-de/shacl-vue), and in the [new development branch](https://github.com/datalad/datalad-catalog/tree/revolution). Because of this redirected focus, `datalad-catalog` itself will be downscaled by focusing on maintenance and assessing the priority of new features on a case-by-case basis.
+
+---
 
 <picture>
   <source media="(prefers-color-scheme: light)" srcset="docs/source/_static/datacat0_hero.svg">
@@ -186,7 +193,8 @@ cd datalad-catalog
 pip install -r requirements-devel.txt
 ```
 
-This installs `sphinx` and related packages for documentation building, `coverage` for code coverage, and `pytest` for testing.
+This installs `sphinx` and related packages for documentation building, `coverage` for code coverage,
+`black` for linting, and `pytest` for testing.
 
 ### Contribution process
 
@@ -195,10 +203,12 @@ To make a contribution to the code or documentation, please:
 - create an issue describing the bug/feature
 - fork the project repository,
 - create a branch from `main`,
-- check that tests succeed: from the project root directory, run `pytest`
 - commit your changes,
-- push to your fork
+- check that linting tests succeed: from the project root directory, run `black .`
+- check that tests succeed: from the project root directory, run `python -m pytest`
+- push your commits to your fork
 - create a pull request with a clear description of the changes
+- check that all continuous integration tests succeed on the pull request
 
 ## Contributors ✨
 

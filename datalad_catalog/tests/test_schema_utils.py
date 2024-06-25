@@ -14,6 +14,8 @@ ds = {
     "description": "",
     "doi": "",
     "url": "",
+    "download_url": "",
+    "homepage_url": "",
     "license": {"name": "", "url": ""},
     "authors": [
         {

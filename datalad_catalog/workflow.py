@@ -117,7 +117,7 @@ class Workflow(ValidatedInterface):
         ),
         mode=Parameter(
             # cmdline argument definitions, incl aliases
-            args=("-t", "--type"),
+            args=("-m", "--mode"),
             # documentation
             doc="""Which type of workflow to run: one of ['new', 'update']""",
         ),
@@ -193,7 +193,7 @@ class Workflow(ValidatedInterface):
                 "dataset='path/to/superdataset', extractor='metalad_core')"
             ),
             code_cmd=(
-                "datalad catalog-workflow -t new -c /tmp/my-cat "
+                "datalad catalog-workflow -m new -c /tmp/my-cat "
                 "-d path/to/superdataset -e metalad_core"
             ),
         ),
@@ -208,7 +208,7 @@ class Workflow(ValidatedInterface):
                 "extractor='metalad_core')"
             ),
             code_cmd=(
-                "datalad catalog-workflow -t new -c /tmp/my-cat "
+                "datalad catalog-workflow -m update -c /tmp/my-cat "
                 "-d path/to/superdataset -s path/to/subdataset -e metalad_core"
             ),
         ),
@@ -244,7 +244,7 @@ class Workflow(ValidatedInterface):
         )
         if mode == "new":
             yield from super_workflow(
-                ds=dataset,
+                ds=dataset.ds,
                 cat=catalog,
                 extractors=extractor,
                 config_file=config_file,
@@ -253,8 +253,8 @@ class Workflow(ValidatedInterface):
             )
         if mode == "update":
             yield from update_workflow(
-                superds=dataset,
-                subds=subdataset,
+                superds=dataset.ds,
+                subds=subdataset.ds,
                 catalog=catalog,
                 extractors=extractor,
                 **res_kwargs,

@@ -15,3 +15,4 @@ Command Line Reference
    generated/man/datalad-catalog-set
    generated/man/datalad-catalog-translate
    generated/man/datalad-catalog-workflow
+   generated/man/datalad-catalog-tree

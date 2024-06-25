@@ -11,6 +11,7 @@
     },
     "dataset_options": {
         "include_metadata_export": true,
+        "include_access_request": false,
         "default_tab": "subdatasets"
     },
     "property_sources": {
