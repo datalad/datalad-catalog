@@ -1,6 +1,15 @@
 Pipeline Description
 ********************
 
+.. warning::
+
+   This section describes a functioning but outdated view of generating a catalog
+   entry from a DataLad dataset using ``datalad-metalad`` extractors and 
+   ``datalad-catalog`` translators. This will soon be updated to suggest a 
+   metadata ingestion pipeline using the :doc:`metadata_source_spec` and
+   dedicated toolset.
+
+
 The DataLad ecosystem provides a complete set of free and open source tools
 that, together, provide full control over dataset access and distribution,
 version control, provenance tracking, metadata addition, extraction, and

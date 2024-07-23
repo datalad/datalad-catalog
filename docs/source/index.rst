@@ -66,6 +66,7 @@ Index
    overview
    installation
    usage
+   metadata_source_spec
    pipeline_description
    metadata_formats
    catalog_schema
