@@ -50,7 +50,7 @@ This demo site is hosted via Netlify and it builds from the `datalad_catalog/cat
 
 ## 2. How it works
 
-DataLad Catalog can receive commands to `create` a new catalog, `add` and `remove` metadata entries to/from an existing catalog, `serve` an existing catalog locally, and more. Metadata can be provided to DataLad Catalog from any number of arbitrary metadata sources, as an aggregated set or as individual metadata items. DataLad Catalog has a dedicated [schema](https://datalad.github.io/datalad-catalog/display_schema) (using the [JSON Schema](https://json-schema.org/) vocabulary) against which incoming metadata items are validated. This schema allows for standard metadata fields as one would expect for datasets of any kind (such as `name`, `doi`, `url`, `description`, `license`, `authors`, and more), as well as fields that support identification, versioning, dataset context and linkage, and file tree specification.
+DataLad Catalog can receive commands to `create` a new catalog, `add` and `remove` metadata entries to/from an existing catalog, `serve` an existing catalog locally, and more. Metadata can be provided to DataLad Catalog from any number of arbitrary metadata sources, as an aggregated set or as individual metadata items. DataLad Catalog has a dedicated [schema](https://datalad-catalog.netlify.app/display_schema) (using the [JSON Schema](https://json-schema.org/) vocabulary) against which incoming metadata items are validated. This schema allows for standard metadata fields as one would expect for datasets of any kind (such as `name`, `doi`, `url`, `description`, `license`, `authors`, and more), as well as fields that support identification, versioning, dataset context and linkage, and file tree specification.
 
 The process of generating a catalog, after metadata entry validation, involves:
 1. aggregation of the provided metadata into the catalog filetree, and
@@ -114,8 +114,8 @@ The overall catalog generation process actually starts several steps before the 
 1. curating data into datasets (a group of files in an hierarchical tree)
 2. adding metadata to datasets and files (the process for this and the resulting metadata formats and content vary widely depending on domain, file types, data availability, and more)
 3. extracting the metadata using an automated tool to output metadata items into a standardized and queryable set
-4. in the current context: translating the metadata into the [catalog schema](https://datalad.github.io/datalad-catalog/display_schema)
-5. in the current context: using `datalad-catalog` to generate a catalog from the [schema-conforming metadata](https://datalad.github.io/datalad-catalog/display_schema)
+4. in the current context: translating the metadata into the [catalog schema](https://datalad-catalog.netlify.app/display_schema)
+5. in the current context: using `datalad-catalog` to generate a catalog from the [schema-conforming metadata](https://datalad-catalog.netlify.app/)
 
 The first four steps in this list can follow any arbitrarily specified procedures and can use any arbitrarily specified tools to get the job done. If these steps are completed, correctly formatted data can be input, together with some configuration details, to `datalad-catalog`. This tool then provides several basic commands for catalog generation and customization. *For example:*
 
@@ -164,7 +164,7 @@ The DataLad ecosystem provides a complete set of free and open source tools that
 
 DataLad itself can be used for decentralised management of data as lightweight, portable and extensible representations. DataLad MetaLad can extract structured high- and low-level metadata and associate it with these datasets or with individual files. And at the end of the workflow, DataLad Catalog can turn the structured metadata into a user-friendly data browser.
 
-Importantly, DataLad Catalog can operate independently as well. Since it provides its own [schema](https://datalad.github.io/datalad-catalog/display_schema) in a standard vocabulary, any metadata that conforms to this schema can be submitted to the tool in order to generate a catalog. Metadata items do not necessarily have to be derived from DataLad datasets, and the metadata extraction does not have to be conducted via DataLad MetaLad.
+Importantly, DataLad Catalog can operate independently as well. Since it provides its own [schema](https://datalad-catalog.netlify.app/display_schema) in a standard vocabulary, any metadata that conforms to this schema can be submitted to the tool in order to generate a catalog. Metadata items do not necessarily have to be derived from DataLad datasets, and the metadata extraction does not have to be conducted via DataLad MetaLad.
 
 Even so, the provided set of tools can be particularly powerful when used together in a distributed (meta)data management pipeline.
 
