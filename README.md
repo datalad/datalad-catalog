@@ -115,7 +115,7 @@ The overall catalog generation process actually starts several steps before the 
 2. adding metadata to datasets and files (the process for this and the resulting metadata formats and content vary widely depending on domain, file types, data availability, and more)
 3. extracting the metadata using an automated tool to output metadata items into a standardized and queryable set
 4. in the current context: translating the metadata into the [catalog schema](https://datalad-catalog.netlify.app/display_schema)
-5. in the current context: using `datalad-catalog` to generate a catalog from the [schema-conforming metadata](https://datalad-catalog.netlify.app/)
+5. in the current context: using `datalad-catalog` to generate a catalog from the [schema-conforming metadata](https://datalad-catalog.netlify.app/display_schema)
 
 The first four steps in this list can follow any arbitrarily specified procedures and can use any arbitrarily specified tools to get the job done. If these steps are completed, correctly formatted data can be input, together with some configuration details, to `datalad-catalog`. This tool then provides several basic commands for catalog generation and customization. *For example:*
 
