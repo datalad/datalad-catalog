@@ -243,7 +243,7 @@ To run a workflow from scratch on a dataset and all of its subdatasets:
 
 .. code-block:: bash
 
-   datalad catalog-workflow --type new --catalog /tmp/my-cat --dataset path/to/superdataset --extractor metalad_core
+   datalad catalog-workflow --mode new --catalog /tmp/my-cat --dataset path/to/superdataset --extractor metalad_core
 
 This workflow will:
 
@@ -261,7 +261,7 @@ to the superdataset which the catalog represents:
 
 .. code-block:: bash
 
-   datalad catalog-workflow --type update --catalog /tmp/my-cat --dataset path/to/superdataset --subdataset path/to/subdataset --extractor metalad_core
+   datalad catalog-workflow --mode update --catalog /tmp/my-cat --dataset path/to/superdataset --subdataset path/to/subdataset --extractor metalad_core
 
 This workflow assumes:
 
